@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { formatDateLocale } from '@/lib/utils'
 import UploadManager from './UploadManager'
 
@@ -47,7 +48,7 @@ export default async function UploadPage() {
   }, {} as Record<string, string>) || {}
 
   const deadline = settingsMap.upload_deadline ? new Date(settingsMap.upload_deadline) : null
-  const isDeadlinePassed = deadline && new Date() > deadline
+  const isDeadlinePassed = deadline ? new Date() > deadline : false
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,9 +56,9 @@ export default async function UploadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <a href="/dashboard" className="text-indigo-600 hover:text-indigo-900">
+              <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-900">
                 ← ダッシュボードに戻る
-              </a>
+              </Link>
               <h1 className="text-2xl font-bold text-gray-900">
                 ファイルアップロード
               </h1>
