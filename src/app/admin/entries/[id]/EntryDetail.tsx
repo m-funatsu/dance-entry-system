@@ -137,7 +137,7 @@ export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
 
       setMessage('選考結果を保存しました')
       router.refresh()
-    } catch (error) {
+    } catch {
       setMessage('選考結果の保存に失敗しました')
     } finally {
       setLoading(false)
