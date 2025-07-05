@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { formatDateLocale } from '@/lib/utils'
@@ -244,8 +245,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{entry.users.name}</div>
-                      <div className="text-sm text-gray-500">{entry.users.email}</div>
+                      <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
+                      <div className="text-sm text-gray-500">{entry.users?.email || 'メールアドレス不明'}</div>
                       <div className="text-xs text-gray-400 mt-1">
                         {formatDateLocale(entry.created_at)}
                       </div>
@@ -282,12 +283,12 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     {getStatusBadge(entry.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <a
+                    <Link
                       href={`/admin/entries/${entry.id}`}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
                       詳細
-                    </a>
+                    </Link>
                     <select
                       value={entry.status}
                       onChange={(e) => updateEntryStatus(entry.id, e.target.value)}

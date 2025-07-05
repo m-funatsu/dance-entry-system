@@ -160,6 +160,16 @@ Required for deployment:
 - Check Supabase storage bucket configuration
 - Verify file permissions and policies
 
+### Null Reference Errors
+- Always use optional chaining (`?.`) when accessing nested properties
+- Provide fallback values: `entry.users?.name || 'Unknown User'`
+- Check for null/undefined before mapping arrays
+
+### Database Relationship Issues
+- Ensure foreign key relationships are properly set up
+- Use LEFT JOIN in Supabase queries when related data might not exist
+- Handle cases where related records might be deleted
+
 ## Testing
 
 Before any major changes:

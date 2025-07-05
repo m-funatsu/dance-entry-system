@@ -26,12 +26,14 @@ export default async function AdminDashboardPage() {
     .select('*, users(name)')
     .order('created_at', { ascending: false })
 
+  const safeEntries = entries || []
+  
   const stats = {
-    total: entries?.length || 0,
-    pending: entries?.filter(e => e.status === 'pending').length || 0,
-    submitted: entries?.filter(e => e.status === 'submitted').length || 0,
-    selected: entries?.filter(e => e.status === 'selected').length || 0,
-    rejected: entries?.filter(e => e.status === 'rejected').length || 0,
+    total: safeEntries.length,
+    pending: safeEntries.filter(e => e.status === 'pending').length,
+    submitted: safeEntries.filter(e => e.status === 'submitted').length,
+    selected: safeEntries.filter(e => e.status === 'selected').length,
+    rejected: safeEntries.filter(e => e.status === 'rejected').length,
   }
 
   return (
