@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import EntryForm from './EntryForm'
 
 export default async function EntryPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   

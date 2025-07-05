@@ -5,7 +5,7 @@ import { formatDateLocale } from '@/lib/utils'
 import UploadManager from './UploadManager'
 
 export default async function UploadPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   

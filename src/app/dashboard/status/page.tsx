@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { formatDateLocale } from '@/lib/utils'
 
 export default async function StatusPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   

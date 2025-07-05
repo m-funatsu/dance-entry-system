@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function EntryDetailPage({ params }: PageProps) {
   const resolvedParams = await params
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   
