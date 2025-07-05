@@ -96,7 +96,7 @@ export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
         const { error } = await supabase
           .from('selections')
           .update({
-            score: score ? parseInt(score) : null,
+            score: score ? parseInt(String(score)) : null,
             comments,
             status,
           })
@@ -113,7 +113,7 @@ export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
             {
               entry_id: entry.id,
               admin_id: adminId,
-              score: score ? parseInt(score) : null,
+              score: score ? parseInt(String(score)) : null,
               comments,
               status,
             }
