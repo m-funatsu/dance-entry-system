@@ -36,6 +36,9 @@ interface EntryDetailProps {
       score?: number
       comments?: string
       created_at: string
+      users?: {
+        name: string
+      }
     }[]
   }
   adminId: string
