@@ -22,7 +22,7 @@ export default async function AdminEntriesPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries } = await supabase
+  const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select(`
       *,
@@ -31,6 +31,32 @@ export default async function AdminEntriesPage() {
       selections(id, status, score, created_at)
     `)
     .order('created_at', { ascending: false })
+
+  // デバッグ用: エラーがある場合はログ出力
+  if (entriesError) {
+    console.error('Entries fetch error:', entriesError)
+  }
+
+  // デバッグ用: 全ユーザーデータも取得して確認
+  const { data: allUsers, error: usersError } = await supabase
+    .from('users')
+    .select('*')
+
+  if (usersError) {
+    console.error('Users fetch error:', usersError)
+  }
+
+  console.log('All users:', allUsers)
+  console.log('Entries with users:', entries?.map(e => ({ id: e.id, user_id: e.user_id, users: e.users })))
+
+  // 手動でユーザーデータをマッピング
+  const entriesWithUsers = entries?.map(entry => {
+    const user = allUsers?.find(u => u.id === entry.user_id)
+    return {
+      ...entry,
+      users: user ? { name: user.name, email: user.email } : null
+    }
+  }) || []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -98,7 +124,7 @@ export default async function AdminEntriesPage() {
                 </div>
               </div>
               
-              <EntryTable entries={entries || []} adminId={user.id} />
+              <EntryTable entries={entriesWithUsers} adminId={user.id} />
             </div>
           </div>
         </div>

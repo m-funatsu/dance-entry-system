@@ -169,6 +169,14 @@ Required for deployment:
 - Ensure foreign key relationships are properly set up
 - Use LEFT JOIN in Supabase queries when related data might not exist
 - Handle cases where related records might be deleted
+- If Supabase joins fail, manually fetch and map related data:
+  ```typescript
+  const users = await supabase.from('users').select('*')
+  const entriesWithUsers = entries.map(entry => ({
+    ...entry,
+    users: users.find(u => u.id === entry.user_id)
+  }))
+  ```
 
 ## Testing
 

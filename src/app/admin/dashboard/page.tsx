@@ -21,19 +21,36 @@ export default async function AdminDashboardPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries } = await supabase
+  const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select('*, users(name)')
     .order('created_at', { ascending: false })
 
-  const safeEntries = entries || []
-  
+  // デバッグ用
+  if (entriesError) {
+    console.error('Dashboard entries error:', entriesError)
+  }
+
+  // 全ユーザーデータも取得
+  const { data: allUsers } = await supabase
+    .from('users')
+    .select('id, name, email')
+
+  // 手動でユーザーデータをマッピング
+  const entriesWithUsers = entries?.map(entry => {
+    const user = allUsers?.find(u => u.id === entry.user_id)
+    return {
+      ...entry,
+      users: user ? { name: user.name } : null
+    }
+  }) || []
+
   const stats = {
-    total: safeEntries.length,
-    pending: safeEntries.filter(e => e.status === 'pending').length,
-    submitted: safeEntries.filter(e => e.status === 'submitted').length,
-    selected: safeEntries.filter(e => e.status === 'selected').length,
-    rejected: safeEntries.filter(e => e.status === 'rejected').length,
+    total: entriesWithUsers.length,
+    pending: entriesWithUsers.filter(e => e.status === 'pending').length,
+    submitted: entriesWithUsers.filter(e => e.status === 'submitted').length,
+    selected: entriesWithUsers.filter(e => e.status === 'selected').length,
+    rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
   }
 
   return (
