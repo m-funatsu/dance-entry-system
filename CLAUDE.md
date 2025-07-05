@@ -89,6 +89,7 @@ src/
 - **Home**: `/`
 - **Login**: `/auth/login`
 - **Register**: `/auth/register`
+- **Admin Register** (dev only): `/auth/admin-register`
 - **User Dashboard**: `/dashboard`
 - **Admin Dashboard**: `/admin/dashboard`
 - **File Upload**: `/dashboard/upload`
