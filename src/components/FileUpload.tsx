@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { uploadFile, formatFileSize, getFileIcon, FileUploadOptions } from '@/lib/storage'
+import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
 
 interface FileUploadProps {
   userId: string
@@ -95,7 +95,7 @@ export default function FileUpload({
       } else {
         onUploadError?.(result.error || 'アップロードに失敗しました')
       }
-    } catch (error) {
+    } catch {
       onUploadError?.('アップロードに失敗しました')
     } finally {
       setIsUploading(false)

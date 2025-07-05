@@ -15,7 +15,7 @@ export interface Entry {
   participant_names: string
   phone_number?: string
   emergency_contact?: string
-  google_form_data?: any
+  google_form_data?: Record<string, unknown>
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string

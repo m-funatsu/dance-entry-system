@@ -56,7 +56,7 @@ export default function LoginPage() {
           router.push('/dashboard')
         }, 100)
       }
-    } catch (err) {
+    } catch {
       setError('ログインに失敗しました')
     } finally {
       setLoading(false)

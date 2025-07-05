@@ -46,7 +46,7 @@ export default function RegisterPage() {
         // メール確認後にログイン時に作成される
         router.push('/auth/login?message=登録が完了しました。ログインしてください。')
       }
-    } catch (err) {
+    } catch {
       setError('登録に失敗しました')
     } finally {
       setLoading(false)

@@ -95,7 +95,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
       }
 
       router.push('/dashboard?message=エントリー情報を保存しました')
-    } catch (err) {
+    } catch {
       setError('エントリー情報の保存に失敗しました')
     } finally {
       setLoading(false)

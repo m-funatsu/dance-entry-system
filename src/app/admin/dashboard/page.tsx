@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function AdminDashboardPage() {
   const supabase = createClient()
@@ -197,9 +198,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <a href="/admin/entries" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link href="/admin/entries" className="font-medium text-indigo-600 hover:text-indigo-500">
                     エントリー一覧を表示 →
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

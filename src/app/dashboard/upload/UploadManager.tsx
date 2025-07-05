@@ -16,7 +16,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
   const [uploadError, setUploadError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleUploadComplete = (fileId: string, filePath: string) => {
+  const handleUploadComplete = () => {
     setUploadSuccess('ファイルのアップロードが完了しました')
     setUploadError('')
     setRefreshKey(prev => prev + 1)
@@ -27,7 +27,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
     setUploadSuccess('')
   }
 
-  const handleFileDeleted = (fileId: string) => {
+  const handleFileDeleted = () => {
     setUploadSuccess('ファイルを削除しました')
     setUploadError('')
     setRefreshKey(prev => prev + 1)

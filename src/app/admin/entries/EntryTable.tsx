@@ -37,7 +37,7 @@ interface EntryTableProps {
   adminId: string
 }
 
-export default function EntryTable({ entries, adminId }: EntryTableProps) {
+export default function EntryTable({ entries }: EntryTableProps) {
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -125,7 +125,7 @@ export default function EntryTable({ entries, adminId }: EntryTableProps) {
       }
 
       router.refresh()
-    } catch (error) {
+    } catch {
       alert('ステータスの更新に失敗しました')
     } finally {
       setLoading(false)
@@ -158,7 +158,7 @@ export default function EntryTable({ entries, adminId }: EntryTableProps) {
 
       setSelectedEntries([])
       router.refresh()
-    } catch (error) {
+    } catch {
       alert('ステータスの更新に失敗しました')
     } finally {
       setLoading(false)

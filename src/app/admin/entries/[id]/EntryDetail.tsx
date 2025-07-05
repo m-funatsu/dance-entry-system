@@ -7,7 +7,37 @@ import { formatDateLocale } from '@/lib/utils'
 import FileList from '@/components/FileList'
 
 interface EntryDetailProps {
-  entry: any
+  entry: {
+    id: string
+    user_id: string
+    dance_style: string
+    team_name?: string
+    participant_names: string
+    phone_number?: string
+    emergency_contact?: string
+    status: string
+    created_at: string
+    updated_at: string
+    users: {
+      name: string
+      email: string
+    }
+    entry_files: {
+      id: string
+      file_type: string
+      file_path: string
+      file_name: string
+      file_size: number
+      created_at: string
+    }[]
+    selections?: {
+      id: string
+      status: string
+      score?: number
+      comments?: string
+      created_at: string
+    }[]
+  }
   adminId: string
 }
 

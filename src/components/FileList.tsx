@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { getFileUrl, deleteFile, formatFileSize, getFileIcon } from '@/lib/storage'
 import { formatDateLocale } from '@/lib/utils'
@@ -18,11 +19,7 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
   const [loading, setLoading] = useState(true)
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({})
 
-  useEffect(() => {
-    fetchFiles()
-  }, [entryId])
-
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     const supabase = createClient()
     
     try {
@@ -57,7 +54,11 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
     } finally {
       setLoading(false)
     }
-  }
+  }, [entryId, fileType])
+
+  useEffect(() => {
+    fetchFiles()
+  }, [fetchFiles])
 
   const handleDelete = async (fileId: string) => {
     if (!confirm('このファイルを削除しますか？')) return
@@ -92,9 +93,11 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
 
     if (file.file_type === 'photo') {
       return (
-        <img
+        <Image
           src={url}
           alt={file.file_name}
+          width={64}
+          height={64}
           className="w-16 h-16 object-cover rounded"
         />
       )
@@ -124,9 +127,11 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
     if (file.file_type === 'photo') {
       return (
         <div className="mt-2">
-          <img
+          <Image
             src={url}
             alt={file.file_name}
+            width={800}
+            height={256}
             className="max-w-full max-h-64 object-contain rounded"
           />
         </div>
