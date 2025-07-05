@@ -91,9 +91,13 @@ src/
 - **Register**: `/auth/register`
 - **Admin Register** (dev only): `/auth/admin-register`
 - **User Dashboard**: `/dashboard`
+- **Admin Root**: `/admin` (redirects to dashboard)
 - **Admin Dashboard**: `/admin/dashboard`
+- **Admin Entries**: `/admin/entries`
+- **Admin Entry Detail**: `/admin/entries/[id]`
+- **Admin Import**: `/admin/import` (placeholder)
+- **Admin Settings**: `/admin/settings` (placeholder)
 - **File Upload**: `/dashboard/upload`
-- **Entry Management**: `/admin/entries`
 
 ## Environment Variables
 
@@ -180,11 +184,34 @@ Required for deployment:
 
 ## Testing
 
+### Admin Pages Test Status (Last Updated)
+All admin pages have been comprehensively tested:
+
+✅ **Working Pages:**
+- `/admin` - Root page (redirects to dashboard)
+- `/admin/dashboard` - Statistics and navigation
+- `/admin/entries` - Entry listing with filtering
+- `/admin/entries/[id]` - Individual entry details
+- `/admin/import` - Data import placeholder
+- `/admin/settings` - System settings placeholder
+
+✅ **Authentication & Authorization:**
+- All pages properly check admin role
+- Redirects work correctly for unauthorized access
+- Session management functions properly
+
+✅ **Core Functionality:**
+- Database queries work with fallback user mapping
+- File display and management functional
+- Status updates and bulk operations working
+- Responsive design implemented
+
 Before any major changes:
 1. Test authentication flow
-2. Test file upload functionality
+2. Test file upload functionality  
 3. Test admin panel access
 4. Verify responsive design
+5. Run `npm run build` and `npm run lint`
 
 ## Deployment Notes
 

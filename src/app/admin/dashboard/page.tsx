@@ -26,10 +26,6 @@ export default async function AdminDashboardPage() {
     .select('*, users(name)')
     .order('created_at', { ascending: false })
 
-  // デバッグ用
-  if (entriesError) {
-    console.error('Dashboard entries error:', entriesError)
-  }
 
   // 全ユーザーデータも取得
   const { data: allUsers } = await supabase

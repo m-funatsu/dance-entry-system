@@ -32,22 +32,10 @@ export default async function AdminEntriesPage() {
     `)
     .order('created_at', { ascending: false })
 
-  // デバッグ用: エラーがある場合はログ出力
-  if (entriesError) {
-    console.error('Entries fetch error:', entriesError)
-  }
-
-  // デバッグ用: 全ユーザーデータも取得して確認
-  const { data: allUsers, error: usersError } = await supabase
+  // 全ユーザーデータも取得
+  const { data: allUsers } = await supabase
     .from('users')
     .select('*')
-
-  if (usersError) {
-    console.error('Users fetch error:', usersError)
-  }
-
-  console.log('All users:', allUsers)
-  console.log('Entries with users:', entries?.map(e => ({ id: e.id, user_id: e.user_id, users: e.users })))
 
   // 手動でユーザーデータをマッピング
   const entriesWithUsers = entries?.map(entry => {
