@@ -197,6 +197,74 @@ export default async function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* エントリー情報詳細表示 */}
+          {entry && (
+            <div className="mt-8 space-y-6">
+              {/* 基本情報表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">基本情報</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {entry.photo_url && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">写真</label>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={entry.photo_url}
+                          alt="登録写真"
+                          className="h-32 w-32 object-cover rounded-lg border border-gray-300"
+                        />
+                      </div>
+                    )}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">ダンスジャンル</label>
+                        <p className="mt-1 text-sm text-gray-900">{entry.dance_style || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">ペア名</label>
+                        <p className="mt-1 text-sm text-gray-900">{entry.team_name || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">参加者名</label>
+                        <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{entry.participant_names || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">電話番号</label>
+                        <p className="mt-1 text-sm text-gray-900">{entry.phone_number || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">緊急連絡先</label>
+                        <p className="mt-1 text-sm text-gray-900">{entry.emergency_contact || '未設定'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 楽曲情報表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">楽曲情報</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">曲目</label>
+                      <p className="mt-1 text-sm text-gray-900">{entry.music_title || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">振付師</label>
+                      <p className="mt-1 text-sm text-gray-900">{entry.choreographer || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">ストーリー</label>
+                      <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{entry.story || '未設定'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       
