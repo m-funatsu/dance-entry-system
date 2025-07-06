@@ -13,7 +13,7 @@ interface MusicInfoFormProps {
   existingEntry?: Entry | null
 }
 
-export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicInfoFormProps) {
+export default function MusicInfoForm({ entryId, existingEntry }: MusicInfoFormProps) {
   const [formData, setFormData] = useState(() => ({
     music_title: existingEntry?.music_title || '',
     choreographer: existingEntry?.choreographer || '',

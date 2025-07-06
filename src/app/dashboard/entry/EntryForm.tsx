@@ -197,6 +197,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           </div>
           {formData.photo_url && (
             <div className="mt-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={formData.photo_url}
                 alt="アップロード済み写真"

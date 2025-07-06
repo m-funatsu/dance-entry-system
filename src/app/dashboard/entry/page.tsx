@@ -26,7 +26,7 @@ export default async function EntryPage() {
   }
 
   // 最新のエントリーを1件取得（複数ある場合は最新のもの）
-  const { data: entries, error: entryError } = await supabase
+  const { data: entries } = await supabase
     .from('entries')
     .select('*')
     .eq('user_id', user.id)

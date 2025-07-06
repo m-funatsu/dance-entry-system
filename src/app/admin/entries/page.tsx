@@ -35,7 +35,7 @@ export default async function AdminEntriesPage() {
 
   // 管理者クライアントで全ユーザーデータを取得
   const adminSupabase = createAdminClient()
-  const { data: allUsers, error: usersError } = await adminSupabase
+  const { data: allUsers } = await adminSupabase
     .from('users')
     .select('*')
 
