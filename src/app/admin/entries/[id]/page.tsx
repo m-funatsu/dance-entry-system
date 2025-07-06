@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -28,7 +29,9 @@ export default async function EntryDetailPage({ params }: PageProps) {
     redirect('/dashboard')
   }
 
-  const { data: entry } = await supabase
+  // 管理者クライアントでエントリーデータを取得
+  const adminSupabase = createAdminClient()
+  const { data: entry } = await adminSupabase
     .from('entries')
     .select(`
       *,
@@ -43,24 +46,20 @@ export default async function EntryDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  // ユーザー情報が取得できない場合の手動マッピング
+  // 管理者クライアントを使用してもユーザー情報が取得できない場合のフォールバック
   if (!entry.users && entry.user_id) {
-    const { data: userData } = await supabase
+    const { data: userData } = await adminSupabase
       .from('users')
       .select('name, email')
       .eq('id', entry.user_id)
       .single()
     
-    if (userData) {
-      entry.users = {
-        name: userData.name || '不明なユーザー',
-        email: userData.email || 'メールアドレス不明'
-      }
-    } else {
-      entry.users = {
-        name: '不明なユーザー',
-        email: 'メールアドレス不明'
-      }
+    entry.users = userData ? {
+      name: userData.name || '不明なユーザー',
+      email: userData.email || 'メールアドレス不明'
+    } : {
+      name: '不明なユーザー',
+      email: 'メールアドレス不明'
     }
   } else if (!entry.users) {
     entry.users = {
