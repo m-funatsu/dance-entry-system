@@ -23,7 +23,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   const [error, setError] = useState('')
   const [uploadSuccess, setUploadSuccess] = useState('')
   const [uploadError, setUploadError] = useState('')
-  const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
@@ -77,7 +76,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   const handleUploadComplete = () => {
     setUploadSuccess('ファイルのアップロードが完了しました')
     setUploadError('')
-    setRefreshKey(prev => prev + 1)
   }
 
   const handleUploadError = (error: string) => {
@@ -88,7 +86,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   const handleFileDeleted = () => {
     setUploadSuccess('ファイルを削除しました')
     setUploadError('')
-    setRefreshKey(prev => prev + 1)
   }
 
   return (
@@ -205,7 +202,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
                 entryId={entryId}
                 fileType="video"
                 onFileDeleted={handleFileDeleted}
-                refreshKey={refreshKey}
               />
             </div>
           </div>
@@ -226,7 +222,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
                 entryId={entryId}
                 fileType="photo"
                 onFileDeleted={handleFileDeleted}
-                refreshKey={refreshKey}
               />
             </div>
           </div>
