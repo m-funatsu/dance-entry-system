@@ -157,11 +157,11 @@ export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <dt className="text-sm font-medium text-gray-500">参加者名</dt>
-              <dd className="mt-1 text-sm text-gray-900">{entry.users.name}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{entry.users?.name || '不明なユーザー'}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">メールアドレス</dt>
-              <dd className="mt-1 text-sm text-gray-900">{entry.users.email}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{entry.users?.email || 'メールアドレス不明'}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">ダンスジャンル</dt>

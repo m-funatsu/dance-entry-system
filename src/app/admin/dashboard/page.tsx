@@ -32,12 +32,16 @@ export default async function AdminDashboardPage() {
     .from('users')
     .select('id, name, email')
 
-  // 手動でユーザーデータをマッピング
+  // 手動でユーザーデータをマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
     return {
       ...entry,
-      users: user ? { name: user.name } : null
+      users: user ? { 
+        name: user.name || '不明なユーザー' 
+      } : { 
+        name: '不明なユーザー' 
+      }
     }
   }) || []
 

@@ -43,6 +43,32 @@ export default async function EntryDetailPage({ params }: PageProps) {
     notFound()
   }
 
+  // ユーザー情報が取得できない場合の手動マッピング
+  if (!entry.users && entry.user_id) {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('name, email')
+      .eq('id', entry.user_id)
+      .single()
+    
+    if (userData) {
+      entry.users = {
+        name: userData.name || '不明なユーザー',
+        email: userData.email || 'メールアドレス不明'
+      }
+    } else {
+      entry.users = {
+        name: '不明なユーザー',
+        email: 'メールアドレス不明'
+      }
+    }
+  } else if (!entry.users) {
+    entry.users = {
+      name: '不明なユーザー',
+      email: 'メールアドレス不明'
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">

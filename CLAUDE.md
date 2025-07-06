@@ -168,6 +168,18 @@ Required for deployment:
 - Always use optional chaining (`?.`) when accessing nested properties
 - Provide fallback values: `entry.users?.name || 'Unknown User'`
 - Check for null/undefined before mapping arrays
+- CRITICAL: Never access nested properties directly without null checks
+- When Supabase joins fail, implement manual data mapping with safe defaults:
+  ```typescript
+  // Safe user mapping
+  users: user ? { 
+    name: user.name || '不明なユーザー', 
+    email: user.email || 'メールアドレス不明' 
+  } : { 
+    name: '不明なユーザー', 
+    email: 'メールアドレス不明' 
+  }
+  ```
 
 ### Database Relationship Issues
 - Ensure foreign key relationships are properly set up

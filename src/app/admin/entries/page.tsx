@@ -37,12 +37,18 @@ export default async function AdminEntriesPage() {
     .from('users')
     .select('*')
 
-  // 手動でユーザーデータをマッピング
+  // 手動でユーザーデータをマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
     return {
       ...entry,
-      users: user ? { name: user.name, email: user.email } : null
+      users: user ? { 
+        name: user.name || '不明なユーザー', 
+        email: user.email || 'メールアドレス不明' 
+      } : { 
+        name: '不明なユーザー', 
+        email: 'メールアドレス不明' 
+      }
     }
   }) || []
 
