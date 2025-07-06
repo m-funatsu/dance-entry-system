@@ -113,7 +113,7 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
         [settingKey]: publicUrl.publicUrl
       }))
       
-    } catch (error) {
+    } catch {
       setError('画像のアップロードに失敗しました')
     } finally {
       setUploading(null)
