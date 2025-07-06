@@ -28,7 +28,7 @@ export default function LoginPage() {
         // エラーメッセージを日本語化
         let errorMessage = 'ログインに失敗しました'
         if (error.message.includes('Invalid login credentials')) {
-          errorMessage = 'メールアドレスまたはパスワードが正しくありません'
+          errorMessage = 'パスワードが不正です'
         } else if (error.message.includes('Email not confirmed')) {
           errorMessage = 'メールアドレスの確認が完了していません'
         } else if (error.message.includes('Too many requests')) {

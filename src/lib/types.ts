@@ -15,6 +15,10 @@ export interface Entry {
   participant_names: string
   phone_number?: string
   emergency_contact?: string
+  photo_url?: string
+  music_title?: string
+  choreographer?: string
+  story?: string
   google_form_data?: Record<string, unknown>
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string

@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import EntryForm from './EntryForm'
+import Link from 'next/link'
+import MusicInfoForm from './MusicInfoForm'
 
-export default async function EntryPage() {
+export default async function MusicPage() {
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -25,16 +26,15 @@ export default async function EntryPage() {
     redirect('/admin/dashboard')
   }
 
-  // 最新のエントリーを1件取得（複数ある場合は最新のもの）
-  const { data: entries, error: entryError } = await supabase
+  const { data: entry } = await supabase
     .from('entries')
     .select('*')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
+    .single()
 
-  const existingEntry = entries && entries.length > 0 ? entries[0] : null
-
+  if (!entry) {
+    redirect('/dashboard/entry?message=先に基本情報を入力してください')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,11 +42,11 @@ export default async function EntryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <a href="/dashboard" className="text-indigo-600 hover:text-indigo-900">
+              <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-900">
                 ← ダッシュボードに戻る
-              </a>
+              </Link>
               <h1 className="text-2xl font-bold text-gray-900">
-                基本情報
+                楽曲情報
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -71,11 +71,12 @@ export default async function EntryPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                {existingEntry ? '基本情報の編集' : '基本情報の入力'}
+                楽曲情報の入力
               </h2>
-              <EntryForm 
+              <MusicInfoForm 
                 userId={user.id}
-                existingEntry={existingEntry}
+                entryId={entry.id}
+                existingEntry={entry}
               />
             </div>
           </div>

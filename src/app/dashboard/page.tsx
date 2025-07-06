@@ -43,7 +43,7 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <h1 className="text-3xl font-bold text-gray-900">
-                ダンス・エントリー・システム
+                2025 バルカーカップ エントリー
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        エントリー情報
+                        基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
                         {entry ? '登録済み' : '基本情報を登録'}
@@ -97,7 +97,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <a href="/dashboard/entry" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry ? 'エントリー情報を編集 →' : 'エントリー情報を入力 →'}
+                    {entry ? '基本情報を編集 →' : '基本情報を入力 →'}
                   </a>
                 </div>
               </div>
@@ -114,10 +114,10 @@ export default async function DashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        ファイル アップロード
+                        楽曲情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        楽曲・写真・動画
+                        楽曲・動画・写真・ストーリー
                       </dd>
                     </dl>
                   </div>
@@ -125,8 +125,8 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <a href="/dashboard/upload" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    ファイルをアップロード →
+                  <a href="/dashboard/music" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    楽曲情報を入力 →
                   </a>
                 </div>
               </div>
@@ -159,6 +159,22 @@ export default async function DashboardPage() {
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* 問い合わせ情報 */}
+          <div className="mt-12 text-center border-t border-gray-200 pt-8">
+            <div className="text-sm text-gray-600">
+              <p className="mb-2">問い合わせ</p>
+              <p className="font-medium">バルカーカップ事務局</p>
+              <p>
+                <a 
+                  href="mailto:c-cloud01@valqua.com" 
+                  className="text-indigo-600 hover:text-indigo-500"
+                >
+                  c-cloud01@valqua.com
+                </a>
+              </p>
             </div>
           </div>
         </div>

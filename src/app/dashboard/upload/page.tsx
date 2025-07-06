@@ -60,7 +60,7 @@ export default async function UploadPage() {
                 ← ダッシュボードに戻る
               </Link>
               <h1 className="text-2xl font-bold text-gray-900">
-                ファイルアップロード
+                楽曲情報
               </h1>
             </div>
             <div className="flex items-center space-x-4">
