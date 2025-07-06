@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 interface BackgroundSettingsProps {
@@ -28,7 +28,7 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     setSuccess('')
 
     try {
-      const supabase = createAdminClient()
+      const supabase = createClient()
       
       // 各設定を更新
       for (const [key, value] of Object.entries(settings)) {
@@ -85,28 +85,19 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     setError('')
     
     try {
-      const supabase = createAdminClient()
-      
-      // バケット一覧を確認
-      const { data: buckets, error: bucketError } = await supabase.storage.listBuckets()
-      console.log('Available buckets:', buckets)
-      if (bucketError) {
-        console.error('Bucket list error:', bucketError)
-      }
+      const supabase = createClient()
       
       // ファイル名を生成
       const fileExt = file.name.split('.').pop()
       const fileName = `background_${settingKey}_${Date.now()}.${fileExt}`
       const filePath = `backgrounds/${fileName}`
       
-      // ファイルをアップロード（まずバケットの存在を確認）
-      console.log('Uploading to bucket: entries, path:', filePath)
+      // ファイルをアップロード
       const { error: uploadError } = await supabase.storage
         .from('entries')
         .upload(filePath, file)
         
       if (uploadError) {
-        console.error('Upload error details:', uploadError)
         setError(`画像のアップロードに失敗しました: ${uploadError.message}`)
         return
       }
@@ -123,7 +114,6 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       }))
       
     } catch (error) {
-      console.error('File upload error:', error)
       setError('画像のアップロードに失敗しました')
     } finally {
       setUploading(null)
