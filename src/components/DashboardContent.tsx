@@ -3,11 +3,50 @@
 import Link from 'next/link'
 import BackgroundLoader from '@/components/BackgroundLoader'
 
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  has_seed?: boolean
+}
+
+interface Entry {
+  id: string
+  user_id: string
+  dance_style: string
+  team_name?: string
+  participant_names: string
+  phone_number: string
+  emergency_contact: string
+  photo_url?: string
+  music_title?: string
+  choreographer?: string
+  story?: string
+  status: string
+}
+
+interface MusicInfo {
+  id: string
+  user_id: string
+  music_title: string
+  choreographer?: string
+  story?: string
+}
+
+interface EntryFile {
+  id: string
+  entry_id: string
+  file_type: string
+  file_name: string
+  file_path: string
+}
+
 interface DashboardContentProps {
-  userProfile: any
-  entry: any
-  musicInfo: any
-  entryFiles: any[]
+  userProfile: User
+  entry: Entry | null
+  musicInfo: MusicInfo | null
+  entryFiles: EntryFile[]
 }
 
 export default function DashboardContent({ userProfile, entry, musicInfo, entryFiles }: DashboardContentProps) {
