@@ -11,13 +11,44 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
   const router = useRouter()
   const supabase = createClient()
+
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = []
+    
+    if (password.length < 8) {
+      errors.push('8文字以上で入力してください')
+    }
+    if (password.length > 20) {
+      errors.push('20文字以内で入力してください')
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('大文字を1文字以上含めてください')
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('小文字を1文字以上含めてください')
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('数字を1文字以上含めてください')
+    }
+    
+    return errors
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    // パスワード検証
+    const errors = validatePassword(password)
+    if (errors.length > 0) {
+      setValidationErrors(errors)
+      setLoading(false)
+      return
+    }
 
     if (password !== confirmPassword) {
       setError('パスワードが一致しません')
@@ -26,6 +57,18 @@ export default function RegisterPage() {
     }
 
     try {
+      // メール重複チェック
+      const { data: existingUsers } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email.trim())
+        .limit(1)
+
+      if (existingUsers && existingUsers.length > 0) {
+        setError('このメールアドレスは既に登録されています')
+        setLoading(false)
+        return
+      }
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -58,10 +101,13 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            新規登録
+            2025 バルカーカップ•ジャパンオープン•ショーダンス選手権
           </h2>
+          <p className="mt-2 text-center text-lg text-gray-600">
+            エントリーシステム
+          </p>
           <p className="mt-2 text-center text-sm text-gray-600">
-            エントリー者として登録
+            新規アカウント登録
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleRegister}>
@@ -108,7 +154,10 @@ export default function RegisterPage() {
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="パスワード"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setValidationErrors(validatePassword(e.target.value))
+                }}
               />
             </div>
             <div>
@@ -128,6 +177,25 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {validationErrors.length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2">パスワードの要件:</h4>
+              {validationErrors.map((error, index) => (
+                <p key={index} className="text-sm text-yellow-700">• {error}</p>
+              ))}
+            </div>
+          )}
+
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <h4 className="text-sm font-medium text-blue-800 mb-2">パスワードの要件:</h4>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• 8文字以上20文字以内</li>
+              <li>• 大文字を1文字以上</li>
+              <li>• 小文字を1文字以上</li>
+              <li>• 数字を1文字以上</li>
+            </ul>
+          </div>
+
           {error && (
             <div className="text-red-600 text-sm text-center">{error}</div>
           )}
@@ -135,7 +203,7 @@ export default function RegisterPage() {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || validationErrors.length > 0}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {loading ? '登録中...' : '新規登録'}

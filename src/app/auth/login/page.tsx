@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -24,7 +25,16 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // エラーメッセージを日本語化
+        let errorMessage = 'ログインに失敗しました'
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'メールアドレスまたはパスワードが正しくありません'
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'メールアドレスの確認が完了していません'
+        } else if (error.message.includes('Too many requests')) {
+          errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+        }
+        setError(errorMessage)
         return
       }
 
@@ -68,8 +78,11 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            ダンス・エントリー・システム
+            2025 バルカーカップ•ジャパンオープン•ショーダンス選手権
           </h2>
+          <p className="mt-2 text-center text-lg text-gray-600">
+            エントリーシステム
+          </p>
           <p className="mt-2 text-center text-sm text-gray-600">
             ログインしてください
           </p>
@@ -122,13 +135,23 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              アカウントをお持ちでない場合は、
-              <a href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-                新規登録
-              </a>
-            </p>
+          <div className="text-center space-y-2">
+            <div>
+              <Link
+                href="/auth/reset-password"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                パスワードを忘れた方はこちら
+              </Link>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">
+                アカウントをお持ちでない場合は、
+                <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  新規登録
+                </Link>
+              </p>
+            </div>
           </div>
         </form>
       </div>
