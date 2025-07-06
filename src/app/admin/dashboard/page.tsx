@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries, error: entriesError } = await supabase
+  const { data: entries } = await supabase
     .from('entries')
     .select('*, users(name)')
     .order('created_at', { ascending: false })

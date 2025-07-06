@@ -22,7 +22,7 @@ export default async function AdminEntriesPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries, error: entriesError } = await supabase
+  const { data: entries } = await supabase
     .from('entries')
     .select(`
       *,
