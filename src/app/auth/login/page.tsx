@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackgroundLoader from '@/components/BackgroundLoader'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -74,12 +75,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50" style={{
-      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--login-bg-image, none)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-    }}>
+    <>
+      <BackgroundLoader pageType="login" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" style={{
+        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--login-bg-image, none)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}>
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -160,6 +163,7 @@ export default function LoginPage() {
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
