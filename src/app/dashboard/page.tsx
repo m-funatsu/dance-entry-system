@@ -47,9 +47,9 @@ export default async function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <Link href="/" className="text-3xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
                 2025 バルカーカップ エントリー
-              </h1>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">
