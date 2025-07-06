@@ -18,6 +18,7 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [uploading, setUploading] = useState<string | null>(null)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,6 +80,66 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     }))
   }
 
+  const handleFileUpload = async (file: File, settingKey: string) => {
+    setUploading(settingKey)
+    setError('')
+    
+    try {
+      const supabase = createAdminClient()
+      
+      // ファイル名を生成
+      const fileExt = file.name.split('.').pop()
+      const fileName = `background_${settingKey}_${Date.now()}.${fileExt}`
+      const filePath = `backgrounds/${fileName}`
+      
+      // ファイルをアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('entries')
+        .upload(filePath, file)
+        
+      if (uploadError) {
+        setError('画像のアップロードに失敗しました')
+        return
+      }
+      
+      // 公開URLを取得
+      const { data: publicUrl } = supabase.storage
+        .from('entries')
+        .getPublicUrl(filePath)
+        
+      // 設定を更新
+      setSettings(prev => ({
+        ...prev,
+        [settingKey]: publicUrl.publicUrl
+      }))
+      
+    } catch (error) {
+      console.error('File upload error:', error)
+      setError('画像のアップロードに失敗しました')
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, settingKey: string) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // 画像ファイルのみ許可
+      if (!file.type.startsWith('image/')) {
+        setError('画像ファイルのみアップロード可能です')
+        return
+      }
+      
+      // ファイルサイズ制限（5MB）
+      if (file.size > 5 * 1024 * 1024) {
+        setError('ファイルサイズは5MB以下にしてください')
+        return
+      }
+      
+      handleFileUpload(file, settingKey)
+    }
+  }
+
   const backgroundPages = [
     { key: 'login_background_image', label: 'ログイン画面', description: 'ログインページの背景画像' },
     { key: 'dashboard_background_image', label: 'ダッシュボード画面', description: 'ダッシュボードページの背景画像' },
@@ -90,26 +151,52 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     <div>
       <form onSubmit={handleSubmit} className="space-y-6">
         {backgroundPages.map(({ key, label, description }) => (
-          <div key={key}>
-            <label htmlFor={key} className="block text-sm font-medium text-gray-700">
+          <div key={key} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">
               {label}
             </label>
-            <input
-              type="url"
-              id={key}
-              name={key}
-              value={settings[key as keyof typeof settings]}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              placeholder="https://example.com/image.jpg"
-            />
-            <p className="mt-1 text-sm text-gray-500">{description}</p>
+            
+            {/* URL入力 */}
+            <div>
+              <label htmlFor={key} className="block text-xs font-medium text-gray-600 mb-1">
+                URL指定
+              </label>
+              <input
+                type="url"
+                id={key}
+                name={key}
+                value={settings[key as keyof typeof settings]}
+                onChange={handleChange}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            
+            {/* ファイルアップロード */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                ファイルアップロード
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e, key)}
+                disabled={uploading === key}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50"
+              />
+              {uploading === key && (
+                <p className="mt-1 text-sm text-blue-600">アップロード中...</p>
+              )}
+            </div>
+            
+            <p className="text-sm text-gray-500">{description}</p>
             
             {/* プレビュー */}
             {settings[key as keyof typeof settings] && (
-              <div className="mt-2">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-2">プレビュー</label>
                 <div 
-                  className="h-24 w-full rounded-md border border-gray-300"
+                  className="h-32 w-full rounded-md border border-gray-300"
                   style={{
                     backgroundImage: `url(${settings[key as keyof typeof settings]})`,
                     backgroundSize: 'cover',
@@ -155,9 +242,11 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       <div className="mt-8 p-4 bg-blue-50 rounded-md">
         <h3 className="text-sm font-medium text-blue-800 mb-2">使用方法:</h3>
         <ul className="text-sm text-blue-700 space-y-1">
-          <li>• 画像URLを入力してください（https://で始まるURL）</li>
+          <li>• <strong>URL指定</strong>: 外部画像のURLを入力（https://で始まるURL）</li>
+          <li>• <strong>ファイルアップロード</strong>: ローカルファイルから画像を選択してアップロード</li>
           <li>• 推奨サイズ: 1920x1080px以上</li>
-          <li>• 対応形式: JPG, PNG, WebP</li>
+          <li>• 対応形式: JPG, PNG, WebP, GIF</li>
+          <li>• ファイルサイズ: 5MB以下</li>
           <li>• 設定後、各画面で背景画像が表示されます</li>
         </ul>
       </div>
