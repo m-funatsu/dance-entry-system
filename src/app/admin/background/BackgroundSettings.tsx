@@ -98,7 +98,8 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
         .upload(filePath, file)
         
       if (uploadError) {
-        setError(`画像のアップロードに失敗しました: ${uploadError.message}`)
+        console.error('Upload error details:', uploadError)
+        setError(`画像のアップロードに失敗しました: ${uploadError.message} (詳細: ${JSON.stringify(uploadError)})`)
         return
       }
       
