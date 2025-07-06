@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import EntryForm from './EntryForm'
+import Link from 'next/link'
+import BackgroundSettings from './BackgroundSettings'
 
-export default async function EntryPage() {
+export default async function BackgroundPage() {
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,46 +19,38 @@ export default async function EntryPage() {
     .eq('id', user.id)
     .single()
 
-  if (!userProfile) {
-    redirect('/auth/login')
+  if (!userProfile || userProfile.role !== 'admin') {
+    redirect('/dashboard')
   }
 
-  if (userProfile.role !== 'participant') {
-    redirect('/admin/dashboard')
-  }
-
-  // 最新のエントリーを1件取得（複数ある場合は最新のもの）
-  const { data: entries, error: entryError } = await supabase
-    .from('entries')
+  // 背景画像設定を取得
+  const adminSupabase = createAdminClient()
+  const { data: settings } = await adminSupabase
+    .from('settings')
     .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
+    .in('key', ['login_background_image', 'dashboard_background_image', 'entry_background_image', 'music_background_image'])
 
-  const existingEntry = entries && entries.length > 0 ? entries[0] : null
-
+  const settingsMap = settings?.reduce((acc, setting) => {
+    acc[setting.key] = setting.value
+    return acc
+  }, {} as Record<string, string>) || {}
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{
-      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), var(--entry-bg-image, none)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-    }}>
+    <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <a href="/dashboard" className="text-indigo-600 hover:text-indigo-900">
-                ← ダッシュボードに戻る
-              </a>
+              <Link href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+                ← 管理ダッシュボードに戻る
+              </Link>
               <h1 className="text-2xl font-bold text-gray-900">
-                基本情報
+                背景画像設定
               </h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">
-                {userProfile.name}さん
+                {userProfile.name}さん（管理者）
               </span>
               <form action="/auth/logout" method="post">
                 <button
@@ -76,12 +70,9 @@ export default async function EntryPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                {existingEntry ? '基本情報の編集' : '基本情報の入力'}
+                各画面の背景画像URL設定
               </h2>
-              <EntryForm 
-                userId={user.id}
-                existingEntry={existingEntry}
-              />
+              <BackgroundSettings initialSettings={settingsMap} />
             </div>
           </div>
         </div>

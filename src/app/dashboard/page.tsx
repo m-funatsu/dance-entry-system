@@ -37,7 +37,12 @@ export default async function DashboardPage() {
   const entry = entries && entries.length > 0 ? entries[0] : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" style={{
+      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), var(--dashboard-bg-image, none)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }}>
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -68,7 +73,7 @@ export default async function DashboardPage() {
           <Suspense fallback={null}>
             <MessageAlert />
           </Suspense>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid grid-cols-1 gap-6 ${userProfile.has_seed ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -132,34 +137,65 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                    </svg>
+            {/* 選考状況カード - シード権ユーザーには非表示 */}
+            {!userProfile.has_seed && (
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                      </svg>
+                    </div>
+                    <div className="ml-5 w-0 flex-1">
+                      <dl>
+                        <dt className="text-sm font-medium text-gray-500 truncate">
+                          選考状況
+                        </dt>
+                        <dd className="text-lg font-medium text-gray-900">
+                          結果を確認
+                        </dd>
+                      </dl>
+                    </div>
                   </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        選考状況
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        結果を確認
-                      </dd>
-                    </dl>
+                </div>
+                <div className="bg-gray-50 px-5 py-3">
+                  <div className="text-sm">
+                    <a href="/dashboard/status" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      選考状況を確認 →
+                    </a>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  <a href="/dashboard/status" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    選考状況を確認 →
-                  </a>
+            )}
+
+            {/* シード権ユーザー専用の情報カード */}
+            {userProfile.has_seed && (
+              <div className="bg-green-50 overflow-hidden shadow rounded-lg border border-green-200">
+                <div className="p-5">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-5 w-0 flex-1">
+                      <dl>
+                        <dt className="text-sm font-medium text-green-700 truncate">
+                          シード権
+                        </dt>
+                        <dd className="text-lg font-medium text-green-900">
+                          選考免除
+                        </dd>
+                        <dd className="text-sm text-green-600 mt-1">
+                          自動的に選考を通過します
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           
           {/* 問い合わせ情報 */}

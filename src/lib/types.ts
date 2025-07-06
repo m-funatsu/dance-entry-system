@@ -3,6 +3,7 @@ export interface User {
   email: string
   name: string
   role: 'participant' | 'admin'
+  has_seed?: boolean
   created_at: string
   updated_at: string
 }
