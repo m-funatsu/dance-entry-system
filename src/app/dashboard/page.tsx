@@ -138,7 +138,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* 選考状況カード - シード権ユーザーには非表示 */}
-            {!userProfile.has_seed && (
+            {!userProfile.has_seed && entry && (
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="p-5">
                   <div className="flex items-center">
@@ -153,17 +153,19 @@ export default async function DashboardPage() {
                           選考状況
                         </dt>
                         <dd className="text-lg font-medium text-gray-900">
-                          結果を確認
+                          {entry.status === 'pending' && '審査待ち'}
+                          {entry.status === 'submitted' && '提出済み'}
+                          {entry.status === 'selected' && '選考通過'}
+                          {entry.status === 'rejected' && '不選考'}
+                        </dd>
+                        <dd className="text-sm text-gray-500 mt-1">
+                          {entry.status === 'pending' && '審査をお待ちください'}
+                          {entry.status === 'submitted' && '審査中です'}
+                          {entry.status === 'selected' && 'おめでとうございます！'}
+                          {entry.status === 'rejected' && '残念ながら不選考となりました'}
                         </dd>
                       </dl>
                     </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-5 py-3">
-                  <div className="text-sm">
-                    <a href="/dashboard/status" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      選考状況を確認 →
-                    </a>
                   </div>
                 </div>
               </div>
