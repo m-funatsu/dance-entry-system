@@ -92,9 +92,9 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       const fileName = `background_${settingKey}_${Date.now()}.${fileExt}`
       const filePath = `backgrounds/${fileName}`
       
-      // ファイルをアップロード
+      // ファイルをアップロード（一般的なバケット名を試す）
       const { error: uploadError } = await supabase.storage
-        .from('entries')
+        .from('files')  // または 'uploads', 'public' など
         .upload(filePath, file)
         
       if (uploadError) {
@@ -104,7 +104,7 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       
       // 公開URLを取得
       const { data: publicUrl } = supabase.storage
-        .from('entries')
+        .from('files')
         .getPublicUrl(filePath)
         
       // 設定を更新
