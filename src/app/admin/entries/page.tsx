@@ -33,13 +33,22 @@ export default async function AdminEntriesPage() {
     .order('created_at', { ascending: false })
 
   // 全ユーザーデータも取得
-  const { data: allUsers } = await supabase
+  const { data: allUsers, error: usersError } = await supabase
     .from('users')
     .select('*')
+
+  // デバッグ用ログ（一時的）
+  console.log('📊 Admin Entries Debug Info:')
+  console.log('Total entries:', entries?.length)
+  console.log('Total users:', allUsers?.length)
+  console.log('Users error:', usersError)
+  console.log('Sample entry:', entries?.[0])
+  console.log('Sample user:', allUsers?.[0])
 
   // 手動でユーザーデータをマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
+    console.log(`Entry ${entry.id}: user_id=${entry.user_id}, found_user=${!!user}, user_name=${user?.name}`)
     return {
       ...entry,
       users: user ? { 
