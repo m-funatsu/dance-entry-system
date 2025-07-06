@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import Link from 'next/link'
 import MessageAlert from '@/components/MessageAlert'
 
 export default async function DashboardPage() {
