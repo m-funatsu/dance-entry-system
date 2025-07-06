@@ -87,18 +87,27 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     try {
       const supabase = createAdminClient()
       
+      // バケット一覧を確認
+      const { data: buckets, error: bucketError } = await supabase.storage.listBuckets()
+      console.log('Available buckets:', buckets)
+      if (bucketError) {
+        console.error('Bucket list error:', bucketError)
+      }
+      
       // ファイル名を生成
       const fileExt = file.name.split('.').pop()
       const fileName = `background_${settingKey}_${Date.now()}.${fileExt}`
       const filePath = `backgrounds/${fileName}`
       
-      // ファイルをアップロード
+      // ファイルをアップロード（まずバケットの存在を確認）
+      console.log('Uploading to bucket: entries, path:', filePath)
       const { error: uploadError } = await supabase.storage
         .from('entries')
         .upload(filePath, file)
         
       if (uploadError) {
-        setError('画像のアップロードに失敗しました')
+        console.error('Upload error details:', uploadError)
+        setError(`画像のアップロードに失敗しました: ${uploadError.message}`)
         return
       }
       
