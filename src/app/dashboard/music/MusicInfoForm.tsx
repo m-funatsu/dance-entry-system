@@ -13,7 +13,7 @@ interface MusicInfoFormProps {
   existingEntry?: Entry | null
 }
 
-export default function MusicInfoForm({ entryId, existingEntry }: MusicInfoFormProps) {
+export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicInfoFormProps) {
   const [formData, setFormData] = useState(() => ({
     music_title: existingEntry?.music_title || '',
     choreographer: existingEntry?.choreographer || '',
@@ -194,10 +194,9 @@ export default function MusicInfoForm({ entryId, existingEntry }: MusicInfoFormP
             <h4 className="text-md font-semibold text-gray-900 mb-4">動画</h4>
             <p className="text-sm text-gray-600 mb-4">パフォーマンス動画をアップロードしてください（最大200MB）</p>
             <FileUpload
+              userId={userId}
               entryId={entryId}
               fileType="video"
-              acceptedFormats=".mp4,.mov,.avi,.wmv"
-              maxSizeMB={200}
               onUploadComplete={handleUploadComplete}
               onUploadError={handleUploadError}
             />
@@ -216,10 +215,9 @@ export default function MusicInfoForm({ entryId, existingEntry }: MusicInfoFormP
             <h4 className="text-md font-semibold text-gray-900 mb-4">写真</h4>
             <p className="text-sm text-gray-600 mb-4">ペア写真や過去の競技写真をアップロードしてください</p>
             <FileUpload
+              userId={userId}
               entryId={entryId}
               fileType="photo"
-              acceptedFormats=".jpg,.jpeg,.png,.gif"
-              maxSizeMB={10}
               onUploadComplete={handleUploadComplete}
               onUploadError={handleUploadError}
             />
