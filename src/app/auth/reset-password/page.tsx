@@ -31,8 +31,12 @@ export default function ResetPasswordPage() {
         let errorMessage = 'パスワードリセットに失敗しました'
         if (error.message.includes('Email not found')) {
           errorMessage = 'このメールアドレスは登録されていません'
+        } else if (error.message.includes('User already registered')) {
+          errorMessage = 'このメールアドレスは既に登録されています'
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = '有効なメールアドレスを入力してください'
         }
         setError(errorMessage)
         return

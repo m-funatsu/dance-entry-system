@@ -38,7 +38,20 @@ export default function AdminRegisterPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // エラーメッセージを日本語化
+        let errorMessage = '管理者登録に失敗しました'
+        if (error.message.includes('User already registered')) {
+          errorMessage = 'このメールアドレスは既に登録されています'
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'メールアドレスの確認が完了していません'
+        } else if (error.message.includes('Password should be at least')) {
+          errorMessage = 'パスワードは8文字以上である必要があります'
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = '有効なメールアドレスを入力してください'
+        } else if (error.message.includes('Too many requests')) {
+          errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+        }
+        setError(errorMessage)
         return
       }
 
