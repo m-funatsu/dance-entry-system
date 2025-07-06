@@ -197,24 +197,26 @@ export default async function DashboardPage() {
               </div>
             )}
           </div>
-          
-          {/* 問い合わせ情報 */}
-          <div className="mt-12 text-center border-t border-gray-200 pt-8">
-            <div className="text-sm text-gray-600">
-              <p className="mb-2">問い合わせ</p>
-              <p className="font-medium">バルカーカップ事務局</p>
-              <p>
-                <a 
-                  href="mailto:c-cloud01@valqua.com" 
-                  className="text-indigo-600 hover:text-indigo-500"
-                >
-                  c-cloud01@valqua.com
-                </a>
-              </p>
-            </div>
-          </div>
         </div>
       </main>
+      
+      {/* フッター */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-sm text-gray-600">
+            <p className="mb-2">問い合わせ</p>
+            <p className="font-medium">バルカーカップ事務局</p>
+            <p>
+              <a 
+                href="mailto:c-cloud01@valqua.com" 
+                className="text-indigo-600 hover:text-indigo-500"
+              >
+                c-cloud01@valqua.com
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
