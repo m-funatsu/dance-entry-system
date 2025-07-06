@@ -72,12 +72,34 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
     }
   }
 
+  const updateCSSVariable = (settingKey: string, imageUrl: string) => {
+    if (typeof window !== 'undefined') {
+      const root = document.documentElement
+      const cssVarMap: Record<string, string> = {
+        'login_background_image': '--login-bg-image',
+        'dashboard_background_image': '--dashboard-bg-image',
+        'entry_background_image': '--entry-bg-image',
+        'music_background_image': '--music-bg-image'
+      }
+      
+      const cssVar = cssVarMap[settingKey]
+      if (cssVar) {
+        root.style.setProperty(cssVar, `url(${imageUrl})`)
+      }
+    }
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setSettings(prev => ({
       ...prev,
       [name]: value
     }))
+    
+    // URL入力時も即座にCSS変数を更新
+    if (value) {
+      updateCSSVariable(name, value)
+    }
   }
 
   const handleFileUpload = async (file: File, settingKey: string) => {
@@ -109,10 +131,17 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
         .getPublicUrl(filePath)
         
       // 設定を更新
-      setSettings(prev => ({
-        ...prev,
-        [settingKey]: publicUrl.publicUrl
-      }))
+      setSettings(prev => {
+        const newSettings = {
+          ...prev,
+          [settingKey]: publicUrl.publicUrl
+        }
+        
+        // 即座にCSS変数を更新
+        updateCSSVariable(settingKey, publicUrl.publicUrl)
+        
+        return newSettings
+      })
       
     } catch {
       setError('画像のアップロードに失敗しました')
