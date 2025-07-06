@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -27,8 +28,9 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: false })
 
 
-  // 全ユーザーデータも取得
-  const { data: allUsers } = await supabase
+  // 管理者クライアントで全ユーザーデータを取得
+  const adminSupabase = createAdminClient()
+  const { data: allUsers } = await adminSupabase
     .from('users')
     .select('id, name, email')
 

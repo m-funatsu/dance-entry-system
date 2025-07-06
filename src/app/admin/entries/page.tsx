@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EntryTable from './EntryTable'
@@ -32,8 +33,9 @@ export default async function AdminEntriesPage() {
     `)
     .order('created_at', { ascending: false })
 
-  // 全ユーザーデータも取得
-  const { data: allUsers, error: usersError } = await supabase
+  // 管理者クライアントで全ユーザーデータを取得
+  const adminSupabase = createAdminClient()
+  const { data: allUsers, error: usersError } = await adminSupabase
     .from('users')
     .select('*')
 

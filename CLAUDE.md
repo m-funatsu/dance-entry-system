@@ -104,6 +104,7 @@ src/
 Required for deployment:
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (for admin operations)
 
 ## Code Standards
 
@@ -185,9 +186,16 @@ Required for deployment:
 - Ensure foreign key relationships are properly set up
 - Use LEFT JOIN in Supabase queries when related data might not exist
 - Handle cases where related records might be deleted
+- **Row Level Security (RLS) Issues**: Admin users may not see all data due to RLS policies
+- Use service role key for admin operations:
+  ```typescript
+  import { createAdminClient } from '@/lib/supabase/admin'
+  const adminSupabase = createAdminClient()
+  const { data: allUsers } = await adminSupabase.from('users').select('*')
+  ```
 - If Supabase joins fail, manually fetch and map related data:
   ```typescript
-  const users = await supabase.from('users').select('*')
+  const users = await adminSupabase.from('users').select('*')
   const entriesWithUsers = entries.map(entry => ({
     ...entry,
     users: users.find(u => u.id === entry.user_id)

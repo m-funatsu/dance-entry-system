@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -21,14 +22,26 @@ export default async function AdminTestDataPage() {
     redirect('/dashboard')
   }
 
-  // 現在のデータ状況を確認
+  // 管理者専用クライアントでデータを取得
+  const adminSupabase = createAdminClient()
+  
+  // 通常のクライアントと管理者クライアントの両方でテスト
   const { data: entries } = await supabase
     .from('entries')
     .select('*')
 
-  const { data: users } = await supabase
+  const { data: users, error: usersError } = await supabase
     .from('users')
     .select('*')
+
+  const { data: allUsersAdmin, error: allUsersAdminError } = await adminSupabase
+    .from('users')
+    .select('*')
+
+  console.log('🔍 RLS Debug Info:')
+  console.log('Current user (admin):', user.id)
+  console.log('Regular client - Users:', users?.length, 'Error:', usersError)
+  console.log('Admin client - Users:', allUsersAdmin?.length, 'Error:', allUsersAdminError)
 
   const { data: settings } = await supabase
     .from('settings')
@@ -70,10 +83,14 @@ export default async function AdminTestDataPage() {
             {/* データベース状況 */}
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">データベース状況</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">{users?.length || 0}</div>
-                  <div className="text-sm text-blue-600">ユーザー数</div>
+                  <div className="text-sm text-blue-600">ユーザー数（通常）</div>
+                </div>
+                <div className="bg-indigo-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-indigo-600">{allUsersAdmin?.length || 0}</div>
+                  <div className="text-sm text-indigo-600">ユーザー数（管理者）</div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">{entries?.length || 0}</div>
