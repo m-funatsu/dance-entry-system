@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Entry } from '@/lib/types'
+import BackgroundLoader from '@/components/BackgroundLoader'
 
 interface EntryFormProps {
   userId: string
@@ -176,7 +177,15 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
   }
 
   return (
-    <div>
+    <>
+      <BackgroundLoader pageType="entry" />
+      <div style={{
+        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--entry-bg-image, none)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh'
+      }}>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 写真アップロード */}
         <div>
@@ -320,6 +329,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   )
 }

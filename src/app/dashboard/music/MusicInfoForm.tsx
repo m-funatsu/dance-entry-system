@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { Entry } from '@/lib/types'
 import FileUpload from '@/components/FileUpload'
 import FileList from '@/components/FileList'
+import BackgroundLoader from '@/components/BackgroundLoader'
 
 interface MusicInfoFormProps {
   userId: string
@@ -89,7 +90,16 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   }
 
   return (
-    <div className="space-y-8">
+    <>
+      <BackgroundLoader pageType="music" />
+      <div className="space-y-8" style={{
+        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--music-bg-image, none)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh',
+        padding: '20px'
+      }}>
       {/* 楽曲情報フォーム */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 曲目 */}
@@ -227,6 +237,7 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
