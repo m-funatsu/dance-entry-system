@@ -179,7 +179,7 @@ export default function FileUpload({
             ) : fileType === 'photo' ? (
               'JPG, PNG形式 (最大100MB)'
             ) : fileType === 'video' ? (
-              'MP4, MOV, AVI形式 (最大100MB)'
+              'MP4, MOV, AVI形式 (最大200MB)'
             ) : (
               '最大100MB'
             )}

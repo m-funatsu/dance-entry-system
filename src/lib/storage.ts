@@ -24,10 +24,12 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません' }
   }
 
-  const maxSizeInBytes = 100 * 1024 * 1024
+  // 動画は200MB、その他は100MBまで
+  const maxSizeInBytes = fileType === 'video' ? 200 * 1024 * 1024 : 100 * 1024 * 1024
+  const maxSizeText = fileType === 'video' ? '200MB' : '100MB'
 
   if (file.size > maxSizeInBytes) {
-    return { success: false, error: 'ファイルサイズが100MBを超えています' }
+    return { success: false, error: `ファイルサイズが${maxSizeText}を超えています` }
   }
 
   const allowedTypes = {
