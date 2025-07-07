@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import MessageAlert from '@/components/MessageAlert'
+import BackgroundLoader from '@/components/BackgroundLoader'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -38,12 +39,14 @@ export default async function DashboardPage() {
   const entry = entries && entries.length > 0 ? entries[0] : null
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{
-      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), var(--dashboard-bg-image, none)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-    }}>
+    <>
+      <BackgroundLoader pageType="dashboard" />
+      <div className="min-h-screen bg-gray-50" style={{
+        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), var(--dashboard-bg-image, none)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}>
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -288,6 +291,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }
