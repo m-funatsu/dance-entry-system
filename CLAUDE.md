@@ -40,9 +40,14 @@ git add -A
 # Commit with descriptive message
 git commit -m "Description of changes"
 
-# Push to remote
-git push
+# Push to remote (ALWAYS REQUIRED)
+git push origin main
 ```
+
+### CRITICAL: Always Push After Commit
+- **ALWAYS** run `git push origin main` after every commit
+- **NEVER** leave commits unpushed unless explicitly instructed otherwise
+- This ensures changes are immediately available and prevents sync issues
 
 ## Important Build Requirements
 
