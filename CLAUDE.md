@@ -249,6 +249,30 @@ Before any major changes:
 5. **Handle errors gracefully**
 6. **Keep components focused and reusable**
 7. **Use semantic commit messages**
+8. **NEVER make unauthorized layout changes** - Only modify layouts when explicitly requested by the user
+
+## UI/UX Guidelines
+
+### CRITICAL: Layout Change Policy
+- **NEVER** change existing page layouts without explicit user instruction
+- **NEVER** convert between different design patterns (e.g., card-based to list-based) without permission
+- **NEVER** restructure component hierarchies unless specifically requested
+- **ALWAYS** preserve the original design intent and user experience
+- **ONLY** make layout changes when the user explicitly asks for them
+
+### What constitutes a layout change:
+- Changing from card-based to list-based layouts
+- Modifying component arrangement or structure
+- Changing page organization or information hierarchy
+- Altering the visual design patterns
+- Restructuring navigation or user flow
+
+### Acceptable changes without permission:
+- Bug fixes that don't affect layout
+- Code quality improvements (TypeScript, performance)
+- Adding new features that don't modify existing layouts
+- Styling tweaks like colors, fonts, spacing (when specifically requested)
+- Functional improvements that maintain the same visual structure
 
 ## Troubleshooting Commands
 
