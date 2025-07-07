@@ -178,7 +178,7 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
       </form>
 
       {/* ファイルアップロードセクション */}
-      <div className="border-t border-gray-200 pt-8">
+      <div className="bg-white rounded-lg p-6 shadow-lg">
         <h3 className="text-lg font-medium text-gray-900 mb-6">ファイル管理</h3>
         
         {uploadSuccess && (
