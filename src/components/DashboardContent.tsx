@@ -95,7 +95,7 @@ export default function DashboardContent({ userProfile, entry, musicInfo, entryF
                 </h2>
 
                 {/* 基本情報セクション */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <div className="bg-white rounded-lg p-6 mb-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -139,7 +139,7 @@ export default function DashboardContent({ userProfile, entry, musicInfo, entryF
                 </div>
 
                 {/* 楽曲情報セクション */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <div className="bg-white rounded-lg p-6 mb-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -185,7 +185,7 @@ export default function DashboardContent({ userProfile, entry, musicInfo, entryF
                 </div>
 
                 {/* ファイルアップロード状況 */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <div className="bg-white rounded-lg p-6 mb-6">
                   <h3 className="text-md font-medium text-gray-900 mb-3">アップロードファイル</h3>
                   <div className="space-y-2">
                     {entryFiles.length > 0 ? (
