@@ -23,7 +23,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
   const { userId, entryId, fileType, file } = options
 
   if (!file) {
-    return { success: false, error: 'ファイルが選択されていません' }
+    return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
   // 動画は200MB、その他は100MBまで
@@ -31,7 +31,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
   const maxSizeText = fileType === 'video' ? '200MB' : '100MB'
 
   if (file.size > maxSizeInBytes) {
-    return { success: false, error: `ファイルサイズが${maxSizeText}を超えています` }
+    return { success: false, error: `ファイルサイズが${maxSizeText}を超えています。ファイルサイズを確認してください。` }
   }
 
   const allowedTypes = {
@@ -42,7 +42,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
   }
 
   if (!allowedTypes[fileType].includes(file.type)) {
-    return { success: false, error: '許可されていないファイル形式です' }
+    return { success: false, error: '許可されていないファイル形式です。対応形式をご確認ください。' }
   }
 
   // ファイル名をサニタイズ（英数字、ハイフン、アンダースコア、ドットのみ許可）
@@ -107,7 +107,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       console.error('Error details:', JSON.stringify(error, null, 2))
       console.error('File path:', filePath)
       console.error('Tried buckets:', POSSIBLE_BUCKETS)
-      return { success: false, error: `ファイルのアップロードに失敗しました: ${error?.message || error}` }
+      return { success: false, error: `ファイルのアップロードに失敗しました。しばらく時間をおいて再度お試しください。エラー: ${error?.message || error}` }
     }
 
     const { data: insertData, error: insertError } = await supabase
@@ -126,7 +126,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     if (insertError) {
       console.error('Database insert error:', insertError)
       await supabase.storage.from(usedBucket).remove([filePath])
-      return { success: false, error: 'ファイル情報の保存に失敗しました' }
+      return { success: false, error: 'ファイル情報の保存に失敗しました。しばらく時間をおいて再度お試しください。' }
     }
 
     return { 
@@ -137,7 +137,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
 
   } catch (error) {
     console.error('Upload error:', error)
-    return { success: false, error: 'ファイルのアップロードに失敗しました' }
+    return { success: false, error: 'ファイルのアップロードに失敗しました。ネットワーク接続を確認して再度お試しください。' }
   }
 }
 
