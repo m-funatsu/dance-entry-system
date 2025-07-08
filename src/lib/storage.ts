@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 
-// 複数のバケット名を試すための配列
-const POSSIBLE_BUCKETS = ['files', 'uploads', 'public', 'entry-files', 'storage']
-export const STORAGE_BUCKET = POSSIBLE_BUCKETS[0] // デフォルトは 'files'
+// filesバケットのみ使用（他は存在しないため）
+const POSSIBLE_BUCKETS = ['files']
+export const STORAGE_BUCKET = 'files'
 
 export interface FileUploadOptions {
   userId: string
@@ -45,14 +45,33 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: '許可されていないファイル形式です' }
   }
 
+  // ファイル名をサニタイズ（英数字、ハイフン、アンダースコア、ドットのみ許可）
+  const sanitizeFileName = (name: string): string => {
+    // 拡張子を分離
+    const lastDotIndex = name.lastIndexOf('.')
+    const nameWithoutExt = lastDotIndex > 0 ? name.substring(0, lastDotIndex) : name
+    const extension = lastDotIndex > 0 ? name.substring(lastDotIndex) : ''
+    
+    // 日本語や特殊文字を削除し、英数字とハイフン、アンダースコアのみ残す
+    const sanitizedName = nameWithoutExt
+      .replace(/[^\w\-]/g, '_')  // 英数字、アンダースコア、ハイフン以外を_に置換
+      .replace(/_{2,}/g, '_')    // 連続するアンダースコアを1つに
+      .replace(/^_+|_+$/g, '')   // 先頭と末尾のアンダースコアを削除
+    
+    return sanitizedName + extension
+  }
+
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const fileName = `${timestamp}-${file.name}`
+  const sanitizedFileName = sanitizeFileName(file.name)
+  const fileName = `${timestamp}-${sanitizedFileName}`
   const filePath = `${userId}/${entryId}/${fileType}/${fileName}`
 
   console.log('Upload attempt:', {
     bucket: STORAGE_BUCKET,
     filePath,
-    fileName: file.name,
+    originalFileName: file.name,
+    sanitizedFileName,
+    finalFileName: fileName,
     fileType: file.type,
     fileSize: file.size,
     maxSize: fileType === 'video' ? '200MB' : '100MB'
