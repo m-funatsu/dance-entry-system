@@ -214,6 +214,26 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
             </div>
           </div>
 
+          {/* 音源アップロード */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h4 className="text-md font-semibold text-gray-900 mb-4">音源</h4>
+            <p className="text-sm text-gray-600 mb-4">本大会で使用する予定の音源をアップロードしてください</p>
+            <FileUpload
+              userId={userId}
+              entryId={entryId}
+              fileType="audio"
+              onUploadComplete={handleUploadComplete}
+              onUploadError={handleUploadError}
+            />
+            <div className="mt-4">
+              <FileList
+                entryId={entryId}
+                fileType="audio"
+                onFileDeleted={handleFileDeleted}
+              />
+            </div>
+          </div>
+
           {/* 写真アップロード */}
           <div className="bg-gray-50 rounded-lg p-6">
             <h4 className="text-md font-semibold text-gray-900 mb-4">写真</h4>
