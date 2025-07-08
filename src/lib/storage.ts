@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 
-export const STORAGE_BUCKET = 'entry-files'
+export const STORAGE_BUCKET = 'files'
 
 export interface FileUploadOptions {
   userId: string
@@ -68,8 +68,6 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
           file_type: fileType,
           file_name: file.name,
           file_path: data.path,
-          file_size: file.size,
-          mime_type: file.type,
         }
       ])
       .select()
