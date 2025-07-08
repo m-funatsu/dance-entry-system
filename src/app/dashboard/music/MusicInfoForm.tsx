@@ -197,7 +197,7 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
           {/* 動画アップロード */}
           <div className="bg-gray-50 rounded-lg p-6">
             <h4 className="text-md font-semibold text-gray-900 mb-4">動画</h4>
-            <p className="text-sm text-gray-600 mb-4">パフォーマンス動画をアップロードしてください（最大200MB）</p>
+            <p className="text-sm text-gray-600 mb-4">パフォーマンス動画をアップロードしてください（最大50MB）</p>
             <FileUpload
               userId={userId}
               entryId={entryId}

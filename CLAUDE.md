@@ -171,7 +171,7 @@ Required for deployment:
 - Verify file permissions and policies
 - **Bucket Name**: Must use `files` bucket (other buckets don't exist)
 - **File Name Sanitization**: Japanese characters and special characters are automatically converted to underscores
-- **File Size Limits**: Video files 200MB max, other files 100MB max
+- **File Size Limits**: Video files 50MB max, other files 25MB max (Supabase storage limits)
 - **Supported Formats**:
   - Video: MP4, MOV, AVI (video/mp4, video/mov, video/avi, video/quicktime)
   - Audio: MP3, WAV, AAC (audio/mpeg, audio/wav, audio/aac, audio/mp3)
@@ -180,7 +180,10 @@ Required for deployment:
 ### File Upload Error Messages (Japanese)
 - ファイルが選択されていません → File not selected
 - ファイルサイズが[size]を超えています → File size exceeds limit
+- ファイルサイズが大きすぎます → File too large (413 error)
 - 許可されていないファイル形式です → Unsupported file format
+- ファイル名に使用できない文字が含まれています → Invalid file name characters
+- ストレージの設定に問題があります → Storage configuration issue (404 error)
 - ファイルのアップロードに失敗しました → Upload failed (network/server issue)
 - ファイル情報の保存に失敗しました → Database save failed
 

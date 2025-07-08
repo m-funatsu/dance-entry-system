@@ -26,9 +26,9 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
-  // 動画は200MB、その他は100MBまで
-  const maxSizeInBytes = fileType === 'video' ? 200 * 1024 * 1024 : 100 * 1024 * 1024
-  const maxSizeText = fileType === 'video' ? '200MB' : '100MB'
+  // Supabaseの制限に合わせて調整: 動画50MB、その他25MBまで
+  const maxSizeInBytes = fileType === 'video' ? 50 * 1024 * 1024 : 25 * 1024 * 1024
+  const maxSizeText = fileType === 'video' ? '50MB' : '25MB'
 
   if (file.size > maxSizeInBytes) {
     return { success: false, error: `ファイルサイズが${maxSizeText}を超えています。ファイルサイズを確認してください。` }
@@ -99,6 +99,11 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       } else {
         console.log(`Failed to upload to bucket ${bucketName}:`, result.error)
         error = result.error
+        
+        // 413エラー（Payload too large）の場合は早期に終了
+        if (result.error?.statusCode === '413' || result.error?.message?.includes('too large')) {
+          break
+        }
       }
     }
 
@@ -107,7 +112,20 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       console.error('Error details:', JSON.stringify(error, null, 2))
       console.error('File path:', filePath)
       console.error('Tried buckets:', POSSIBLE_BUCKETS)
-      return { success: false, error: `ファイルのアップロードに失敗しました。しばらく時間をおいて再度お試しください。エラー: ${error?.message || error}` }
+      // エラータイプに応じたメッセージを生成
+      let errorMessage = 'ファイルのアップロードに失敗しました。'
+      
+      if (error?.statusCode === '413' || error?.message?.includes('too large')) {
+        errorMessage = `ファイルサイズが大きすぎます。${maxSizeText}以下のファイルをアップロードしてください。`
+      } else if (error?.statusCode === '400' && error?.error === 'InvalidKey') {
+        errorMessage = 'ファイル名に使用できない文字が含まれています。ファイル名を英数字に変更してください。'
+      } else if (error?.statusCode === '404') {
+        errorMessage = 'ストレージの設定に問題があります。管理者にお問い合わせください。'
+      } else {
+        errorMessage += `しばらく時間をおいて再度お試しください。エラー: ${error?.message || error}`
+      }
+      
+      return { success: false, error: errorMessage }
     }
 
     const { data: insertData, error: insertError } = await supabase
