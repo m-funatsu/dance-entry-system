@@ -83,12 +83,12 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       }
     }
 
-    if (error) {
+    if (error || !data) {
       console.error('Storage upload error (all buckets failed):', error)
       console.error('Error details:', JSON.stringify(error, null, 2))
       console.error('File path:', filePath)
       console.error('Tried buckets:', POSSIBLE_BUCKETS)
-      return { success: false, error: `ファイルのアップロードに失敗しました: ${error.message || error}` }
+      return { success: false, error: `ファイルのアップロードに失敗しました: ${error?.message || error}` }
     }
 
     const { data: insertData, error: insertError } = await supabase
