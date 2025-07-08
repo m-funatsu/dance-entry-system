@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 
-export const STORAGE_BUCKET = 'files'
+// 複数のバケット名を試すための配列
+const POSSIBLE_BUCKETS = ['files', 'uploads', 'public', 'entry-files', 'storage']
+export const STORAGE_BUCKET = POSSIBLE_BUCKETS[0] // デフォルトは 'files'
 
 export interface FileUploadOptions {
   userId: string
@@ -47,17 +49,46 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
   const fileName = `${timestamp}-${file.name}`
   const filePath = `${userId}/${entryId}/${fileType}/${fileName}`
 
+  console.log('Upload attempt:', {
+    bucket: STORAGE_BUCKET,
+    filePath,
+    fileName: file.name,
+    fileType: file.type,
+    fileSize: file.size,
+    maxSize: fileType === 'video' ? '200MB' : '100MB'
+  })
+
   try {
-    const { data, error } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+    let data, error
+    let usedBucket = STORAGE_BUCKET
+
+    // 複数のバケット名を順番に試す
+    for (const bucketName of POSSIBLE_BUCKETS) {
+      const result = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      
+      if (!result.error) {
+        data = result.data
+        error = null
+        usedBucket = bucketName
+        console.log(`Successfully uploaded to bucket: ${bucketName}`)
+        break
+      } else {
+        console.log(`Failed to upload to bucket ${bucketName}:`, result.error)
+        error = result.error
+      }
+    }
 
     if (error) {
-      console.error('Storage upload error:', error)
-      return { success: false, error: 'ファイルのアップロードに失敗しました' }
+      console.error('Storage upload error (all buckets failed):', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      console.error('File path:', filePath)
+      console.error('Tried buckets:', POSSIBLE_BUCKETS)
+      return { success: false, error: `ファイルのアップロードに失敗しました: ${error.message || error}` }
     }
 
     const { data: insertData, error: insertError } = await supabase
@@ -75,7 +106,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
 
     if (insertError) {
       console.error('Database insert error:', insertError)
-      await supabase.storage.from(STORAGE_BUCKET).remove([filePath])
+      await supabase.storage.from(usedBucket).remove([filePath])
       return { success: false, error: 'ファイル情報の保存に失敗しました' }
     }
 
@@ -95,11 +126,18 @@ export async function getFileUrl(filePath: string): Promise<string | null> {
   const supabase = createClient()
   
   try {
-    const { data } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(filePath, 3600)
+    // 複数のバケットでURLを試す
+    for (const bucketName of POSSIBLE_BUCKETS) {
+      const { data } = await supabase.storage
+        .from(bucketName)
+        .createSignedUrl(filePath, 3600)
+      
+      if (data?.signedUrl) {
+        return data.signedUrl
+      }
+    }
     
-    return data?.signedUrl || null
+    return null
   } catch (error) {
     console.error('Get file URL error:', error)
     return null
@@ -120,9 +158,20 @@ export async function deleteFile(fileId: string): Promise<boolean> {
       return false
     }
 
-    const { error: storageError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .remove([fileData.file_path])
+    // 複数のバケットで削除を試す
+    let storageError = null
+    for (const bucketName of POSSIBLE_BUCKETS) {
+      const { error } = await supabase.storage
+        .from(bucketName)
+        .remove([fileData.file_path])
+      
+      if (!error) {
+        storageError = null
+        break
+      } else {
+        storageError = error
+      }
+    }
 
     if (storageError) {
       console.error('Storage delete error:', storageError)
