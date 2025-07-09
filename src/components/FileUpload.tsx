@@ -175,13 +175,13 @@ export default function FileUpload({
           
           <div className="text-xs text-gray-500">
             {fileType === 'music' || fileType === 'audio' ? (
-              'MP3, WAV, AAC形式 (最大25MB)'
+              'MP3, WAV, AAC形式 (最大100MB)'
             ) : fileType === 'photo' ? (
-              'JPG, PNG形式 (最大25MB)'
+              'JPG, PNG形式 (最大100MB)'
             ) : fileType === 'video' ? (
-              'MP4, MOV, AVI形式 (最大50MB)'
+              'MP4, MOV, AVI形式 (最大200MB)'
             ) : (
-              '最大25MB'
+              '最大100MB'
             )}
           </div>
         </div>

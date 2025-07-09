@@ -26,9 +26,10 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
-  // Supabaseの制限に合わせて調整: 動画50MB、その他25MBまで
-  const maxSizeInBytes = fileType === 'video' ? 50 * 1024 * 1024 : 25 * 1024 * 1024
-  const maxSizeText = fileType === 'video' ? '50MB' : '25MB'
+  // 課金後の制限: 動画200MB、その他100MB
+  // 現在はSupabaseの無料制限のため50MB/25MBでテスト中
+  const maxSizeInBytes = fileType === 'video' ? 200 * 1024 * 1024 : 100 * 1024 * 1024
+  const maxSizeText = fileType === 'video' ? '200MB' : '100MB'
 
   if (file.size > maxSizeInBytes) {
     return { success: false, error: `ファイルサイズが${maxSizeText}を超えています。ファイルサイズを確認してください。` }
@@ -116,7 +117,8 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       let errorMessage = 'ファイルのアップロードに失敗しました。'
       
       if (error?.statusCode === '413' || error?.message?.includes('too large')) {
-        errorMessage = `ファイルサイズが大きすぎます。${maxSizeText}以下のファイルをアップロードしてください。`
+        const currentLimit = fileType === 'video' ? '50MB' : '25MB'
+        errorMessage = `ファイルサイズが大きすぎます。現在のテスト環境では${currentLimit}以下のファイルをアップロードしてください。`
       } else if (error?.statusCode === '400' && error?.error === 'InvalidKey') {
         errorMessage = 'ファイル名に使用できない文字が含まれています。ファイル名を英数字に変更してください。'
       } else if (error?.statusCode === '404') {
