@@ -52,8 +52,13 @@ git push origin main
 ## Important Build Requirements
 
 ### CRITICAL: Always run before committing
-1. **`npm run build`** - Ensures TypeScript compilation and lint checks pass
-2. **`npm run lint`** - Catches ESLint violations that will fail Vercel builds
+**MANDATORY Testing Workflow** - Run these commands in order:
+1. **`npx tsc --noEmit`** - Fast TypeScript type check
+2. **`npm run lint`** - Catches ESLint violations that will fail Vercel builds  
+3. **`npm run build`** - Ensures TypeScript compilation and lint checks pass
+4. **Only commit if ALL tests pass**
+
+**IMPORTANT**: TypeScript/ESLint errors will cause Vercel deployment failures. Test locally BEFORE committing to avoid failed deployments.
 
 ### Common Build Errors and Fixes
 
