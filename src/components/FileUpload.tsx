@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
+import { useToast } from '@/contexts/ToastContext'
 
 interface FileUploadProps {
   userId: string
@@ -23,6 +24,7 @@ export default function FileUpload({
   const [dragOver, setDragOver] = useState(false)
   const [mounted, setMounted] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { showToast } = useToast()
 
   useEffect(() => {
     setMounted(true)
@@ -91,11 +93,14 @@ export default function FileUpload({
       setUploadProgress(100)
 
       if (result.success && result.fileId && result.filePath) {
+        showToast('ファイルのアップロードが完了しました', 'success')
         onUploadComplete?.(result.fileId, result.filePath)
       } else {
+        showToast(result.error || 'アップロードに失敗しました', 'error')
         onUploadError?.(result.error || 'アップロードに失敗しました')
       }
     } catch {
+      showToast('アップロードに失敗しました', 'error')
       onUploadError?.('アップロードに失敗しました')
     } finally {
       setIsUploading(false)

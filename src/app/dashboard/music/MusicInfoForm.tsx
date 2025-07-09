@@ -7,6 +7,7 @@ import type { Entry } from '@/lib/types'
 import FileUpload from '@/components/FileUpload'
 import FileList from '@/components/FileList'
 import BackgroundLoader from '@/components/BackgroundLoader'
+import { ToastProvider } from '@/contexts/ToastContext'
 
 interface MusicInfoFormProps {
   userId: string
@@ -22,8 +23,7 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   }))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [uploadSuccess, setUploadSuccess] = useState('')
-  const [uploadError, setUploadError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
@@ -75,22 +75,19 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   }
 
   const handleUploadComplete = () => {
-    setUploadSuccess('ファイルのアップロードが完了しました')
-    setUploadError('')
+    setRefreshKey(prev => prev + 1)
   }
 
   const handleUploadError = (error: string) => {
-    setUploadError(error)
-    setUploadSuccess('')
+    console.error('Upload error:', error)
   }
 
   const handleFileDeleted = () => {
-    setUploadSuccess('ファイルを削除しました')
-    setUploadError('')
+    setRefreshKey(prev => prev + 1)
   }
 
   return (
-    <>
+    <ToastProvider>
       <BackgroundLoader pageType="music" />
       <div className="space-y-8 min-h-screen p-5" style={{
         backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--music-bg-image, none)',
@@ -181,17 +178,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
       <div className="bg-white rounded-lg p-6 shadow-lg">
         <h3 className="text-lg font-medium text-gray-900 mb-6">ファイル管理</h3>
         
-        {uploadSuccess && (
-          <div className="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
-            <div className="text-green-700 text-sm">{uploadSuccess}</div>
-          </div>
-        )}
-
-        {uploadError && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="text-red-700 text-sm">{uploadError}</div>
-          </div>
-        )}
 
         <div className="space-y-8">
           {/* 動画アップロード */}
@@ -209,6 +195,8 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
               <FileList
                 entryId={entryId}
                 fileType="video"
+                editable={true}
+                refreshKey={refreshKey}
                 onFileDeleted={handleFileDeleted}
               />
             </div>
@@ -229,6 +217,8 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
               <FileList
                 entryId={entryId}
                 fileType="audio"
+                editable={true}
+                refreshKey={refreshKey}
                 onFileDeleted={handleFileDeleted}
               />
             </div>
@@ -249,6 +239,8 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
               <FileList
                 entryId={entryId}
                 fileType="photo"
+                editable={true}
+                refreshKey={refreshKey}
                 onFileDeleted={handleFileDeleted}
               />
             </div>
@@ -256,6 +248,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
         </div>
       </div>
       </div>
-    </>
+    </ToastProvider>
   )
 }

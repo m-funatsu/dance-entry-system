@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { getFileUrl, deleteFile, formatFileSize, getFileIcon } from '@/lib/storage'
 import { formatDateLocale } from '@/lib/utils'
+import { useToast } from '@/contexts/ToastContext'
 import type { EntryFile } from '@/lib/types'
 
 interface FileListProps {
@@ -12,12 +13,14 @@ interface FileListProps {
   editable?: boolean
   fileType?: 'music' | 'audio' | 'photo' | 'video'
   onFileDeleted?: (fileId: string) => void
+  refreshKey?: number
 }
 
-export default function FileList({ entryId, editable = false, fileType, onFileDeleted }: FileListProps) {
+export default function FileList({ entryId, editable = false, fileType, onFileDeleted, refreshKey }: FileListProps) {
   const [files, setFiles] = useState<EntryFile[]>([])
   const [loading, setLoading] = useState(true)
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({})
+  const { showToast } = useToast()
 
   const fetchFiles = useCallback(async () => {
     const supabase = createClient()
@@ -58,7 +61,7 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
 
   useEffect(() => {
     fetchFiles()
-  }, [fetchFiles])
+  }, [fetchFiles, refreshKey])
 
   const handleDelete = async (fileId: string) => {
     if (!confirm('このファイルを削除しますか？')) return
@@ -66,9 +69,10 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
     const success = await deleteFile(fileId)
     if (success) {
       setFiles(files.filter(f => f.id !== fileId))
+      showToast('ファイルを削除しました', 'success')
       onFileDeleted?.(fileId)
     } else {
-      alert('ファイルの削除に失敗しました')
+      showToast('ファイルの削除に失敗しました', 'error')
     }
   }
 
@@ -93,13 +97,16 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
 
     if (file.file_type === 'photo') {
       return (
-        <Image
-          src={url}
-          alt={file.file_name}
-          width={64}
-          height={64}
-          className="w-16 h-16 object-cover rounded"
-        />
+        <div className="w-16 h-16 rounded overflow-hidden bg-gray-100">
+          <Image
+            src={url}
+            alt={file.file_name}
+            width={64}
+            height={64}
+            className="w-full h-full object-cover"
+            unoptimized
+          />
+        </div>
       )
     }
 
@@ -127,13 +134,16 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
     if (file.file_type === 'photo') {
       return (
         <div className="mt-2">
-          <Image
-            src={url}
-            alt={file.file_name}
-            width={800}
-            height={256}
-            className="max-w-full max-h-64 object-contain rounded"
-          />
+          <div className="max-w-full max-h-64 bg-gray-100 rounded overflow-hidden">
+            <Image
+              src={url}
+              alt={file.file_name}
+              width={800}
+              height={256}
+              className="max-w-full max-h-64 object-contain rounded"
+              unoptimized
+            />
+          </div>
         </div>
       )
     }

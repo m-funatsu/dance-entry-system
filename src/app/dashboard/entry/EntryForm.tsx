@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Entry } from '@/lib/types'
+import { ToastProvider } from '@/contexts/ToastContext'
 
 interface EntryFormProps {
   userId: string
@@ -176,7 +177,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
   }
 
   return (
-    <>
+    <ToastProvider>
       <div className="min-h-screen p-5 bg-gray-50">
       <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-lg p-6 shadow-lg">
         {/* 写真アップロード */}
@@ -322,6 +323,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
         </div>
       </form>
       </div>
-    </>
+    </ToastProvider>
   )
 }
