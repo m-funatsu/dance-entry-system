@@ -102,7 +102,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
         error = result.error
         
         // 413エラー（Payload too large）の場合は早期に終了
-        if (result.error?.statusCode === '413' || result.error?.message?.includes('too large')) {
+        if (result.error?.message?.includes('too large') || result.error?.message?.includes('413')) {
           break
         }
       }
@@ -115,13 +115,14 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       console.error('Tried buckets:', POSSIBLE_BUCKETS)
       // エラータイプに応じたメッセージを生成
       let errorMessage = 'ファイルのアップロードに失敗しました。'
+      const errorAny = error as any
       
-      if (error?.statusCode === '413' || error?.message?.includes('too large')) {
+      if (error?.message?.includes('too large') || error?.message?.includes('413') || errorAny?.statusCode === '413') {
         const currentLimit = fileType === 'video' ? '50MB' : '25MB'
         errorMessage = `ファイルサイズが大きすぎます。現在のテスト環境では${currentLimit}以下のファイルをアップロードしてください。`
-      } else if (error?.statusCode === '400' && error?.error === 'InvalidKey') {
+      } else if (errorAny?.statusCode === '400' && errorAny?.error === 'InvalidKey') {
         errorMessage = 'ファイル名に使用できない文字が含まれています。ファイル名を英数字に変更してください。'
-      } else if (error?.statusCode === '404') {
+      } else if (errorAny?.statusCode === '404') {
         errorMessage = 'ストレージの設定に問題があります。管理者にお問い合わせください。'
       } else {
         errorMessage += `しばらく時間をおいて再度お試しください。エラー: ${error?.message || error}`
