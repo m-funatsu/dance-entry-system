@@ -45,7 +45,11 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
       
       const hasFile = Boolean(data && data.length > 0)
       console.log(`[FileUpload] ${fileType} has existing file: ${hasFile}`)
-      setHasExistingFile(hasFile)
+      setHasExistingFile(prevState => {
+        console.log(`[FileUpload] ${fileType} previous state: ${prevState}`)
+        console.log(`[FileUpload] ${fileType} new state will be: ${hasFile}`)
+        return hasFile
+      })
     }
   }, [entryId, fileType])
 
@@ -53,6 +57,10 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
     setMounted(true)
     checkExistingFile()
   }, [checkExistingFile])
+
+  useEffect(() => {
+    console.log(`[FileUpload] ${fileType} hasExistingFile state changed to: ${hasExistingFile}`)
+  }, [hasExistingFile, fileType])
 
   useImperativeHandle(ref, () => ({
     refreshFileStatus: () => {
