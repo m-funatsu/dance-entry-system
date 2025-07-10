@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import DataExportManager from '@/components/DataExportManager'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -27,12 +28,15 @@ export default async function AdminDashboardPage() {
     .select('*, users(name)')
     .order('created_at', { ascending: false })
 
-
-  // 管理者クライアントで全ユーザーデータを取得
+  // 管理者クライアントで全ユーザーデータとファイル数を取得
   const adminSupabase = createAdminClient()
-  const { data: allUsers } = await adminSupabase
-    .from('users')
-    .select('id, name, email')
+  const [usersResult, filesResult] = await Promise.all([
+    adminSupabase.from('users').select('id, name, email'),
+    adminSupabase.from('entry_files').select('id')
+  ])
+  
+  const { data: allUsers } = usersResult
+  const { data: allFiles } = filesResult
 
   // 手動でユーザーデータをマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
@@ -319,6 +323,14 @@ export default async function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* データエクスポート機能 */}
+          <div className="mt-8">
+            <DataExportManager 
+              totalEntries={stats.total}
+              totalFiles={allFiles?.length || 0}
+            />
           </div>
         </div>
       </main>
