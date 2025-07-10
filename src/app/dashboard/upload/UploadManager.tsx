@@ -33,14 +33,19 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
   }
 
   const handleFileDeleted = (deletedFileType: string) => {
+    console.log(`[UploadManager] File deleted: ${deletedFileType}`)
     setUploadSuccess('ファイルを削除しました')
     setUploadError('')
     setRefreshKey(prev => prev + 1)
     
     // Refresh the corresponding FileUpload component
     const fileUploadRef = fileUploadRefs.current[deletedFileType]
+    console.log(`[UploadManager] FileUpload ref for ${deletedFileType}:`, fileUploadRef)
     if (fileUploadRef) {
+      console.log(`[UploadManager] Calling refreshFileStatus for ${deletedFileType}`)
       fileUploadRef.refreshFileStatus()
+    } else {
+      console.log(`[UploadManager] No ref found for ${deletedFileType}`)
     }
   }
 
@@ -97,7 +102,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
               {!isDeadlinePassed && (
                 <div className="mb-6">
                   <FileUpload
-                    key={`${fileType.type}-${refreshKey}`}
+                    key={fileType.type}
                     ref={(ref) => setFileUploadRef(fileType.type, ref)}
                     userId={userId}
                     entryId={entryId}

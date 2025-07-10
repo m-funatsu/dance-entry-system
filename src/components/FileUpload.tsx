@@ -34,6 +34,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
 
   const checkExistingFile = useCallback(async () => {
     if (fileType === 'video' || fileType === 'audio' || fileType === 'music') {
+      console.log(`[FileUpload] checkExistingFile called for ${fileType}`)
       const supabase = createClient()
       const { data } = await supabase
         .from('entry_files')
@@ -42,7 +43,9 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
         .eq('file_type', fileType)
         .limit(1)
       
-      setHasExistingFile(Boolean(data && data.length > 0))
+      const hasFile = Boolean(data && data.length > 0)
+      console.log(`[FileUpload] ${fileType} has existing file: ${hasFile}`)
+      setHasExistingFile(hasFile)
     }
   }, [entryId, fileType])
 
@@ -53,9 +56,10 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
 
   useImperativeHandle(ref, () => ({
     refreshFileStatus: () => {
+      console.log(`[FileUpload] refreshFileStatus called for ${fileType}`)
       checkExistingFile()
     }
-  }), [checkExistingFile])
+  }), [checkExistingFile, fileType])
 
   if (!mounted) {
     return <div className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>
