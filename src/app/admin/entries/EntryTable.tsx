@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { formatDateLocale } from '@/lib/utils'
+import EmailComposer from '@/components/EmailComposer'
 
 interface EntryWithDetails {
   id: string
@@ -41,6 +42,7 @@ interface EntryTableProps {
 export default function EntryTable({ entries }: EntryTableProps) {
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+  const [showEmailComposer, setShowEmailComposer] = useState(false)
   const router = useRouter()
 
   const getStatusBadge = (status: string) => {
@@ -196,6 +198,13 @@ export default function EntryTable({ entries }: EntryTableProps) {
               >
                 不選考に変更
               </button>
+              <button
+                onClick={() => setShowEmailComposer(true)}
+                disabled={loading}
+                className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50"
+              >
+                メール送信
+              </button>
             </div>
           </div>
         </div>
@@ -312,6 +321,18 @@ export default function EntryTable({ entries }: EntryTableProps) {
         <div className="text-center py-12">
           <div className="text-sm text-gray-500">エントリーがありません</div>
         </div>
+      )}
+
+      {showEmailComposer && (
+        <EmailComposer
+          selectedEntries={selectedEntries}
+          entries={entries}
+          onClose={() => setShowEmailComposer(false)}
+          onSent={() => {
+            setSelectedEntries([])
+            router.refresh()
+          }}
+        />
       )}
     </div>
   )
