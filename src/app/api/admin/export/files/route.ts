@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import JSZip from 'jszip'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // 認証チェック
     const supabase = await createClient()
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 
     // 各ファイルをダウンロードしてZIPに追加
     let processedCount = 0
-    const failedFiles: any[] = []
+    const failedFiles: { file_name: string; file_path: string; error: string }[] = []
 
     for (const file of entryFiles) {
       try {

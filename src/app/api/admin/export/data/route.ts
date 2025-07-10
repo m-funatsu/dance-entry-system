@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const settings = settingsResult.data || []
 
     // CSVヘルパー関数
-    const escapeCSV = (value: any): string => {
+    const escapeCSV = (value: unknown): string => {
       if (value === null || value === undefined) return ''
       const str = String(value)
       if (str.includes(',') || str.includes('"') || str.includes('\n')) {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       return str
     }
 
-    const arrayToCSV = (data: any[], headers: string[]): string => {
+    const arrayToCSV = (data: Record<string, unknown>[], headers: string[]): string => {
       const headerRow = headers.map(escapeCSV).join(',')
       const dataRows = data.map(row => 
         headers.map(header => escapeCSV(row[header])).join(',')
