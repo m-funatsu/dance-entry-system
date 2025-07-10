@@ -11,47 +11,51 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
   const [isExporting, setIsExporting] = useState(false)
   const [exportStatus, setExportStatus] = useState<string>('')
 
+  // 内部関数：状態管理を外部で行う版
+  const performDataExport = async (format: 'json' | 'csv' | 'zip' = 'csv') => {
+    const response = await fetch(`/api/admin/export/data?format=${format}`)
+    
+    if (!response.ok) {
+      throw new Error('データエクスポートに失敗しました')
+    }
+
+    if (format === 'csv' || format === 'zip') {
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
+      if (format === 'zip') {
+        a.download = `dance_entry_data_tables_${timestamp}.zip`
+      } else {
+        a.download = `dance_entry_data_${timestamp}.csv`
+      }
+      
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } else {
+      const data = await response.json()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `dance_entry_data_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.json`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }
+  }
+
   const handleExportData = async (format: 'json' | 'csv' | 'zip' = 'csv') => {
     setIsExporting(true)
     setExportStatus('データベースデータをエクスポート中...')
 
     try {
-      const response = await fetch(`/api/admin/export/data?format=${format}`)
-      
-      if (!response.ok) {
-        throw new Error('データエクスポートに失敗しました')
-      }
-
-      if (format === 'csv' || format === 'zip') {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
-        if (format === 'zip') {
-          a.download = `dance_entry_data_tables_${timestamp}.zip`
-        } else {
-          a.download = `dance_entry_data_${timestamp}.csv`
-        }
-        
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-      } else {
-        const data = await response.json()
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `dance_entry_data_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.json`
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-      }
-
+      await performDataExport(format)
       setExportStatus('データエクスポートが完了しました')
     } catch (error) {
       console.error('Export error:', error)
@@ -59,6 +63,38 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     } finally {
       setIsExporting(false)
     }
+  }
+
+  // 内部関数：状態管理を外部で行う版
+  const performFileExport = async () => {
+    const response = await fetch('/api/admin/export/files')
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'ファイルエクスポートに失敗しました')
+    }
+
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    
+    // レスポンスヘッダーからファイル名を取得
+    const contentDisposition = response.headers.get('content-disposition')
+    let filename = `dance_entry_files_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.zip`
+    
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="([^"]+)"/)
+      if (filenameMatch) {
+        filename = filenameMatch[1]
+      }
+    }
+    
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
   }
 
   const handleExportFiles = async () => {
@@ -75,35 +111,7 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     setExportStatus('ファイルアーカイブを作成中...')
 
     try {
-      const response = await fetch('/api/admin/export/files')
-      
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'ファイルエクスポートに失敗しました')
-      }
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      
-      // レスポンスヘッダーからファイル名を取得
-      const contentDisposition = response.headers.get('content-disposition')
-      let filename = `dance_entry_files_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.zip`
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="([^"]+)"/)
-        if (filenameMatch) {
-          filename = filenameMatch[1]
-        }
-      }
-      
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-
+      await performFileExport()
       setExportStatus('ファイルエクスポートが完了しました')
     } catch (error) {
       console.error('File export error:', error)
@@ -118,13 +126,30 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
       return
     }
 
-    // テーブル別ZIPデータエクスポート
-    await handleExportData('zip')
+    setIsExporting(true)
     
-    // 少し間を空けてファイルエクスポート
-    setTimeout(async () => {
-      await handleExportFiles()
-    }, 1000)
+    try {
+      // Step 1: テーブル別ZIPデータエクスポート
+      setExportStatus('ステップ1/2: データベースデータをエクスポート中...')
+      await performDataExport('zip')
+      
+      // Step 2: ファイルアーカイブエクスポート
+      if (totalFiles > 0) {
+        setExportStatus('ステップ2/2: ファイルアーカイブをエクスポート中...')
+        // 少し間を空けてファイルエクスポート
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        await performFileExport()
+      } else {
+        setExportStatus('データベースデータのエクスポートが完了しました（ファイルはありません）')
+      }
+      
+      setExportStatus('完全エクスポートが完了しました！')
+    } catch (error) {
+      console.error('Full export error:', error)
+      setExportStatus('完全エクスポートに失敗しました: ' + (error instanceof Error ? error.message : '不明なエラー'))
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
