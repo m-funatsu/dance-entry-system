@@ -12,7 +12,7 @@ interface FileListProps {
   entryId: string
   editable?: boolean
   fileType?: 'music' | 'audio' | 'photo' | 'video'
-  onFileDeleted?: (fileId: string) => void
+  onFileDeleted?: (fileId: string, fileType: string) => void
   refreshKey?: number
 }
 
@@ -66,11 +66,14 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
   const handleDelete = async (fileId: string) => {
     if (!confirm('このファイルを削除しますか？')) return
 
+    const fileToDelete = files.find(f => f.id === fileId)
     const success = await deleteFile(fileId)
     if (success) {
       setFiles(files.filter(f => f.id !== fileId))
       showToast('ファイルを削除しました', 'success')
-      onFileDeleted?.(fileId)
+      if (fileToDelete) {
+        onFileDeleted?.(fileId, fileToDelete.file_type)
+      }
     } else {
       showToast('ファイルの削除に失敗しました', 'error')
     }

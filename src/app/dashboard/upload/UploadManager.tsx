@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import FileUpload from '@/components/FileUpload'
+import { useState, useRef } from 'react'
+import FileUpload, { FileUploadRef } from '@/components/FileUpload'
 import FileList from '@/components/FileList'
 
 interface UploadManagerProps {
@@ -15,6 +15,11 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
   const [uploadSuccess, setUploadSuccess] = useState('')
   const [uploadError, setUploadError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const fileUploadRefs = useRef<{ [key: string]: FileUploadRef | null }>({})
+
+  const setFileUploadRef = (fileType: string, ref: FileUploadRef | null) => {
+    fileUploadRefs.current[fileType] = ref
+  }
 
   const handleUploadComplete = () => {
     setUploadSuccess('ファイルのアップロードが完了しました')
@@ -27,10 +32,16 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
     setUploadSuccess('')
   }
 
-  const handleFileDeleted = () => {
+  const handleFileDeleted = (deletedFileType: string) => {
     setUploadSuccess('ファイルを削除しました')
     setUploadError('')
     setRefreshKey(prev => prev + 1)
+    
+    // Refresh the corresponding FileUpload component
+    const fileUploadRef = fileUploadRefs.current[deletedFileType]
+    if (fileUploadRef) {
+      fileUploadRef.refreshFileStatus()
+    }
   }
 
   const fileTypes = [
@@ -87,6 +98,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
                 <div className="mb-6">
                   <FileUpload
                     key={`${fileType.type}-${refreshKey}`}
+                    ref={(ref) => setFileUploadRef(fileType.type, ref)}
                     userId={userId}
                     entryId={entryId}
                     fileType={fileType.type}
@@ -105,7 +117,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
                   entryId={entryId}
                   fileType={fileType.type}
                   editable={!isDeadlinePassed}
-                  onFileDeleted={handleFileDeleted}
+                  onFileDeleted={(fileId, fileType) => handleFileDeleted(fileType)}
                 />
               </div>
             </div>

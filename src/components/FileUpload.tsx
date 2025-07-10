@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
 import { useToast } from '@/contexts/ToastContext'
 import { createClient } from '@/lib/supabase/client'
@@ -13,13 +13,17 @@ interface FileUploadProps {
   onUploadError?: (error: string) => void
 }
 
-export default function FileUpload({
+export interface FileUploadRef {
+  refreshFileStatus: () => void
+}
+
+const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
   userId,
   entryId,
   fileType,
   onUploadComplete,
   onUploadError
-}: FileUploadProps) {
+}, ref) => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [dragOver, setDragOver] = useState(false)
@@ -28,12 +32,7 @@ export default function FileUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  useEffect(() => {
-    setMounted(true)
-    checkExistingFile()
-  }, [])
-
-  const checkExistingFile = async () => {
+  const checkExistingFile = useCallback(async () => {
     if (fileType === 'video' || fileType === 'audio' || fileType === 'music') {
       const supabase = createClient()
       const { data } = await supabase
@@ -45,7 +44,18 @@ export default function FileUpload({
       
       setHasExistingFile(Boolean(data && data.length > 0))
     }
-  }
+  }, [entryId, fileType])
+
+  useEffect(() => {
+    setMounted(true)
+    checkExistingFile()
+  }, [checkExistingFile])
+
+  useImperativeHandle(ref, () => ({
+    refreshFileStatus: () => {
+      checkExistingFile()
+    }
+  }), [checkExistingFile])
 
   if (!mounted) {
     return <div className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>
@@ -251,4 +261,8 @@ export default function FileUpload({
       </div>
     </div>
   )
-}
+})
+
+FileUpload.displayName = 'FileUpload'
+
+export default FileUpload
