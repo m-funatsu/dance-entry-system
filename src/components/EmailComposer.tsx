@@ -160,8 +160,6 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     setSending(true)
 
     try {
-      const supabase = createClient()
-      
       // メール送信APIを呼び出し
       const emailData = selectedEntriesData.map(entry => ({
         to: entry.users.email,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
 import { useToast } from '@/contexts/ToastContext'
 import { createClient } from '@/lib/supabase/client'
@@ -28,7 +28,7 @@ export default function FileUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  const checkExistingFile = async () => {
+  const checkExistingFile = useCallback(async () => {
     if (fileType === 'video' || fileType === 'audio' || fileType === 'music') {
       const supabase = createClient()
       const { data } = await supabase
@@ -40,12 +40,12 @@ export default function FileUpload({
       
       setHasExistingFile(Boolean(data && data.length > 0))
     }
-  }
+  }, [entryId, fileType])
 
   useEffect(() => {
     setMounted(true)
     checkExistingFile()
-  }, [])
+  }, [checkExistingFile])
 
   if (!mounted) {
     return <div className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>
