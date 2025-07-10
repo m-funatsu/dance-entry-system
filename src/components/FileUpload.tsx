@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
 import { useToast } from '@/contexts/ToastContext'
 import { createClient } from '@/lib/supabase/client'
@@ -13,17 +13,13 @@ interface FileUploadProps {
   onUploadError?: (error: string) => void
 }
 
-export interface FileUploadRef {
-  refreshFileStatus: () => void
-}
-
-const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
+export default function FileUpload({
   userId,
   entryId,
   fileType,
   onUploadComplete,
   onUploadError
-}, ref) => {
+}: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [dragOver, setDragOver] = useState(false)
@@ -32,9 +28,8 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  const checkExistingFile = useCallback(async () => {
+  const checkExistingFile = async () => {
     if (fileType === 'video' || fileType === 'audio' || fileType === 'music') {
-      console.log(`[FileUpload] checkExistingFile called for ${fileType}`)
       const supabase = createClient()
       const { data } = await supabase
         .from('entry_files')
@@ -43,31 +38,14 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
         .eq('file_type', fileType)
         .limit(1)
       
-      const hasFile = Boolean(data && data.length > 0)
-      console.log(`[FileUpload] ${fileType} has existing file: ${hasFile}`)
-      setHasExistingFile(prevState => {
-        console.log(`[FileUpload] ${fileType} previous state: ${prevState}`)
-        console.log(`[FileUpload] ${fileType} new state will be: ${hasFile}`)
-        return hasFile
-      })
+      setHasExistingFile(Boolean(data && data.length > 0))
     }
-  }, [entryId, fileType])
+  }
 
   useEffect(() => {
     setMounted(true)
     checkExistingFile()
-  }, [checkExistingFile])
-
-  useEffect(() => {
-    console.log(`[FileUpload] ${fileType} hasExistingFile state changed to: ${hasExistingFile}`)
-  }, [hasExistingFile, fileType])
-
-  useImperativeHandle(ref, () => ({
-    refreshFileStatus: () => {
-      console.log(`[FileUpload] refreshFileStatus called for ${fileType}`)
-      checkExistingFile()
-    }
-  }), [checkExistingFile, fileType])
+  }, [])
 
   if (!mounted) {
     return <div className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>
@@ -273,8 +251,4 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
       </div>
     </div>
   )
-})
-
-FileUpload.displayName = 'FileUpload'
-
-export default FileUpload
+}

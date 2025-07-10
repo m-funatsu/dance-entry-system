@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import FileUpload, { FileUploadRef } from '@/components/FileUpload'
+import { useState } from 'react'
+import FileUpload from '@/components/FileUpload'
 import FileList from '@/components/FileList'
 
 interface UploadManagerProps {
@@ -15,11 +15,6 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
   const [uploadSuccess, setUploadSuccess] = useState('')
   const [uploadError, setUploadError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
-  const fileUploadRefs = useRef<{ [key: string]: FileUploadRef | null }>({})
-
-  const setFileUploadRef = (fileType: string, ref: FileUploadRef | null) => {
-    fileUploadRefs.current[fileType] = ref
-  }
 
   const handleUploadComplete = () => {
     setUploadSuccess('ファイルのアップロードが完了しました')
@@ -33,19 +28,15 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
   }
 
   const handleFileDeleted = (deletedFileType: string) => {
-    console.log(`[UploadManager] File deleted: ${deletedFileType}`)
     setUploadSuccess('ファイルを削除しました')
     setUploadError('')
     setRefreshKey(prev => prev + 1)
     
-    // Refresh the corresponding FileUpload component
-    const fileUploadRef = fileUploadRefs.current[deletedFileType]
-    console.log(`[UploadManager] FileUpload ref for ${deletedFileType}:`, fileUploadRef)
-    if (fileUploadRef) {
-      console.log(`[UploadManager] Calling refreshFileStatus for ${deletedFileType}`)
-      fileUploadRef.refreshFileStatus()
-    } else {
-      console.log(`[UploadManager] No ref found for ${deletedFileType}`)
+    // Auto-reload the page after deletion for single-file types
+    if (deletedFileType === 'video' || deletedFileType === 'audio' || deletedFileType === 'music') {
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000) // Wait 1 second to show the success message
     }
   }
 
@@ -102,8 +93,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
               {!isDeadlinePassed && (
                 <div className="mb-6">
                   <FileUpload
-                    key={fileType.type}
-                    ref={(ref) => setFileUploadRef(fileType.type, ref)}
+                    key={`${fileType.type}-${refreshKey}`}
                     userId={userId}
                     entryId={entryId}
                     fileType={fileType.type}
