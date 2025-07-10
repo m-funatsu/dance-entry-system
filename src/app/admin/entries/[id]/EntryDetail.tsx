@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { formatDateLocale } from '@/lib/utils'
 import FileList from '@/components/FileList'
@@ -41,10 +40,9 @@ interface EntryDetailProps {
       }
     }[]
   }
-  adminId: string
 }
 
-export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
+export default function EntryDetail({ entry }: EntryDetailProps) {
   const [score, setScore] = useState(entry.selections?.[0]?.score || '')
   const [comments, setComments] = useState(entry.selections?.[0]?.comments || '')
   const [status, setStatus] = useState(entry.selections?.[0]?.status || 'pending')

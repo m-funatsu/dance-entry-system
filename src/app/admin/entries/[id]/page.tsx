@@ -100,7 +100,7 @@ export default async function EntryDetailPage({ params }: PageProps) {
 
       <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <EntryDetail entry={entry} adminId={user.id} />
+          <EntryDetail entry={entry} />
         </div>
       </main>
     </div>
