@@ -11,7 +11,7 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
   const [isExporting, setIsExporting] = useState(false)
   const [exportStatus, setExportStatus] = useState<string>('')
 
-  const handleExportData = async (format: 'json' | 'csv' = 'csv') => {
+  const handleExportData = async (format: 'json' | 'csv' | 'zip' = 'csv') => {
     setIsExporting(true)
     setExportStatus('データベースデータをエクスポート中...')
 
@@ -22,12 +22,19 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
         throw new Error('データエクスポートに失敗しました')
       }
 
-      if (format === 'csv') {
+      if (format === 'csv' || format === 'zip') {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `dance_entry_data_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.csv`
+        
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
+        if (format === 'zip') {
+          a.download = `dance_entry_data_tables_${timestamp}.zip`
+        } else {
+          a.download = `dance_entry_data_${timestamp}.csv`
+        }
+        
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
@@ -107,12 +114,12 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
   }
 
   const handleFullExport = async () => {
-    if (!confirm('全データ（データベース + ファイル）をエクスポートしますか？\n\n1. CSVデータファイル\n2. ZIPファイルアーカイブ\n\nの順でダウンロードが開始されます。')) {
+    if (!confirm('全データ（データベース + ファイル）をエクスポートしますか？\n\n1. テーブル別ZIPファイル\n2. ファイルアーカイブZIP\n\nの順でダウンロードが開始されます。')) {
       return
     }
 
-    // CSVデータエクスポート
-    await handleExportData('csv')
+    // テーブル別ZIPデータエクスポート
+    await handleExportData('zip')
     
     // 少し間を空けてファイルエクスポート
     setTimeout(async () => {
@@ -183,22 +190,30 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
           <div className="border border-gray-200 rounded-lg p-4">
             <h4 className="text-sm font-medium text-gray-900 mb-2">データベースデータのエクスポート</h4>
             <p className="text-sm text-gray-500 mb-3">
-              参加者情報、エントリー詳細、選考結果などのデータをエクスポートします。
+              参加者情報、エントリー詳細、選考結果などのデータをエクスポートします。<br/>
+              <strong>📁 テーブル別ZIP</strong>: 各テーブル（users.csv, entries.csv等）を個別ファイルでZIP化（推奨）
             </p>
             <div className="flex space-x-2">
               <button
-                onClick={() => handleExportData('csv')}
+                onClick={() => handleExportData('zip')}
                 disabled={isExporting}
                 className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                CSV形式でダウンロード
+                📁 テーブル別ZIP（推奨）
+              </button>
+              <button
+                onClick={() => handleExportData('csv')}
+                disabled={isExporting}
+                className="px-3 py-2 bg-blue-100 text-blue-700 border border-blue-300 rounded-md text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                📄 統合CSV
               </button>
               <button
                 onClick={() => handleExportData('json')}
                 disabled={isExporting}
-                className="px-3 py-2 bg-blue-100 text-blue-700 border border-blue-300 rounded-md text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                JSON形式でダウンロード
+                📋 JSON形式
               </button>
             </div>
           </div>
@@ -237,15 +252,12 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
         <div className="mt-6 text-xs text-gray-500">
           <p className="mb-2">📝 <strong>エクスポートされるデータ:</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>参加者情報（users.csv）</li>
-            <li>エントリー詳細（entries.csv）</li>
-            <li>ファイル情報（entry_files.csv）</li>
-            <li>選考結果（selections.csv）</li>
-            <li>システム設定（settings.csv）</li>
-            <li>アップロードファイル（音楽、動画、写真等）</li>
+            <li><strong>テーブル別ZIP</strong>: users.csv, entries.csv, entry_files.csv, selections.csv, settings.csv（各テーブル個別ファイル + README）</li>
+            <li><strong>統合CSV</strong>: 全テーブルが1つのファイルに結合（従来形式）</li>
+            <li><strong>ファイルアーカイブ</strong>: 音楽、動画、写真等をフォルダ分類してZIP化</li>
           </ul>
           <p className="mt-3">
-            💡 <strong>ヒント:</strong> 大会終了後のデータアーカイブや次回大会での参加者データ再利用に活用できます。
+            💡 <strong>推奨:</strong> テーブル別ZIPは各データを個別に分析でき、次回システムでの再利用にも適しています。
           </p>
         </div>
       </div>

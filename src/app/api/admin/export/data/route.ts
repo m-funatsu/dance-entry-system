@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import JSZip from 'jszip'
 
 export async function GET(request: NextRequest) {
   try {
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
     const format = searchParams.get('format') || 'json'
 
     if (format === 'csv') {
-      // 統合CSVファイルを生成
+      // 統合CSVファイルを生成（従来の機能）
       let combinedCSV = `# ダンスエントリーシステム データエクスポート\n`
       combinedCSV += `# エクスポート日時: ${exportData.export_info.exported_at}\n`
       combinedCSV += `# エクスポート実行者: ${user.id}\n`
@@ -131,6 +132,64 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="dance_entry_data_${timestamp}.csv"`,
+          'Cache-Control': 'no-cache',
+        }
+      })
+    }
+
+    if (format === 'zip') {
+      // テーブルごとに個別のCSVファイルを作成してZIPに格納
+      const zip = new JSZip()
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
+
+      // 各テーブルのCSVファイルを作成
+      zip.file('users.csv', usersCSV)
+      zip.file('entries.csv', entriesCSV)
+      zip.file('entry_files.csv', entryFilesCSV)
+      zip.file('selections.csv', selectionsCSV)
+      zip.file('settings.csv', settingsCSV)
+
+      // メタデータファイルを追加
+      zip.file('export_info.json', JSON.stringify(exportData.export_info, null, 2))
+
+      // README.txtを追加
+      const readme = `ダンスエントリーシステム データエクスポート
+=======================================
+
+エクスポート日時: ${exportData.export_info.exported_at}
+エクスポート実行者: ${user.id}
+
+ファイル一覧:
+- users.csv: 参加者情報 (${users.length}件)
+- entries.csv: エントリー情報 (${entries.length}件)
+- entry_files.csv: ファイル情報 (${entryFiles.length}件)
+- selections.csv: 選考結果 (${selections.length}件)
+- settings.csv: システム設定 (${settings.length}件)
+- export_info.json: エクスポート詳細情報
+
+各CSVファイルはUTF-8エンコーディングで保存されています。
+Excel等で開く際は、文字エンコーディングを正しく設定してください。
+
+利用方法:
+1. 各CSVファイルを表計算ソフトで開いて分析
+2. 次回システムでのデータインポート用として利用
+3. アーカイブとして保管
+`
+
+      zip.file('README.txt', readme)
+
+      // ZIPファイルを生成
+      const zipBuffer = await zip.generateAsync({ 
+        type: 'arraybuffer',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      })
+
+      return new NextResponse(zipBuffer, {
+        headers: {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': `attachment; filename="dance_entry_data_tables_${timestamp}.zip"`,
+          'Content-Length': zipBuffer.byteLength.toString(),
           'Cache-Control': 'no-cache',
         }
       })
