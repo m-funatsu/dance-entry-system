@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -32,7 +32,8 @@ export async function PUT(
       )
     }
 
-    const entryId = params.id
+    const resolvedParams = await params
+    const entryId = resolvedParams.id
     const body = await request.json()
     const { score, comments, status } = body
 
