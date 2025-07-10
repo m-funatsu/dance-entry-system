@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
 import { useToast } from '@/contexts/ToastContext'
+import { createClient } from '@/lib/supabase/client'
 
 interface FileUploadProps {
   userId: string
@@ -23,12 +24,28 @@ export default function FileUpload({
   const [uploadProgress, setUploadProgress] = useState(0)
   const [dragOver, setDragOver] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [hasExistingFile, setHasExistingFile] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
   useEffect(() => {
     setMounted(true)
+    checkExistingFile()
   }, [])
+
+  const checkExistingFile = async () => {
+    if (fileType === 'video' || fileType === 'audio' || fileType === 'music') {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('entry_files')
+        .select('id')
+        .eq('entry_id', entryId)
+        .eq('file_type', fileType)
+        .limit(1)
+      
+      setHasExistingFile(Boolean(data && data.length > 0))
+    }
+  }
 
   if (!mounted) {
     return <div className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>
@@ -66,6 +83,12 @@ export default function FileUpload({
   const handleFileSelect = async (file: File) => {
     if (isUploading) return
 
+    // Check if file already exists for single-file types
+    if ((fileType === 'video' || fileType === 'audio' || fileType === 'music') && hasExistingFile) {
+      showToast('この種類のファイルは1つまでしかアップロードできません', 'error')
+      return
+    }
+
     setIsUploading(true)
     setUploadProgress(0)
 
@@ -94,6 +117,7 @@ export default function FileUpload({
 
       if (result.success && result.fileId && result.filePath) {
         showToast('ファイルのアップロードが完了しました', 'success')
+        setHasExistingFile(true)
         onUploadComplete?.(result.fileId, result.filePath)
       } else {
         showToast(result.error || 'アップロードに失敗しました', 'error')
@@ -136,21 +160,33 @@ export default function FileUpload({
   }
 
   const handleClick = () => {
+    if (hasExistingFile && (fileType === 'video' || fileType === 'audio' || fileType === 'music')) return
     fileInputRef.current?.click()
   }
 
+  const isDisabled = isUploading || (hasExistingFile && (fileType === 'video' || fileType === 'audio' || fileType === 'music'))
+
   return (
     <div className="w-full">
+      {hasExistingFile && (fileType === 'video' || fileType === 'audio' || fileType === 'music') && (
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-sm text-yellow-800">
+            {getFileTypeLabel()}は1つまでしかアップロードできません。新しいファイルをアップロードするには、既存のファイルを削除してください。
+          </p>
+        </div>
+      )}
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-          dragOver
-            ? 'border-indigo-500 bg-indigo-50'
-            : 'border-gray-300 hover:border-gray-400'
-        } ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={handleClick}
+        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+          isDisabled
+            ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+            : dragOver
+            ? 'border-indigo-500 bg-indigo-50 cursor-pointer'
+            : 'border-gray-300 hover:border-gray-400 cursor-pointer'
+        }`}
+        onDragOver={isDisabled ? undefined : handleDragOver}
+        onDragLeave={isDisabled ? undefined : handleDragLeave}
+        onDrop={isDisabled ? undefined : handleDrop}
+        onClick={isDisabled ? undefined : handleClick}
       >
         <input
           ref={fileInputRef}
@@ -158,7 +194,7 @@ export default function FileUpload({
           accept={getAcceptedTypes()}
           onChange={handleFileInputChange}
           className="hidden"
-          disabled={isUploading}
+          disabled={isDisabled}
         />
         
         <div className="flex flex-col items-center">
@@ -167,13 +203,21 @@ export default function FileUpload({
           </div>
           
           <div className="text-sm text-gray-600 mb-2">
-            <span className="font-medium text-indigo-600">
-              {getFileTypeLabel()}をアップロード
-            </span>
-            {!isUploading && (
+            {isDisabled ? (
+              <span className="font-medium text-gray-500">
+                {hasExistingFile ? 'アップロード済み' : 'アップロード不可'}
+              </span>
+            ) : (
               <>
-                <span className="text-gray-500"> または </span>
-                <span className="text-indigo-600">ここにドラッグ＆ドロップ</span>
+                <span className="font-medium text-indigo-600">
+                  {getFileTypeLabel()}をアップロード
+                </span>
+                {!isUploading && (
+                  <>
+                    <span className="text-gray-500"> または </span>
+                    <span className="text-indigo-600">ここにドラッグ＆ドロップ</span>
+                  </>
+                )}
               </>
             )}
           </div>

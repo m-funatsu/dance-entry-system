@@ -86,6 +86,7 @@ export default function UploadManager({ userId, entryId, isDeadlinePassed, setti
               {!isDeadlinePassed && (
                 <div className="mb-6">
                   <FileUpload
+                    key={`${fileType.type}-${refreshKey}`}
                     userId={userId}
                     entryId={entryId}
                     fileType={fileType.type}
