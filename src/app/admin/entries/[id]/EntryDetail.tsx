@@ -93,54 +93,29 @@ export default function EntryDetail({ entry, adminId }: EntryDetailProps) {
     setMessage('')
 
     try {
-      const supabase = createClient()
+      const response = await fetch(`/api/admin/entries/${entry.id}/selection`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          score: score ? parseInt(String(score)) : null,
+          comments,
+          status,
+        }),
+      })
 
-      if (entry.selections && entry.selections.length > 0) {
-        const { error } = await supabase
-          .from('selections')
-          .update({
-            score: score ? parseInt(String(score)) : null,
-            comments,
-            status,
-          })
-          .eq('id', entry.selections[0].id)
-
-        if (error) {
-          setMessage('選考結果の更新に失敗しました')
-          return
-        }
-      } else {
-        const { error } = await supabase
-          .from('selections')
-          .insert([
-            {
-              entry_id: entry.id,
-              admin_id: adminId,
-              score: score ? parseInt(String(score)) : null,
-              comments,
-              status,
-            }
-          ])
-
-        if (error) {
-          setMessage('選考結果の作成に失敗しました')
-          return
-        }
-      }
-
-      const { error: entryError } = await supabase
-        .from('entries')
-        .update({ status })
-        .eq('id', entry.id)
-
-      if (entryError) {
-        setMessage('エントリーステータスの更新に失敗しました')
+      if (!response.ok) {
+        const errorData = await response.json()
+        setMessage(errorData.error || '選考結果の保存に失敗しました')
         return
       }
 
       setMessage('選考結果を保存しました')
+      // ページをリフレッシュして最新データを取得
       router.refresh()
-    } catch {
+    } catch (error) {
+      console.error('Selection save error:', error)
       setMessage('選考結果の保存に失敗しました')
     } finally {
       setLoading(false)

@@ -114,21 +114,28 @@ export default function EntryTable({ entries }: EntryTableProps) {
 
   const updateEntryStatus = async (entryId: string, newStatus: string) => {
     setLoading(true)
-    const supabase = createClient()
 
     try {
-      const { error } = await supabase
-        .from('entries')
-        .update({ status: newStatus })
-        .eq('id', entryId)
+      const response = await fetch('/api/admin/entries/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryIds: [entryId],
+          status: newStatus,
+        }),
+      })
 
-      if (error) {
-        alert('ステータスの更新に失敗しました')
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(errorData.error || 'ステータスの更新に失敗しました')
         return
       }
 
       router.refresh()
-    } catch {
+    } catch (error) {
+      console.error('Status update error:', error)
       alert('ステータスの更新に失敗しました')
     } finally {
       setLoading(false)
@@ -146,22 +153,29 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
 
     setLoading(true)
-    const supabase = createClient()
 
     try {
-      const { error } = await supabase
-        .from('entries')
-        .update({ status: newStatus })
-        .in('id', selectedEntries)
+      const response = await fetch('/api/admin/entries/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryIds: selectedEntries,
+          status: newStatus,
+        }),
+      })
 
-      if (error) {
-        alert('ステータスの更新に失敗しました')
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(errorData.error || 'ステータスの更新に失敗しました')
         return
       }
 
       setSelectedEntries([])
       router.refresh()
-    } catch {
+    } catch (error) {
+      console.error('Bulk status update error:', error)
       alert('ステータスの更新に失敗しました')
     } finally {
       setLoading(false)
