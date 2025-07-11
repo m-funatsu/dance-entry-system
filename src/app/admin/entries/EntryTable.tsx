@@ -218,7 +218,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
       }
 
       const result = await response.json()
-      alert(`${result.deletedCount}件のエントリーを削除しました`)
+      const message = `${result.deletedCount}件のエントリーを削除しました\n\n📁 ファイル削除: ${result.filesDeletionSummary.details}`
+      alert(message)
       setSelectedEntries([])
       router.refresh()
     } catch (error) {

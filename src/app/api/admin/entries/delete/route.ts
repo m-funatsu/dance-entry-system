@@ -97,11 +97,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     // ファイルストレージからの削除（失敗しても処理を続行）
-    const fileDeletePromises = []
+    const fileDeletePromises: Promise<any>[] = []
+    const filePaths: string[] = []
+    
     for (const entry of entriesData) {
       if (entry.entry_files && entry.entry_files.length > 0) {
         for (const file of entry.entry_files) {
           if (file.file_path) {
+            filePaths.push(file.file_path)
             fileDeletePromises.push(
               adminSupabase.storage
                 .from('files')
@@ -112,19 +115,49 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
+    let fileDeleteResults: any[] = []
     if (fileDeletePromises.length > 0) {
       try {
-        await Promise.all(fileDeletePromises)
+        console.log(`Attempting to delete ${fileDeletePromises.length} files from storage:`, filePaths)
+        fileDeleteResults = await Promise.all(fileDeletePromises)
+        
+        // 削除結果を詳細にログ
+        let successCount = 0
+        let failCount = 0
+        
+        fileDeleteResults.forEach((result, index) => {
+          if (result.error) {
+            console.error(`Failed to delete file ${filePaths[index]}:`, result.error)
+            failCount++
+          } else {
+            console.log(`Successfully deleted file ${filePaths[index]}`)
+            successCount++
+          }
+        })
+        
+        console.log(`File deletion summary: ${successCount} succeeded, ${failCount} failed`)
       } catch (error) {
         console.warn('File deletion warning:', error)
         // ファイル削除の失敗は致命的ではないため、警告として扱う
       }
     }
 
+    // 削除結果のサマリーを作成
+    const successFiles = fileDeleteResults.filter(r => !r.error).length
+    const failedFiles = fileDeleteResults.filter(r => r.error).length
+    
     return NextResponse.json({ 
       success: true, 
       message: `${entryIds.length} entries deleted successfully`,
-      deletedCount: entryIds.length
+      deletedCount: entryIds.length,
+      filesDeletionSummary: {
+        attempted: fileDeletePromises.length,
+        succeeded: successFiles,
+        failed: failedFiles,
+        details: fileDeletePromises.length > 0 ? 
+          `${successFiles} files deleted from storage, ${failedFiles} failed` :
+          'No files to delete'
+      }
     })
 
   } catch (error) {
