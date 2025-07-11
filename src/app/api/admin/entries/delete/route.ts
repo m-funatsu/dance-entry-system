@@ -97,7 +97,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // ファイルストレージからの削除（失敗しても処理を続行）
-    const fileDeletePromises: Promise<any>[] = []
+    const fileDeletePromises: Promise<{ data: unknown; error: unknown }>[] = []
     const filePaths: string[] = []
     
     for (const entry of entriesData) {
@@ -115,7 +115,7 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    let fileDeleteResults: any[] = []
+    let fileDeleteResults: { data: unknown; error: unknown }[] = []
     if (fileDeletePromises.length > 0) {
       try {
         console.log(`Attempting to delete ${fileDeletePromises.length} files from storage:`, filePaths)
