@@ -181,6 +181,54 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
   }
 
+  const bulkDeleteEntries = async () => {
+    if (selectedEntries.length === 0) {
+      alert('削除するエントリーを選択してください')
+      return
+    }
+
+    const confirmMessage = `選択した${selectedEntries.length}件のエントリーを完全に削除しますか？\n\n⚠️ 注意: この操作は取り消せません。\n- エントリーデータ\n- 関連するファイル\n- 選考結果\n\nすべてが削除されます。`
+    
+    if (!confirm(confirmMessage)) {
+      return
+    }
+
+    // 二重確認
+    if (!confirm('本当に削除しますか？この操作は取り消せません。')) {
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/admin/entries/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryIds: selectedEntries,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(errorData.error || 'エントリーの削除に失敗しました')
+        return
+      }
+
+      const result = await response.json()
+      alert(`${result.deletedCount}件のエントリーを削除しました`)
+      setSelectedEntries([])
+      router.refresh()
+    } catch (error) {
+      console.error('Bulk delete error:', error)
+      alert('エントリーの削除に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       {selectedEntries.length > 0 && (
@@ -189,7 +237,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
             <span className="text-sm font-medium text-indigo-800">
               {selectedEntries.length}件のエントリーが選択されています
             </span>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => bulkUpdateStatus('submitted')}
                 disabled={loading}
@@ -217,6 +265,21 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50"
               >
                 メール送信
+              </button>
+            </div>
+          </div>
+          {/* 危険操作エリア */}
+          <div className="mt-3 pt-3 border-t border-indigo-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-red-600 font-medium">
+                ⚠️ 危険操作: 削除したデータは復元できません
+              </span>
+              <button
+                onClick={bulkDeleteEntries}
+                disabled={loading}
+                className="px-3 py-1 bg-red-700 text-white rounded text-sm hover:bg-red-800 disabled:opacity-50 border border-red-600 font-medium"
+              >
+                🗑️ 選択されたエントリーを削除
               </button>
             </div>
           </div>
