@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import EntryTable from './EntryTable'
+import EntriesWithFilters from './EntriesWithFilters'
 
 export default async function AdminEntriesPage() {
   const supabase = await createClient()
@@ -92,37 +92,7 @@ export default async function AdminEntriesPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg leading-6 font-medium text-gray-900">
-                  全エントリー ({entries?.length || 0}件)
-                </h2>
-                <div className="flex space-x-2">
-                  <select className="rounded-md border-gray-300 text-sm">
-                    <option value="">全ステータス</option>
-                    <option value="pending">未処理</option>
-                    <option value="submitted">提出済み</option>
-                    <option value="selected">選考通過</option>
-                    <option value="rejected">不選考</option>
-                  </select>
-                  <select className="rounded-md border-gray-300 text-sm">
-                    <option value="">全ジャンル</option>
-                    <option value="hip-hop">Hip-Hop</option>
-                    <option value="jazz">Jazz</option>
-                    <option value="contemporary">Contemporary</option>
-                    <option value="ballet">Ballet</option>
-                    <option value="street">Street</option>
-                    <option value="breakdance">Breakdance</option>
-                    <option value="k-pop">K-Pop</option>
-                    <option value="other">その他</option>
-                  </select>
-                </div>
-              </div>
-              
-              <EntryTable entries={entriesWithUsers} adminId={user.id} />
-            </div>
-          </div>
+          <EntriesWithFilters entries={entriesWithUsers} adminId={user.id} />
         </div>
       </main>
     </div>
