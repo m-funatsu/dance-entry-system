@@ -16,12 +16,18 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
     dance_style: existingEntry?.dance_style || '',
     team_name: existingEntry?.team_name || '',
     participant_names: existingEntry?.participant_names || '',
+    representative_name: existingEntry?.representative_name || '',
+    representative_furigana: existingEntry?.representative_furigana || '',
+    partner_name: existingEntry?.partner_name || '',
+    partner_furigana: existingEntry?.partner_furigana || '',
     phone_number: existingEntry?.phone_number || '',
     emergency_contact: existingEntry?.emergency_contact || '',
     photo_url: existingEntry?.photo_url || '',
     music_title: existingEntry?.music_title || '',
     choreographer: existingEntry?.choreographer || '',
+    choreographer_furigana: existingEntry?.choreographer_furigana || '',
     story: existingEntry?.story || '',
+    agreement_checked: existingEntry?.agreement_checked || false,
   }))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -36,12 +42,18 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
         dance_style: existingEntry.dance_style || '',
         team_name: existingEntry.team_name || '',
         participant_names: existingEntry.participant_names || '',
+        representative_name: existingEntry.representative_name || '',
+        representative_furigana: existingEntry.representative_furigana || '',
+        partner_name: existingEntry.partner_name || '',
+        partner_furigana: existingEntry.partner_furigana || '',
         phone_number: existingEntry.phone_number || '',
         emergency_contact: existingEntry.emergency_contact || '',
         photo_url: existingEntry.photo_url || '',
         music_title: existingEntry.music_title || '',
         choreographer: existingEntry.choreographer || '',
+        choreographer_furigana: existingEntry.choreographer_furigana || '',
         story: existingEntry.story || '',
+        agreement_checked: existingEntry.agreement_checked || false,
       })
     }
   }, [existingEntry])
@@ -81,6 +93,13 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
     setLoading(true)
     setError('')
 
+    // バリデーション
+    if (!formData.agreement_checked) {
+      setError('参加資格への同意が必要です')
+      setLoading(false)
+      return
+    }
+
     try {
       const supabase = createClient()
       
@@ -103,12 +122,18 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             dance_style: formData.dance_style,
             team_name: formData.team_name,
             participant_names: formData.participant_names,
+            representative_name: formData.representative_name,
+            representative_furigana: formData.representative_furigana,
+            partner_name: formData.partner_name,
+            partner_furigana: formData.partner_furigana,
             phone_number: formData.phone_number,
             emergency_contact: formData.emergency_contact,
             photo_url: photoUrl,
             music_title: formData.music_title,
             choreographer: formData.choreographer,
+            choreographer_furigana: formData.choreographer_furigana,
             story: formData.story,
+            agreement_checked: formData.agreement_checked,
           })
           .eq('id', existingEntry.id)
 
@@ -137,12 +162,18 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
               dance_style: formData.dance_style,
               team_name: formData.team_name,
               participant_names: formData.participant_names,
+              representative_name: formData.representative_name,
+              representative_furigana: formData.representative_furigana,
+              partner_name: formData.partner_name,
+              partner_furigana: formData.partner_furigana,
               phone_number: formData.phone_number,
               emergency_contact: formData.emergency_contact,
               photo_url: photoUrl,
               music_title: formData.music_title,
               choreographer: formData.choreographer,
+              choreographer_furigana: formData.choreographer_furigana,
               story: formData.story,
+              agreement_checked: formData.agreement_checked,
               status: 'pending',
             }
           ])
@@ -162,10 +193,10 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }))
   }
 
@@ -250,20 +281,87 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           />
         </div>
 
-        {/* 参加者名 */}
+        {/* 代表者名 */}
+        <div>
+          <label htmlFor="representative_name" className="block text-sm font-medium text-gray-700">
+            代表者名 *
+          </label>
+          <input
+            type="text"
+            id="representative_name"
+            name="representative_name"
+            required
+            value={formData.representative_name}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="代表者の氏名を入力"
+          />
+        </div>
+
+        {/* 代表者フリガナ */}
+        <div>
+          <label htmlFor="representative_furigana" className="block text-sm font-medium text-gray-700">
+            代表者フリガナ *
+          </label>
+          <input
+            type="text"
+            id="representative_furigana"
+            name="representative_furigana"
+            required
+            value={formData.representative_furigana}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="代表者のフリガナを入力"
+          />
+        </div>
+
+        {/* パートナ名 */}
+        <div>
+          <label htmlFor="partner_name" className="block text-sm font-medium text-gray-700">
+            パートナ名 *
+          </label>
+          <input
+            type="text"
+            id="partner_name"
+            name="partner_name"
+            required
+            value={formData.partner_name}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="パートナの氏名を入力"
+          />
+        </div>
+
+        {/* パートナフリガナ */}
+        <div>
+          <label htmlFor="partner_furigana" className="block text-sm font-medium text-gray-700">
+            パートナフリガナ *
+          </label>
+          <input
+            type="text"
+            id="partner_furigana"
+            name="partner_furigana"
+            required
+            value={formData.partner_furigana}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="パートナのフリガナを入力"
+          />
+        </div>
+
+        {/* 旧参加者名（下位互換のため残す） */}
         <div>
           <label htmlFor="participant_names" className="block text-sm font-medium text-gray-700">
-            参加者名 *
+            参加者名（全員）
           </label>
           <textarea
             id="participant_names"
             name="participant_names"
-            required
             rows={3}
             value={formData.participant_names}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="参加者の氏名を入力（複数人の場合は改行で区切る）"
+            placeholder="全参加者の氏名を入力（複数人の場合は改行で区切る）"
           />
         </div>
 
@@ -299,6 +397,63 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             placeholder="緊急時の連絡先（氏名・電話番号）"
           />
+        </div>
+
+        {/* 振付師名 */}
+        <div>
+          <label htmlFor="choreographer" className="block text-sm font-medium text-gray-700">
+            振付師名
+          </label>
+          <input
+            type="text"
+            id="choreographer"
+            name="choreographer"
+            value={formData.choreographer}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="振付師の氏名を入力"
+          />
+        </div>
+
+        {/* 振付師フリガナ */}
+        <div>
+          <label htmlFor="choreographer_furigana" className="block text-sm font-medium text-gray-700">
+            振付師フリガナ
+          </label>
+          <input
+            type="text"
+            id="choreographer_furigana"
+            name="choreographer_furigana"
+            value={formData.choreographer_furigana}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="振付師のフリガナを入力"
+          />
+        </div>
+
+        {/* 参加資格同意 */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">参加資格</h3>
+          <div className="text-sm text-gray-600 mb-4 space-y-2">
+            <p>• ペアであれば、プロ、アマを問わず全ての選手がエントリー可能</p>
+            <p>• ダンスによる教師、デモンストレーション等で収入を少額でも得ている場合はプロとみなす</p>
+            <p>• プロとアマチュアの混合での出場は不可</p>
+            <p>• ペアにおける性別は問わない</p>
+            <p>• ペアの年齢合計は20歳以上90歳未満とする</p>
+          </div>
+          <div className="flex items-center">
+            <input
+              id="agreement_checked"
+              name="agreement_checked"
+              type="checkbox"
+              checked={formData.agreement_checked}
+              onChange={handleChange}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label htmlFor="agreement_checked" className="ml-2 block text-sm text-gray-900">
+              上記の参加資格に同意します *
+            </label>
+          </div>
         </div>
 
         {error && (

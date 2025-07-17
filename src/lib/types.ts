@@ -14,12 +14,18 @@ export interface Entry {
   dance_style: string
   team_name?: string
   participant_names: string
+  representative_name?: string
+  representative_furigana?: string
+  partner_name?: string
+  partner_furigana?: string
   phone_number?: string
   emergency_contact?: string
   photo_url?: string
   music_title?: string
   choreographer?: string
+  choreographer_furigana?: string
   story?: string
+  agreement_checked?: boolean
   google_form_data?: Record<string, unknown>
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
