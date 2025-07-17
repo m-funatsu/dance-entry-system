@@ -14,7 +14,6 @@ interface EntryFormProps {
 export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
   const [formData, setFormData] = useState(() => ({
     dance_style: existingEntry?.dance_style || '',
-    team_name: existingEntry?.team_name || '',
     participant_names: existingEntry?.participant_names || '',
     representative_name: existingEntry?.representative_name || '',
     representative_furigana: existingEntry?.representative_furigana || '',
@@ -40,7 +39,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
     if (existingEntry) {
       setFormData({
         dance_style: existingEntry.dance_style || '',
-        team_name: existingEntry.team_name || '',
         participant_names: existingEntry.participant_names || '',
         representative_name: existingEntry.representative_name || '',
         representative_furigana: existingEntry.representative_furigana || '',
@@ -120,7 +118,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           .from('entries')
           .update({
             dance_style: formData.dance_style,
-            team_name: formData.team_name,
             participant_names: formData.participant_names,
             representative_name: formData.representative_name,
             representative_furigana: formData.representative_furigana,
@@ -160,7 +157,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             {
               user_id: userId,
               dance_style: formData.dance_style,
-              team_name: formData.team_name,
               participant_names: formData.participant_names,
               representative_name: formData.representative_name,
               representative_furigana: formData.representative_furigana,
@@ -264,22 +260,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           </select>
         </div>
 
-        {/* ペア名 */}
-        <div>
-          <label htmlFor="team_name" className="block text-sm font-medium text-gray-700">
-            ペア名 *
-          </label>
-          <input
-            type="text"
-            id="team_name"
-            name="team_name"
-            required
-            value={formData.team_name}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="ペア名を入力"
-          />
-        </div>
 
         {/* 代表者名 */}
         <div>
