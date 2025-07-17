@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(rg:*)",
+      "Bash(npx eslint:*)",
+      "Bash(timeout 30 npm run lint)",
+      "Bash(timeout 60 npm run build)",
+      "Bash(echo:*)",
+      "Bash(source:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(node:*)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://ckffwsmgtivqjqkhppkj.supabase.co\" SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrZmZ3c21ndGl2cWpxa2hwcGtqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTYxMzA2MSwiZXhwIjoyMDY3MTg5MDYxfQ.PeEjT0VXSTX7IgsPzQWzwLeHhRFgHOZvTUcgQEZ3kcQ\" node scripts/keep-supabase-active.js)"
+    ],
+    "deny": []
+  }
+}

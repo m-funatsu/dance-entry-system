@@ -294,7 +294,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             value={formData.representative_name}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="代表者の氏名を入力"
+            placeholder="バルカー太郎"
           />
         </div>
 
@@ -311,7 +311,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             value={formData.representative_furigana}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="代表者のフリガナを入力"
+            placeholder="バルカー タロウ"
           />
         </div>
 
@@ -328,7 +328,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             value={formData.partner_name}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="パートナの氏名を入力"
+            placeholder="バルカー花子"
           />
         </div>
 
@@ -345,25 +345,10 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             value={formData.partner_furigana}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="パートナのフリガナを入力"
+            placeholder="バルカー ハナコ"
           />
         </div>
 
-        {/* 旧参加者名（下位互換のため残す） */}
-        <div>
-          <label htmlFor="participant_names" className="block text-sm font-medium text-gray-700">
-            参加者名（全員）
-          </label>
-          <textarea
-            id="participant_names"
-            name="participant_names"
-            rows={3}
-            value={formData.participant_names}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="全参加者の氏名を入力（複数人の場合は改行で区切る）"
-          />
-        </div>
 
         {/* 電話番号 */}
         <div>
