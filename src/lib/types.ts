@@ -63,6 +63,19 @@ export interface Settings {
   updated_at: string
 }
 
+export interface NotificationTemplate {
+  id: string
+  name: string
+  description?: string
+  subject: string
+  body: string
+  category: 'entry' | 'selection' | 'reminder' | 'general'
+  is_active: boolean
+  created_by?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -90,6 +103,11 @@ export interface Database {
         Row: Settings
         Insert: Omit<Settings, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Settings, 'id' | 'created_at' | 'updated_at'>>
+      }
+      notification_templates: {
+        Row: NotificationTemplate
+        Insert: Omit<NotificationTemplate, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<NotificationTemplate, 'id' | 'created_at' | 'updated_at'>>
       }
     }
   }

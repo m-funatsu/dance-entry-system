@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import type { NotificationTemplate } from '@/lib/types'
 
 interface EmailComposerProps {
   selectedEntries: string[]
@@ -13,6 +14,8 @@ interface EmailComposerProps {
     dance_style: string
     team_name?: string
     participant_names: string
+    representative_name?: string
+    partner_name?: string
     status: string
   }[]
   onClose: () => void
@@ -103,12 +106,38 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [sending, setSending] = useState(false)
+  const [templates, setTemplates] = useState<NotificationTemplate[]>([])
+  const [templatesLoading, setTemplatesLoading] = useState(true)
 
   const selectedEntriesData = entries.filter(entry => selectedEntries.includes(entry.id))
 
+  // テンプレートをデータベースから取得
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await fetch('/api/admin/notification-templates')
+        if (response.ok) {
+          const data = await response.json()
+          setTemplates(data.filter((t: NotificationTemplate) => t.is_active))
+        }
+      } catch (error) {
+        console.error('Failed to fetch templates:', error)
+      } finally {
+        setTemplatesLoading(false)
+      }
+    }
+
+    fetchTemplates()
+  }, [])
+
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId)
-    const template = defaultTemplates.find(t => t.id === templateId)
+    
+    // データベースからのテンプレートを優先、フォールバックとしてデフォルトテンプレートを使用
+    const dbTemplate = templates.find(t => t.id === templateId)
+    const defaultTemplate = defaultTemplates.find(t => t.id === templateId)
+    const template = dbTemplate || defaultTemplate
+    
     if (template) {
       setSubject(template.subject)
       setBody(template.body)
@@ -120,9 +149,13 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       { variable: '{{name}}', description: '参加者名' },
       { variable: '{{email}}', description: 'メールアドレス' },
       { variable: '{{dance_style}}', description: 'ダンススタイル' },
+      { variable: '{{representative_name}}', description: '代表者名' },
+      { variable: '{{partner_name}}', description: 'パートナ名' },
       { variable: '{{team_name}}', description: 'チーム名（個人参加の場合は「個人参加」）' },
       { variable: '{{participant_names}}', description: '参加者名一覧' },
-      { variable: '{{status}}', description: '現在のステータス' }
+      { variable: '{{status}}', description: '現在のステータス' },
+      { variable: '{{competition_name}}', description: 'コンペティション名' },
+      { variable: '{{organization_name}}', description: '主催者名' }
     ]
   }
 
@@ -131,9 +164,13 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       .replace(/\{\{name\}\}/g, entry.users.name)
       .replace(/\{\{email\}\}/g, entry.users.email)
       .replace(/\{\{dance_style\}\}/g, entry.dance_style)
+      .replace(/\{\{representative_name\}\}/g, entry.representative_name || entry.users.name)
+      .replace(/\{\{partner_name\}\}/g, entry.partner_name || 'パートナ名未設定')
       .replace(/\{\{team_name\}\}/g, entry.team_name || '個人参加')
       .replace(/\{\{participant_names\}\}/g, entry.participant_names)
       .replace(/\{\{status\}\}/g, getStatusText(entry.status))
+      .replace(/\{\{competition_name\}\}/g, 'ダンスコンペティション')
+      .replace(/\{\{organization_name\}\}/g, 'ダンスコンペティション運営事務局')
   }
 
   const getStatusText = (status: string) => {
@@ -215,13 +252,23 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   テンプレート選択
+                  {templatesLoading && <span className="text-xs text-gray-500 ml-2">読み込み中...</span>}
                 </label>
                 <select
                   value={selectedTemplate}
                   onChange={(e) => handleTemplateChange(e.target.value)}
+                  disabled={templatesLoading}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 >
                   <option value="">テンプレートを選択...</option>
+                  {/* データベースからのテンプレート */}
+                  {templates.map(template => (
+                    <option key={template.id} value={template.id}>
+                      {template.name} ({template.category})
+                    </option>
+                  ))}
+                  {/* デフォルトテンプレート */}
+                  {templates.length > 0 && <option disabled>--- デフォルト ---</option>}
                   {defaultTemplates.map(template => (
                     <option key={template.id} value={template.id}>
                       {template.name}
