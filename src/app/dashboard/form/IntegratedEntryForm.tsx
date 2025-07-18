@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, User, EntryFile } from '@/lib/types'
 
@@ -42,10 +41,11 @@ interface FormData {
 }
 
 export default function IntegratedEntryForm({ userId, existingEntry, userProfile }: IntegratedEntryFormProps) {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState<FormSection>('basic')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({})
+  const [sectionSaved, setSectionSaved] = useState<Record<string, boolean>>({})
+  const [entryId, setEntryId] = useState<string>(existingEntry?.id || '')
   
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
@@ -111,10 +111,121 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     setFormData(prev => ({ ...prev, [field]: file }))
   }
 
-  const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'video', entryId: string) => {
+  const handleSaveSection = async (section: FormSection) => {
+    // バリデーション
+    if (!validateSection(section)) {
+      return
+    }
+
+    setSectionLoading({ ...sectionLoading, [section]: true })
+    setErrors({})
+
+    try {
+      const supabase = createClient()
+      
+      // エントリーデータの準備
+      let updateData: Record<string, unknown> = {}
+      
+      switch (section) {
+        case 'basic':
+          updateData = {
+            dance_style: formData.dance_style,
+            team_name: formData.team_name,
+            participant_names: '',
+            representative_name: formData.representative_name,
+            representative_furigana: formData.representative_furigana,
+            partner_name: formData.partner_name,
+            partner_furigana: formData.partner_furigana,
+            phone_number: formData.phone_number,
+            emergency_contact: formData.emergency_contact,
+            agreement_checked: formData.agreement_checked,
+          }
+          break
+        case 'music':
+          // 楽曲情報はファイルのみなので、ファイルアップロード処理を実行
+          if (formData.photo || formData.video || formData.music || formData.music2) {
+            await handleFilesUpload()
+          }
+          setSectionSaved({ ...sectionSaved, [section]: true })
+          setSectionLoading({ ...sectionLoading, [section]: false })
+          return
+        case 'additional':
+          updateData = {
+            choreographer: formData.choreographer,
+            choreographer_furigana: formData.choreographer_furigana,
+            story: formData.story,
+          }
+          break
+      }
+
+      // 既存エントリーがない場合は新規作成
+      if (!entryId) {
+        const { data, error } = await supabase
+          .from('entries')
+          .insert({
+            user_id: userId,
+            ...updateData,
+            music_title: '',
+            status: userProfile.has_seed ? 'selected' : 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .select()
+          .single()
+        
+        if (error) throw error
+        setEntryId(data.id)
+      } else {
+        // 既存エントリーの更新
+        const { error } = await supabase
+          .from('entries')
+          .update({
+            ...updateData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', entryId)
+        
+        if (error) throw error
+      }
+
+      setSectionSaved({ ...sectionSaved, [section]: true })
+    } catch (error) {
+      console.error('Error saving section:', error)
+      setErrors({ submit: `${section}の保存中にエラーが発生しました` })
+    } finally {
+      setSectionLoading({ ...sectionLoading, [section]: false })
+    }
+  }
+
+  const handleFilesUpload = async () => {
+    if (!entryId) {
+      setErrors({ submit: '基本情報を先に保存してください' })
+      return
+    }
+
+    const uploadPromises = []
+    if (formData.photo) {
+      uploadPromises.push(uploadFile(formData.photo, 'photo', entryId))
+    }
+    if (formData.music) {
+      uploadPromises.push(uploadFile(formData.music, 'music', entryId))
+    }
+    if (formData.video) {
+      uploadPromises.push(uploadFile(formData.video, 'video', entryId))
+    }
+    if (formData.use_different_songs && formData.music2) {
+      uploadPromises.push(uploadFile(formData.music2, 'music', entryId))
+    }
+
+    if (uploadPromises.length > 0) {
+      await Promise.all(uploadPromises)
+    }
+  }
+
+  const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'video', uploadEntryId: string) => {
     const supabase = createClient()
-    const fileName = `${entryId}_${fileType}_${Date.now()}_${file.name}`
-    const filePath = `entries/${entryId}/${fileName}`
+    const fileName = `${uploadEntryId}_${fileType}_${Date.now()}_${file.name}`
+    const filePath = `entries/${uploadEntryId}/${fileName}`
 
     const { error: uploadError, data } = await supabase.storage
       .from('files')
@@ -126,7 +237,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     const { error: dbError } = await supabase
       .from('entry_files')
       .insert({
-        entry_id: entryId,
+        entry_id: uploadEntryId,
         file_type: fileType,
         file_name: file.name,
         file_path: filePath,
@@ -141,94 +252,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // 必須セクションの検証
-    const requiredSections = sections.filter(s => s.required).map(s => s.id)
-    for (const section of requiredSections) {
-      if (!validateSection(section)) {
-        setActiveSection(section)
-        return
-      }
-    }
-    
-
-    setLoading(true)
-    setErrors({})
-
-    try {
-      const supabase = createClient()
-      
-      // エントリーデータの保存
-      const entryData = {
-        user_id: userId,
-        dance_style: formData.dance_style,
-        team_name: formData.team_name,
-        participant_names: '', // 一時的に空文字を設定
-        representative_name: formData.representative_name,
-        representative_furigana: formData.representative_furigana,
-        partner_name: formData.partner_name,
-        partner_furigana: formData.partner_furigana,
-        phone_number: formData.phone_number,
-        emergency_contact: formData.emergency_contact,
-        music_title: '',
-        choreographer: formData.choreographer,
-        choreographer_furigana: formData.choreographer_furigana,
-        story: formData.story,
-        agreement_checked: formData.agreement_checked,
-        status: userProfile.has_seed ? 'selected' : 'pending',
-        created_at: existingEntry ? existingEntry.created_at : new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }
-
-      let entryId: string
-      
-      if (existingEntry) {
-        // 更新
-        const { error } = await supabase
-          .from('entries')
-          .update(entryData)
-          .eq('id', existingEntry.id)
-        
-        if (error) throw error
-        entryId = existingEntry.id
-      } else {
-        // 新規作成
-        const { data, error } = await supabase
-          .from('entries')
-          .insert(entryData)
-          .select()
-          .single()
-        
-        if (error) throw error
-        entryId = data.id
-      }
-
-      // ファイルのアップロード
-      const uploadPromises = []
-      if (formData.photo) {
-        uploadPromises.push(uploadFile(formData.photo, 'photo', entryId))
-      }
-      if (formData.music) {
-        uploadPromises.push(uploadFile(formData.music, 'music', entryId))
-      }
-      if (formData.video) {
-        uploadPromises.push(uploadFile(formData.video, 'video', entryId))
-      }
-      if (formData.use_different_songs && formData.music2) {
-        uploadPromises.push(uploadFile(formData.music2, 'music', entryId))
-      }
-
-      if (uploadPromises.length > 0) {
-        await Promise.all(uploadPromises)
-      }
-
-      router.push('/dashboard?message=エントリー情報を保存しました')
-    } catch (error) {
-      console.error('Error saving entry:', error)
-      setErrors({ submit: 'エントリーの保存中にエラーが発生しました' })
-    } finally {
-      setLoading(false)
-    }
+    // フォーム全体の送信は無効化（各セクションで個別保存するため）
   }
 
   return (
@@ -394,6 +418,21 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 </div>
                 {errors.agreement && <p className="mt-1 text-sm text-red-600">{errors.agreement}</p>}
               </div>
+              
+              {/* 基本情報保存ボタン */}
+              <div className="mt-6 flex justify-end space-x-3">
+                {sectionSaved.basic && (
+                  <span className="text-sm text-green-600">✓ 保存済み</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSaveSection('basic')}
+                  disabled={sectionLoading.basic}
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sectionLoading.basic ? '保存中...' : '基本情報を保存'}
+                </button>
+              </div>
             </div>
           )}
 
@@ -481,6 +520,24 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   </div>
                 )}
               </div>
+              
+              {/* 楽曲情報保存ボタン */}
+              <div className="mt-6 flex justify-end space-x-3">
+                {!entryId && (
+                  <p className="text-sm text-red-600">※ 基本情報を先に保存してください</p>
+                )}
+                {sectionSaved.music && (
+                  <span className="text-sm text-green-600">✓ 保存済み</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSaveSection('music')}
+                  disabled={sectionLoading.music || !entryId}
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sectionLoading.music ? 'アップロード中...' : '楽曲情報を保存'}
+                </button>
+              </div>
             </div>
           )}
 
@@ -526,6 +583,24 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   placeholder="作品のストーリーや説明を入力してください"
                 />
               </div>
+              
+              {/* 追加情報保存ボタン */}
+              <div className="mt-6 flex justify-end space-x-3">
+                {!entryId && (
+                  <p className="text-sm text-red-600">※ 基本情報を先に保存してください</p>
+                )}
+                {sectionSaved.additional && (
+                  <span className="text-sm text-green-600">✓ 保存済み</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSaveSection('additional')}
+                  disabled={sectionLoading.additional || !entryId}
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sectionLoading.additional ? '保存中...' : '追加情報を保存'}
+                </button>
+              </div>
             </div>
           )}
 
@@ -539,32 +614,12 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
             </div>
           )}
 
-          {/* 送信ボタン */}
-          <div className="mt-8 space-y-4">
-
-            {errors.submit && (
-              <div className="rounded-md bg-red-50 p-4">
-                <p className="text-sm text-red-800">{errors.submit}</p>
-              </div>
-            )}
-
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => router.push('/dashboard')}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                キャンセル
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? '保存中...' : (existingEntry ? '更新する' : '登録する')}
-              </button>
+          {/* エラー表示 */}
+          {errors.submit && (
+            <div className="mt-8 rounded-md bg-red-50 p-4">
+              <p className="text-sm text-red-800">{errors.submit}</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </form>
