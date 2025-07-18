@@ -18,7 +18,6 @@ interface FormData {
   // 基本情報
   dance_style: string
   team_name: string
-  participant_names: string
   representative_name: string
   representative_furigana: string
   partner_name: string
@@ -50,7 +49,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
     team_name: existingEntry?.team_name || '',
-    participant_names: existingEntry?.participant_names || '',
     representative_name: existingEntry?.representative_name || '',
     representative_furigana: existingEntry?.representative_furigana || '',
     partner_name: existingEntry?.partner_name || '',
@@ -77,7 +75,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     switch (section) {
       case 'basic':
         if (!formData.dance_style) newErrors.dance_style = 'ダンスジャンルを選択してください'
-        if (!formData.participant_names) newErrors.participant_names = '参加者名を入力してください'
         if (!formData.phone_number) newErrors.phone_number = '電話番号を入力してください'
         if (!formData.emergency_contact) newErrors.emergency_contact = '緊急連絡先を入力してください'
         break
@@ -154,7 +151,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     }
     
     if (!formData.agreement_checked) {
-      setErrors({ agreement: '同意事項にチェックしてください' })
+      setErrors({ agreement: '参加資格への同意が必要です' })
       return
     }
 
@@ -169,7 +166,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         user_id: userId,
         dance_style: formData.dance_style,
         team_name: formData.team_name,
-        participant_names: formData.participant_names,
         representative_name: formData.representative_name,
         representative_furigana: formData.representative_furigana,
         partner_name: formData.partner_name,
@@ -296,19 +292,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  参加者名 <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={formData.participant_names}
-                  onChange={(e) => setFormData(prev => ({ ...prev, participant_names: e.target.value }))}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="複数名の場合は改行で区切ってください"
-                />
-                {errors.participant_names && <p className="mt-1 text-sm text-red-600">{errors.participant_names}</p>}
-              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -514,6 +497,15 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
           {/* 同意事項と送信ボタン */}
           <div className="mt-8 space-y-4">
+            {/* 参加資格 */}
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">参加資格</h4>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>• ペアにおける性別は問わない</p>
+                <p>• ペアの年齢合計は20歳以上90歳未満とする</p>
+              </div>
+            </div>
+            
             <div className="flex items-start">
               <input
                 id="agreement"
@@ -523,7 +515,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <label htmlFor="agreement" className="ml-2 block text-sm text-gray-900">
-                エントリー規約に同意します
+                上記の参加資格に同意します *
               </label>
             </div>
             {errors.agreement && <p className="text-sm text-red-600">{errors.agreement}</p>}
