@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import FileList from '@/components/FileList'
 import type { Entry, User, EntryFile } from '@/lib/types'
 
 interface IntegratedEntryFormProps {
@@ -46,6 +47,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({})
   const [sectionSaved, setSectionSaved] = useState<Record<string, boolean>>({})
   const [entryId, setEntryId] = useState<string>(existingEntry?.id || '')
+  const [fileListRefreshKey, setFileListRefreshKey] = useState(0)
   
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
@@ -219,6 +221,8 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
     if (uploadPromises.length > 0) {
       await Promise.all(uploadPromises)
+      // ファイルリストを更新
+      setFileListRefreshKey(prev => prev + 1)
     }
   }
 
@@ -520,6 +524,19 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   </div>
                 )}
               </div>
+
+              {/* アップロード済みファイルのプレビュー */}
+              {entryId && (
+                <div className="mt-8">
+                  <h4 className="text-sm font-medium text-gray-900 mb-4">アップロード済みファイル</h4>
+                  <FileList 
+                    entryId={entryId} 
+                    editable={true}
+                    refreshKey={fileListRefreshKey}
+                    onFileDeleted={() => setFileListRefreshKey(prev => prev + 1)}
+                  />
+                </div>
+              )}
               
               {/* 楽曲情報保存ボタン */}
               <div className="mt-6 flex justify-end space-x-3">
