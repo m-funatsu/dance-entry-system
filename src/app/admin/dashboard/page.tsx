@@ -235,34 +235,6 @@ export default async function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Googleフォーム
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        データを取り込み
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  <a href="/admin/import" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    データを取り込む →
-                  </a>
-                </div>
-              </div>
-            </div>
 
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">

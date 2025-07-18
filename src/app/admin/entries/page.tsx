@@ -68,12 +68,6 @@ export default async function AdminEntriesPage() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <a
-                href="/admin/import"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                データ取り込み
-              </a>
               <span className="text-sm text-gray-500">
                 {userProfile.name}さん（管理者）
               </span>
