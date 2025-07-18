@@ -539,6 +539,26 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 )}
               </div>
 
+              {/* 写真のアップロード済みファイル */}
+              {entryId && (
+                <div className="mt-4 ml-4">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの写真</h5>
+                  <FileList 
+                    entryId={entryId} 
+                    fileType="photo"
+                    editable={true}
+                    refreshKey={fileListRefreshKey}
+                    onFileDeleted={(fileId, fileType) => {
+                      setFileListRefreshKey(prev => prev + 1)
+                      setUploadedFiles(prev => ({
+                        ...prev,
+                        photo: Math.max(0, prev.photo - 1)
+                      }))
+                    }}
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   動画 <span className="text-red-500">*</span>
@@ -577,6 +597,26 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 </p>
               </div>
 
+              {/* 動画のアップロード済みファイル */}
+              {entryId && (
+                <div className="mt-4 ml-4">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの動画</h5>
+                  <FileList 
+                    entryId={entryId} 
+                    fileType="video"
+                    editable={true}
+                    refreshKey={fileListRefreshKey}
+                    onFileDeleted={(fileId, fileType) => {
+                      setFileListRefreshKey(prev => prev + 1)
+                      setUploadedFiles(prev => ({
+                        ...prev,
+                        video: Math.max(0, prev.video - 1)
+                      }))
+                    }}
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   楽曲ファイル（音源） <span className="text-red-500">*</span>
@@ -610,6 +650,9 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                     )}
                   </>
                 )}
+                <p className="mt-2 text-sm text-gray-500">
+                  ※ この音源は準決勝・決勝共通で使用されます
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -653,24 +696,33 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 )}
               </div>
 
-              {/* アップロード済みファイルのプレビュー */}
+              {/* 音源のアップロード済みファイル */}
               {entryId && (
                 <div className="mt-8">
-                  <h4 className="text-sm font-medium text-gray-900 mb-4">アップロード済みファイル</h4>
-                  <FileList 
-                    entryId={entryId} 
-                    editable={true}
-                    refreshKey={fileListRefreshKey}
-                    onFileDeleted={(fileId, fileType) => {
-                      setFileListRefreshKey(prev => prev + 1)
-                      // ファイル削除時にカウントを即座に更新
-                      const type = fileType === 'audio' ? 'music' : fileType
-                      setUploadedFiles(prev => ({
-                        ...prev,
-                        [type]: Math.max(0, prev[type as keyof typeof prev] - 1)
-                      }))
-                    }}
-                  />
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの音源</h5>
+                  <div className="space-y-4">
+                    <div className="ml-4">
+                      <FileList 
+                        entryId={entryId} 
+                        fileType="music"
+                        editable={true}
+                        refreshKey={fileListRefreshKey}
+                        onFileDeleted={(fileId, fileType) => {
+                          setFileListRefreshKey(prev => prev + 1)
+                          setUploadedFiles(prev => ({
+                            ...prev,
+                            music: Math.max(0, prev.music - 1)
+                          }))
+                        }}
+                      />
+                      {uploadedFiles.music > 0 && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          ※ 音源がアップロードされた順に表示されています。
+                          {formData.use_different_songs ? '1つ目が準決勝用、2つ目が決勝用です。' : ''}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
               
