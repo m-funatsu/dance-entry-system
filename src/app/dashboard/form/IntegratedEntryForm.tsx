@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import FileList from '@/components/FileList'
+import { uploadFile as uploadFileToStorage } from '@/lib/storage'
 import type { Entry, User, EntryFile } from '@/lib/types'
 
 interface IntegratedEntryFormProps {
@@ -280,31 +281,18 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   }
 
   const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'video', uploadEntryId: string) => {
-    const supabase = createClient()
-    const fileName = `${uploadEntryId}_${fileType}_${Date.now()}_${file.name}`
-    const filePath = `entries/${uploadEntryId}/${fileName}`
+    const result = await uploadFileToStorage({
+      userId: userId,
+      entryId: uploadEntryId,
+      fileType: fileType,
+      file: file
+    })
 
-    const { error: uploadError, data } = await supabase.storage
-      .from('files')
-      .upload(filePath, file)
+    if (!result.success) {
+      throw new Error(result.error || 'アップロードに失敗しました')
+    }
 
-    if (uploadError) throw uploadError
-
-    // ファイル情報をDBに保存
-    const { error: dbError } = await supabase
-      .from('entry_files')
-      .insert({
-        entry_id: uploadEntryId,
-        file_type: fileType,
-        file_name: file.name,
-        file_path: filePath,
-        file_size: file.size,
-        mime_type: file.type,
-      })
-
-    if (dbError) throw dbError
-
-    return data
+    return result
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
