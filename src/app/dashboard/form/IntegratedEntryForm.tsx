@@ -113,6 +113,59 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     setFormData(prev => ({ ...prev, [field]: file }))
   }
 
+  const getFilePreview = (file: File | undefined, type: 'photo' | 'music' | 'video') => {
+    if (!file) return null
+
+    const objectUrl = URL.createObjectURL(file)
+
+    if (type === 'photo') {
+      return (
+        <div className="mt-2">
+          <div className="max-w-full max-h-64 bg-gray-100 rounded overflow-hidden">
+            <img
+              src={objectUrl}
+              alt={file.name}
+              className="max-w-full max-h-64 object-contain rounded"
+              onLoad={() => URL.revokeObjectURL(objectUrl)}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    if (type === 'video') {
+      return (
+        <div className="mt-2">
+          <video
+            src={objectUrl}
+            controls
+            className="max-w-full max-h-64 rounded"
+            onLoadedData={() => URL.revokeObjectURL(objectUrl)}
+          >
+            お使いのブラウザは動画再生に対応していません。
+          </video>
+        </div>
+      )
+    }
+
+    if (type === 'music') {
+      return (
+        <div className="mt-2">
+          <audio
+            src={objectUrl}
+            controls
+            className="w-full"
+            onLoadedData={() => URL.revokeObjectURL(objectUrl)}
+          >
+            お使いのブラウザは音声再生に対応していません。
+          </audio>
+        </div>
+      )
+    }
+
+    return null
+  }
+
   const handleSaveSection = async (section: FormSection) => {
     // バリデーション
     if (!validateSection(section)) {
@@ -456,7 +509,10 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                 />
                 {formData.photo && (
-                  <p className="mt-1 text-sm text-gray-600">選択: {formData.photo.name}</p>
+                  <>
+                    <p className="mt-1 text-sm text-gray-600">選択: {formData.photo.name}</p>
+                    {getFilePreview(formData.photo, 'photo')}
+                  </>
                 )}
               </div>
 
@@ -471,7 +527,10 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                 />
                 {formData.video && (
-                  <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
+                  <>
+                    <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
+                    {getFilePreview(formData.video, 'video')}
+                  </>
                 )}
                 <p className="mt-2 text-sm text-gray-500">
                   ※ 動画ファイルは200MBまでアップロード可能です
@@ -489,7 +548,10 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                 />
                 {formData.music && (
-                  <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
+                  <>
+                    <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
+                    {getFilePreview(formData.music, 'music')}
+                  </>
                 )}
               </div>
 
@@ -519,7 +581,10 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                       className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                     />
                     {formData.music2 && (
-                      <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>
+                      <>
+                        <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>
+                        {getFilePreview(formData.music2, 'music')}
+                      </>
                     )}
                   </div>
                 )}
