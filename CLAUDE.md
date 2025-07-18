@@ -2,6 +2,16 @@
 
 This file contains important information for Claude Code when working on this dance entry management system.
 
+## 重要な指示 / Important Instructions
+
+1. **言語設定 / Language Setting**
+   - **必ず日本語で会話してください** / Always communicate in Japanese
+   - エラーメッセージ、説明、提案などすべて日本語で行うこと
+
+2. **Git Push の厳守 / Mandatory Git Push**
+   - **コミット後は必ず `git push origin main` を実行すること**
+   - **絶対にpushを忘れないこと** - 変更が即座に反映されるようにするため
+
 ## Project Overview
 
 This is a Next.js 15 application for managing dance competition entries, built with:
