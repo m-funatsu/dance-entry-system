@@ -214,7 +214,10 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
                   </span>
                   {showMusicLabels && file.file_type === 'music' && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {index === 0 ? '準決勝用' : index === 1 && useDifferentSongs ? '決勝用' : `${index + 1}つ目`}
+                      {!useDifferentSongs && files.length === 1 ? '準決勝・決勝共通' : 
+                       index === 0 ? '準決勝用' : 
+                       index === 1 && useDifferentSongs ? '決勝用' : 
+                       `${index + 1}つ目`}
                     </span>
                   )}
                   <span className="text-sm text-gray-500">
