@@ -7,7 +7,6 @@ import type { Entry } from '@/lib/types'
 import FileUpload from '@/components/FileUpload'
 import FileList from '@/components/FileList'
 import BackgroundLoader from '@/components/BackgroundLoader'
-import { ToastProvider } from '@/contexts/ToastContext'
 
 interface MusicInfoFormProps {
   userId: string
@@ -87,7 +86,7 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
   }
 
   return (
-    <ToastProvider>
+    <>
       <BackgroundLoader pageType="music" />
       <div className="space-y-8 min-h-screen p-5" style={{
         backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--music-bg-image, none)',
@@ -248,6 +247,6 @@ export default function MusicInfoForm({ userId, entryId, existingEntry }: MusicI
         </div>
       </div>
       </div>
-    </ToastProvider>
+    </>
   )
 }
