@@ -27,11 +27,12 @@ interface FormData {
   agreement_checked: boolean
   
   // 楽曲情報
-  music_title: string
+  use_different_songs: boolean
+  
+  // 追加情報
   choreographer: string
   choreographer_furigana: string
   story: string
-  use_different_songs: boolean
   
   // ファイル
   photo?: File
@@ -55,11 +56,10 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     partner_furigana: existingEntry?.partner_furigana || '',
     phone_number: existingEntry?.phone_number || '',
     emergency_contact: existingEntry?.emergency_contact || '',
-    music_title: existingEntry?.music_title || '',
+    use_different_songs: false,
     choreographer: existingEntry?.choreographer || '',
     choreographer_furigana: existingEntry?.choreographer_furigana || '',
     story: existingEntry?.story || '',
-    use_different_songs: false,
     agreement_checked: existingEntry?.agreement_checked || false,
   })
 
@@ -81,8 +81,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         if (!formData.agreement_checked) newErrors.agreement = '参加資格への同意が必要です'
         break
       case 'music':
-        if (!formData.music_title) newErrors.music_title = '曲名を入力してください'
-        if (!formData.choreographer) newErrors.choreographer = '振付師を入力してください'
+        // 楽曲情報の必須項目なし（ファイルは別途チェック）
         break
     }
     
@@ -164,13 +163,14 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         user_id: userId,
         dance_style: formData.dance_style,
         team_name: formData.team_name,
+        participant_names: '', // 一時的に空文字を設定
         representative_name: formData.representative_name,
         representative_furigana: formData.representative_furigana,
         partner_name: formData.partner_name,
         partner_furigana: formData.partner_furigana,
         phone_number: formData.phone_number,
         emergency_contact: formData.emergency_contact,
-        music_title: formData.music_title,
+        music_title: '',
         choreographer: formData.choreographer,
         choreographer_furigana: formData.choreographer_furigana,
         story: formData.story,
@@ -401,58 +401,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
           {activeSection === 'music' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">楽曲情報</h3>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  曲名 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.music_title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, music_title: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
-                {errors.music_title && <p className="mt-1 text-sm text-red-600">{errors.music_title}</p>}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    振付師 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.choreographer}
-                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                  {errors.choreographer && <p className="mt-1 text-sm text-red-600">{errors.choreographer}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    振付師フリガナ
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.choreographer_furigana}
-                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer_furigana: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  ストーリー・作品説明
-                </label>
-                <textarea
-                  value={formData.story}
-                  onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
-                  rows={5}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="作品のストーリーや説明を入力してください"
-                />
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -540,9 +488,44 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
           {activeSection === 'additional' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">追加情報</h3>
-              <p className="text-sm text-gray-600">
-                今後、追加情報が必要な場合はこちらに表示されます。
-              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    振付師
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.choreographer}
+                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer: e.target.value }))}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    振付師フリガナ
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.choreographer_furigana}
+                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer_furigana: e.target.value }))}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  ストーリー・作品説明
+                </label>
+                <textarea
+                  value={formData.story}
+                  onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
+                  rows={5}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  placeholder="作品のストーリーや説明を入力してください"
+                />
+              </div>
             </div>
           )}
 
