@@ -24,20 +24,20 @@ interface FormData {
   partner_furigana: string
   phone_number: string
   emergency_contact: string
+  agreement_checked: boolean
   
   // 楽曲情報
   music_title: string
   choreographer: string
   choreographer_furigana: string
   story: string
+  use_different_songs: boolean
   
   // ファイル
   photo?: File
   music?: File
+  music2?: File
   video?: File
-  
-  // その他
-  agreement_checked: boolean
 }
 
 export default function IntegratedEntryForm({ userId, existingEntry, userProfile }: IntegratedEntryFormProps) {
@@ -59,6 +59,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     choreographer: existingEntry?.choreographer || '',
     choreographer_furigana: existingEntry?.choreographer_furigana || '',
     story: existingEntry?.story || '',
+    use_different_songs: false,
     agreement_checked: existingEntry?.agreement_checked || false,
   })
 
@@ -77,6 +78,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         if (!formData.dance_style) newErrors.dance_style = 'ダンスジャンルを選択してください'
         if (!formData.phone_number) newErrors.phone_number = '電話番号を入力してください'
         if (!formData.emergency_contact) newErrors.emergency_contact = '緊急連絡先を入力してください'
+        if (!formData.agreement_checked) newErrors.agreement = '参加資格への同意が必要です'
         break
       case 'music':
         if (!formData.music_title) newErrors.music_title = '曲名を入力してください'
@@ -106,7 +108,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     setActiveSection(section)
   }
 
-  const handleFileChange = (field: 'photo' | 'music' | 'video', file: File | undefined) => {
+  const handleFileChange = (field: 'photo' | 'music' | 'music2' | 'video', file: File | undefined) => {
     setFormData(prev => ({ ...prev, [field]: file }))
   }
 
@@ -150,10 +152,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
       }
     }
     
-    if (!formData.agreement_checked) {
-      setErrors({ agreement: '参加資格への同意が必要です' })
-      return
-    }
 
     setLoading(true)
     setErrors({})
@@ -215,6 +213,9 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
       }
       if (formData.video) {
         uploadPromises.push(uploadFile(formData.video, 'video', entryId))
+      }
+      if (formData.use_different_songs && formData.music2) {
+        uploadPromises.push(uploadFile(formData.music2, 'music', entryId))
       }
 
       if (uploadPromises.length > 0) {
@@ -368,6 +369,31 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 />
                 {errors.emergency_contact && <p className="mt-1 text-sm text-red-600">{errors.emergency_contact}</p>}
               </div>
+
+              {/* 参加資格への同意 */}
+              <div className="space-y-4 mt-6">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">参加資格</h4>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>• ペアにおける性別は問わない</p>
+                    <p>• ペアの年齢合計は20歳以上90歳未満とする</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <input
+                    id="agreement"
+                    type="checkbox"
+                    checked={formData.agreement_checked}
+                    onChange={(e) => setFormData(prev => ({ ...prev, agreement_checked: e.target.checked }))}
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="agreement" className="ml-2 block text-sm text-gray-900">
+                    上記の参加資格に同意します *
+                  </label>
+                </div>
+                {errors.agreement && <p className="mt-1 text-sm text-red-600">{errors.agreement}</p>}
+              </div>
             </div>
           )}
 
@@ -430,29 +456,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  楽曲ファイル
-                </label>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => handleFileChange('music', e.target.files?.[0])}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                {formData.music && (
-                  <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* 追加情報セクション */}
-          {activeSection === 'additional' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">追加情報</h3>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  写真
+                  写真 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
@@ -467,7 +471,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  動画
+                  動画 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
@@ -482,6 +486,63 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                   ※ 動画ファイルは200MBまでアップロード可能です
                 </p>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  楽曲ファイル（音源） <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => handleFileChange('music', e.target.files?.[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                />
+                {formData.music && (
+                  <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <input
+                    id="use_different_songs"
+                    type="checkbox"
+                    checked={formData.use_different_songs}
+                    onChange={(e) => setFormData(prev => ({ ...prev, use_different_songs: e.target.checked }))}
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
+                  />
+                  <label htmlFor="use_different_songs" className="ml-2 block text-sm text-gray-900">
+                    準決勝と決勝で異なる曲を使用する場合
+                  </label>
+                </div>
+                
+                {formData.use_different_songs && (
+                  <div className="ml-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      決勝用楽曲ファイル（音源） <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      onChange={(e) => handleFileChange('music2', e.target.files?.[0])}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    />
+                    {formData.music2 && (
+                      <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 追加情報セクション */}
+          {activeSection === 'additional' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-gray-900">追加情報</h3>
+              <p className="text-sm text-gray-600">
+                今後、追加情報が必要な場合はこちらに表示されます。
+              </p>
             </div>
           )}
 
@@ -495,30 +556,8 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
             </div>
           )}
 
-          {/* 同意事項と送信ボタン */}
+          {/* 送信ボタン */}
           <div className="mt-8 space-y-4">
-            {/* 参加資格 */}
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">参加資格</h4>
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>• ペアにおける性別は問わない</p>
-                <p>• ペアの年齢合計は20歳以上90歳未満とする</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <input
-                id="agreement"
-                type="checkbox"
-                checked={formData.agreement_checked}
-                onChange={(e) => setFormData(prev => ({ ...prev, agreement_checked: e.target.checked }))}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="agreement" className="ml-2 block text-sm text-gray-900">
-                上記の参加資格に同意します *
-              </label>
-            </div>
-            {errors.agreement && <p className="text-sm text-red-600">{errors.agreement}</p>}
 
             {errors.submit && (
               <div className="rounded-md bg-red-50 p-4">
