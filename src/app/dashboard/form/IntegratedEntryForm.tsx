@@ -711,6 +711,8 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                         fileType="music"
                         editable={true}
                         refreshKey={fileListRefreshKey}
+                        showMusicLabels={true}
+                        useDifferentSongs={formData.use_different_songs}
                         onFileDeleted={() => {
                           setFileListRefreshKey(prev => prev + 1)
                           setUploadedFiles(prev => ({
@@ -719,10 +721,9 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                           }))
                         }}
                       />
-                      {uploadedFiles.music > 0 && (
+                      {uploadedFiles.music > 0 && !formData.use_different_songs && (
                         <p className="text-xs text-gray-500 mt-2">
                           ※ 音源がアップロードされた順に表示されています。
-                          {formData.use_different_songs ? '1つ目が準決勝用、2つ目が決勝用です。' : ''}
                         </p>
                       )}
                     </div>

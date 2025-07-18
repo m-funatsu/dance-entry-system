@@ -14,9 +14,11 @@ interface FileListProps {
   fileType?: 'music' | 'audio' | 'photo' | 'video'
   onFileDeleted?: (fileId: string, fileType: string) => void
   refreshKey?: number
+  showMusicLabels?: boolean
+  useDifferentSongs?: boolean
 }
 
-export default function FileList({ entryId, editable = false, fileType, onFileDeleted, refreshKey }: FileListProps) {
+export default function FileList({ entryId, editable = false, fileType, onFileDeleted, refreshKey, showMusicLabels = false, useDifferentSongs = false }: FileListProps) {
   const [files, setFiles] = useState<EntryFile[]>([])
   const [loading, setLoading] = useState(true)
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({})
@@ -35,7 +37,7 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
         query = query.eq('file_type', fileType)
       }
 
-      const { data, error } = await query.order('uploaded_at', { ascending: false })
+      const { data, error } = await query.order('uploaded_at', { ascending: true })
 
       if (error) {
         console.error('Error fetching files:', error)
@@ -200,7 +202,7 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
 
   return (
     <div className="space-y-4">
-      {files.map((file) => (
+      {files.map((file, index) => (
         <div key={file.id} className="bg-white border rounded-lg p-4 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
@@ -210,6 +212,11 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                     {getFileTypeLabel(file.file_type)}
                   </span>
+                  {showMusicLabels && file.file_type === 'music' && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {index === 0 ? '準決勝用' : index === 1 && useDifferentSongs ? '決勝用' : `${index + 1}つ目`}
+                    </span>
+                  )}
                   <span className="text-sm text-gray-500">
                     {formatFileSize(file.file_size || 0)}
                   </span>
