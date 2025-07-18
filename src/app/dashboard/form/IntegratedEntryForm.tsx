@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import FileList from '@/components/FileList'
 import { uploadFile as uploadFileToStorage } from '@/lib/storage'
@@ -49,6 +49,11 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   const [sectionSaved, setSectionSaved] = useState<Record<string, boolean>>({})
   const [entryId, setEntryId] = useState<string>(existingEntry?.id || '')
   const [fileListRefreshKey, setFileListRefreshKey] = useState(0)
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, number>>({
+    photo: 0,
+    video: 0,
+    music: 0
+  })
   
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
@@ -72,6 +77,36 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     { id: 'additional', label: '追加情報' },
     { id: 'optional', label: '任意申請' },
   ]
+
+  // アップロード済みファイル数を取得
+  const fetchUploadedFileCounts = useCallback(async () => {
+    if (!entryId) return
+
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('entry_files')
+      .select('file_type')
+      .eq('entry_id', entryId)
+
+    if (!error && data) {
+      const counts = data.reduce((acc, file) => {
+        const type = file.file_type as 'photo' | 'video' | 'music' | 'audio'
+        const key = type === 'audio' ? 'music' : type
+        acc[key] = (acc[key] || 0) + 1
+        return acc
+      }, {} as Record<string, number>)
+
+      setUploadedFiles({
+        photo: counts.photo || 0,
+        video: counts.video || 0,
+        music: (counts.music || 0) + (counts.audio || 0)
+      })
+    }
+  }, [entryId])
+
+  useEffect(() => {
+    fetchUploadedFileCounts()
+  }, [fetchUploadedFileCounts, fileListRefreshKey])
 
   const validateSection = (section: FormSection): boolean => {
     const newErrors: Record<string, string> = {}
@@ -507,38 +542,72 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   動画 <span className="text-red-500">*</span>
+                  {uploadedFiles.video > 0 && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      （{uploadedFiles.video}/1 アップロード済み）
+                    </span>
+                  )}
                 </label>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => handleFileChange('video', e.target.files?.[0])}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                {formData.video && (
+                {uploadedFiles.video >= 1 && !formData.video ? (
+                  <div className="p-4 bg-gray-100 rounded-md">
+                    <p className="text-sm text-gray-600">
+                      動画は既に1つアップロードされています。
+                      新しい動画をアップロードする場合は、下のファイルリストから既存の動画を削除してください。
+                    </p>
+                  </div>
+                ) : (
                   <>
-                    <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
-                    {getFilePreview(formData.video, 'video')}
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => handleFileChange('video', e.target.files?.[0])}
+                      disabled={uploadedFiles.video >= 1}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    {formData.video && (
+                      <>
+                        <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
+                        {getFilePreview(formData.video, 'video')}
+                      </>
+                    )}
                   </>
                 )}
                 <p className="mt-2 text-sm text-gray-500">
-                  ※ 動画ファイルは200MBまでアップロード可能です
+                  ※ 動画ファイルは200MBまでアップロード可能です（最大1ファイル）
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   楽曲ファイル（音源） <span className="text-red-500">*</span>
+                  {uploadedFiles.music > 0 && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      （{uploadedFiles.music}/2 アップロード済み）
+                    </span>
+                  )}
                 </label>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => handleFileChange('music', e.target.files?.[0])}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                {formData.music && (
+                {uploadedFiles.music >= 2 && !formData.music && !formData.use_different_songs ? (
+                  <div className="p-4 bg-gray-100 rounded-md">
+                    <p className="text-sm text-gray-600">
+                      音源は既に2つアップロードされています。
+                      新しい音源をアップロードする場合は、下のファイルリストから既存の音源を削除してください。
+                    </p>
+                  </div>
+                ) : (
                   <>
-                    <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
-                    {getFilePreview(formData.music, 'music')}
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      onChange={(e) => handleFileChange('music', e.target.files?.[0])}
+                      disabled={uploadedFiles.music >= 2}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    {formData.music && (
+                      <>
+                        <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
+                        {getFilePreview(formData.music, 'music')}
+                      </>
+                    )}
                   </>
                 )}
               </div>
@@ -566,13 +635,19 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                       type="file"
                       accept="audio/*"
                       onChange={(e) => handleFileChange('music2', e.target.files?.[0])}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                      disabled={uploadedFiles.music >= 2}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     {formData.music2 && (
                       <>
                         <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>
                         {getFilePreview(formData.music2, 'music')}
                       </>
+                    )}
+                    {uploadedFiles.music >= 1 && (
+                      <p className="mt-2 text-sm text-yellow-600">
+                        ※ 音源は最大2つまでです。既に{uploadedFiles.music}つアップロード済みです。
+                      </p>
                     )}
                   </div>
                 )}
@@ -586,7 +661,15 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                     entryId={entryId} 
                     editable={true}
                     refreshKey={fileListRefreshKey}
-                    onFileDeleted={() => setFileListRefreshKey(prev => prev + 1)}
+                    onFileDeleted={(fileId, fileType) => {
+                      setFileListRefreshKey(prev => prev + 1)
+                      // ファイル削除時にカウントを即座に更新
+                      const type = fileType === 'audio' ? 'music' : fileType
+                      setUploadedFiles(prev => ({
+                        ...prev,
+                        [type]: Math.max(0, prev[type as keyof typeof prev] - 1)
+                      }))
+                    }}
                   />
                 </div>
               )}
