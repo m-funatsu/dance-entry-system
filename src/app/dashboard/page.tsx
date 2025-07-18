@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           <Suspense fallback={null}>
             <MessageAlert />
           </Suspense>
-          <div className={`grid grid-cols-1 gap-6 ${userProfile.has_seed ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+          <div className={`grid grid-cols-1 gap-6 ${userProfile.has_seed ? 'md:grid-cols-2' : 'md:grid-cols-1 lg:grid-cols-2'}`}>
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -89,10 +89,10 @@ export default async function DashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        基本情報
+                        エントリー情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry ? '登録済み' : '基本情報を登録'}
+                        {entry ? '登録済み' : '情報を登録'}
                       </dd>
                       {entry && (
                         <dd className="text-sm text-gray-500 mt-1">
@@ -105,37 +105,8 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <a href="/dashboard/entry" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry ? '基本情報を編集 →' : '基本情報を入力 →'}
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        楽曲情報
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        楽曲・動画・写真・ストーリー
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  <a href="/dashboard/music" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    楽曲情報を入力 →
+                  <a href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    {entry ? 'エントリー情報を編集 →' : 'エントリー情報を登録 →'}
                   </a>
                 </div>
               </div>
