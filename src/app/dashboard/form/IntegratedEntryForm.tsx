@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import FileList from '@/components/FileList'
 import { uploadFile as uploadFileToStorage } from '@/lib/storage'
 import type { Entry, User, EntryFile } from '@/lib/types'
+import Image from 'next/image'
 
 interface IntegratedEntryFormProps {
   userId: string
@@ -157,11 +158,14 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     if (type === 'photo') {
       return (
         <div className="mt-2">
-          <div className="max-w-full max-h-64 bg-gray-100 rounded overflow-hidden">
-            <img
+          <div className="max-w-full max-h-64 bg-gray-100 rounded overflow-hidden relative">
+            <Image
               src={objectUrl}
               alt={file.name}
+              width={300}
+              height={300}
               className="max-w-full max-h-64 object-contain rounded"
+              style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '16rem' }}
               onLoad={() => URL.revokeObjectURL(objectUrl)}
             />
           </div>
@@ -548,7 +552,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                     fileType="photo"
                     editable={true}
                     refreshKey={fileListRefreshKey}
-                    onFileDeleted={(fileId, fileType) => {
+                    onFileDeleted={() => {
                       setFileListRefreshKey(prev => prev + 1)
                       setUploadedFiles(prev => ({
                         ...prev,
@@ -606,7 +610,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                     fileType="video"
                     editable={true}
                     refreshKey={fileListRefreshKey}
-                    onFileDeleted={(fileId, fileType) => {
+                    onFileDeleted={() => {
                       setFileListRefreshKey(prev => prev + 1)
                       setUploadedFiles(prev => ({
                         ...prev,
@@ -707,7 +711,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                         fileType="music"
                         editable={true}
                         refreshKey={fileListRefreshKey}
-                        onFileDeleted={(fileId, fileType) => {
+                        onFileDeleted={() => {
                           setFileListRefreshKey(prev => prev + 1)
                           setUploadedFiles(prev => ({
                             ...prev,
