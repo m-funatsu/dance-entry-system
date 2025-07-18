@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import EntryTable from './EntryTable'
+import CSVExportButton from './CSVExportButton'
+import CSVImportButton from './CSVImportButton'
 
 interface EntryWithDetails {
   id: string
@@ -11,7 +13,7 @@ interface EntryWithDetails {
   participant_names: string
   phone_number?: string
   emergency_contact?: string
-  status: string
+  status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string
   users: {
@@ -57,11 +59,14 @@ export default function EntriesWithFilters({ entries, adminId }: EntriesWithFilt
   return (
     <div className="bg-white shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
           <h2 className="text-lg leading-6 font-medium text-gray-900">
             全エントリー ({filteredEntries.length}件 / {entries.length}件)
           </h2>
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-2 flex-wrap gap-2">
+            <CSVExportButton entries={filteredEntries} />
+            <CSVImportButton />
+            <div className="flex space-x-2">
             <select 
               className="rounded-md border-gray-300 text-sm"
               value={statusFilter}
@@ -96,6 +101,7 @@ export default function EntriesWithFilters({ entries, adminId }: EntriesWithFilt
                 フィルタをクリア
               </button>
             )}
+            </div>
           </div>
         </div>
         

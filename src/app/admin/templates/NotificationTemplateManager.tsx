@@ -233,6 +233,20 @@ export default function NotificationTemplateManager() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 placeholder="【{competition_name}】選考結果のお知らせ"
               />
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="text-sm font-medium text-gray-700 mb-2">利用可能な変数：</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{representative_name}'}</code> - 代表者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{partner_name}'}</code> - パートナ名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{name}'}</code> - 参加者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{email}'}</code> - メールアドレス</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{dance_style}'}</code> - ダンススタイル</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{participant_names}'}</code> - 参加者名一覧</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{status}'}</code> - ステータス</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{competition_name}'}</code> - コンペティション名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{organization_name}'}</code> - 主催者名</div>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -249,9 +263,20 @@ export default function NotificationTemplateManager() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 placeholder="{representative_name}様..."
               />
-              <p className="mt-1 text-sm text-gray-500">
-                変数例: {'{representative_name}'}, {'{partner_name}'}, {'{competition_name}'}, {'{organization_name}'}
-              </p>
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="text-sm font-medium text-gray-700 mb-2">利用可能な変数：</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{representative_name}'}</code> - 代表者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{partner_name}'}</code> - パートナ名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{name}'}</code> - 参加者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{email}'}</code> - メールアドレス</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{dance_style}'}</code> - ダンススタイル</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{participant_names}'}</code> - 参加者名一覧</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{status}'}</code> - ステータス</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{competition_name}'}</code> - コンペティション名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{organization_name}'}</code> - 主催者名</div>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center">
