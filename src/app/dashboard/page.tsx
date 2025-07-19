@@ -55,24 +55,45 @@ export default async function DashboardPage() {
     }
   }
 
-  // セクション期限の取得
-  const { data: deadlines } = await supabase
-    .from('section_deadlines')
+  // システム設定から期限を取得
+  const { data: settings } = await supabase
+    .from('settings')
     .select('*')
 
-  const deadlineMap = deadlines?.reduce((acc, d) => {
-    acc[d.section_name] = d
+  const settingsMap = settings?.reduce((acc, setting) => {
+    acc[setting.key] = setting.value
     return acc
-  }, {} as Record<string, { id: string; section_name: string; deadline: string | null; is_required: boolean }>) || {}
+  }, {} as Record<string, string>) || {}
 
-  // 期限までの残り日数を計算
-  const getDaysUntilDeadline = (deadline: string | null) => {
+  // 期限情報を取得して表示用に整形
+  const getDeadlineInfo = (deadline: string | null) => {
     if (!deadline) return null
     const now = new Date()
     const deadlineDate = new Date(deadline)
     const diffTime = deadlineDate.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
+    
+    // 期限をフォーマット
+    const formattedDate = deadlineDate.toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+    
+    return {
+      date: formattedDate,
+      daysLeft: diffDays,
+      isExpired: diffDays < 0,
+      isUrgent: diffDays >= 0 && diffDays <= 3
+    }
+  }
+
+  // 期限チェック機能
+  const isFormEditable = (deadlineKey: string) => {
+    const deadline = getDeadlineInfo(settingsMap[deadlineKey])
+    return !deadline || !deadline.isExpired
   }
 
   return (
@@ -192,20 +213,37 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && entry.dance_style ? '登録済み' : '未登録'}
                       </dd>
-                      {deadlineMap.basic_info?.deadline && (
-                        <dd className="text-xs text-red-600 mt-1">
-                          期限: {getDaysUntilDeadline(deadlineMap.basic_info.deadline)}日
-                        </dd>
-                      )}
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.basic_info_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry && entry.dance_style ? '編集' : '登録'} →
-                  </Link>
+                  {isFormEditable('basic_info_deadline') ? (
+                    <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && entry.dance_style ? '編集' : '登録'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -227,20 +265,37 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && (entry.music_title || entry.original_artist) ? '登録済み' : '未登録'}
                       </dd>
-                      {deadlineMap.music_info?.deadline && (
-                        <dd className="text-xs text-red-600 mt-1">
-                          期限: {getDaysUntilDeadline(deadlineMap.music_info.deadline)}日
-                        </dd>
-                      )}
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/music-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
-                  </Link>
+                  {isFormEditable('music_info_deadline') ? (
+                    <Link href="/dashboard/music-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -262,20 +317,37 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && (entry.sponsor || entry.remarks || fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0) ? '登録済み' : '未登録'}
                       </dd>
-                      {deadlineMap.additional_info?.deadline && (
-                        <dd className="text-xs text-red-600 mt-1">
-                          期限: {getDaysUntilDeadline(deadlineMap.additional_info.deadline)}日
-                        </dd>
-                      )}
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.additional_info_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/additional-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    管理 →
-                  </Link>
+                  {isFormEditable('additional_info_deadline') ? (
+                    <Link href="/dashboard/additional-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      管理 →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -297,20 +369,37 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && entry.optional_requests ? '申請あり' : '申請なし'}
                       </dd>
-                      {deadlineMap.optional_request?.deadline && (
-                        <dd className="text-xs text-red-600 mt-1">
-                          期限: {getDaysUntilDeadline(deadlineMap.optional_request.deadline)}日
-                        </dd>
-                      )}
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.optional_request_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/optional-request" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry && entry.optional_requests ? '編集' : '申請'} →
-                  </Link>
+                  {isFormEditable('optional_request_deadline') ? (
+                    <Link href="/dashboard/optional-request" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && entry.optional_requests ? '編集' : '申請'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -324,9 +413,15 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">基本情報</h3>
-                    <Link href="/dashboard/basic-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                      編集
-                    </Link>
+                    {isFormEditable('basic_info_deadline') ? (
+                      <Link href="/dashboard/basic-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
@@ -388,12 +483,24 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">楽曲情報</h3>
                     <div className="flex space-x-3">
-                      <Link href="/dashboard/music-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                        編集
-                      </Link>
-                      <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                        ファイル管理
-                      </Link>
+                      {isFormEditable('music_info_deadline') ? (
+                        <Link href="/dashboard/music-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                          編集
+                        </Link>
+                      ) : (
+                        <span className="text-sm font-medium text-gray-400">
+                          期限切れ
+                        </span>
+                      )}
+                      {isFormEditable('additional_info_deadline') ? (
+                        <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                          ファイル管理
+                        </Link>
+                      ) : (
+                        <span className="text-sm font-medium text-gray-400">
+                          期限切れ
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -471,9 +578,15 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">追加情報</h3>
-                    <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                      編集
-                    </Link>
+                    {isFormEditable('additional_info_deadline') ? (
+                      <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-4">
                     <div>
@@ -494,9 +607,15 @@ export default async function DashboardPage() {
                   <div className="px-4 py-5 sm:p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">任意申請</h3>
-                      <Link href="/dashboard/optional-request" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                        編集
-                      </Link>
+                      {isFormEditable('optional_request_deadline') ? (
+                        <Link href="/dashboard/optional-request" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                          編集
+                        </Link>
+                      ) : (
+                        <span className="text-sm font-medium text-gray-400">
+                          期限切れ
+                        </span>
+                      )}
                     </div>
                     <div>
                       <p className="text-base text-gray-900 whitespace-pre-line">{entry.optional_requests || '未設定'}</p>
