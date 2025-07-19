@@ -47,6 +47,7 @@ export interface EntryFile {
   file_path: string
   file_size?: number
   mime_type?: string
+  purpose?: string
   uploaded_at: string
 }
 

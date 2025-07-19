@@ -297,6 +297,8 @@ Before any major changes:
 - **NEVER** restructure component hierarchies unless specifically requested
 - **ALWAYS** preserve the original design intent and user experience
 - **ONLY** make layout changes when the user explicitly asks for them
+- **NEVER** move form fields between different pages without explicit instruction
+- **NEVER** change the established flow of data entry forms
 
 ### What constitutes a layout change:
 - Changing from card-based to list-based layouts
@@ -304,6 +306,8 @@ Before any major changes:
 - Changing page organization or information hierarchy
 - Altering the visual design patterns
 - Restructuring navigation or user flow
+- Moving form fields or sections between pages
+- Changing the established structure of data entry forms
 
 ### Acceptable changes without permission:
 - Bug fixes that don't affect layout
@@ -311,6 +315,12 @@ Before any major changes:
 - Adding new features that don't modify existing layouts
 - Styling tweaks like colors, fonts, spacing (when specifically requested)
 - Functional improvements that maintain the same visual structure
+
+### IMPORTANT: Form Structure Policy
+- **NEVER** move file upload fields from one form to another without explicit instruction
+- **MAINTAIN** the established structure of multi-page forms
+- If a form already includes certain fields, **DO NOT** move them to a different page
+- If the user asks to add new fields, add them to the specified location without moving existing fields
 
 ## Troubleshooting Commands
 

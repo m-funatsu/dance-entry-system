@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import type { Entry } from '@/lib/types'
+import type { Entry, EntryFile } from '@/lib/types'
+import FileUpload from '@/components/FileUpload'
 
 interface MusicInfoFormProps {
   entry: Entry
@@ -26,6 +27,51 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
   })
   
   const [saving, setSaving] = useState(false)
+  const [existingFiles, setExistingFiles] = useState<EntryFile[]>([])
+  const [user, setUser] = useState<{id: string} | null>(null)
+
+  const fetchUser = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user)
+  }, [supabase.auth])
+
+  const fetchExistingFiles = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .in('file_type', ['music', 'video'])
+
+      if (error) throw error
+      setExistingFiles(data || [])
+    } catch (error) {
+      console.error('Error fetching files:', error)
+    }
+  }, [entry.id, supabase])
+
+  useEffect(() => {
+    fetchExistingFiles()
+    fetchUser()
+  }, [fetchExistingFiles, fetchUser])
+
+
+  const handleDeleteFile = async (fileId: string) => {
+    try {
+      const { error } = await supabase
+        .from('entry_files')
+        .delete()
+        .eq('id', fileId)
+
+      if (error) throw error
+
+      showToast('ファイルを削除しました', 'success')
+      fetchExistingFiles()
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      showToast('ファイルの削除に失敗しました', 'error')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -163,6 +209,107 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="作品のストーリーやコンセプトを記入してください"
         />
+      </div>
+
+      {/* 予選動画セクション */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">予選動画</h3>
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-600 mb-4">
+            予選用の動画をアップロードしてください（MP4、MOV、AVI形式）
+          </p>
+          {user && (
+            <FileUpload
+              userId={user.id}
+              entryId={entry.id}
+              fileType="video"
+              onUploadComplete={() => fetchExistingFiles()}
+            />
+          )}
+          {existingFiles.filter(f => f.file_type === 'video').map((file) => (
+            <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">予選動画: {file.file_name}</span>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteFile(file.id)}
+                  className="text-red-600 hover:text-red-800 text-sm"
+                >
+                  削除
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 音源アップロードセクション */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">音源ファイル</h3>
+        
+        {/* 準決勝用音源 */}
+        <div className="mb-6">
+          <h4 className="text-md font-medium text-gray-700 mb-3">
+            {formData.use_different_songs ? '準決勝用音源' : '準決勝・決勝共通音源'}
+          </h4>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            {user && (
+              <FileUpload
+                userId={user.id}
+                entryId={entry.id}
+                fileType="music"
+                onUploadComplete={() => fetchExistingFiles()}
+              />
+            )}
+            {existingFiles.filter(f => f.file_type === 'music' && f.purpose !== '決勝').map((file) => (
+              <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">
+                    {formData.use_different_songs ? '準決勝用' : '準決勝・決勝共通'}: {file.file_name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFile(file.id)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 決勝用音源（異なる楽曲使用時のみ） */}
+        {formData.use_different_songs && (
+          <div>
+            <h4 className="text-md font-medium text-gray-700 mb-3">決勝用音源</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              {user && (
+                <FileUpload
+                  userId={user.id}
+                  entryId={entry.id}
+                  fileType="music"
+                  onUploadComplete={() => fetchExistingFiles()}
+                />
+              )}
+              {existingFiles.filter(f => f.file_type === 'music' && f.purpose === '決勝').map((file) => (
+                <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">決勝用: {file.file_name}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteFile(file.id)}
+                      className="text-red-600 hover:text-red-800 text-sm"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between">
