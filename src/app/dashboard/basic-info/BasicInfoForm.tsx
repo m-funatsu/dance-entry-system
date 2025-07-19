@@ -22,7 +22,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
     participant_names: initialData?.participant_names || '',
     phone_number: initialData?.phone_number || '',
     emergency_contact: initialData?.emergency_contact || '',
-    use_different_songs: initialData?.use_different_songs || false
+    agreement_checked: initialData?.agreement_checked || false
   })
   
   const [saving, setSaving] = useState(false)
@@ -144,16 +144,23 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         />
       </div>
 
-      <div>
+      <div className="bg-gray-50 p-4 rounded-md">
+        <h3 className="text-sm font-medium text-gray-900 mb-2">エントリー要件</h3>
+        <div className="text-sm text-gray-600 space-y-1 mb-3">
+          <p>・参加規約を確認し、同意します</p>
+          <p>・提出した情報に虚偽がないことを確認します</p>
+          <p>・著作権に関する規定を遵守します</p>
+        </div>
         <label className="flex items-center">
           <input
             type="checkbox"
-            checked={formData.use_different_songs}
-            onChange={(e) => setFormData({ ...formData, use_different_songs: e.target.checked })}
+            checked={formData.agreement_checked}
+            onChange={(e) => setFormData({ ...formData, agreement_checked: e.target.checked })}
+            required
             className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
           />
-          <span className="ml-2 text-sm text-gray-700">
-            準決勝・決勝で異なる楽曲を使用する
+          <span className="ml-2 text-sm font-medium text-gray-700">
+            上記の要件を確認し、同意します <span className="text-red-500">*</span>
           </span>
         </label>
       </div>

@@ -21,7 +21,8 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
     final_music_title: entry.final_music_title || '',
     final_original_artist: entry.final_original_artist || '',
     choreographer: entry.choreographer || '',
-    story: entry.story || ''
+    story: entry.story || '',
+    use_different_songs: entry.use_different_songs || false
   })
   
   const [saving, setSaving] = useState(false)
@@ -53,6 +54,20 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label className="flex items-center mb-6">
+          <input
+            type="checkbox"
+            checked={formData.use_different_songs}
+            onChange={(e) => setFormData({ ...formData, use_different_songs: e.target.checked })}
+            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+          />
+          <span className="ml-2 text-sm text-gray-700">
+            準決勝・決勝で異なる楽曲を使用する
+          </span>
+        </label>
+      </div>
+
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">準決勝用楽曲</h3>
         
@@ -87,7 +102,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
         </div>
       </div>
 
-      {entry.use_different_songs && (
+      {formData.use_different_songs && (
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">決勝用楽曲</h3>
           
@@ -101,7 +116,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
                 id="final_music_title"
                 value={formData.final_music_title}
                 onChange={(e) => setFormData({ ...formData, final_music_title: e.target.value })}
-                required={entry.use_different_songs}
+                required={formData.use_different_songs}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
@@ -115,7 +130,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
                 id="final_original_artist"
                 value={formData.final_original_artist}
                 onChange={(e) => setFormData({ ...formData, final_original_artist: e.target.value })}
-                required={entry.use_different_songs}
+                required={formData.use_different_songs}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
