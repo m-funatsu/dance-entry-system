@@ -55,6 +55,26 @@ export default async function DashboardPage() {
     }
   }
 
+  // セクション期限の取得
+  const { data: deadlines } = await supabase
+    .from('section_deadlines')
+    .select('*')
+
+  const deadlineMap = deadlines?.reduce((acc, d) => {
+    acc[d.section_name] = d
+    return acc
+  }, {} as Record<string, { id: string; section_name: string; deadline: string | null; is_required: boolean }>) || {}
+
+  // 期限までの残り日数を計算
+  const getDaysUntilDeadline = (deadline: string | null) => {
+    if (!deadline) return null
+    const now = new Date()
+    const deadlineDate = new Date(deadline)
+    const diffTime = deadlineDate.getTime() - now.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
   return (
     <>
       <BackgroundLoader pageType="dashboard" />
@@ -172,13 +192,18 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && entry.dance_style ? '登録済み' : '未登録'}
                       </dd>
+                      {deadlineMap.basic_info?.deadline && (
+                        <dd className="text-xs text-red-600 mt-1">
+                          期限: {getDaysUntilDeadline(deadlineMap.basic_info.deadline)}日
+                        </dd>
+                      )}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
                     {entry && entry.dance_style ? '編集' : '登録'} →
                   </Link>
                 </div>
@@ -200,16 +225,21 @@ export default async function DashboardPage() {
                         楽曲情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.music_title ? '登録済み' : '未登録'}
+                        {entry && (entry.music_title || entry.original_artist) ? '登録済み' : '未登録'}
                       </dd>
+                      {deadlineMap.music_info?.deadline && (
+                        <dd className="text-xs text-red-600 mt-1">
+                          期限: {getDaysUntilDeadline(deadlineMap.music_info.deadline)}日
+                        </dd>
+                      )}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry && entry.music_title ? '編集' : '登録'} →
+                  <Link href="/dashboard/music-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
                   </Link>
                 </div>
               </div>
@@ -230,15 +260,20 @@ export default async function DashboardPage() {
                         追加情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0 ? 'ファイルあり' : '未アップロード'}
+                        {entry && (entry.sponsor || entry.remarks || fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0) ? '登録済み' : '未登録'}
                       </dd>
+                      {deadlineMap.additional_info?.deadline && (
+                        <dd className="text-xs text-red-600 mt-1">
+                          期限: {getDaysUntilDeadline(deadlineMap.additional_info.deadline)}日
+                        </dd>
+                      )}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link href="/dashboard/additional-info" className="font-medium text-indigo-600 hover:text-indigo-500">
                     管理 →
                   </Link>
                 </div>
@@ -262,13 +297,18 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && entry.optional_requests ? '申請あり' : '申請なし'}
                       </dd>
+                      {deadlineMap.optional_request?.deadline && (
+                        <dd className="text-xs text-red-600 mt-1">
+                          期限: {getDaysUntilDeadline(deadlineMap.optional_request.deadline)}日
+                        </dd>
+                      )}
                     </dl>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link href="/dashboard/optional-request" className="font-medium text-indigo-600 hover:text-indigo-500">
                     {entry && entry.optional_requests ? '編集' : '申請'} →
                   </Link>
                 </div>
@@ -284,7 +324,7 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">基本情報</h3>
-                    <Link href="/dashboard/form" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/dashboard/basic-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                       編集
                     </Link>
                   </div>
@@ -328,15 +368,31 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">楽曲情報</h3>
-                    <Link href="/dashboard/form" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/dashboard/music-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                       編集
                     </Link>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">曲目</label>
+                      <label className="block text-sm font-medium text-gray-500">準決勝用楽曲</label>
                       <p className="mt-1 text-base text-gray-900">{entry.music_title || '未設定'}</p>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">原曲アーティスト</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.original_artist || '未設定'}</p>
+                    </div>
+                    {entry.use_different_songs && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500">決勝用楽曲</label>
+                          <p className="mt-1 text-base text-gray-900">{entry.final_music_title || '未設定'}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500">決勝用原曲アーティスト</label>
+                          <p className="mt-1 text-base text-gray-900">{entry.final_original_artist || '未設定'}</p>
+                        </div>
+                      </>
+                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-500">振付師</label>
                       <p className="mt-1 text-base text-gray-900">{entry.choreographer || '未設定'}</p>
@@ -348,13 +404,35 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              {/* 追加情報表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">追加情報</h3>
+                    <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      編集
+                    </Link>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">協賛企業・協賛品</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.sponsor || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">備考</label>
+                      <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.remarks || '未設定'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               {/* ファイル情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">アップロードファイル</h3>
-                    <Link href="/dashboard/form" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                       管理
                     </Link>
                   </div>
@@ -393,7 +471,7 @@ export default async function DashboardPage() {
                   <div className="px-4 py-5 sm:p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">任意申請</h3>
-                      <Link href="/dashboard/form" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <Link href="/dashboard/optional-request" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
                       </Link>
                     </div>

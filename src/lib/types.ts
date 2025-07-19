@@ -22,9 +22,16 @@ export interface Entry {
   emergency_contact?: string
   photo_url?: string
   music_title?: string
+  original_artist?: string
+  final_music_title?: string
+  final_original_artist?: string
+  use_different_songs?: boolean
   choreographer?: string
   choreographer_furigana?: string
   story?: string
+  sponsor?: string
+  remarks?: string
+  optional_requests?: string
   agreement_checked?: boolean
   google_form_data?: Record<string, unknown>
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
