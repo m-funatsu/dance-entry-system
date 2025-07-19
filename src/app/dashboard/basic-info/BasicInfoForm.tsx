@@ -19,7 +19,10 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
   const [formData, setFormData] = useState({
     dance_style: initialData?.dance_style || '',
     team_name: initialData?.team_name || '',
-    participant_names: initialData?.participant_names || '',
+    representative_name: initialData?.representative_name || '',
+    representative_furigana: initialData?.representative_furigana || '',
+    partner_name: initialData?.partner_name || '',
+    partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
     emergency_contact: initialData?.emergency_contact || '',
     agreement_checked: initialData?.agreement_checked || false
@@ -38,6 +41,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
           .from('entries')
           .update({
             ...formData,
+            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
             updated_at: new Date().toISOString()
           })
           .eq('id', initialData.id)
@@ -50,6 +54,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
           .insert({
             user_id: userId,
             ...formData,
+            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
             status: 'pending'
           })
 
@@ -99,19 +104,65 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         />
       </div>
 
-      <div>
-        <label htmlFor="participant_names" className="block text-sm font-medium text-gray-700">
-          参加者名 <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="participant_names"
-          value={formData.participant_names}
-          onChange={(e) => setFormData({ ...formData, participant_names: e.target.value })}
-          required
-          rows={3}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="複数名の場合は改行で区切ってください"
-        />
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-gray-900">参加者情報（ペア）</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="representative_name" className="block text-sm font-medium text-gray-700">
+              代表者氏名 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="representative_name"
+              value={formData.representative_name}
+              onChange={(e) => setFormData({ ...formData, representative_name: e.target.value })}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="representative_furigana" className="block text-sm font-medium text-gray-700">
+              代表者フリガナ <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="representative_furigana"
+              value={formData.representative_furigana}
+              onChange={(e) => setFormData({ ...formData, representative_furigana: e.target.value })}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="カタカナで入力"
+            />
+          </div>
+          <div>
+            <label htmlFor="partner_name" className="block text-sm font-medium text-gray-700">
+              ペア氏名 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="partner_name"
+              value={formData.partner_name}
+              onChange={(e) => setFormData({ ...formData, partner_name: e.target.value })}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="partner_furigana" className="block text-sm font-medium text-gray-700">
+              ペアフリガナ <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="partner_furigana"
+              value={formData.partner_furigana}
+              onChange={(e) => setFormData({ ...formData, partner_furigana: e.target.value })}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="カタカナで入力"
+            />
+          </div>
+        </div>
       </div>
 
       <div>
@@ -145,11 +196,22 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
       </div>
 
       <div className="bg-gray-50 p-4 rounded-md">
-        <h3 className="text-sm font-medium text-gray-900 mb-2">エントリー要件</h3>
+        <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格・エントリー要件</h3>
         <div className="text-sm text-gray-600 space-y-1 mb-3">
-          <p>・参加規約を確認し、同意します</p>
-          <p>・提出した情報に虚偽がないことを確認します</p>
-          <p>・著作権に関する規定を遵守します</p>
+          <p className="font-medium mb-2">■ 参加資格</p>
+          <ul className="space-y-1 ml-4">
+            <li>・ペアであれば、プロ、アマを問わず全ての選手がエントリー可能</li>
+            <li>・ダンスによる教師、デモンストレーション等で収入を少額でも得ている場合はプロとみなす</li>
+            <li>・プロとアマチュアの混合での出場は不可</li>
+            <li>・ペアにおける性別は問わない</li>
+            <li>・ペアの年齢合計は 20 歳以上 90 歳未満とする</li>
+          </ul>
+          <p className="font-medium mt-3 mb-2">■ その他の要件</p>
+          <ul className="space-y-1 ml-4">
+            <li>・参加規約を確認し、同意します</li>
+            <li>・提出した情報に虚偽がないことを確認します</li>
+            <li>・著作権に関する規定を遵守します</li>
+          </ul>
         </div>
         <label className="flex items-center">
           <input
@@ -160,7 +222,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
             className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">
-            上記の要件を確認し、同意します <span className="text-red-500">*</span>
+            上記の参加資格・要件を確認し、同意します <span className="text-red-500">*</span>
           </span>
         </label>
       </div>

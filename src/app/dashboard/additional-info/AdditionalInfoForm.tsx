@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import FileUpload from '@/components/FileUpload'
-import FileList from '@/components/FileList'
 import type { Entry, EntryFile } from '@/lib/types'
 
 interface AdditionalInfoFormProps {
@@ -14,7 +12,7 @@ interface AdditionalInfoFormProps {
   userId: string
 }
 
-export default function AdditionalInfoForm({ entry, initialFiles, userId }: AdditionalInfoFormProps) {
+export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
@@ -25,15 +23,6 @@ export default function AdditionalInfoForm({ entry, initialFiles, userId }: Addi
   })
   
   const [saving, setSaving] = useState(false)
-  const [fileListRefreshKey, setFileListRefreshKey] = useState(0)
-
-  // ファイル数をカウント
-  const fileStats = initialFiles.reduce((acc, file) => {
-    if (file.file_type === 'music') acc.music++
-    else if (file.file_type === 'video') acc.video++
-    else if (file.file_type === 'photo') acc.photo++
-    return acc
-  }, { music: 0, video: 0, photo: 0 })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,10 +47,6 @@ export default function AdditionalInfoForm({ entry, initialFiles, userId }: Addi
     } finally {
       setSaving(false)
     }
-  }
-
-  const handleFileUploaded = () => {
-    setFileListRefreshKey(prev => prev + 1)
   }
 
   return (
@@ -92,78 +77,6 @@ export default function AdditionalInfoForm({ entry, initialFiles, userId }: Addi
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="その他の連絡事項があれば記入してください"
         />
-      </div>
-
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">ファイルアップロード</h3>
-        
-        {/* 写真アップロード */}
-        <div className="mb-6">
-          <h4 className="text-base font-medium text-gray-700 mb-2">写真</h4>
-          {fileStats.photo === 0 ? (
-            <FileUpload
-              userId={userId}
-              entryId={entry.id}
-              fileType="photo"
-              onUploadComplete={handleFileUploaded}
-            />
-          ) : (
-            <FileList
-              entryId={entry.id}
-              fileType="photo"
-              editable={true}
-              refreshKey={fileListRefreshKey}
-              onFileDeleted={handleFileUploaded}
-            />
-          )}
-        </div>
-
-        {/* 動画アップロード */}
-        <div className="mb-6">
-          <h4 className="text-base font-medium text-gray-700 mb-2">動画 <span className="text-red-500">*</span></h4>
-          {fileStats.video === 0 ? (
-            <FileUpload
-              userId={userId}
-              entryId={entry.id}
-              fileType="video"
-              onUploadComplete={handleFileUploaded}
-            />
-          ) : (
-            <FileList
-              entryId={entry.id}
-              fileType="video"
-              editable={true}
-              refreshKey={fileListRefreshKey}
-              onFileDeleted={handleFileUploaded}
-            />
-          )}
-        </div>
-
-        {/* 音源アップロード */}
-        <div className="mb-6">
-          <h4 className="text-base font-medium text-gray-700 mb-2">
-            音源 <span className="text-red-500">*</span>
-            {entry.use_different_songs && ' (準決勝用・決勝用の2つ)'}
-          </h4>
-          {fileStats.music < (entry.use_different_songs ? 2 : 1) ? (
-            <FileUpload
-              userId={userId}
-              entryId={entry.id}
-              fileType="music"
-              onUploadComplete={handleFileUploaded}
-            />
-          ) : (
-            <FileList
-              entryId={entry.id}
-              fileType="music"
-              editable={true}
-              refreshKey={fileListRefreshKey}
-              showMusicLabels={true}
-              useDifferentSongs={entry.use_different_songs}
-              onFileDeleted={handleFileUploaded}
-            />
-          )}
-        </div>
       </div>
 
       <div className="flex justify-between">
