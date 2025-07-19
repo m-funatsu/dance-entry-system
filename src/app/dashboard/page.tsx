@@ -335,22 +335,47 @@ export default async function DashboardPage() {
                         <p className="mt-1 text-base text-gray-900">{entry.dance_style || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">チーム名／ペア名</label>
-                        <p className="mt-1 text-base text-gray-900">{entry.team_name || '未設定'}</p>
+                        <label className="block text-sm font-medium text-gray-500">代表者名</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {entry.representative_name || '未設定'}
+                          {entry.representative_furigana && (
+                            <span className="text-sm text-gray-600">（{entry.representative_furigana}）</span>
+                          )}
+                        </p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">参加者名</label>
-                        <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.participant_names || '未設定'}</p>
+                        <label className="block text-sm font-medium text-gray-500">パートナー名</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {entry.partner_name || '未設定'}
+                          {entry.partner_furigana && (
+                            <span className="text-sm text-gray-600">（{entry.partner_furigana}）</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {entry.choreographer || '未設定'}
+                          {entry.choreographer_furigana && (
+                            <span className="text-sm text-gray-600">（{entry.choreographer_furigana}）</span>
+                          )}
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">代表者電話番号</label>
+                        <label className="block text-sm font-medium text-gray-500">電話番号</label>
                         <p className="mt-1 text-base text-gray-900">{entry.phone_number || '未設定'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">緊急連絡先</label>
                         <p className="mt-1 text-base text-gray-900">{entry.emergency_contact || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">写真</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {entry.photo_url ? 'アップロード済み' : '未アップロード'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -399,8 +424,8 @@ export default async function DashboardPage() {
                       </>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">振付師</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.choreographer || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.work_title || '未設定'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-500">ストーリー・コンセプト</label>
