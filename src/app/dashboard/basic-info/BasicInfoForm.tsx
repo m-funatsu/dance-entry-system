@@ -207,12 +207,6 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
             <li>・ペアにおける性別は問わない</li>
             <li>・ペアの年齢合計は 20 歳以上 90 歳未満とする</li>
           </ul>
-          <p className="font-medium mt-3 mb-2">■ その他の要件</p>
-          <ul className="space-y-1 ml-4">
-            <li>・参加規約を確認し、同意します</li>
-            <li>・提出した情報に虚偽がないことを確認します</li>
-            <li>・著作権に関する規定を遵守します</li>
-          </ul>
         </div>
         <label className="flex items-center">
           <input

@@ -29,6 +29,7 @@ export interface Entry {
   choreographer?: string
   choreographer_furigana?: string
   story?: string
+  work_title?: string
   sponsor?: string
   remarks?: string
   optional_requests?: string

@@ -23,6 +23,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
     final_original_artist: entry.final_original_artist || '',
     choreographer: entry.choreographer || '',
     story: entry.story || '',
+    work_title: entry.work_title || '',
     use_different_songs: entry.use_different_songs || false
   })
   
@@ -200,6 +201,21 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
       {/* 予選動画セクション */}
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">予選動画</h3>
+        
+        <div className="mb-4">
+          <label htmlFor="work_title" className="block text-sm font-medium text-gray-700">
+            作品タイトルまたはテーマ
+          </label>
+          <input
+            type="text"
+            id="work_title"
+            value={formData.work_title}
+            onChange={(e) => setFormData({ ...formData, work_title: e.target.value })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="作品のタイトルまたはテーマを入力してください"
+          />
+        </div>
+        
         <div className="bg-gray-50 p-4 rounded-lg">
           <p className="text-sm text-gray-600 mb-4">
             予選用の動画をアップロードしてください（MP4、MOV、AVI形式）
