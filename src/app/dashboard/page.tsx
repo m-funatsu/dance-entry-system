@@ -352,12 +352,6 @@ export default async function DashboardPage() {
                         <label className="block text-sm font-medium text-gray-500">緊急連絡先</label>
                         <p className="mt-1 text-base text-gray-900">{entry.emergency_contact || '未設定'}</p>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">楽曲使用</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {entry.use_different_songs ? '準決勝・決勝で異なる楽曲を使用' : '準決勝・決勝で同じ楽曲を使用'}
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -378,6 +372,12 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">楽曲使用</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {entry.use_different_songs ? '準決勝・決勝で異なる楽曲を使用' : '準決勝・決勝で同じ楽曲を使用'}
+                      </p>
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-500">準決勝用楽曲</label>
                       <p className="mt-1 text-base text-gray-900">{entry.music_title || '未設定'}</p>

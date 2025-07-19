@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import OptionalRequestForm from './OptionalRequestForm'
 
 export default async function OptionalRequestPage() {
@@ -30,9 +31,16 @@ export default async function OptionalRequestPage() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              任意申請
-            </h1>
+            <div className="flex items-center">
+              <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-800 mr-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+              </Link>
+              <h1 className="text-3xl font-bold text-gray-900">
+                任意申請
+              </h1>
+            </div>
           </div>
         </div>
       </header>
