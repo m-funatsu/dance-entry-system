@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 interface Settings {
   entry_deadline: string
   upload_deadline: string
@@ -24,6 +25,8 @@ interface Settings {
   music_info_deadline: string
   additional_info_deadline: string
   optional_request_deadline: string
+  // ファビコン設定
+  favicon_url: string
 }
 
 export default function AdminSettingsPage() {
@@ -47,11 +50,15 @@ export default function AdminSettingsPage() {
     basic_info_deadline: '',
     music_info_deadline: '',
     additional_info_deadline: '',
-    optional_request_deadline: ''
+    optional_request_deadline: '',
+    favicon_url: ''
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [faviconFile, setFaviconFile] = useState<File | null>(null)
+  const [isUploadingFavicon, setIsUploadingFavicon] = useState(false)
+  const [isDeletingFavicon, setIsDeletingFavicon] = useState(false)
 
   useEffect(() => {
     fetchSettings()
@@ -105,6 +112,94 @@ export default function AdminSettingsPage() {
       ...prev,
       [field]: typeof value === 'boolean' ? value.toString() : value
     }))
+  }
+
+  const handleFaviconUpload = async () => {
+    if (!faviconFile) {
+      setMessage({ type: 'error', text: 'ファビコンファイルを選択してください' })
+      return
+    }
+
+    setIsUploadingFavicon(true)
+    setMessage(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('favicon', faviconFile)
+
+      const response = await fetch('/api/admin/favicon', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setSettings(prev => ({ ...prev, favicon_url: result.url }))
+        setFaviconFile(null)
+        // ファイル入力をリセット
+        const fileInput = document.getElementById('favicon-file') as HTMLInputElement
+        if (fileInput) fileInput.value = ''
+        setMessage({ type: 'success', text: 'ファビコンをアップロードしました' })
+      } else {
+        const error = await response.json()
+        setMessage({ type: 'error', text: error.error || 'ファビコンのアップロードに失敗しました' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'ファビコンのアップロード中にエラーが発生しました' })
+    } finally {
+      setIsUploadingFavicon(false)
+    }
+  }
+
+  const handleFaviconFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // ファイル形式のチェック
+      const allowedTypes = ['image/png', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/ico']
+      if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.ico')) {
+        setMessage({ type: 'error', text: 'ICOまたはPNG形式のファイルを選択してください' })
+        return
+      }
+      // ファイルサイズのチェック（1MB以下）
+      if (file.size > 1024 * 1024) {
+        setMessage({ type: 'error', text: 'ファイルサイズは1MB以下にしてください' })
+        return
+      }
+      setFaviconFile(file)
+      setMessage(null)
+    }
+  }
+
+  const handleFaviconDelete = async () => {
+    if (!settings.favicon_url) {
+      setMessage({ type: 'error', text: '削除するファビコンがありません' })
+      return
+    }
+
+    if (!confirm('ファビコンを削除しますか？この操作は取り消せません。')) {
+      return
+    }
+
+    setIsDeletingFavicon(true)
+    setMessage(null)
+
+    try {
+      const response = await fetch('/api/admin/favicon', {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setSettings(prev => ({ ...prev, favicon_url: '' }))
+        setMessage({ type: 'success', text: 'ファビコンを削除しました' })
+      } else {
+        const error = await response.json()
+        setMessage({ type: 'error', text: error.error || 'ファビコンの削除に失敗しました' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'ファビコンの削除中にエラーが発生しました' })
+    } finally {
+      setIsDeletingFavicon(false)
+    }
   }
 
   if (isLoading) {
@@ -435,6 +530,100 @@ export default function AdminSettingsPage() {
                         placeholder="エントリーページに表示するメッセージを入力してください"
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ファビコン設定 */}
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">ファビコン設定</h3>
+                  <div className="space-y-4">
+                    {settings.favicon_url && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          現在のファビコン
+                        </label>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="relative w-8 h-8">
+                              <Image
+                                src={settings.favicon_url}
+                                alt="現在のファビコン"
+                                fill
+                                className="object-contain"
+                              />
+                            </div>
+                            <span className="text-sm text-gray-600">{settings.favicon_url}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleFaviconDelete}
+                            disabled={isDeletingFavicon}
+                            className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
+                              isDeletingFavicon
+                                ? 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
+                                : 'border-red-300 text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                            }`}
+                          >
+                            {isDeletingFavicon ? (
+                              <>
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                削除中...
+                              </>
+                            ) : (
+                              '削除'
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        新しいファビコンをアップロード
+                      </label>
+                      <div className="mt-1 flex items-center space-x-3">
+                        <input
+                          id="favicon-file"
+                          type="file"
+                          accept=".ico,.png,image/x-icon,image/png"
+                          onChange={handleFaviconFileChange}
+                          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleFaviconUpload}
+                          disabled={!faviconFile || isUploadingFavicon}
+                          className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                            !faviconFile || isUploadingFavicon
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                          }`}
+                        >
+                          {isUploadingFavicon ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              アップロード中...
+                            </>
+                          ) : (
+                            'アップロード'
+                          )}
+                        </button>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-500">
+                        ICOまたはPNG形式、1MB以下のファイルを選択してください。推奨サイズ: 32x32px または 16x16px
+                      </p>
+                      {faviconFile && (
+                        <p className="mt-1 text-sm text-green-600">
+                          選択されたファイル: {faviconFile.name}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
