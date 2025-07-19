@@ -35,6 +35,12 @@ export interface Entry {
   optional_requests?: string
   agreement_checked?: boolean
   google_form_data?: Record<string, unknown>
+  // 音響指示書
+  sound_semifinal?: string
+  sound_final?: string
+  // 照明指示書
+  lighting_semifinal?: string
+  lighting_final?: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string

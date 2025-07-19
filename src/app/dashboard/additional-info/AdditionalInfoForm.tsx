@@ -19,7 +19,13 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
   
   const [formData, setFormData] = useState({
     sponsor: entry.sponsor || '',
-    remarks: entry.remarks || ''
+    remarks: entry.remarks || '',
+    // 音響指示書
+    sound_semifinal: entry.sound_semifinal || '',
+    sound_final: entry.sound_final || '',
+    // 照明指示書
+    lighting_semifinal: entry.lighting_semifinal || '',
+    lighting_final: entry.lighting_final || ''
   })
   
   const [saving, setSaving] = useState(false)
@@ -77,6 +83,72 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="その他の連絡事項があれば記入してください"
         />
+      </div>
+
+      {/* 音響指示書セクション */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">音響指示書</h3>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="sound_semifinal" className="block text-sm font-medium text-gray-700">
+              準決勝
+            </label>
+            <textarea
+              id="sound_semifinal"
+              value={formData.sound_semifinal}
+              onChange={(e) => setFormData({ ...formData, sound_semifinal: e.target.value })}
+              rows={4}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="準決勝での音響に関する指示を記入してください"
+            />
+          </div>
+          <div>
+            <label htmlFor="sound_final" className="block text-sm font-medium text-gray-700">
+              決勝
+            </label>
+            <textarea
+              id="sound_final"
+              value={formData.sound_final}
+              onChange={(e) => setFormData({ ...formData, sound_final: e.target.value })}
+              rows={4}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="決勝での音響に関する指示を記入してください"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 照明指示書セクション */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">照明指示書</h3>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="lighting_semifinal" className="block text-sm font-medium text-gray-700">
+              準決勝
+            </label>
+            <textarea
+              id="lighting_semifinal"
+              value={formData.lighting_semifinal}
+              onChange={(e) => setFormData({ ...formData, lighting_semifinal: e.target.value })}
+              rows={4}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="準決勝での照明に関する指示を記入してください"
+            />
+          </div>
+          <div>
+            <label htmlFor="lighting_final" className="block text-sm font-medium text-gray-700">
+              決勝
+            </label>
+            <textarea
+              id="lighting_final"
+              value={formData.lighting_final}
+              onChange={(e) => setFormData({ ...formData, lighting_final: e.target.value })}
+              rows={4}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="決勝での照明に関する指示を記入してください"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between">
