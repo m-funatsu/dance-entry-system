@@ -95,49 +95,36 @@ export default async function DashboardPage() {
             <MessageAlert />
           </Suspense>
           
-          {/* 選考状況セクション（最上部） */}
+          {/* 選考状況セクション（スリム版） */}
           {!userProfile.has_seed && entry && (
-            <div className="mb-8">
-              <div className="bg-white overflow-hidden shadow-lg rounded-lg border-2 border-indigo-200">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">選考状況</h2>
-                      <div className="flex items-center space-x-3">
-                        <span className={`inline-flex items-center px-4 py-2 rounded-full text-lg font-semibold ${
-                          entry.status === 'selected' ? 'bg-green-100 text-green-800' :
-                          entry.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                          entry.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {entry.status === 'pending' && '審査待ち'}
-                          {entry.status === 'submitted' && '提出済み'}
-                          {entry.status === 'selected' && '選考通過'}
-                          {entry.status === 'rejected' && '不選考'}
-                        </span>
-                        <p className="text-gray-600">
-                          {entry.status === 'pending' && '審査をお待ちください'}
-                          {entry.status === 'submitted' && '審査中です'}
-                          {entry.status === 'selected' && 'おめでとうございます！次のステップの案内をお待ちください。'}
-                          {entry.status === 'rejected' && '残念ながら不選考となりました'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <svg className={`h-16 w-16 ${
-                        entry.status === 'selected' ? 'text-green-500' :
-                        entry.status === 'rejected' ? 'text-red-500' :
-                        entry.status === 'submitted' ? 'text-blue-500' :
-                        'text-yellow-500'
-                      }`} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                        {entry.status === 'selected' ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        ) : entry.status === 'rejected' ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        ) : (
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        )}
-                      </svg>
+            <div className="mb-6">
+              <div className={`border-l-4 bg-white shadow rounded-lg p-4 ${
+                entry.status === 'selected' ? 'border-green-500' :
+                entry.status === 'rejected' ? 'border-red-500' :
+                entry.status === 'submitted' ? 'border-blue-500' :
+                'border-yellow-500'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">選考状況</h3>
+                    <div className="mt-1 flex items-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        entry.status === 'selected' ? 'bg-green-100 text-green-800' :
+                        entry.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        entry.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {entry.status === 'pending' && '審査待ち'}
+                        {entry.status === 'submitted' && '提出済み'}
+                        {entry.status === 'selected' && '選考通過'}
+                        {entry.status === 'rejected' && '不選考'}
+                      </span>
+                      <span className="ml-3 text-sm text-gray-600">
+                        {entry.status === 'pending' && '審査をお待ちください'}
+                        {entry.status === 'submitted' && '審査中です'}
+                        {entry.status === 'selected' && 'おめでとうございます！'}
+                        {entry.status === 'rejected' && '残念ながら不選考となりました'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -147,25 +134,18 @@ export default async function DashboardPage() {
 
           {/* シード権ユーザー専用の選考状況 */}
           {userProfile.has_seed && (
-            <div className="mb-8">
-              <div className="bg-green-50 overflow-hidden shadow-lg rounded-lg border-2 border-green-300">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold text-green-900 mb-2">選考状況</h2>
-                      <div className="flex items-center space-x-3">
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-lg font-semibold bg-green-100 text-green-800">
-                          シード権保持
-                        </span>
-                        <p className="text-green-700">
-                          自動的に選考を通過します。エントリー情報を登録してください。
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <svg className="h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+            <div className="mb-6">
+              <div className="border-l-4 border-green-500 bg-green-50 shadow rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-green-700">選考状況</h3>
+                    <div className="mt-1 flex items-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        シード権保持
+                      </span>
+                      <span className="ml-3 text-sm text-green-700">
+                        自動的に選考を通過します
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -174,7 +154,7 @@ export default async function DashboardPage() {
           )}
 
           {/* エントリー情報カード */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
             {/* 基本情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -190,13 +170,8 @@ export default async function DashboardPage() {
                         基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry ? '登録済み' : '未登録'}
+                        {entry && entry.dance_style ? '登録済み' : '未登録'}
                       </dd>
-                      {entry && (
-                        <dd className="text-sm text-gray-500 mt-1">
-                          {entry.dance_style} {entry.team_name && `• ${entry.team_name}`}
-                        </dd>
-                      )}
                     </dl>
                   </div>
                 </div>
@@ -204,34 +179,29 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry ? '情報を編集 →' : '情報を登録 →'}
+                    {entry && entry.dance_style ? '編集' : '登録'} →
                   </Link>
                 </div>
               </div>
             </div>
 
-            {/* ファイルアップロードカード */}
+            {/* 楽曲情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
                     </svg>
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        ファイルアップロード
+                        楽曲情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0 ? 'アップロード済み' : '未アップロード'}
+                        {entry && entry.music_title ? '登録済み' : '未登録'}
                       </dd>
-                      {(fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0) && (
-                        <dd className="text-sm text-gray-500 mt-1">
-                          音源: {fileStats.music}個 • 動画: {fileStats.video}個 • 写真: {fileStats.photo}個
-                        </dd>
-                      )}
                     </dl>
                   </div>
                 </div>
@@ -239,35 +209,29 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    ファイルを管理 →
+                    {entry && entry.music_title ? '編集' : '登録'} →
                   </Link>
                 </div>
               </div>
             </div>
 
-            {/* 提出状況カード */}
+            {/* 追加情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        提出状況
+                        追加情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.status !== 'pending' ? '提出済み' : '未提出'}
+                        {fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0 ? 'ファイルあり' : '未アップロード'}
                       </dd>
-                      {entry && (
-                        <dd className="text-sm text-gray-500 mt-1">
-                          {entry.status === 'pending' && '必要項目を入力して提出してください'}
-                          {entry.status !== 'pending' && '審査をお待ちください'}
-                        </dd>
-                      )}
                     </dl>
                   </div>
                 </div>
@@ -275,7 +239,37 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    {entry && entry.status !== 'pending' ? '内容を確認 →' : 'エントリーを提出 →'}
+                    管理 →
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* 任意申請カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        任意申請
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {entry && entry.optional_requests ? '申請あり' : '申請なし'}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  <Link href="/dashboard/form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    {entry && entry.optional_requests ? '編集' : '申請'} →
                   </Link>
                 </div>
               </div>
@@ -284,7 +278,7 @@ export default async function DashboardPage() {
 
           {/* エントリー情報詳細表示 */}
           {entry && (
-            <div className="mt-8 space-y-6">
+            <div className="space-y-6">
               {/* 基本情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
@@ -392,6 +386,23 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              {/* 任意申請情報表示 */}
+              {entry.optional_requests && (
+                <div className="bg-white shadow rounded-lg">
+                  <div className="px-4 py-5 sm:p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">任意申請</h3>
+                      <Link href="/dashboard/form" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    </div>
+                    <div>
+                      <p className="text-base text-gray-900 whitespace-pre-line">{entry.optional_requests}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
