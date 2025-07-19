@@ -1,36 +1,113 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+interface Settings {
+  entry_deadline: string
+  upload_deadline: string
+  max_file_size: string
+  max_files_per_type: string
+  email_notifications: string
+  admin_email: string
+  site_title: string
+  entry_message: string
+  competition_name: string
+  competition_year: string
+  competition_date: string
+  competition_venue: string
+  application_start_date: string
+  application_end_date: string
+  announcement_date: string
+  max_entries: string
+}
 
-export default async function AdminSettingsPage() {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect('/auth/login')
+export default function AdminSettingsPage() {
+  const [settings, setSettings] = useState<Settings>({
+    entry_deadline: '',
+    upload_deadline: '',
+    max_file_size: '100',
+    max_files_per_type: '5',
+    email_notifications: 'true',
+    admin_email: '',
+    site_title: '2025 バルカーカップ ダンスエントリーシステム',
+    entry_message: '',
+    competition_name: 'バルカーカップ',
+    competition_year: '2025',
+    competition_date: '',
+    competition_venue: '',
+    application_start_date: '',
+    application_end_date: '',
+    announcement_date: '',
+    max_entries: '100'
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(prev => ({ ...prev, ...data.settings }))
+      }
+    } catch (error) {
+      console.error('設定の取得に失敗しました:', error)
+      setMessage({ type: 'error', text: '設定の取得に失敗しました' })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSaving(true)
+    setMessage(null)
 
-  if (!userProfile || userProfile.role !== 'admin') {
-    redirect('/dashboard')
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ settings })
+      })
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: '設定を保存しました' })
+      } else {
+        const error = await response.json()
+        setMessage({ type: 'error', text: error.error || '設定の保存に失敗しました' })
+      }
+    } catch (error) {
+      console.error('設定保存エラー:', error)
+      setMessage({ type: 'error', text: '設定の保存中にエラーが発生しました' })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  // システム設定を取得
-  const { data: settings } = await supabase
-    .from('settings')
-    .select('*')
-    .order('key', { ascending: true })
+  const handleChange = (field: keyof Settings, value: string | boolean) => {
+    setSettings(prev => ({
+      ...prev,
+      [field]: typeof value === 'boolean' ? value.toString() : value
+    }))
+  }
 
-  const settingsMap = settings?.reduce((acc, setting) => {
-    acc[setting.key] = setting.value
-    return acc
-  }, {} as Record<string, string>) || {}
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,25 +122,24 @@ export default async function AdminSettingsPage() {
                 システム設定
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
-                {userProfile.name}さん（管理者）
-              </span>
-              <form action="/auth/logout" method="post">
-                <button
-                  type="submit"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  ログアウト
-                </button>
-              </form>
-            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+        <form onSubmit={handleSubmit} className="px-4 py-6 sm:px-0">
+          {message && (
+            <div className={`mb-6 rounded-md p-4 ${
+              message.type === 'success' ? 'bg-green-50' : 'bg-red-50'
+            }`}>
+              <p className={`text-sm font-medium ${
+                message.type === 'success' ? 'text-green-800' : 'text-red-800'
+              }`}>
+                {message.text}
+              </p>
+            </div>
+          )}
+
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h2 className="text-lg leading-6 font-medium text-gray-900 mb-6">
@@ -71,17 +147,83 @@ export default async function AdminSettingsPage() {
               </h2>
 
               <div className="space-y-6">
+                {/* 大会基本情報 */}
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">大会基本情報</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          大会名
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.competition_name}
+                          onChange={(e) => handleChange('competition_name', e.target.value)}
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          開催年
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.competition_year}
+                          onChange={(e) => handleChange('competition_year', e.target.value)}
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        開催日
+                      </label>
+                      <input
+                        type="date"
+                        value={settings.competition_date}
+                        onChange={(e) => handleChange('competition_date', e.target.value)}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        開催場所
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.competition_venue}
+                        onChange={(e) => handleChange('competition_venue', e.target.value)}
+                        placeholder="例: 東京国際フォーラム"
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* エントリー期限設定 */}
                 <div className="border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">エントリー期限</h3>
                   <div className="grid grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        エントリー受付期限
+                        エントリー受付開始日時
                       </label>
                       <input
                         type="datetime-local"
-                        defaultValue={settingsMap.entry_deadline || ''}
+                        value={settings.application_start_date}
+                        onChange={(e) => handleChange('application_start_date', e.target.value)}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        エントリー受付終了日時
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={settings.entry_deadline}
+                        onChange={(e) => handleChange('entry_deadline', e.target.value)}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                       <p className="mt-1 text-sm text-gray-500">
@@ -94,12 +236,24 @@ export default async function AdminSettingsPage() {
                       </label>
                       <input
                         type="datetime-local"
-                        defaultValue={settingsMap.upload_deadline || ''}
+                        value={settings.upload_deadline}
+                        onChange={(e) => handleChange('upload_deadline', e.target.value)}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                       <p className="mt-1 text-sm text-gray-500">
                         この日時以降、ファイルのアップロードを停止します
                       </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        選考結果発表日
+                      </label>
+                      <input
+                        type="date"
+                        value={settings.announcement_date}
+                        onChange={(e) => handleChange('announcement_date', e.target.value)}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
                     </div>
                   </div>
                 </div>
@@ -114,7 +268,8 @@ export default async function AdminSettingsPage() {
                       </label>
                       <input
                         type="number"
-                        defaultValue={settingsMap.max_file_size || '100'}
+                        value={settings.max_file_size}
+                        onChange={(e) => handleChange('max_file_size', e.target.value)}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
@@ -124,10 +279,30 @@ export default async function AdminSettingsPage() {
                       </label>
                       <input
                         type="number"
-                        defaultValue={settingsMap.max_files_per_type || '5'}
+                        value={settings.max_files_per_type}
+                        onChange={(e) => handleChange('max_files_per_type', e.target.value)}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* エントリー制限設定 */}
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">エントリー制限</h3>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      最大エントリー数
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.max_entries}
+                      onChange={(e) => handleChange('max_entries', e.target.value)}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      この数に達するとエントリーを自動的に締め切ります（0で無制限）
+                    </p>
                   </div>
                 </div>
 
@@ -139,7 +314,8 @@ export default async function AdminSettingsPage() {
                       <input
                         id="email_notifications"
                         type="checkbox"
-                        defaultChecked={settingsMap.email_notifications === 'true'}
+                        checked={settings.email_notifications === 'true'}
+                        onChange={(e) => handleChange('email_notifications', e.target.checked)}
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
                       <label htmlFor="email_notifications" className="ml-2 block text-sm text-gray-900">
@@ -152,7 +328,8 @@ export default async function AdminSettingsPage() {
                       </label>
                       <input
                         type="email"
-                        defaultValue={settingsMap.admin_email || ''}
+                        value={settings.admin_email}
+                        onChange={(e) => handleChange('admin_email', e.target.value)}
                         placeholder="admin@example.com"
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
@@ -170,7 +347,8 @@ export default async function AdminSettingsPage() {
                       </label>
                       <input
                         type="text"
-                        defaultValue={settingsMap.site_title || 'ダンスエントリーシステム'}
+                        value={settings.site_title}
+                        onChange={(e) => handleChange('site_title', e.target.value)}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
@@ -180,7 +358,8 @@ export default async function AdminSettingsPage() {
                       </label>
                       <textarea
                         rows={3}
-                        defaultValue={settingsMap.entry_message || ''}
+                        value={settings.entry_message}
+                        onChange={(e) => handleChange('entry_message', e.target.value)}
                         placeholder="エントリーページに表示するメッセージを入力してください"
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
@@ -190,42 +369,38 @@ export default async function AdminSettingsPage() {
 
                 {/* 保存ボタン */}
                 <div className="flex justify-end space-x-3">
-                  <button
-                    type="button"
+                  <Link
+                    href="/admin/dashboard"
                     className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     キャンセル
-                  </button>
+                  </Link>
                   <button
-                    type="button"
-                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    type="submit"
+                    disabled={isSaving}
+                    className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+                      isSaving
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                    }`}
                   >
-                    設定を保存
+                    {isSaving ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        保存中...
+                      </>
+                    ) : (
+                      '設定を保存'
+                    )}
                   </button>
-                </div>
-
-                {/* 開発中の注意 */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-yellow-800">
-                        設定保存機能は開発中
-                      </h3>
-                      <div className="mt-2 text-sm text-yellow-700">
-                        <p>現在、設定の保存機能は実装中です。表示のみ可能です。</p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </form>
       </main>
     </div>
   )
