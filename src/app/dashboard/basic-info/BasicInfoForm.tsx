@@ -85,9 +85,10 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="">選択してください</option>
-          <option value="Couple Dance">Couple Dance</option>
-          <option value="Formation">Formation</option>
-          <option value="Team">Team</option>
+          <option value="社交ダンス">社交ダンス</option>
+          <option value="バレエ・コンテンポラリーダンス">バレエ・コンテンポラリーダンス</option>
+          <option value="ジャズダンス">ジャズダンス</option>
+          <option value="ストリートダンス全般">ストリートダンス全般</option>
         </select>
       </div>
 
