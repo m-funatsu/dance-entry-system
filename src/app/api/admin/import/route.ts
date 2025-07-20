@@ -6,14 +6,16 @@ import { createAdminClient } from '@/lib/supabase/admin'
 const FIELD_MAPPING: Record<string, string> = {
   'タイムスタンプ': 'timestamp',
   '●出場ジャンル（一つ選択）': 'dance_style',
-  '■ペア情報　代表者 【氏名　漢字】　': 'representative_name',
-  '■ペア情報　代表者 【氏名　フリガナ】　': 'representative_furigana',
+  '■ペア情報　代表者 【氏名　漢字】': 'representative_name',
+  '■ペア情報　代表者 【氏名　フリガナ】': 'representative_furigana',
   '■ペア情報　代表者 【メールアドレス】': 'email',
   '■ペア情報　代表者 【電話番号】': 'phone_number',
-  '■ペア情報　パートナー 【氏名　漢字】　': 'partner_name',
-  '■ペア情報　パートナー 【氏名　フリガナ】　': 'partner_furigana',
-  '■ 振付師情報【氏名　漢字】　': 'choreographer',
-  '■ 振付師情報【氏名　フリガナ】　': 'choreographer_furigana',
+  '■ペア情報　パートナー 【氏名　漢字】': 'partner_name',
+  '■ペア情報　パートナー 【氏名　フリガナ】': 'partner_furigana',
+  '■ 振付師情報【氏名　漢字】': 'choreographer',
+  '■ 振付師情報【氏名　フリガナ】': 'choreographer_furigana',
+  '●ペア参加資格および参加者情報の内容について': 'agreement_status',
+  'プライバシーポリシー ※上記よりご確認ください。': 'privacy_policy_status'
 }
 
 // ヘッダーの正規化（空白の違いを吸収）
@@ -181,11 +183,12 @@ export async function POST(request: NextRequest) {
           phone_number: mappedData.phone_number || '',
           choreographer: mappedData.choreographer || '',
           choreographer_furigana: mappedData.choreographer_furigana || '',
-          participant_names: `${mappedData.representative_name}\n${mappedData.partner_name || ''}`.trim(),
-          status: 'pending',
+          status: 'pending' as const,
+          agreement_checked: mappedData.agreement_status === '理解した',
           google_form_data: {
             timestamp: mappedData.timestamp,
-            imported_at: new Date().toISOString()
+            imported_at: new Date().toISOString(),
+            privacy_policy: mappedData.privacy_policy_status
           }
         }
 
