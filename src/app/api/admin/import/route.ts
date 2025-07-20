@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 // Google FormのCSVヘッダーとデータベースフィールドのマッピング
-const FIELD_MAPPING = {
+const FIELD_MAPPING: Record<string, string> = {
   'タイムスタンプ': 'timestamp',
   '●出場ジャンル（一つ選択）': 'dance_style',
   '■ペア情報　代表者 【氏名　漢字】　': 'representative_name',
@@ -14,6 +14,11 @@ const FIELD_MAPPING = {
   '■ペア情報　パートナー 【氏名　フリガナ】　': 'partner_furigana',
   '■ 振付師情報【氏名　漢字】　': 'choreographer',
   '■ 振付師情報【氏名　フリガナ】　': 'choreographer_furigana',
+}
+
+// ヘッダーの正規化（空白の違いを吸収）
+function normalizeHeader(header: string): string {
+  return header.trim().replace(/\s+/g, ' ')
 }
 
 export async function POST(request: NextRequest) {
@@ -45,8 +50,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ファイルが選択されていません' }, { status: 400 })
     }
 
-    // CSVの読み込み
-    const text = await file.text()
+    // CSVの読み込み（BOMを削除）
+    const buffer = await file.arrayBuffer()
+    const decoder = new TextDecoder('utf-8')
+    let text = decoder.decode(buffer)
+    
+    // BOMを削除
+    if (text.charCodeAt(0) === 0xFEFF) {
+      text = text.slice(1)
+    }
+    
+    // 改行コードを統一
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+    
     const lines = text.split('\n').filter(line => line.trim())
     
     if (lines.length < 2) {
@@ -54,8 +70,19 @@ export async function POST(request: NextRequest) {
     }
 
     // ヘッダーの解析
-    const headers = parseCSVLine(lines[0])
+    const headers = parseCSVLine(lines[0]).map(h => normalizeHeader(h))
     console.log('Headers:', headers)
+    console.log('First data line:', lines[1])
+    
+    // 正規化されたマッピングを作成
+    const normalizedMapping: Record<string, string> = {}
+    Object.entries(FIELD_MAPPING).forEach(([key, value]) => {
+      normalizedMapping[normalizeHeader(key)] = value
+    })
+    
+    // ヘッダーのマッピング確認
+    const mappedHeaders = headers.map(h => normalizedMapping[h] || null)
+    console.log('Mapped headers:', mappedHeaders)
 
     // 管理者クライアントを使用（RLS回避）
     const adminSupabase = createAdminClient()
@@ -75,7 +102,7 @@ export async function POST(request: NextRequest) {
         // データのマッピング
         const mappedData: Record<string, string> = {}
         headers.forEach((header, index) => {
-          const dbField = FIELD_MAPPING[header as keyof typeof FIELD_MAPPING]
+          const dbField = normalizedMapping[header]
           if (dbField && values[index]) {
             mappedData[dbField] = values[index].trim()
           }
@@ -85,6 +112,11 @@ export async function POST(request: NextRequest) {
 
         // 必須フィールドのチェック
         if (!mappedData.email || !mappedData.representative_name || !mappedData.dance_style) {
+          console.log(`Row ${i + 1} missing required fields:`, {
+            email: mappedData.email,
+            representative_name: mappedData.representative_name,
+            dance_style: mappedData.dance_style
+          })
           results.errors.push(`行 ${i + 1}: 必須フィールド（メールアドレス、代表者名、ダンスジャンル）が不足しています`)
           continue
         }
@@ -185,6 +217,18 @@ export async function POST(request: NextRequest) {
         console.error(`Error processing row ${i + 1}:`, error)
         results.errors.push(`行 ${i + 1}: 処理中にエラーが発生しました`)
       }
+    }
+
+    // デバッグ情報を含める
+    if (results.success === 0 && results.errors.length === 0) {
+      return NextResponse.json({
+        error: '有効なインポートデータが見つかりませんでした',
+        details: [
+          `ヘッダー: ${headers.join(', ')}`,
+          `データ行数: ${lines.length - 1}`,
+          '※CSVファイルの形式を確認してください'
+        ]
+      }, { status: 400 })
     }
 
     return NextResponse.json({
