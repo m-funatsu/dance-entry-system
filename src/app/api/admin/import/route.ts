@@ -63,16 +63,17 @@ export async function POST(request: NextRequest) {
     // 改行コードを統一
     text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
     
-    const lines = text.split('\n').filter(line => line.trim())
+    // 複数行ヘッダーを処理
+    const { headers: rawHeaders, dataLines } = parseCSVWithMultilineHeaders(text)
     
-    if (lines.length < 2) {
-      return NextResponse.json({ error: 'CSVファイルが空です' }, { status: 400 })
+    if (dataLines.length === 0) {
+      return NextResponse.json({ error: 'CSVファイルにデータがありません' }, { status: 400 })
     }
 
-    // ヘッダーの解析
-    const headers = parseCSVLine(lines[0]).map(h => normalizeHeader(h))
+    // ヘッダーの正規化
+    const headers = rawHeaders.map(h => normalizeHeader(h))
     console.log('Headers:', headers)
-    console.log('First data line:', lines[1])
+    console.log('First data line:', dataLines[0])
     
     // 正規化されたマッピングを作成
     const normalizedMapping: Record<string, string> = {}
@@ -94,8 +95,8 @@ export async function POST(request: NextRequest) {
     }
 
     // データ行の処理
-    for (let i = 1; i < lines.length; i++) {
-      const values = parseCSVLine(lines[i])
+    for (let i = 0; i < dataLines.length; i++) {
+      const values = parseCSVLine(dataLines[i])
       if (values.length === 0) continue
 
       try {
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
           }
         })
 
-        console.log(`Row ${i} mapped data:`, mappedData)
+        console.log(`Row ${i + 1} mapped data:`, mappedData)
 
         // 必須フィールドのチェック
         if (!mappedData.email || !mappedData.representative_name || !mappedData.dance_style) {
@@ -225,7 +226,7 @@ export async function POST(request: NextRequest) {
         error: '有効なインポートデータが見つかりませんでした',
         details: [
           `ヘッダー: ${headers.join(', ')}`,
-          `データ行数: ${lines.length - 1}`,
+          `データ行数: ${dataLines.length}`,
           '※CSVファイルの形式を確認してください'
         ]
       }, { status: 400 })
@@ -268,13 +269,37 @@ function parseCSVLine(line: string): string[] {
         inQuotes = false
       }
     } else if (char === ',' && !inQuotes) {
-      result.push(current)
+      result.push(current.trim())
       current = ''
     } else {
       current += char
     }
   }
   
-  result.push(current)
+  result.push(current.trim())
   return result
+}
+
+// 複数行にまたがるヘッダーを処理
+function parseCSVWithMultilineHeaders(text: string): { headers: string[], dataLines: string[] } {
+  const lines = text.split('\n')
+  let headerLine = ''
+  let dataStartIndex = 0
+  
+  // ヘッダー行を特定（最初のタイムスタンプ形式の行まで）
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (line.match(/^\d{4}\/\d{2}\/\d{2}/)) {
+      // データ行を発見
+      dataStartIndex = i
+      break
+    }
+    headerLine += (headerLine ? '\n' : '') + line
+  }
+  
+  // ヘッダーを解析（改行を削除）
+  const headers = parseCSVLine(headerLine.replace(/\n/g, ' '))
+  const dataLines = lines.slice(dataStartIndex).filter(line => line.trim())
+  
+  return { headers, dataLines }
 }
