@@ -33,14 +33,68 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  const pathname = request.nextUrl.pathname
+
+  // 公開ルートの定義
+  const publicRoutes = [
+    '/',
+    '/login',
+    '/auth/login',
+    '/auth/register',
+    '/auth/logout',
+    '/auth/reset-password',
+    '/auth/update-password',
+    '/api/admin/favicon' // ファビコン取得は公開
+  ]
+
+  // 管理者専用ルート
+  const adminRoutes = [
+    '/admin',
+    '/api/admin'
+  ]
+
+  // 公開ルートはスキップ
+  if (publicRoutes.includes(pathname) || pathname.startsWith('/_next')) {
+    return supabaseResponse
+  }
+
+  // 認証チェック
+  if (!user) {
+    // APIルートの場合は401を返す
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: '認証が必要です' },
+        { status: 401 }
+      )
+    }
+    // 通常のページはログインページへリダイレクト
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/auth/login'
     return NextResponse.redirect(url)
+  }
+
+  // 管理者権限チェック
+  if (adminRoutes.some(route => pathname.startsWith(route))) {
+    // ユーザー情報を取得して権限を確認
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!userData || userData.role !== 'admin') {
+      // APIルートの場合は403を返す
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json(
+          { error: '管理者権限が必要です' },
+          { status: 403 }
+        )
+      }
+      // 通常のページはダッシュボードへリダイレクト
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
