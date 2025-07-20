@@ -1,19 +1,25 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function UpdatePasswordPage() {
+function UpdatePasswordForm() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [isFirstTime, setIsFirstTime] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
+    // URLパラメータから初回ログインかどうかを判定
+    const firstTime = searchParams.get('first_time') === 'true'
+    setIsFirstTime(firstTime)
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         // パスワードリセットセッションが有効
@@ -23,7 +29,7 @@ export default function UpdatePasswordPage() {
     return () => {
       authListener.subscription.unsubscribe()
     }
-  }, [supabase.auth])
+  }, [supabase.auth, searchParams])
 
   const validatePassword = (password: string): string[] => {
     const errors: string[] = []
@@ -76,8 +82,15 @@ export default function UpdatePasswordPage() {
         return
       }
 
-      alert('パスワードが更新されました')
-      router.push('/auth/login')
+      // パスワード更新成功
+      if (isFirstTime) {
+        // 初回ログインの場合は、ダッシュボードへ直接リダイレクト
+        alert('アカウントが正常に作成されました。ダッシュボードへ移動します。')
+        router.push('/dashboard')
+      } else {
+        alert('パスワードが更新されました')
+        router.push('/auth/login')
+      }
     } catch {
       setError('パスワードの更新に失敗しました')
     } finally {
@@ -90,8 +103,17 @@ export default function UpdatePasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            新しいパスワードを設定
+            {isFirstTime ? 'アカウントの初期設定' : '新しいパスワードを設定'}
           </h2>
+          {isFirstTime && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
+              <p className="text-center text-sm text-blue-800">
+                ダンスエントリーシステムへようこそ！<br />
+                エントリー登録が完了しました。<br />
+                安全なパスワードを設定して、アカウントを有効化してください。
+              </p>
+            </div>
+          )}
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleUpdatePassword}>
@@ -165,5 +187,13 @@ export default function UpdatePasswordPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50">読み込み中...</div>}>
+      <UpdatePasswordForm />
+    </Suspense>
   )
 }
