@@ -111,6 +111,34 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
   }
 
+  const sendWelcomeEmail = async (email: string, name: string) => {
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/admin/send-welcome-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, name }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || 'ウェルカムメールの送信に失敗しました')
+        return
+      }
+
+      alert(data.message || 'ウェルカムメールを送信しました')
+    } catch (error) {
+      console.error('Welcome email error:', error)
+      alert('ウェルカムメールの送信に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const updateEntryStatus = async (entryId: string, newStatus: string) => {
     setLoading(true)
 
@@ -368,24 +396,37 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(entry.status)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <Link
-                      href={`/admin/entries/${entry.id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      詳細
-                    </Link>
-                    <select
-                      value={entry.status}
-                      onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
-                      disabled={loading}
-                      className="rounded border-gray-300 text-xs disabled:opacity-50"
-                    >
-                      <option value="pending">未処理</option>
-                      <option value="submitted">提出済み</option>
-                      <option value="selected">選考通過</option>
-                      <option value="rejected">不選考</option>
-                    </select>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Link
+                          href={`/admin/entries/${entry.id}`}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          詳細
+                        </Link>
+                        <select
+                          value={entry.status}
+                          onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
+                          disabled={loading}
+                          className="rounded border-gray-300 text-xs disabled:opacity-50"
+                        >
+                          <option value="pending">未処理</option>
+                          <option value="submitted">提出済み</option>
+                          <option value="selected">選考通過</option>
+                          <option value="rejected">不選考</option>
+                        </select>
+                      </div>
+                      {entry.status === 'pending' && (
+                        <button
+                          onClick={() => sendWelcomeEmail(entry.users.email, entry.users.name)}
+                          disabled={loading}
+                          className="text-xs text-indigo-600 hover:text-indigo-900 disabled:opacity-50"
+                        >
+                          ウェルカムメールを送信
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               )

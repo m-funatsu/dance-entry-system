@@ -203,21 +203,7 @@ export async function POST(request: NextRequest) {
         }
 
         results.success++
-
-        // パスワードリセットメールを送信（初回ログインパラメータ付き）
-        const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
-          mappedData.email,
-          {
-            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?first_time=true`
-          }
-        )
-
-        if (resetError) {
-          console.error('Password reset error:', resetError)
-          results.created.push(`${mappedData.representative_name} (${mappedData.email}) - ユーザー作成成功、メール送信失敗`)
-        } else {
-          results.created.push(`${mappedData.representative_name} (${mappedData.email}) - ユーザー作成成功、メール送信済み`)
-        }
+        results.created.push(`${mappedData.representative_name} (${mappedData.email}) - ユーザー作成成功`)
 
       } catch (error) {
         console.error(`Error processing row ${i + 1}:`, error)
