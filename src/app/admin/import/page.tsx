@@ -76,6 +76,57 @@ export default function AdminImportPage() {
     }
   }
 
+  const handleTestUpload = async () => {
+    if (!file) {
+      setUploadResult({
+        success: false,
+        message: 'ファイルを選択してください'
+      })
+      return
+    }
+
+    setIsUploading(true)
+    setUploadResult(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/admin/test-import', {
+        method: 'POST',
+        body: formData
+      })
+
+      const result = await response.json()
+
+      console.log('Test import result:', result)
+
+      setUploadResult({
+        success: response.ok,
+        message: result.message,
+        details: [
+          `ファイル名: ${result.debug?.fileName}`,
+          `総行数: ${result.analysis?.totalLines}`,
+          `空でない行数: ${result.analysis?.nonEmptyLines}`,
+          `ヘッダー数: ${result.analysis?.headers?.length || 0}`,
+          `データ行数: ${result.analysis?.dataLines?.length || 0}`,
+          '--- ヘッダー ---',
+          ...(result.analysis?.headers || []).map((h: string, i: number) => `${i + 1}: ${h}`),
+          '--- 最初のデータ行 ---',
+          ...(result.analysis?.dataLines?.[0]?.values || []).map((v: string, i: number) => `${i + 1}: ${v}`)
+        ]
+      })
+    } catch (error) {
+      console.error('Test upload error:', error)
+      setUploadResult({
+        success: false,
+        message: 'テストアップロード中にエラーが発生しました'
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   const handleDownloadTemplate = async () => {
     try {
       const response = await fetch('/api/admin/csv-template')
@@ -156,6 +207,16 @@ export default function AdminImportPage() {
                   onChange={handleFileChange}
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                 />
+                <button
+                  onClick={handleTestUpload}
+                  disabled={!file || isUploading}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75" />
+                  </svg>
+                  テスト
+                </button>
                 <button
                   onClick={handleUpload}
                   disabled={!file || isUploading}
