@@ -248,7 +248,59 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* 楽曲情報カード */}
+            {/* 予選情報カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        予選情報
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {entry && entry.work_title ? '登録済み' : '未登録'}
+                      </dd>
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  {isFormEditable('music_info_deadline') ? (
+                    <Link href="/dashboard/preliminary" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && entry.work_title ? '編集' : '登録'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 本選情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -260,7 +312,7 @@ export default async function DashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        楽曲情報
+                        本選情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && (entry.music_title || entry.original_artist) ? '登録済み' : '未登録'}
@@ -288,7 +340,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href="/dashboard/music-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -351,7 +403,6 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
-
             {/* 任意申請カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -397,7 +448,7 @@ export default async function DashboardPage() {
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
+                      期限切れ（編雈不可）
                     </span>
                   )}
                 </div>
@@ -477,31 +528,50 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
-              {/* 楽曲情報表示 */}
+              {/* 予選情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">楽曲情報</h3>
-                    <div className="flex space-x-3">
-                      {isFormEditable('music_info_deadline') ? (
-                        <Link href="/dashboard/music-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                          編集
-                        </Link>
-                      ) : (
-                        <span className="text-sm font-medium text-gray-400">
-                          期限切れ
-                        </span>
-                      )}
-                      {isFormEditable('additional_info_deadline') ? (
-                        <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                          ファイル管理
-                        </Link>
-                      ) : (
-                        <span className="text-sm font-medium text-gray-400">
-                          期限切れ
-                        </span>
-                      )}
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">予選情報</h3>
+                    {isFormEditable('music_info_deadline') ? (
+                      <Link href="/dashboard/preliminary" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.work_title || '未設定'}</p>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">予選動画</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {fileStats.video > 0 ? 'アップロード済み' : '未アップロード'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 本選情報表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">本選情報</h3>
+                    {isFormEditable('music_info_deadline') ? (
+                      <Link href="/dashboard/finals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-4">
                     <div>
@@ -530,10 +600,6 @@ export default async function DashboardPage() {
                         </div>
                       </>
                     )}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.work_title || '未設定'}</p>
-                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-500">ストーリー・コンセプト</label>
                       <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.story || '未設定'}</p>
