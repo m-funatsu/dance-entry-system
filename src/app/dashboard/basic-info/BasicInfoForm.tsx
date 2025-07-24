@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import type { BasicInfo, Entry } from '@/lib/types'
+import type { BasicInfo } from '@/lib/types'
 
 interface BasicInfoFormProps {
   userId: string
