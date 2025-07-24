@@ -11,7 +11,7 @@ interface SNSFormProps {
   initialData: Entry | null
 }
 
-export default function SNSForm({ userId, initialData }: SNSFormProps) {
+export default function SNSForm({ initialData }: SNSFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()

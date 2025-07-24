@@ -11,7 +11,7 @@ interface SemifinalsFormProps {
   initialData: Entry | null
 }
 
-export default function SemifinalsForm({ userId, initialData }: SemifinalsFormProps) {
+export default function SemifinalsForm({ initialData }: SemifinalsFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
