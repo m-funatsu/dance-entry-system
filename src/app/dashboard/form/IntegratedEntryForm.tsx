@@ -19,13 +19,11 @@ type FormSection = 'basic' | 'music' | 'additional' | 'optional'
 interface FormData {
   // 基本情報
   dance_style: string
-  team_name: string
   representative_name: string
   representative_furigana: string
   partner_name: string
   partner_furigana: string
   phone_number: string
-  emergency_contact: string
   agreement_checked: boolean
   
   // 楽曲情報
@@ -58,13 +56,11 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
-    team_name: existingEntry?.team_name || '',
     representative_name: existingEntry?.representative_name || '',
     representative_furigana: existingEntry?.representative_furigana || '',
     partner_name: existingEntry?.partner_name || '',
     partner_furigana: existingEntry?.partner_furigana || '',
     phone_number: existingEntry?.phone_number || '',
-    emergency_contact: existingEntry?.emergency_contact || '',
     use_different_songs: false,
     choreographer: existingEntry?.choreographer || '',
     choreographer_furigana: existingEntry?.choreographer_furigana || '',
@@ -116,7 +112,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
       case 'basic':
         if (!formData.dance_style) newErrors.dance_style = 'ダンスジャンルを選択してください'
         if (!formData.phone_number) newErrors.phone_number = '電話番号を入力してください'
-        if (!formData.emergency_contact) newErrors.emergency_contact = '緊急連絡先を入力してください'
         if (!formData.agreement_checked) newErrors.agreement = '参加資格への同意が必要です'
         break
       case 'music':
@@ -225,14 +220,12 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         case 'basic':
           updateData = {
             dance_style: formData.dance_style,
-            team_name: formData.team_name,
             participant_names: '',
             representative_name: formData.representative_name,
             representative_furigana: formData.representative_furigana,
             partner_name: formData.partner_name,
             partner_furigana: formData.partner_furigana,
             phone_number: formData.phone_number,
-            emergency_contact: formData.emergency_contact,
             agreement_checked: formData.agreement_checked,
           }
           break
@@ -389,17 +382,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 {errors.dance_style && <p className="mt-1 text-sm text-red-600">{errors.dance_style}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  チーム名
-                </label>
-                <input
-                  type="text"
-                  value={formData.team_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, team_name: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
-              </div>
 
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -465,18 +447,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
                 {errors.phone_number && <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  緊急連絡先 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  value={formData.emergency_contact}
-                  onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
-                {errors.emergency_contact && <p className="mt-1 text-sm text-red-600">{errors.emergency_contact}</p>}
-              </div>
 
               {/* 参加資格への同意 */}
               <div className="space-y-4 mt-6">

@@ -19,7 +19,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
     partner_name: existingEntry?.partner_name || '',
     partner_furigana: existingEntry?.partner_furigana || '',
     phone_number: existingEntry?.phone_number || '',
-    emergency_contact: existingEntry?.emergency_contact || '',
     photo_url: existingEntry?.photo_url || '',
     music_title: existingEntry?.music_title || '',
     choreographer: existingEntry?.choreographer || '',
@@ -44,7 +43,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
         partner_name: existingEntry.partner_name || '',
         partner_furigana: existingEntry.partner_furigana || '',
         phone_number: existingEntry.phone_number || '',
-        emergency_contact: existingEntry.emergency_contact || '',
         photo_url: existingEntry.photo_url || '',
         music_title: existingEntry.music_title || '',
         choreographer: existingEntry.choreographer || '',
@@ -123,8 +121,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
             partner_name: formData.partner_name,
             partner_furigana: formData.partner_furigana,
             phone_number: formData.phone_number,
-            emergency_contact: formData.emergency_contact,
-            photo_url: photoUrl,
+                    photo_url: photoUrl,
             music_title: formData.music_title,
             choreographer: formData.choreographer,
             choreographer_furigana: formData.choreographer_furigana,
@@ -162,8 +159,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
               partner_name: formData.partner_name,
               partner_furigana: formData.partner_furigana,
               phone_number: formData.phone_number,
-              emergency_contact: formData.emergency_contact,
-              photo_url: photoUrl,
+                        photo_url: photoUrl,
               music_title: formData.music_title,
               choreographer: formData.choreographer,
               choreographer_furigana: formData.choreographer_furigana,
@@ -345,22 +341,6 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           />
         </div>
 
-        {/* 緊急連絡先 */}
-        <div>
-          <label htmlFor="emergency_contact" className="block text-sm font-medium text-gray-700">
-            緊急連絡先 *
-          </label>
-          <input
-            type="text"
-            id="emergency_contact"
-            name="emergency_contact"
-            required
-            value={formData.emergency_contact}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="緊急時の連絡先（氏名・電話番号）"
-          />
-        </div>
 
         {/* 振付師名 */}
         <div>
