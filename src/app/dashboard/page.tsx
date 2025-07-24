@@ -195,7 +195,7 @@ export default async function DashboardPage() {
           )}
 
           {/* エントリー情報カード */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {/* 基本情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -300,7 +300,7 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* 本選情報カード */}
+            {/* 準決勝情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -312,7 +312,7 @@ export default async function DashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        本選情報
+                        準決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && (entry.music_title || entry.original_artist) ? '登録済み' : '未登録'}
@@ -340,7 +340,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/dashboard/semifinals" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -352,25 +352,25 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* 追加情報カード */}
+            {/* 決勝情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
                     </svg>
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        追加情報
+                        決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && (entry.sponsor || entry.remarks || fileStats.music > 0 || fileStats.video > 0 || fileStats.photo > 0) ? '登録済み' : '未登録'}
+                        {entry && (entry.final_music_title || entry.final_original_artist) ? '登録済み' : '未登録'}
                       </dd>
                       {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.additional_info_deadline)
+                        const deadline = getDeadlineInfo(settingsMap.finals_deadline)
                         if (!deadline) return null
                         return (
                           <dd className={`text-xs mt-1 ${
@@ -391,9 +391,9 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('additional_info_deadline') ? (
-                    <Link href="/dashboard/additional-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      管理 →
+                  {isFormEditable('finals_deadline') ? (
+                    <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && (entry.final_music_title || entry.final_original_artist) ? '編集' : '登録'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
@@ -403,6 +403,59 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
+            
+            {/* SNS情報カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        SNS情報
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {entry && (entry.instagram || entry.twitter || entry.facebook) ? '登録済み' : '未登録'}
+                      </dd>
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.sns_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  {isFormEditable('sns_deadline') ? (
+                    <Link href="/dashboard/sns" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            
             {/* 任意申請カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -558,13 +611,13 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
-              {/* 本選情報表示 */}
+              {/* 準決勝情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">本選情報</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">準決勝情報</h3>
                     {isFormEditable('music_info_deadline') ? (
-                      <Link href="/dashboard/finals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <Link href="/dashboard/semifinals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
                       </Link>
                     ) : (
@@ -575,12 +628,6 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">楽曲使用</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {entry.use_different_songs ? '準決勝・決勝で異なる楽曲を使用' : '準決勝・決勝で同じ楽曲を使用'}
-                      </p>
-                    </div>
-                    <div>
                       <label className="block text-sm font-medium text-gray-500">準決勝用楽曲</label>
                       <p className="mt-1 text-base text-gray-900">{entry.music_title || '未設定'}</p>
                     </div>
@@ -588,18 +635,6 @@ export default async function DashboardPage() {
                       <label className="block text-sm font-medium text-gray-500">原曲アーティスト</label>
                       <p className="mt-1 text-base text-gray-900">{entry.original_artist || '未設定'}</p>
                     </div>
-                    {entry.use_different_songs && (
-                      <>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500">決勝用楽曲</label>
-                          <p className="mt-1 text-base text-gray-900">{entry.final_music_title || '未設定'}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500">決勝用原曲アーティスト</label>
-                          <p className="mt-1 text-base text-gray-900">{entry.final_original_artist || '未設定'}</p>
-                        </div>
-                      </>
-                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-500">ストーリー・コンセプト</label>
                       <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.story || '未設定'}</p>
@@ -639,13 +674,13 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
-              {/* 追加情報表示 */}
+              {/* 決勝情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">追加情報</h3>
-                    {isFormEditable('additional_info_deadline') ? (
-                      <Link href="/dashboard/additional-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">決勝情報</h3>
+                    {isFormEditable('finals_deadline') ? (
+                      <Link href="/dashboard/finals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
                       </Link>
                     ) : (
@@ -656,12 +691,44 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">協賛企業・協賛品</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.sponsor || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">決勝用楽曲</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.final_music_title || '未設定'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">備考</label>
-                      <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.remarks || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">決勝用原曲アーティスト</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.final_original_artist || '未設定'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SNS情報表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">SNS情報</h3>
+                    {isFormEditable('sns_deadline') ? (
+                      <Link href="/dashboard/sns" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">Instagram</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.instagram || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">Twitter</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.twitter || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">Facebook</label>
+                      <p className="mt-1 text-base text-gray-900">{entry.facebook || '未設定'}</p>
                     </div>
                   </div>
                 </div>
