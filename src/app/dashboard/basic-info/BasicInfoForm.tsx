@@ -233,7 +233,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
                 rel="noopener noreferrer"
                 className="text-indigo-600 hover:text-indigo-800 underline"
               >
-                プライバシーポリシー（https://www.valquacup.jp/policy）
+                プライバシーポリシー
               </a>
             </p>
             <p className="mt-1">※上記よりご確認ください。</p>
