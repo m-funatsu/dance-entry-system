@@ -67,7 +67,7 @@ export default async function DashboardPage() {
 
   // 期限情報を取得して表示用に整形
   const getDeadlineInfo = (deadline: string | null) => {
-    if (!deadline) return null
+    if (!deadline || deadline === '') return null
     const now = new Date()
     const deadlineDate = new Date(deadline)
     const diffTime = deadlineDate.getTime() - now.getTime()

@@ -72,8 +72,8 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
           .from('settings')
           .upsert({
             key,
-            value: deadlines[key] || null,
-            description: sectionDescriptions[key]
+            value: deadlines[key] || '',  // nullではなく空文字列を使用
+            description: sectionDescriptions[key] || ''
           }, {
             onConflict: 'key'
           })
