@@ -82,6 +82,26 @@ export interface Settings {
   updated_at: string
 }
 
+export interface BasicInfo {
+  id: string
+  entry_id: string
+  dance_style: string
+  representative_name: string
+  representative_furigana: string
+  representative_email: string
+  partner_name?: string
+  partner_furigana?: string
+  phone_number: string
+  choreographer?: string
+  choreographer_furigana?: string
+  agreement_checked: boolean
+  privacy_policy_checked: boolean
+  created_by?: string
+  created_at: string
+  updated_by?: string
+  updated_at: string
+}
+
 export interface NotificationTemplate {
   id: string
   name: string
@@ -107,6 +127,11 @@ export interface Database {
         Row: Entry
         Insert: Omit<Entry, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Entry, 'id' | 'created_at' | 'updated_at'>>
+      }
+      basic_info: {
+        Row: BasicInfo
+        Insert: Omit<BasicInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
+        Update: Partial<Omit<BasicInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile

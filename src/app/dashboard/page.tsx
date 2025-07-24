@@ -38,6 +38,18 @@ export default async function DashboardPage() {
 
   const entry = entries && entries.length > 0 ? entries[0] : null
 
+  // 基本情報の取得
+  let basicInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('basic_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    basicInfo = data
+  }
+
   // ファイル情報の取得
   const fileStats = { music: 0, video: 0, photo: 0 }
   if (entry) {
@@ -211,7 +223,7 @@ export default async function DashboardPage() {
                         基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.dance_style ? '登録済み' : '未登録'}
+                        {basicInfo ? '登録済み' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.basic_info_deadline)
@@ -237,7 +249,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   {isFormEditable('basic_info_deadline') ? (
                     <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {entry && entry.dance_style ? '編集' : '登録'} →
+                      {basicInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
@@ -531,7 +543,7 @@ export default async function DashboardPage() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-500">ダンスジャンル</label>
-                        <p className="mt-1 text-base text-gray-900">{entry.dance_style || '未設定'}</p>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.dance_style || '未設定'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">代表者名</label>
@@ -564,7 +576,7 @@ export default async function DashboardPage() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-500">代表者メールアドレス</label>
-                        <p className="mt-1 text-base text-gray-900">{entry.representative_email || '未設定'}</p>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.representative_email || '未設定'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">電話番号</label>

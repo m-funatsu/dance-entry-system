@@ -4,14 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import type { Entry } from '@/lib/types'
+import type { BasicInfo, Entry } from '@/lib/types'
 
 interface BasicInfoFormProps {
   userId: string
-  initialData: Entry | null
+  entryId: string | null
+  initialData: BasicInfo | null
 }
 
-export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProps) {
+export default function BasicInfoForm({ userId, entryId, initialData }: BasicInfoFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
@@ -37,7 +38,37 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
     setSaving(true)
 
     try {
+      let currentEntryId = entryId
+
+      // エントリーが存在しない場合は作成
+      if (!currentEntryId) {
+        const { data: newEntry, error: entryError } = await supabase
+          .from('entries')
+          .insert({
+            user_id: userId,
+            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            status: 'pending'
+          })
+          .select()
+          .single()
+
+        if (entryError) throw entryError
+        currentEntryId = newEntry.id
+      } else {
+        // participant_namesを更新
+        const { error: updateError } = await supabase
+          .from('entries')
+          .update({
+            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentEntryId)
+
+        if (updateError) throw updateError
+      }
+
       const dataToSave = {
+        entry_id: currentEntryId,
         dance_style: formData.dance_style,
         representative_name: formData.representative_name,
         representative_furigana: formData.representative_furigana,
@@ -48,30 +79,22 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         choreographer: formData.choreographer,
         choreographer_furigana: formData.choreographer_furigana,
         agreement_checked: formData.agreement_checked,
-        privacy_policy_checked: formData.privacy_policy_checked,
-        participant_names: `${formData.representative_name}\n${formData.partner_name}`
+        privacy_policy_checked: formData.privacy_policy_checked
       }
 
       if (initialData) {
         // 更新
         const { error } = await supabase
-          .from('entries')
-          .update({
-            ...dataToSave,
-            updated_at: new Date().toISOString()
-          })
+          .from('basic_info')
+          .update(dataToSave)
           .eq('id', initialData.id)
 
         if (error) throw error
       } else {
         // 新規作成
         const { error } = await supabase
-          .from('entries')
-          .insert({
-            user_id: userId,
-            ...dataToSave,
-            status: 'pending'
-          })
+          .from('basic_info')
+          .insert(dataToSave)
 
         if (error) throw error
       }
@@ -80,7 +103,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving basic info:', error)
-      const errorMessage = error instanceof Error ? error.message : '保存に失敗しました'
+      const errorMessage = error instanceof Error ? error.message : '基本情報の保存に失敗しました'
       showToast(errorMessage, 'error')
     } finally {
       setSaving(false)

@@ -15,12 +15,24 @@ export default async function BasicInfoPage() {
   // エントリー情報の取得
   const { data: entries } = await supabase
     .from('entries')
-    .select('*')
+    .select('id')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
 
   const entry = entries && entries.length > 0 ? entries[0] : null
+
+  // 基本情報の取得
+  let basicInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('basic_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    basicInfo = data
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +57,11 @@ export default async function BasicInfoPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <BasicInfoForm userId={user.id} initialData={entry} />
+              <BasicInfoForm 
+                userId={user.id} 
+                entryId={entry?.id || null}
+                initialData={basicInfo} 
+              />
             </div>
           </div>
         </div>
