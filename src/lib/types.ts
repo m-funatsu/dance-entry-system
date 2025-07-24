@@ -172,6 +172,83 @@ export interface ProgramInfo {
   updated_at: string
 }
 
+export interface SemifinalsInfo {
+  id: string
+  entry_id: string
+  music_change_from_preliminary?: boolean
+  work_title?: string
+  work_character_story?: string
+  copyright_permission?: boolean
+  music_title?: string
+  cd_title?: string
+  artist?: string
+  record_number?: string
+  jasrac_code?: string
+  music_type?: string
+  music_data_path?: string
+  music_usage_method?: string
+  sound_start_timing?: string
+  chaser_song_designation?: string
+  chaser_song?: string
+  fade_out_start_time?: string
+  fade_out_complete_time?: string
+  dance_start_timing?: string
+  scene1_time?: string
+  scene1_trigger?: string
+  scene1_color_type?: string
+  scene1_color_other?: string
+  scene1_image?: string
+  scene1_image_path?: string
+  scene1_notes?: string
+  scene2_time?: string
+  scene2_trigger?: string
+  scene2_color_type?: string
+  scene2_color_other?: string
+  scene2_image?: string
+  scene2_image_path?: string
+  scene2_notes?: string
+  scene3_time?: string
+  scene3_trigger?: string
+  scene3_color_type?: string
+  scene3_color_other?: string
+  scene3_image?: string
+  scene3_image_path?: string
+  scene3_notes?: string
+  scene4_time?: string
+  scene4_trigger?: string
+  scene4_color_type?: string
+  scene4_color_other?: string
+  scene4_image?: string
+  scene4_image_path?: string
+  scene4_notes?: string
+  scene5_time?: string
+  scene5_trigger?: string
+  scene5_color_type?: string
+  scene5_color_other?: string
+  scene5_image?: string
+  scene5_image_path?: string
+  scene5_notes?: string
+  chaser_exit_time?: string
+  chaser_exit_trigger?: string
+  chaser_exit_color_type?: string
+  chaser_exit_color_other?: string
+  chaser_exit_image?: string
+  chaser_exit_image_path?: string
+  chaser_exit_notes?: string
+  choreographer_change_from_preliminary?: boolean
+  choreographer_name?: string
+  choreographer_name_kana?: string
+  bank_name?: string
+  branch_name?: string
+  account_type?: string
+  account_number?: string
+  account_holder?: string
+  created_at: string
+  created_by?: string
+  updated_at: string
+  updated_by?: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -199,6 +276,11 @@ export interface Database {
         Row: ProgramInfo
         Insert: Omit<ProgramInfo, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<ProgramInfo, 'id' | 'created_at' | 'updated_at'>>
+      }
+      semifinals_info: {
+        Row: SemifinalsInfo
+        Insert: Omit<SemifinalsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
+        Update: Partial<Omit<SemifinalsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile
