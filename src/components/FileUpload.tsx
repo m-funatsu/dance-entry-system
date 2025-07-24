@@ -176,17 +176,13 @@ export default function FileUpload({
         </div>
       )}
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+        className={`relative rounded-2xl transition-all duration-200 ${
           isDisabled
-            ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+            ? 'cursor-not-allowed'
             : dragOver
-            ? 'border-indigo-500 bg-indigo-50 cursor-pointer'
-            : 'border-gray-300 hover:border-gray-400 cursor-pointer'
+            ? 'transform scale-[1.02]'
+            : 'hover:transform hover:scale-[1.01]'
         }`}
-        onDragOver={isDisabled ? undefined : handleDragOver}
-        onDragLeave={isDisabled ? undefined : handleDragLeave}
-        onDrop={isDisabled ? undefined : handleDrop}
-        onClick={isDisabled ? undefined : handleClick}
       >
         <input
           ref={fileInputRef}
@@ -195,59 +191,89 @@ export default function FileUpload({
           onChange={handleFileInputChange}
           className="hidden"
           disabled={isDisabled}
+          id={`file-upload-${fileType}`}
         />
         
-        <div className="flex flex-col items-center">
-          <div className="text-4xl mb-2">
-            {getFileIcon(fileType)}
-          </div>
-          
-          <div className="text-sm text-gray-600 mb-2">
-            {isDisabled ? (
-              <span className="font-medium text-gray-500">
-                {hasExistingFile ? 'アップロード済み' : 'アップロード不可'}
-              </span>
+        <label
+          htmlFor={isDisabled ? undefined : `file-upload-${fileType}`}
+          className={`block w-full p-8 rounded-2xl border-2 border-dashed transition-all duration-200 ${
+            isDisabled
+              ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+              : dragOver
+              ? 'border-indigo-400 bg-gradient-to-br from-indigo-50 to-purple-50 cursor-pointer shadow-lg'
+              : 'border-gray-300 bg-gradient-to-br from-gray-50 to-white hover:border-indigo-300 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 cursor-pointer hover:shadow-md'
+          }`}
+          onDragOver={isDisabled ? undefined : handleDragOver}
+          onDragLeave={isDisabled ? undefined : handleDragLeave}
+          onDrop={isDisabled ? undefined : handleDrop}
+        >
+          <div className="flex flex-col items-center">
+            <div className={`p-4 rounded-full ${
+              isDisabled 
+                ? 'bg-gray-100' 
+                : dragOver
+                ? 'bg-indigo-100'
+                : 'bg-gradient-to-br from-indigo-100 to-purple-100'
+            } mb-4 transition-all duration-200`}>
+              <div className="text-4xl">
+                {getFileIcon(fileType)}
+              </div>
+            </div>
+            
+            {isUploading ? (
+              <div className="space-y-2 text-center">
+                <span className="text-sm font-semibold text-gray-700">
+                  アップロード中...
+                </span>
+                <div className="w-48 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <span className="text-xs text-gray-600">
+                  {uploadProgress}%
+                </span>
+              </div>
             ) : (
               <>
-                <span className="font-medium text-indigo-600">
-                  {getFileTypeLabel()}をアップロード
-                </span>
-                {!isUploading && (
-                  <>
-                    <span className="text-gray-500"> または </span>
-                    <span className="text-indigo-600">ここにドラッグ＆ドロップ</span>
-                  </>
-                )}
+                <div className="text-center mb-2">
+                  {isDisabled ? (
+                    <span className="text-sm font-semibold text-gray-500">
+                      {hasExistingFile ? 'アップロード済み' : 'アップロード不可'}
+                    </span>
+                  ) : (
+                    <>
+                      <p className="text-sm font-semibold text-gray-900">
+                        クリックして{getFileTypeLabel()}を選択
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        またはドラッグ＆ドロップ
+                      </p>
+                    </>
+                  )}
+                </div>
+                
+                <div className="text-xs text-gray-500 flex items-center space-x-2">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                  </svg>
+                  <span>
+                    {fileType === 'music' || fileType === 'audio' ? (
+                      'MP3, WAV, AAC形式 (最大100MB)'
+                    ) : fileType === 'photo' ? (
+                      'JPG, PNG形式 (最大100MB)'
+                    ) : fileType === 'video' ? (
+                      'MP4, MOV, AVI形式 (最大200MB)'
+                    ) : (
+                      '最大100MB'
+                    )}
+                  </span>
+                </div>
               </>
             )}
           </div>
-          
-          <div className="text-xs text-gray-500">
-            {fileType === 'music' || fileType === 'audio' ? (
-              'MP3, WAV, AAC形式 (最大100MB)'
-            ) : fileType === 'photo' ? (
-              'JPG, PNG形式 (最大100MB)'
-            ) : fileType === 'video' ? (
-              'MP4, MOV, AVI形式 (最大200MB)'
-            ) : (
-              '最大100MB'
-            )}
-          </div>
-        </div>
-        
-        {isUploading && (
-          <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-              <div
-                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-            <div className="text-sm text-gray-600">
-              アップロード中... {uploadProgress}%
-            </div>
-          </div>
-        )}
+        </label>
       </div>
     </div>
   )

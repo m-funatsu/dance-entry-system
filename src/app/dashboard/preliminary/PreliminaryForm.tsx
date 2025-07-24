@@ -234,16 +234,25 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           <h4 className="text-base font-medium text-gray-900 mb-4">予選提出動画</h4>
           
           {preliminaryVideo ? (
-            <div className="border border-gray-300 rounded-md p-4 bg-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <svg className="h-10 w-10 text-gray-400 mr-3" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{preliminaryVideo.file_name}</p>
-                    <p className="text-sm text-gray-500">
-                      {preliminaryVideo.file_size && `${(preliminaryVideo.file_size / 1024 / 1024).toFixed(2)} MB`}
+            <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-6 border border-indigo-200">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center">
+                      <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {preliminaryVideo.file_name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      ビデオファイル • {preliminaryVideo.file_size && `${(preliminaryVideo.file_size / 1024 / 1024).toFixed(2)} MB`}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      アップロード完了
                     </p>
                   </div>
                 </div>
@@ -251,8 +260,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   type="button"
                   onClick={handleFileDelete}
                   disabled={uploading}
-                  className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+                  className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 >
+                  <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
                   削除
                 </button>
               </div>
@@ -265,25 +277,43 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                 accept="video/mp4,video/quicktime,video/avi,video/mov"
                 onChange={handleFileUpload}
                 disabled={uploading}
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                className="hidden"
+                id="video-upload"
               />
-              <p className="mt-1 text-sm text-gray-500">
-                MP4、MOV、AVI形式（最大200MB）
-              </p>
+              <label
+                htmlFor="video-upload"
+                className={`relative block w-full rounded-lg border-2 border-dashed p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 ${
+                  uploading ? 'border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 bg-white hover:bg-gray-50'
+                }`}
+              >
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 01-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25H13.5" />
+                </svg>
+                <span className="mt-2 block text-sm font-semibold text-gray-900">
+                  {uploading ? 'アップロード中...' : 'クリックして動画を選択'}
+                </span>
+                <span className="mt-1 block text-xs text-gray-600">
+                  またはドラッグ＆ドロップ
+                </span>
+                <span className="mt-2 block text-xs text-gray-500">
+                  MP4、MOV、AVI形式（最大200MB）
+                </span>
+              </label>
             </div>
           )}
           
           {uploading && (
-            <div className="mt-3">
-              <div className="bg-gray-200 rounded-full h-2.5">
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-medium text-gray-700">アップロード中</span>
+                <span className="text-sm font-medium text-gray-700">{uploadProgress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                アップロード中... {uploadProgress}%
-              </p>
             </div>
           )}
         </div>
