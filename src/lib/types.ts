@@ -146,6 +146,32 @@ export interface PreliminaryInfo {
   updated_at: string
 }
 
+export interface ProgramInfo {
+  id: string
+  entry_id: string
+  song_count: '1曲' | '2曲'
+  player_photo_type?: string
+  affiliation?: string
+  player_photo_path?: string
+  notes?: string
+  semifinal_story?: string
+  semifinal_highlight?: string
+  semifinal_image1_path?: string
+  semifinal_image2_path?: string
+  semifinal_image3_path?: string
+  semifinal_image4_path?: string
+  final_affiliation?: string
+  final_player_photo_path?: string
+  final_story?: string
+  final_highlight?: string
+  final_image1_path?: string
+  final_image2_path?: string
+  final_image3_path?: string
+  final_image4_path?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -168,6 +194,11 @@ export interface Database {
         Row: PreliminaryInfo
         Insert: Omit<PreliminaryInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
         Update: Partial<Omit<PreliminaryInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
+      }
+      program_info: {
+        Row: ProgramInfo
+        Insert: Omit<ProgramInfo, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<ProgramInfo, 'id' | 'created_at' | 'updated_at'>>
       }
       entry_files: {
         Row: EntryFile
