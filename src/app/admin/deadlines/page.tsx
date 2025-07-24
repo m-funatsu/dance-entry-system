@@ -23,10 +23,16 @@ export default async function AdminDeadlinesPage() {
   }
 
   // 期限設定を取得
-  const { data: deadlines } = await supabase
-    .from('section_deadlines')
+  const { data: settings } = await supabase
+    .from('settings')
     .select('*')
-    .order('section_name')
+    .in('key', [
+      'basic_info_deadline',
+      'music_info_deadline',
+      'finals_deadline',
+      'sns_deadline', 
+      'optional_request_deadline'
+    ])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,7 +72,7 @@ export default async function AdminDeadlinesPage() {
               <p className="text-sm text-gray-600 mb-6">
                 各セクションの登録期限を設定できます。期限が設定されていない場合は、期限なしとなります。
               </p>
-              <DeadlineSettings initialDeadlines={deadlines || []} />
+              <DeadlineSettings initialSettings={settings || []} />
             </div>
           </div>
         </div>
