@@ -18,14 +18,14 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
   
   const [formData, setFormData] = useState({
     dance_style: initialData?.dance_style || '',
-    team_name: initialData?.team_name || '',
     representative_name: initialData?.representative_name || '',
     representative_furigana: initialData?.representative_furigana || '',
+    representative_email: initialData?.representative_email || '',
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
-    emergency_contact: initialData?.emergency_contact || '',
-    agreement_checked: initialData?.agreement_checked || false
+    agreement_checked: initialData?.agreement_checked || false,
+    privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
   
   const [saving, setSaving] = useState(false)
@@ -35,13 +35,25 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
     setSaving(true)
 
     try {
+      const dataToSave = {
+        dance_style: formData.dance_style,
+        representative_name: formData.representative_name,
+        representative_furigana: formData.representative_furigana,
+        representative_email: formData.representative_email,
+        partner_name: formData.partner_name,
+        partner_furigana: formData.partner_furigana,
+        phone_number: formData.phone_number,
+        agreement_checked: formData.agreement_checked,
+        privacy_policy_checked: formData.privacy_policy_checked,
+        participant_names: `${formData.representative_name}\n${formData.partner_name}`
+      }
+
       if (initialData) {
         // 更新
         const { error } = await supabase
           .from('entries')
           .update({
-            ...formData,
-            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            ...dataToSave,
             updated_at: new Date().toISOString()
           })
           .eq('id', initialData.id)
@@ -53,8 +65,7 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
           .from('entries')
           .insert({
             user_id: userId,
-            ...formData,
-            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            ...dataToSave,
             status: 'pending'
           })
 
@@ -92,21 +103,9 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         </select>
       </div>
 
-      <div>
-        <label htmlFor="team_name" className="block text-sm font-medium text-gray-700">
-          チーム名／ペア名
-        </label>
-        <input
-          type="text"
-          id="team_name"
-          value={formData.team_name}
-          onChange={(e) => setFormData({ ...formData, team_name: e.target.value })}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        />
-      </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900">参加者情報（ペア）</h3>
+        <h3 className="text-lg font-medium text-gray-900">参加者情報</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -166,60 +165,92 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         </div>
       </div>
 
-      <div>
-        <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">
-          代表者電話番号 <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="tel"
-          id="phone_number"
-          value={formData.phone_number}
-          onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-          required
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="090-1234-5678"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="emergency_contact" className="block text-sm font-medium text-gray-700">
-          緊急連絡先 <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="tel"
-          id="emergency_contact"
-          value={formData.emergency_contact}
-          onChange={(e) => setFormData({ ...formData, emergency_contact: e.target.value })}
-          required
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="090-1234-5678"
-        />
-      </div>
-
-      <div className="bg-gray-50 p-4 rounded-md">
-        <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格・エントリー要件</h3>
-        <div className="text-sm text-gray-600 space-y-1 mb-3">
-          <p className="font-medium mb-2">■ 参加資格</p>
-          <ul className="space-y-1 ml-4">
-            <li>・ペアであれば、プロ、アマを問わず全ての選手がエントリー可能</li>
-            <li>・ダンスによる教師、デモンストレーション等で収入を少額でも得ている場合はプロとみなす</li>
-            <li>・プロとアマチュアの混合での出場は不可</li>
-            <li>・ペアにおける性別は問わない</li>
-            <li>・ペアの年齢合計は 20 歳以上 90 歳未満とする</li>
-          </ul>
-        </div>
-        <label className="flex items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="representative_email" className="block text-sm font-medium text-gray-700">
+            代表者メールアドレス <span className="text-red-500">*</span>
+          </label>
           <input
-            type="checkbox"
-            checked={formData.agreement_checked}
-            onChange={(e) => setFormData({ ...formData, agreement_checked: e.target.checked })}
+            type="email"
+            id="representative_email"
+            value={formData.representative_email}
+            onChange={(e) => setFormData({ ...formData, representative_email: e.target.value })}
             required
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="example@email.com"
           />
-          <span className="ml-2 text-sm font-medium text-gray-700">
-            上記の参加資格・要件を確認し、同意します <span className="text-red-500">*</span>
-          </span>
-        </label>
+        </div>
+        <div>
+          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">
+            代表者電話番号 <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            id="phone_number"
+            value={formData.phone_number}
+            onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+            required
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="090-1234-5678"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="bg-gray-50 p-4 rounded-md">
+          <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格・エントリー要件</h3>
+          <div className="text-sm text-gray-600 space-y-1 mb-3">
+            <p className="font-medium mb-2">■ 参加資格</p>
+            <ul className="space-y-1 ml-4">
+              <li>・ペアであれば、プロ、アマを問わず全ての選手がエントリー可能</li>
+              <li>・ダンスによる教師、デモンストレーション等で収入を少額でも得ている場合はプロとみなす</li>
+              <li>・プロとアマチュアの混合での出場は不可</li>
+              <li>・ペアにおける性別は問わない</li>
+              <li>・ペアの年齢合計は 20 歳以上 90 歳未満とする</li>
+            </ul>
+          </div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.agreement_checked}
+              onChange={(e) => setFormData({ ...formData, agreement_checked: e.target.checked })}
+              required
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm font-medium text-gray-700">
+              上記の参加資格・要件を確認し、同意します <span className="text-red-500">*</span>
+            </span>
+          </label>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-md">
+          <h3 className="text-sm font-medium text-gray-900 mb-2">プライバシーポリシー</h3>
+          <div className="text-sm text-gray-600 mb-3">
+            <p>
+              <a 
+                href="https://www.valquacup.jp/policy" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:text-indigo-800 underline"
+              >
+                プライバシーポリシー（https://www.valquacup.jp/policy）
+              </a>
+            </p>
+            <p className="mt-1">※上記よりご確認ください。</p>
+          </div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.privacy_policy_checked}
+              onChange={(e) => setFormData({ ...formData, privacy_policy_checked: e.target.checked })}
+              required
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm font-medium text-gray-700">
+              プライバシーポリシーに同意する <span className="text-red-500">*</span>
+            </span>
+          </label>
+        </div>
       </div>
 
       <div className="flex justify-between">

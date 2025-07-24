@@ -12,14 +12,13 @@ export interface Entry {
   id: string
   user_id: string
   dance_style: string
-  team_name?: string
   participant_names: string
   representative_name?: string
   representative_furigana?: string
+  representative_email?: string
   partner_name?: string
   partner_furigana?: string
   phone_number?: string
-  emergency_contact?: string
   photo_url?: string
   music_title?: string
   original_artist?: string
@@ -34,7 +33,12 @@ export interface Entry {
   remarks?: string
   optional_requests?: string
   agreement_checked?: boolean
+  privacy_policy_checked?: boolean
   google_form_data?: Record<string, unknown>
+  // SNS情報
+  instagram?: string
+  twitter?: string
+  facebook?: string
   // 音響指示書
   sound_semifinal?: string
   sound_final?: string

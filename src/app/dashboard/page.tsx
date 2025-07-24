@@ -563,17 +563,17 @@ export default async function DashboardPage() {
                     </div>
                     <div className="space-y-4">
                       <div>
+                        <label className="block text-sm font-medium text-gray-500">代表者メールアドレス</label>
+                        <p className="mt-1 text-base text-gray-900">{entry.representative_email || '未設定'}</p>
+                      </div>
+                      <div>
                         <label className="block text-sm font-medium text-gray-500">電話番号</label>
                         <p className="mt-1 text-base text-gray-900">{entry.phone_number || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">緊急連絡先</label>
-                        <p className="mt-1 text-base text-gray-900">{entry.emergency_contact || '未設定'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">写真</label>
+                        <label className="block text-sm font-medium text-gray-500">プライバシーポリシー</label>
                         <p className="mt-1 text-base text-gray-900">
-                          {entry.photo_url ? 'アップロード済み' : '未アップロード'}
+                          {entry.privacy_policy_checked ? '同意済み' : '未同意'}
                         </p>
                       </div>
                     </div>
