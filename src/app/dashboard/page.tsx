@@ -50,6 +50,18 @@ export default async function DashboardPage() {
     basicInfo = data
   }
 
+  // 予選情報の取得
+  let preliminaryInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('preliminary_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    preliminaryInfo = data
+  }
+
   // ファイル情報の取得
   const fileStats = { music: 0, video: 0, photo: 0 }
   if (entry) {
@@ -275,7 +287,7 @@ export default async function DashboardPage() {
                         予選情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.work_title ? '登録済み' : '未登録'}
+                        {preliminaryInfo ? '登録済み' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
@@ -715,7 +727,15 @@ export default async function DashboardPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.work_title || '未設定'}</p>
+                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.work_title || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">楽曲タイトル</label>
+                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.music_title || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
+                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.artist || '未設定'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-500">予選動画</label>

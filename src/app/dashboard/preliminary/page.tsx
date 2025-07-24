@@ -26,6 +26,13 @@ export default async function PreliminaryPage() {
     redirect('/dashboard/basic-info')
   }
 
+  // 予選情報の取得
+  const { data: preliminaryInfo } = await supabase
+    .from('preliminary_info')
+    .select('*')
+    .eq('entry_id', entry.id)
+    .single()
+
   // ファイル情報の取得（予選動画のみ）
   const { data: files } = await supabase
     .from('entry_files')
@@ -62,7 +69,8 @@ export default async function PreliminaryPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <PreliminaryForm 
-                entry={entry} 
+                entryId={entry.id}
+                initialData={preliminaryInfo}
                 preliminaryVideo={preliminaryVideo}
                 userId={user.id} 
               />

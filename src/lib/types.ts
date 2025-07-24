@@ -127,6 +127,25 @@ export interface NotificationTemplate {
   updated_at: string
 }
 
+export interface PreliminaryInfo {
+  id: string
+  entry_id: string
+  work_title: string
+  work_story?: string
+  video_submitted: boolean
+  music_rights_cleared: boolean
+  music_title: string
+  cd_title?: string
+  artist: string
+  record_number?: string
+  jasrac_code?: string
+  music_type?: string
+  created_by?: string
+  created_at: string
+  updated_by?: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -144,6 +163,11 @@ export interface Database {
         Row: BasicInfo
         Insert: Omit<BasicInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
         Update: Partial<Omit<BasicInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
+      }
+      preliminary_info: {
+        Row: PreliminaryInfo
+        Insert: Omit<PreliminaryInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
+        Update: Partial<Omit<PreliminaryInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile
