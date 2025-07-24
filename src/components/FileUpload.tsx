@@ -159,11 +159,6 @@ export default function FileUpload({
     }
   }
 
-  const handleClick = () => {
-    if (hasExistingFile && (fileType === 'video' || fileType === 'audio' || fileType === 'music')) return
-    fileInputRef.current?.click()
-  }
-
   const isDisabled = isUploading || (hasExistingFile && (fileType === 'video' || fileType === 'audio' || fileType === 'music'))
 
   return (
