@@ -66,32 +66,21 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
     setMessage('')
     
     try {
-      // 各期限設定を更新
+      // 各期限設定を更新（upsertを使用）
       for (const key of deadlineKeys) {
-        const existingSetting = initialSettings.find(s => s.key === key)
-        
-        if (existingSetting) {
-          // 既存の設定を更新
-          const { error } = await supabase
-            .from('settings')
-            .update({
-              value: deadlines[key] || null,
-              updated_at: new Date().toISOString()
-            })
-            .eq('key', key)
+        const { error } = await supabase
+          .from('settings')
+          .upsert({
+            key,
+            value: deadlines[key] || null,
+            description: sectionDescriptions[key]
+          }, {
+            onConflict: 'key'
+          })
 
-          if (error) throw error
-        } else {
-          // 新規作成
-          const { error } = await supabase
-            .from('settings')
-            .insert({
-              key,
-              value: deadlines[key] || null,
-              description: sectionDescriptions[key]
-            })
-
-          if (error) throw error
+        if (error) {
+          console.error(`Error saving ${key}:`, error)
+          throw error
         }
       }
 
