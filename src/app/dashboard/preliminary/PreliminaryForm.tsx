@@ -429,7 +429,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         </div>
       </div>
 
-      <div className="flex justify-between pt-6 border-t">
+      <div className="flex justify-between pt-6">
         <button
           type="button"
           onClick={() => router.push('/dashboard')}
