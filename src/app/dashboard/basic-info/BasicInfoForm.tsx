@@ -24,6 +24,8 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
+    choreographer: initialData?.choreographer || '',
+    choreographer_furigana: initialData?.choreographer_furigana || '',
     agreement_checked: initialData?.agreement_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
@@ -43,6 +45,8 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
         partner_name: formData.partner_name,
         partner_furigana: formData.partner_furigana,
         phone_number: formData.phone_number,
+        choreographer: formData.choreographer,
+        choreographer_furigana: formData.choreographer_furigana,
         agreement_checked: formData.agreement_checked,
         privacy_policy_checked: formData.privacy_policy_checked,
         participant_names: `${formData.representative_name}\n${formData.partner_name}`
@@ -193,6 +197,35 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="090-1234-5678"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="choreographer" className="block text-sm font-medium text-gray-700">
+            振付師氏名
+          </label>
+          <input
+            type="text"
+            id="choreographer"
+            value={formData.choreographer}
+            onChange={(e) => setFormData({ ...formData, choreographer: e.target.value })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="振付師の氏名"
+          />
+        </div>
+        <div>
+          <label htmlFor="choreographer_furigana" className="block text-sm font-medium text-gray-700">
+            振付師フリガナ
+          </label>
+          <input
+            type="text"
+            id="choreographer_furigana"
+            value={formData.choreographer_furigana}
+            onChange={(e) => setFormData({ ...formData, choreographer_furigana: e.target.value })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="カタカナで入力"
           />
         </div>
       </div>
