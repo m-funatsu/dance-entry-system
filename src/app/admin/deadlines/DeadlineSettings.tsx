@@ -17,7 +17,10 @@ interface DeadlineSettingsProps {
 
 const sectionLabels: Record<string, string> = {
   basic_info_deadline: '基本情報',
-  music_info_deadline: '予選・準決勝情報',
+  music_info_deadline: '予選情報',
+  consent_form_deadline: '参加同意書',
+  program_info_deadline: 'プログラム掲載用情報',
+  semifinals_deadline: '準決勝情報',
   finals_deadline: '決勝情報',
   sns_deadline: 'SNS情報',
   optional_request_deadline: '任意申請'
@@ -25,8 +28,11 @@ const sectionLabels: Record<string, string> = {
 
 const sectionDescriptions: Record<string, string> = {
   basic_info_deadline: 'ダンスジャンル、参加者情報、連絡先などの基本情報',
-  music_info_deadline: '予選動画、準決勝楽曲情報',
-  finals_deadline: '決勝用楽曲情報',
+  music_info_deadline: '予選動画、楽曲情報',
+  consent_form_deadline: '参加同意書の提出',
+  program_info_deadline: 'プログラムに掲載する情報の登録',
+  semifinals_deadline: '準決勝用の音響・照明指示書',
+  finals_deadline: '決勝用楽曲情報、音響・照明指示書',
   sns_deadline: 'Instagram、Twitter、Facebook情報',
   optional_request_deadline: 'その他の申請事項'
 }
@@ -49,6 +55,9 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
   const deadlineKeys = [
     'basic_info_deadline',
     'music_info_deadline',
+    'consent_form_deadline',
+    'program_info_deadline',
+    'semifinals_deadline',
     'finals_deadline',
     'sns_deadline',
     'optional_request_deadline'

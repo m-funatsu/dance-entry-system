@@ -312,6 +312,110 @@ export default async function DashboardPage() {
               </div>
             </div>
 
+            {/* 参加同意書カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-12 w-12 text-purple-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        参加同意書
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {entry && entry.consent_form_submitted ? '提出済み' : '未提出'}
+                      </dd>
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.consent_form_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  {isFormEditable('consent_form_deadline') ? (
+                    <Link href="/dashboard/consent-form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && entry.consent_form_submitted ? '確認' : '提出'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* プログラム掲載用情報カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-12 w-12 text-pink-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        プログラム掲載用情報
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {entry && entry.program_info_submitted ? '登録済み' : '未登録'}
+                      </dd>
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.program_info_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  {isFormEditable('program_info_deadline') ? (
+                    <Link href="/dashboard/program-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      {entry && entry.program_info_submitted ? '編集' : '登録'} →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* 準決勝情報カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">

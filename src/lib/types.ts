@@ -45,6 +45,18 @@ export interface Entry {
   // 照明指示書
   lighting_semifinal?: string
   lighting_final?: string
+  // 参加同意書
+  consent_form_submitted?: boolean
+  consent_form_submitted_at?: string
+  // プログラム掲載用情報
+  program_info_submitted?: boolean
+  program_title?: string
+  program_subtitle?: string
+  program_description?: string
+  program_duration?: string
+  program_music_info?: string
+  program_choreographer_info?: string
+  program_special_notes?: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string
