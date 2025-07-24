@@ -76,7 +76,8 @@ export default function BasicInfoForm({ userId, initialData }: BasicInfoFormProp
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving basic info:', error)
-      showToast('保存に失敗しました', 'error')
+      const errorMessage = error instanceof Error ? error.message : '保存に失敗しました'
+      showToast(errorMessage, 'error')
     } finally {
       setSaving(false)
     }
