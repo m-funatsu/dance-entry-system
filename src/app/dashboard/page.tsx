@@ -134,7 +134,7 @@ export default async function DashboardPage() {
         <div className="flex justify-between items-center w-full">
           <div className="flex items-center">
             <Link href="/" className="text-3xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
-              2025 バルカーカップ エントリー
+              2025 バルカーカップ
             </Link>
           </div>
           <div className="flex items-center space-x-4">
