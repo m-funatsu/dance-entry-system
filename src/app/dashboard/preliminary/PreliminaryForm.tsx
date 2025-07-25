@@ -85,8 +85,50 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         if (error) throw error
       }
 
-      // 完了登録の場合はエントリーステータスを更新
+      // 完了登録の場合は、基本情報が完全に入力されているかチェック
       if (mode === 'submit') {
+        // 基本情報の存在確認
+        const { data: basicInfo } = await supabase
+          .from('basic_info')
+          .select('*')
+          .eq('entry_id', entryId)
+          .single()
+
+        if (!basicInfo) {
+          showToast('基本情報が未登録です。先に基本情報を入力してください。', 'error')
+          setSaving(false)
+          return
+        }
+
+        // 基本情報の必須項目チェック
+        const requiredBasicFields = [
+          'dance_style',
+          'representative_name',
+          'representative_furigana',
+          'representative_email',
+          'partner_name',
+          'partner_furigana',
+          'phone_number',
+          'choreographer',
+          'choreographer_furigana'
+        ]
+
+        const missingBasicFields = requiredBasicFields.filter(field => !basicInfo[field])
+        
+        if (missingBasicFields.length > 0) {
+          showToast('基本情報に未入力の必須項目があります。先に基本情報を完成させてください。', 'error')
+          setSaving(false)
+          return
+        }
+
+        // 同意チェックの確認
+        if (!basicInfo.agreement_checked || !basicInfo.privacy_policy_checked) {
+          showToast('基本情報の同意事項にチェックが必要です。', 'error')
+          setSaving(false)
+          return
+        }
+
+        // すべてのチェックをパスしたらステータスを更新
         const { error: entryError } = await supabase
           .from('entries')
           .update({ 
