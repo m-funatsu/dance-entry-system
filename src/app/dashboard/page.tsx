@@ -629,7 +629,59 @@ export default async function DashboardPage() {
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
-                      期限切れ（編雈不可）
+                      期限切れ（編集不可）
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 各種申請カード */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        各種申請
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        未申請
+                      </dd>
+                      {(() => {
+                        const deadline = getDeadlineInfo(settingsMap.applications_deadline)
+                        if (!deadline) return null
+                        return (
+                          <dd className={`text-xs mt-1 ${
+                            deadline.isExpired ? 'text-red-600' :
+                            deadline.isUrgent ? 'text-orange-600' :
+                            'text-gray-600'
+                          }`}>
+                            {deadline.isExpired ? 
+                              `期限切れ（${deadline.date}）` :
+                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
+                            }
+                          </dd>
+                        )
+                      })()}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  {isFormEditable('applications_deadline') ? (
+                    <Link href="/dashboard/applications" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      申請 →
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-400">
+                      期限切れ（編集不可）
                     </span>
                   )}
                 </div>

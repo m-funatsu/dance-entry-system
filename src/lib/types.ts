@@ -329,6 +329,43 @@ export interface FinalsInfo {
   updated_by?: string
 }
 
+export interface ApplicationsInfo {
+  id: string
+  entry_id: string
+  related_ticket_count?: number
+  related1_relationship?: string
+  related1_name?: string
+  related1_furigana?: string
+  related2_relationship?: string
+  related2_name?: string
+  related2_furigana?: string
+  related3_relationship?: string
+  related3_name?: string
+  related3_furigana?: string
+  related4_relationship?: string
+  related4_name?: string
+  related4_furigana?: string
+  related5_relationship?: string
+  related5_name?: string
+  related5_furigana?: string
+  related_ticket_total_amount?: number
+  companion1_name?: string
+  companion1_furigana?: string
+  companion1_purpose?: string
+  companion2_name?: string
+  companion2_furigana?: string
+  companion2_purpose?: string
+  companion3_name?: string
+  companion3_furigana?: string
+  companion3_purpose?: string
+  companion_total_amount?: number
+  payment_slip_path?: string
+  created_at: string
+  created_by?: string
+  updated_at: string
+  updated_by?: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -366,6 +403,11 @@ export interface Database {
         Row: FinalsInfo
         Insert: Omit<FinalsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
         Update: Partial<Omit<FinalsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
+      }
+      applications_info: {
+        Row: ApplicationsInfo
+        Insert: Omit<ApplicationsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
+        Update: Partial<Omit<ApplicationsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile
