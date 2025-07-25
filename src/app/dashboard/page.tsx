@@ -584,57 +584,6 @@ export default async function DashboardPage() {
               </div>
             </div>
             
-            {/* 任意申請カード */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        任意申請
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.optional_requests ? '申請あり' : '申請なし'}
-                      </dd>
-                      {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.optional_request_deadline)
-                        if (!deadline) return null
-                        return (
-                          <dd className={`text-xs mt-1 ${
-                            deadline.isExpired ? 'text-red-600' :
-                            deadline.isUrgent ? 'text-orange-600' :
-                            'text-gray-600'
-                          }`}>
-                            {deadline.isExpired ? 
-                              `期限切れ（${deadline.date}）` :
-                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
-                            }
-                          </dd>
-                        )
-                      })()}
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  {isFormEditable('optional_request_deadline') ? (
-                    <Link href="/dashboard/optional-request" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {entry && entry.optional_requests ? '編集' : '申請'} →
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
 
             {/* 各種申請カード */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -922,28 +871,6 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
-              {/* 任意申請情報表示 */}
-              <div className="bg-white shadow rounded-lg">
-                <div className="bg-white shadow rounded-lg">
-                  <div className="px-4 py-5 sm:p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">任意申請</h3>
-                      {isFormEditable('optional_request_deadline') ? (
-                        <Link href="/dashboard/optional-request" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                          編集
-                        </Link>
-                      ) : (
-                        <span className="text-sm font-medium text-gray-400">
-                          期限切れ
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-base text-gray-900 whitespace-pre-line">{entry.optional_requests || '未設定'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>
