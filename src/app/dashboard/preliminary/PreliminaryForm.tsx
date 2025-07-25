@@ -22,13 +22,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',
     work_story: initialData?.work_story || '',
-    music_rights_cleared: initialData?.music_rights_cleared || false,
+    music_rights_cleared: initialData?.music_rights_cleared || 'A',
     music_title: initialData?.music_title || '',
     cd_title: initialData?.cd_title || '',
     artist: initialData?.artist || '',
     record_number: initialData?.record_number || '',
     jasrac_code: initialData?.jasrac_code || '',
-    music_type: initialData?.music_type || 'original'
+    music_type: initialData?.music_type || 'cd'
   })
   
   const [saving, setSaving] = useState(false)
@@ -322,21 +322,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
           <h4 className="text-base font-medium text-gray-900">楽曲著作権情報</h4>
           
-          <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.music_rights_cleared}
-                onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.checked })}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-700">
-                楽曲著作権許諾済み
-              </span>
-            </label>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
+            {/* 使用楽曲タイトル */}
             <div>
               <label htmlFor="music_title" className="block text-sm font-medium text-gray-700">
                 使用楽曲タイトル <span className="text-red-500">*</span>
@@ -352,6 +339,23 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               />
             </div>
 
+            {/* 収録CDタイトル */}
+            <div>
+              <label htmlFor="cd_title" className="block text-sm font-medium text-gray-700">
+                収録CDタイトル <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="cd_title"
+                value={formData.cd_title}
+                onChange={(e) => setFormData({ ...formData, cd_title: e.target.value })}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="CD/アルバム名"
+              />
+            </div>
+
+            {/* アーティスト */}
             <div>
               <label htmlFor="artist" className="block text-sm font-medium text-gray-700">
                 アーティスト <span className="text-red-500">*</span>
@@ -367,63 +371,106 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               />
             </div>
 
-            <div>
-              <label htmlFor="cd_title" className="block text-sm font-medium text-gray-700">
-                収録CDタイトル
-              </label>
-              <input
-                type="text"
-                id="cd_title"
-                value={formData.cd_title}
-                onChange={(e) => setFormData({ ...formData, cd_title: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="CD/アルバム名"
-              />
-            </div>
-
+            {/* レコード番号 */}
             <div>
               <label htmlFor="record_number" className="block text-sm font-medium text-gray-700">
-                レコード番号
+                レコード番号 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 id="record_number"
                 value={formData.record_number}
                 onChange={(e) => setFormData({ ...formData, record_number: e.target.value })}
+                required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="例：ABCD-12345"
               />
             </div>
 
+            {/* JASRAC作品コード */}
             <div>
               <label htmlFor="jasrac_code" className="block text-sm font-medium text-gray-700">
-                JASRAC作品コード
+                JASRAC作品コード <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 id="jasrac_code"
                 value={formData.jasrac_code}
                 onChange={(e) => setFormData({ ...formData, jasrac_code: e.target.value })}
+                required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="例：123-4567-8"
               />
             </div>
 
+            {/* 楽曲種類 */}
             <div>
               <label htmlFor="music_type" className="block text-sm font-medium text-gray-700">
-                楽曲種類
+                楽曲種類 <span className="text-red-500">*</span>
               </label>
               <select
                 id="music_type"
                 value={formData.music_type}
                 onChange={(e) => setFormData({ ...formData, music_type: e.target.value })}
+                required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="original">オリジナル楽曲</option>
-                <option value="existing">既存楽曲</option>
-                <option value="remix">リミックス</option>
-                <option value="medley">メドレー</option>
+                <option value="">選択してください</option>
+                <option value="cd">CD楽曲</option>
+                <option value="download">データダウンロード楽曲</option>
+                <option value="other">その他（オリジナル曲）</option>
               </select>
+            </div>
+
+            {/* 楽曲著作権許諾 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                楽曲著作権許諾 <span className="text-red-500">*</span>
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="A"
+                    checked={formData.music_rights_cleared === 'A'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    A.市販の楽曲を使用する
+                  </span>
+                </label>
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="B"
+                    checked={formData.music_rights_cleared === 'B'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    B.自身で著作権に対し許諾を取った楽曲を使用する
+                  </span>
+                </label>
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="C"
+                    checked={formData.music_rights_cleared === 'C'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    C.独自に製作されたオリジナル楽曲を使用する
+                  </span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -439,9 +486,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         </button>
         <button
           type="submit"
-          disabled={saving || uploading || !formData.work_title || !formData.music_title || !formData.artist}
+          disabled={saving || uploading || !formData.work_title || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
           className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-            saving || uploading || !formData.work_title || !formData.music_title || !formData.artist
+            saving || uploading || !formData.work_title || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-indigo-600 hover:bg-indigo-700'
           }`}
