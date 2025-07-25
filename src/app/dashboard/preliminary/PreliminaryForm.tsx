@@ -129,8 +129,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           file_name: file.name,
           file_path: uploadData.path,
           file_size: file.size,
-          mime_type: file.type,
-          purpose: 'preliminary'
+          mime_type: file.type
         })
 
       if (dbError) throw dbError
