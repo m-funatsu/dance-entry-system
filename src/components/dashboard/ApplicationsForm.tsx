@@ -425,6 +425,19 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               </div>
             )}
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              備考
+            </label>
+            <textarea
+              value={applicationsInfo.applications_notes || ''}
+              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, applications_notes: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="その他、申請に関する注意事項や要望があれば記入してください"
+            />
+          </div>
         </div>
       )}
 

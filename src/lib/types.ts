@@ -360,6 +360,7 @@ export interface ApplicationsInfo {
   companion3_purpose?: string
   companion_total_amount?: number
   payment_slip_path?: string
+  applications_notes?: string
   created_at: string
   created_by?: string
   updated_at: string
