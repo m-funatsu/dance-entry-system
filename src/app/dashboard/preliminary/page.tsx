@@ -42,7 +42,6 @@ export default async function PreliminaryPage() {
     .eq('file_type', 'video')
     .eq('purpose', 'preliminary')
     .order('uploaded_at', { ascending: false })
-    .limit(1)
 
   const preliminaryVideo = files && files.length > 0 ? files[0] : null
 

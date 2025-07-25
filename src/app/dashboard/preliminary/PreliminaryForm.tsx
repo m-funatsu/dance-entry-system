@@ -19,6 +19,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
+  // デバッグ用
+  if (preliminaryVideo) {
+    console.log('Preliminary video:', preliminaryVideo)
+    console.log('Video URL:', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}`)
+  }
+  
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',
     work_story: initialData?.work_story || '',
@@ -85,6 +91,15 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const file = e.target.files?.[0]
     if (!file) return
 
+    // 既に動画がアップロードされている場合はエラー
+    if (preliminaryVideo) {
+      showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
+    }
+
     // ファイルサイズチェック（200MB）
     const maxSize = 200 * 1024 * 1024
     if (file.size > maxSize) {
@@ -129,7 +144,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           file_name: file.name,
           file_path: uploadData.path,
           file_size: file.size,
-          mime_type: file.type
+          mime_type: file.type,
+          purpose: 'preliminary'
         })
 
       if (dbError) throw dbError
@@ -242,6 +258,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     controls
                     className="w-full h-full object-contain bg-black"
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}`}
+                    key={preliminaryVideo.id}
                   >
                     お使いのブラウザは動画タグをサポートしていません。
                   </video>
@@ -314,14 +331,14 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                 type="file"
                 accept="video/mp4,video/quicktime,video/avi,video/mov"
                 onChange={handleFileUpload}
-                disabled={uploading}
+                disabled={uploading || !!preliminaryVideo}
                 className="hidden"
                 id="video-upload"
               />
               <label
                 htmlFor="video-upload"
                 className={`relative block w-full rounded-lg border-2 border-dashed p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 ${
-                  uploading ? 'border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 bg-white hover:bg-gray-50'
+                  uploading || preliminaryVideo ? 'border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 bg-white hover:bg-gray-50'
                 }`}
               >
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
