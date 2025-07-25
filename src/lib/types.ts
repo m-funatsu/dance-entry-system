@@ -133,7 +133,7 @@ export interface PreliminaryInfo {
   work_title: string
   work_story?: string
   video_submitted: boolean
-  music_rights_cleared: boolean
+  music_rights_cleared: string
   music_title: string
   cd_title?: string
   artist: string
