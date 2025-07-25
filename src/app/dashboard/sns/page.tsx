@@ -25,7 +25,7 @@ export default async function SNSPage() {
   if (!entry) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow">
+        <header className="bg-white shadow sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-6">
               <div className="flex items-center">
@@ -62,7 +62,7 @@ export default async function SNSPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+      <header className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
             <div className="flex items-center">
