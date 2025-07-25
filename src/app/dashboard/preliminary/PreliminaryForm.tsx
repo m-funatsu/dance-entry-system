@@ -212,12 +212,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
           <div>
             <label htmlFor="work_story" className="block text-sm font-medium text-gray-700">
-              作品キャラクター・ストーリー等（50字以内）
+              作品キャラクター・ストーリー等（50字以内） <span className="text-red-500">*</span>
             </label>
             <textarea
               id="work_story"
               value={formData.work_story}
               onChange={(e) => setFormData({ ...formData, work_story: e.target.value })}
+              required
               maxLength={50}
               rows={2}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -323,6 +324,57 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           <h4 className="text-base font-medium text-gray-900">楽曲著作権情報</h4>
           
           <div className="space-y-4">
+            {/* 楽曲著作権許諾 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                楽曲著作権許諾 <span className="text-red-500">*</span>
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="A"
+                    checked={formData.music_rights_cleared === 'A'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    A.市販の楽曲を使用する
+                  </span>
+                </label>
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="B"
+                    checked={formData.music_rights_cleared === 'B'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    B.自身で著作権に対し許諾を取った楽曲を使用する
+                  </span>
+                </label>
+                <label className="flex items-start">
+                  <input
+                    type="radio"
+                    name="music_rights_cleared"
+                    value="C"
+                    checked={formData.music_rights_cleared === 'C'}
+                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    required
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    C.独自に製作されたオリジナル楽曲を使用する
+                  </span>
+                </label>
+              </div>
+            </div>
+
             {/* 使用楽曲タイトル */}
             <div>
               <label htmlFor="music_title" className="block text-sm font-medium text-gray-700">
@@ -421,57 +473,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                 <option value="other">その他（オリジナル曲）</option>
               </select>
             </div>
-
-            {/* 楽曲著作権許諾 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                楽曲著作権許諾 <span className="text-red-500">*</span>
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-start">
-                  <input
-                    type="radio"
-                    name="music_rights_cleared"
-                    value="A"
-                    checked={formData.music_rights_cleared === 'A'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
-                    required
-                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    A.市販の楽曲を使用する
-                  </span>
-                </label>
-                <label className="flex items-start">
-                  <input
-                    type="radio"
-                    name="music_rights_cleared"
-                    value="B"
-                    checked={formData.music_rights_cleared === 'B'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
-                    required
-                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    B.自身で著作権に対し許諾を取った楽曲を使用する
-                  </span>
-                </label>
-                <label className="flex items-start">
-                  <input
-                    type="radio"
-                    name="music_rights_cleared"
-                    value="C"
-                    checked={formData.music_rights_cleared === 'C'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
-                    required
-                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    C.独自に製作されたオリジナル楽曲を使用する
-                  </span>
-                </label>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -486,9 +487,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         </button>
         <button
           type="submit"
-          disabled={saving || uploading || !formData.work_title || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
+          disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
           className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-            saving || uploading || !formData.work_title || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
+            saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-indigo-600 hover:bg-indigo-700'
           }`}
