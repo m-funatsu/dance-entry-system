@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import MessageAlert from '@/components/MessageAlert'
 import BackgroundLoader from '@/components/BackgroundLoader'
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -129,30 +130,21 @@ export default async function DashboardPage() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}>
-      <header className="bg-white shadow sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Link href="/" className="text-3xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
-                2025 バルカーカップ エントリー
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
-                ようこそ、{userProfile.name}さん
-              </span>
-              <form action="/auth/logout" method="post">
-                <button
-                  type="submit"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  ログアウト
-                </button>
-              </form>
-            </div>
-          </div>
+      <DashboardHeader user={user}>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-500">
+            ようこそ、{userProfile.name}さん
+          </span>
+          <form action="/auth/logout" method="post">
+            <button
+              type="submit"
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              ログアウト
+            </button>
+          </form>
         </div>
-      </header>
+      </DashboardHeader>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
