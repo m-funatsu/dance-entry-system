@@ -80,6 +80,18 @@ export default async function DashboardPage() {
     }
   }
 
+  // 各種申請情報の取得
+  let applicationsInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('applications_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    applicationsInfo = data
+  }
+
   // システム設定から期限を取得
   const { data: settings } = await supabase
     .from('settings')
@@ -312,7 +324,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
                     <Link href="/dashboard/preliminary" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {entry && entry.work_title ? '編集' : '登録'} →
+                      {preliminaryInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
@@ -599,7 +611,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        未申請
+                        {applicationsInfo ? '申請済み' : '未申請'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.applications_deadline)
@@ -664,27 +676,27 @@ export default async function DashboardPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-500">代表者名</label>
                         <p className="mt-1 text-base text-gray-900">
-                          {entry.representative_name || '未設定'}
-                          {entry.representative_furigana && (
-                            <span className="text-sm text-gray-600">（{entry.representative_furigana}）</span>
+                          {basicInfo?.representative_name || '未設定'}
+                          {basicInfo?.representative_furigana && (
+                            <span className="text-sm text-gray-600">（{basicInfo.representative_furigana}）</span>
                           )}
                         </p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">パートナー名</label>
                         <p className="mt-1 text-base text-gray-900">
-                          {entry.partner_name || '未設定'}
-                          {entry.partner_furigana && (
-                            <span className="text-sm text-gray-600">（{entry.partner_furigana}）</span>
+                          {basicInfo?.partner_name || '未設定'}
+                          {basicInfo?.partner_furigana && (
+                            <span className="text-sm text-gray-600">（{basicInfo.partner_furigana}）</span>
                           )}
                         </p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">振付師</label>
                         <p className="mt-1 text-base text-gray-900">
-                          {entry.choreographer || '未設定'}
-                          {entry.choreographer_furigana && (
-                            <span className="text-sm text-gray-600">（{entry.choreographer_furigana}）</span>
+                          {basicInfo?.choreographer || '未設定'}
+                          {basicInfo?.choreographer_furigana && (
+                            <span className="text-sm text-gray-600">（{basicInfo.choreographer_furigana}）</span>
                           )}
                         </p>
                       </div>
@@ -696,12 +708,12 @@ export default async function DashboardPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">電話番号</label>
-                        <p className="mt-1 text-base text-gray-900">{entry.phone_number || '未設定'}</p>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.phone_number || '未設定'}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">プライバシーポリシー</label>
                         <p className="mt-1 text-base text-gray-900">
-                          {entry.privacy_policy_checked ? '同意済み' : '未同意'}
+                          {basicInfo?.privacy_policy_checked ? '同意済み' : '未同意'}
                         </p>
                       </div>
                     </div>
