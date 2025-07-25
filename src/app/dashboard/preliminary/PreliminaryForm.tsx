@@ -113,10 +113,20 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           'choreographer_furigana'
         ]
 
-        const missingBasicFields = requiredBasicFields.filter(field => !basicInfo[field])
+        // デバッグ: 基本情報の内容を確認
+        console.log('Basic Info:', basicInfo)
+        
+        const missingBasicFields = requiredBasicFields.filter(field => {
+          const value = basicInfo[field]
+          const isMissing = !value || (typeof value === 'string' && value.trim() === '')
+          if (isMissing) {
+            console.log(`Missing field: ${field}, value: ${value}`)
+          }
+          return isMissing
+        })
         
         if (missingBasicFields.length > 0) {
-          showToast('基本情報に未入力の必須項目があります。先に基本情報を完成させてください。', 'error')
+          showToast(`基本情報に未入力の必須項目があります: ${missingBasicFields.join(', ')}`, 'error')
           setSaving(false)
           return
         }
