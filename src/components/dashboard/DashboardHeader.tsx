@@ -7,9 +7,10 @@ import { User } from '@supabase/supabase-js'
 interface DashboardHeaderProps {
   user: User | null
   children?: React.ReactNode
+  showDefaultTitle?: boolean
 }
 
-export function DashboardHeader({ user, children }: DashboardHeaderProps) {
+export function DashboardHeader({ user, children, showDefaultTitle = false }: DashboardHeaderProps) {
   const { scrolled } = useScrollDirection()
 
   return (
@@ -19,17 +20,21 @@ export function DashboardHeader({ user, children }: DashboardHeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <h1 className={`font-bold text-gray-900 transition-all duration-300 ${
-              scrolled ? 'text-xl' : 'text-2xl'
-            }`}>
-              WDF エントリーシステム
-            </h1>
-            {user?.email && (
-              <span className={`ml-4 text-gray-600 transition-all duration-300 ${
-                scrolled ? 'text-xs' : 'text-sm'
-              }`}>
-                {user.email}
-              </span>
+            {showDefaultTitle && (
+              <>
+                <h1 className={`font-bold text-gray-900 transition-all duration-300 ${
+                  scrolled ? 'text-xl' : 'text-2xl'
+                }`}>
+                  WDF エントリーシステム
+                </h1>
+                {user?.email && (
+                  <span className={`ml-4 text-gray-600 transition-all duration-300 ${
+                    scrolled ? 'text-xs' : 'text-sm'
+                  }`}>
+                    {user.email}
+                  </span>
+                )}
+              </>
             )}
           </div>
           {children}

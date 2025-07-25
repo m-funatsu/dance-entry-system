@@ -131,18 +131,25 @@ export default async function DashboardPage() {
         backgroundRepeat: 'no-repeat',
       }}>
       <DashboardHeader user={user}>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500">
-            ようこそ、{userProfile.name}さん
-          </span>
-          <form action="/auth/logout" method="post">
-            <button
-              type="submit"
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              ログアウト
-            </button>
-          </form>
+        <div className="flex justify-between items-center w-full">
+          <div className="flex items-center">
+            <Link href="/" className="text-3xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
+              2025 バルカーカップ エントリー
+            </Link>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-500">
+              ようこそ、{userProfile.name}さん
+            </span>
+            <form action="/auth/logout" method="post">
+              <button
+                type="submit"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
+                ログアウト
+              </button>
+            </form>
+          </div>
         </div>
       </DashboardHeader>
 
