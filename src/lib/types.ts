@@ -366,6 +366,19 @@ export interface ApplicationsInfo {
   updated_by?: string
 }
 
+export interface SnsInfo {
+  id: string
+  entry_id: string
+  practice_video_path?: string
+  practice_video_filename?: string
+  introduction_highlight?: string
+  sns_notes?: string
+  created_at: string
+  created_by?: string
+  updated_at: string
+  updated_by?: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -408,6 +421,11 @@ export interface Database {
         Row: ApplicationsInfo
         Insert: Omit<ApplicationsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
         Update: Partial<Omit<ApplicationsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
+      }
+      sns_info: {
+        Row: SnsInfo
+        Insert: Omit<SnsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
+        Update: Partial<Omit<SnsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile
