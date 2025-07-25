@@ -220,6 +220,16 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             選手同伴申請
           </button>
           <button
+            onClick={() => setActiveTab('makeup')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'makeup'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            メイク・ヘアメイク予約申請
+          </button>
+          <button
             onClick={() => setActiveTab('payment')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'payment'
@@ -375,6 +385,109 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 ¥{(applicationsInfo.companion_total_amount || 0).toLocaleString()}
               </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* メイク・ヘアメイク予約申請 */}
+      {activeTab === 'makeup' && (
+        <div className="space-y-6">
+          <h4 className="font-medium">メイク・ヘアメイク予約申請</h4>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              希望美容師
+            </label>
+            <input
+              type="text"
+              value={applicationsInfo.makeup_preferred_stylist || ''}
+              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="希望がある場合は美容師名を入力してください"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                氏名 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={applicationsInfo.makeup_name || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_name: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                メールアドレス <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                value={applicationsInfo.makeup_email || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              ご連絡先電話番号 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={applicationsInfo.makeup_phone || ''}
+              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="例: 090-1234-5678"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                希望スタイル①
+              </label>
+              <input
+                type="text"
+                value={applicationsInfo.makeup_style1 || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_style1: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="例: ナチュラルメイク"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                希望スタイル②
+              </label>
+              <input
+                type="text"
+                value={applicationsInfo.makeup_style2 || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_style2: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="例: アップスタイル"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              備考欄
+            </label>
+            <textarea
+              value={applicationsInfo.makeup_notes || ''}
+              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="その他、ご要望や注意事項があればご記入ください"
+            />
           </div>
         </div>
       )}

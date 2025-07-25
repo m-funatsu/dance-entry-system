@@ -361,6 +361,13 @@ export interface ApplicationsInfo {
   companion_total_amount?: number
   payment_slip_path?: string
   applications_notes?: string
+  makeup_preferred_stylist?: string
+  makeup_name?: string
+  makeup_email?: string
+  makeup_phone?: string
+  makeup_notes?: string
+  makeup_style1?: string
+  makeup_style2?: string
   created_at: string
   created_by?: string
   updated_at: string
