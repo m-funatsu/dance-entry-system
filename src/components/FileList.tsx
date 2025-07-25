@@ -200,6 +200,48 @@ export default function FileList({ entryId, editable = false, fileType, onFileDe
     )
   }
 
+  // 動画ファイルの場合は予選と同じスタイルで表示
+  if (fileType === 'video' && files.length > 0) {
+    const file = files[0] // 動画は1つのみ
+    return (
+      <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-6 border border-indigo-200">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                </svg>
+              </div>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">
+                {file.file_name}
+              </p>
+              <p className="text-sm text-gray-600">
+                ビデオファイル • {file.file_size && `${(file.file_size / 1024 / 1024).toFixed(2)} MB`}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                アップロード完了
+              </p>
+            </div>
+          </div>
+          {editable && (
+            <button
+              type="button"
+              onClick={() => handleDelete(file.id)}
+              className="text-gray-400 hover:text-gray-500"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {files.map((file, index) => (

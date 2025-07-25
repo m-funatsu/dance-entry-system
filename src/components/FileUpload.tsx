@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { uploadFile, getFileIcon, FileUploadOptions } from '@/lib/storage'
+import { uploadFile, FileUploadOptions } from '@/lib/storage'
 import { useToast } from '@/contexts/ToastContext'
 import { createClient } from '@/lib/supabase/client'
 
@@ -170,15 +170,7 @@ export default function FileUpload({
           </p>
         </div>
       )}
-      <div
-        className={`relative rounded-2xl transition-all duration-200 ${
-          isDisabled
-            ? 'cursor-not-allowed'
-            : dragOver
-            ? 'transform scale-[1.02]'
-            : 'hover:transform hover:scale-[1.01]'
-        }`}
-      >
+      <div>
         <input
           ref={fileInputRef}
           type="file"
@@ -191,83 +183,69 @@ export default function FileUpload({
         
         <label
           htmlFor={isDisabled ? undefined : `file-upload-${fileType}`}
-          className={`block w-full p-8 rounded-2xl border-2 border-dashed transition-all duration-200 ${
+          className={`relative block w-full rounded-lg border-2 border-dashed p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 ${
             isDisabled
-              ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+              ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
               : dragOver
-              ? 'border-indigo-400 bg-gradient-to-br from-indigo-50 to-purple-50 cursor-pointer shadow-lg'
-              : 'border-gray-300 bg-gradient-to-br from-gray-50 to-white hover:border-indigo-300 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 cursor-pointer hover:shadow-md'
+              ? 'border-gray-400 bg-gray-100'
+              : 'border-gray-300 bg-white hover:bg-gray-50'
           }`}
           onDragOver={isDisabled ? undefined : handleDragOver}
           onDragLeave={isDisabled ? undefined : handleDragLeave}
           onDrop={isDisabled ? undefined : handleDrop}
         >
-          <div className="flex flex-col items-center">
-            <div className={`p-4 rounded-full ${
-              isDisabled 
-                ? 'bg-gray-100' 
-                : dragOver
-                ? 'bg-indigo-100'
-                : 'bg-gradient-to-br from-indigo-100 to-purple-100'
-            } mb-4 transition-all duration-200`}>
-              <div className="text-4xl">
-                {getFileIcon(fileType)}
-              </div>
-            </div>
-            
-            {isUploading ? (
-              <div className="space-y-2 text-center">
-                <span className="text-sm font-semibold text-gray-700">
-                  アップロード中...
-                </span>
-                <div className="w-48 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300 ease-out"
+          {fileType === 'video' ? (
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 01-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25H13.5" />
+            </svg>
+          ) : fileType === 'music' || fileType === 'audio' ? (
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+            </svg>
+          ) : (
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+          )}
+          
+          {isUploading ? (
+            <div className="mt-4">
+              <span className="text-sm font-semibold text-gray-900">
+                アップロード中...
+              </span>
+              <div className="mt-3">
+                <div className="bg-gray-200 rounded-full h-2 w-full max-w-xs mx-auto overflow-hidden">
+                  <div 
+                    className="bg-indigo-600 h-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-600">
-                  {uploadProgress}%
-                </span>
+                <p className="mt-2 text-sm text-indigo-600">{uploadProgress}%</p>
               </div>
-            ) : (
-              <>
-                <div className="text-center mb-2">
-                  {isDisabled ? (
-                    <span className="text-sm font-semibold text-gray-500">
-                      {hasExistingFile ? 'アップロード済み' : 'アップロード不可'}
-                    </span>
-                  ) : (
-                    <>
-                      <p className="text-sm font-semibold text-gray-900">
-                        クリックして{getFileTypeLabel()}を選択
-                      </p>
-                      <p className="text-xs text-gray-600 mt-1">
-                        またはドラッグ＆ドロップ
-                      </p>
-                    </>
-                  )}
-                </div>
-                
-                <div className="text-xs text-gray-500 flex items-center space-x-2">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-                  </svg>
-                  <span>
-                    {fileType === 'music' || fileType === 'audio' ? (
-                      'MP3, WAV, AAC形式 (最大100MB)'
-                    ) : fileType === 'photo' ? (
-                      'JPG, PNG形式 (最大100MB)'
-                    ) : fileType === 'video' ? (
-                      'MP4, MOV, AVI形式 (最大200MB)'
-                    ) : (
-                      '最大100MB'
-                    )}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <>
+              <span className="mt-2 block text-sm font-semibold text-gray-900">
+                {isDisabled ? (hasExistingFile ? 'アップロード済み' : 'アップロード不可') : `クリックして${getFileTypeLabel()}を選択`}
+              </span>
+              {!isDisabled && (
+                <span className="mt-1 block text-xs text-gray-600">
+                  またはドラッグ＆ドロップ
+                </span>
+              )}
+              <span className="mt-2 block text-xs text-gray-500">
+                {fileType === 'music' || fileType === 'audio' ? (
+                  'MP3、WAV、AAC形式（最大100MB）'
+                ) : fileType === 'photo' ? (
+                  'JPG、PNG形式（最大100MB）'
+                ) : fileType === 'video' ? (
+                  'MP4、MOV、AVI形式（最大200MB）'
+                ) : (
+                  '最大100MB'
+                )}
+              </span>
+            </>
+          )}
         </label>
       </div>
     </div>
