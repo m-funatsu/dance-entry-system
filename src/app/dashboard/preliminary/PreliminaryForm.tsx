@@ -40,8 +40,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit') => {
     e.preventDefault()
 
     if (!entryId) {
@@ -50,7 +51,14 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
+    // 完了登録の場合は動画が必須
+    if (mode === 'submit' && !preliminaryVideo) {
+      showToast('予選動画をアップロードしてください', 'error')
+      return
+    }
+
     setSaving(true)
+    setSavingMode(mode)
 
     try {
       const dataToSave = {
@@ -77,7 +85,25 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         if (error) throw error
       }
 
-      showToast('予選情報を保存しました', 'success')
+      // 完了登録の場合はエントリーステータスを更新
+      if (mode === 'submit') {
+        const { error: entryError } = await supabase
+          .from('entries')
+          .update({ 
+            status: 'submitted',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', entryId)
+
+        if (entryError) throw entryError
+      }
+
+      showToast(
+        mode === 'submit' 
+          ? '予選情報を登録しました' 
+          : '予選情報を一時保存しました', 
+        'success'
+      )
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving preliminary info:', error)
@@ -195,7 +221,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           予選情報の登録
@@ -247,7 +273,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
         {/* 予選提出動画セクション */}
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h4 className="text-base font-medium text-gray-900 mb-4">予選提出動画</h4>
+          <h4 className="text-base font-medium text-gray-900 mb-4">
+            予選提出動画 <span className="text-red-500">*</span>
+          </h4>
           
           {preliminaryVideo ? (
             <div className="space-y-4">
@@ -319,6 +347,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     </p>
                     <p className="mt-1 text-sm text-green-700">
                       動画は1つのみアップロード可能です。変更する場合は現在の動画を削除してから新しい動画をアップロードしてください。
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-green-800">
+                      この動画は予選提出に必須です。
                     </p>
                   </div>
                 </div>
@@ -539,17 +570,32 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         >
           キャンセル
         </button>
-        <button
-          type="submit"
-          disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
-          className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-            saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-indigo-600 hover:bg-indigo-700'
-          }`}
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
+        <div className="space-x-4">
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
+            disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${
+              saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
+                ? 'bg-gray-400 text-white cursor-not-allowed' 
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e as React.FormEvent, 'submit')}
+            disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared || !preliminaryVideo}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
+              saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared || !preliminaryVideo
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+          >
+            {saving && savingMode === 'submit' ? '登録中...' : '完了登録'}
+          </button>
+        </div>
       </div>
     </form>
   )
