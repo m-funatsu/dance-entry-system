@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import type { Entry, FinalsInfo, PreliminaryInfo } from '@/lib/types'
+import type { Entry, FinalsInfo } from '@/lib/types'
 
 interface FinalsInfoFormProps {
   entry: Entry
