@@ -479,15 +479,9 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   ]
 
   const colorTypes = [
-    '赤系',
-    '青系',
-    '緑系',
-    '黄系',
-    '紫系',
-    '白系',
     '暖色系',
     '寒色系',
-    'その他'
+    'その他色指定'
   ]
 
   return (
@@ -879,12 +873,15 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               準決勝 - 踊り出しタイミング <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <select
               value={semifinalsInfo.dance_start_timing || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, dance_start_timing: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            >
+              <option value="">選択してください</option>
+              <option value="音先">音先</option>
+              <option value="板付">板付</option>
+            </select>
           </div>
 
           {/* シーン1-5とチェイサー/退場 */}
