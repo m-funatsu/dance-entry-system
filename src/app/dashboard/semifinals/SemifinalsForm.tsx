@@ -358,8 +358,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           { field: 'chaser_exit_color_type', name: 'チェイサー/退場 - 色・系統' },
           { field: 'chaser_exit_color_other', name: 'チェイサー/退場 - 色・系統その他' },
           { field: 'chaser_exit_image', name: 'チェイサー/退場 - イメージ' },
-          { field: 'chaser_exit_image_path', name: 'チェイサー/退場 - イメージ画像' },
-          { field: 'chaser_exit_notes', name: 'チェイサー/退場 - 備考' }
+          { field: 'chaser_exit_image_path', name: 'チェイサー/退場 - イメージ画像' }
         ]
 
         const missingLightingFields = requiredLightingFields.filter(
@@ -1071,7 +1070,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  備考 <span className="text-red-500">*</span>
+                  備考
                 </label>
                 <textarea
                   value={semifinalsInfo.chaser_exit_notes || ''}
