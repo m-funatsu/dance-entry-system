@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -9,6 +9,135 @@ import type { Entry, SemifinalsInfo, BasicInfo, PreliminaryInfo } from '@/lib/ty
 interface SemifinalsFormProps {
   userId: string
   entry: Entry | null
+}
+
+// 楽曲ファイルアップロードコンポーネント
+function MusicFileUpload({ 
+  disabled, 
+  value, 
+  onChange 
+}: { 
+  disabled?: boolean
+  value?: string
+  onChange: (file: File) => void 
+}) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadingFile, setUploadingFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    if (!disabled) {
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    
+    if (disabled) return
+    
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      const file = files[0]
+      if (file.type.startsWith('audio/')) {
+        setUploadingFile(file)
+        onChange(file)
+      } else {
+        alert('音声ファイルを選択してください')
+      }
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setUploadingFile(file)
+      onChange(file)
+    }
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  return (
+    <div className={`relative ${disabled ? 'opacity-50' : ''}`}>
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => !disabled && fileInputRef.current?.click()}
+        className={`
+          border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
+          transition-all duration-200
+          ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'hover:border-indigo-400 hover:bg-indigo-50'}
+          ${isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}
+          ${value ? 'bg-green-50 border-green-300' : ''}
+        `}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="audio/*"
+          onChange={handleFileSelect}
+          disabled={disabled}
+          className="hidden"
+        />
+        
+        {value ? (
+          <div className="space-y-2">
+            <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-medium text-green-700">アップロード済み</p>
+            {uploadingFile && (
+              <p className="text-xs text-gray-600">
+                {uploadingFile.name} ({formatFileSize(uploadingFile.size)})
+              </p>
+            )}
+            {!disabled && (
+              <p className="text-xs text-gray-500">クリックまたはドラッグ&ドロップで変更</p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+            <p className="text-sm font-medium text-gray-700">
+              音楽ファイルをドラッグ&ドロップ
+            </p>
+            <p className="text-xs text-gray-500">
+              または<span className="text-indigo-600">クリックして選択</span>
+            </p>
+            <p className="text-xs text-gray-400">
+              対応形式: MP3, WAV, AAC, M4A など
+            </p>
+          </div>
+        )}
+        
+        {uploadingFile && !value && (
+          <div className="mt-3">
+            <div className="bg-gray-200 rounded-full h-2 w-full">
+              <div className="bg-indigo-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+            </div>
+            <p className="text-xs text-gray-600 mt-1">アップロード中...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
@@ -511,32 +640,39 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               楽曲データ
             </label>
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) handleFileUpload('music_data_path', file)
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            <MusicFileUpload
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              value={semifinalsInfo.music_data_path}
+              onChange={(file) => handleFileUpload('music_data_path', file)}
             />
-            {semifinalsInfo.music_data_path && (
-              <div className="mt-2 text-sm text-gray-600">
-                アップロード済み
-              </div>
-            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               音源使用方法
             </label>
-            <textarea
-              value={semifinalsInfo.music_usage_method || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              rows={3}
-            />
+            <div className="relative">
+              <textarea
+                value={semifinalsInfo.music_usage_method || ''}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
+                disabled={!semifinalsInfo.music_change_from_preliminary}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+                }`}
+                rows={3}
+                placeholder="例：イントロから3分45秒まで使用、フェードアウト希望"
+              />
+              {!semifinalsInfo.music_change_from_preliminary && (
+                <div className="absolute top-2 right-2">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              使用する部分、編集の要望などを具体的に記入してください
+            </p>
           </div>
         </div>
       )}
