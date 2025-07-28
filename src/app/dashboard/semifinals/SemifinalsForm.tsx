@@ -337,6 +337,11 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           const fieldNames = missingSoundFields.map(({ name }) => name).join('、')
           throw new Error(`以下の音響指示情報は必須項目です：${fieldNames}`)
         }
+
+        // チェイサー曲が「必要」の場合、曲名も必須
+        if (semifinalsInfo.chaser_song_designation === 'required' && !semifinalsInfo.chaser_song) {
+          throw new Error('チェイサー（退場）曲を入力してください')
+        }
       }
 
       // 50文字制限のチェック
@@ -735,28 +740,60 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               チェイサー（退場）曲の指定
             </label>
-            <input
-              type="text"
-              value={semifinalsInfo.chaser_song_designation || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="chaser_designation"
+                  value="included"
+                  checked={semifinalsInfo.chaser_song_designation === 'included'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'included' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                自作曲に組み込み
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="chaser_designation"
+                  value="required"
+                  checked={semifinalsInfo.chaser_song_designation === 'required'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'required' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                必要
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="chaser_designation"
+                  value="not_required"
+                  checked={semifinalsInfo.chaser_song_designation === 'not_required'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'not_required' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                不要（無音）
+              </label>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              チェイサー（退場）曲
-            </label>
-            <input
-              type="text"
-              value={semifinalsInfo.chaser_song || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
+          {semifinalsInfo.chaser_song_designation === 'required' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                チェイサー（退場）曲 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={semifinalsInfo.chaser_song || ''}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="使用する退場曲を入力してください"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
