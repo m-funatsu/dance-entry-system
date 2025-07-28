@@ -49,44 +49,47 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     }
   }
 
-  const handleSave = async () => {
+  const handleSave = async (isTemporary = false) => {
     setError(null)
     setSuccess(null)
     setSaving(true)
 
     try {
-      // 必須項目のチェック
-      if (!programInfo.player_photo_type) {
-        throw new Error('選手紹介用写真の種類を選択してください')
-      }
-      if (!programInfo.player_photo_path) {
-        throw new Error('選手紹介用画像をアップロードしてください')
-      }
-      if (!programInfo.semifinal_story || programInfo.semifinal_story.trim() === '') {
-        throw new Error('作品目あらすじ・ストーリーを入力してください')
-      }
-      if (!programInfo.semifinal_highlight || programInfo.semifinal_highlight.trim() === '') {
-        throw new Error('作品目見所を入力してください')
-      }
-      if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
-          !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) {
-        throw new Error('作品目作品イメージ①〜④をすべてアップロードしてください')
-      }
+      // 一時保存でない場合のみ必須項目をチェック
+      if (!isTemporary) {
+        // 必須項目のチェック
+        if (!programInfo.player_photo_type) {
+          throw new Error('選手紹介用写真の種類を選択してください')
+        }
+        if (!programInfo.player_photo_path) {
+          throw new Error('選手紹介用画像をアップロードしてください')
+        }
+        if (!programInfo.semifinal_story || programInfo.semifinal_story.trim() === '') {
+          throw new Error('作品目あらすじ・ストーリーを入力してください')
+        }
+        if (!programInfo.semifinal_highlight || programInfo.semifinal_highlight.trim() === '') {
+          throw new Error('作品目見所を入力してください')
+        }
+        if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
+            !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) {
+          throw new Error('作品目作品イメージ①〜④をすべてアップロードしてください')
+        }
 
-      // 2曲の場合の追加必須項目チェック
-      if (programInfo.song_count === '2曲') {
-        if (!programInfo.final_player_photo_path) {
-          throw new Error('決勝用の選手紹介用画像をアップロードしてください')
-        }
-        if (!programInfo.final_story || programInfo.final_story.trim() === '') {
-          throw new Error('決勝のあらすじ・ストーリーを入力してください')
-        }
-        if (!programInfo.final_highlight || programInfo.final_highlight.trim() === '') {
-          throw new Error('決勝の見所を入力してください')
-        }
-        if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
-            !programInfo.final_image3_path || !programInfo.final_image4_path) {
-          throw new Error('決勝の作品イメージ①〜④をすべてアップロードしてください')
+        // 2曲の場合の追加必須項目チェック
+        if (programInfo.song_count === '2曲') {
+          if (!programInfo.final_player_photo_path) {
+            throw new Error('決勝用の選手紹介用画像をアップロードしてください')
+          }
+          if (!programInfo.final_story || programInfo.final_story.trim() === '') {
+            throw new Error('決勝のあらすじ・ストーリーを入力してください')
+          }
+          if (!programInfo.final_highlight || programInfo.final_highlight.trim() === '') {
+            throw new Error('決勝の見所を入力してください')
+          }
+          if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
+              !programInfo.final_image3_path || !programInfo.final_image4_path) {
+            throw new Error('決勝の作品イメージ①〜④をすべてアップロードしてください')
+          }
         }
       }
 
@@ -135,7 +138,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         if (error) throw error
       }
 
-      setSuccess('プログラム掲載用情報を保存しました')
+      setSuccess(isTemporary ? 'プログラム掲載用情報を一時保存しました' : 'プログラム掲載用情報を保存しました')
       router.refresh()
     } catch (err) {
       console.error('保存エラー:', err)
@@ -442,9 +445,16 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-4">
         <button
-          onClick={handleSave}
+          onClick={() => handleSave(true)}
+          disabled={saving}
+          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+        >
+          {saving ? '一時保存中...' : '一時保存'}
+        </button>
+        <button
+          onClick={() => handleSave(false)}
           disabled={saving}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
