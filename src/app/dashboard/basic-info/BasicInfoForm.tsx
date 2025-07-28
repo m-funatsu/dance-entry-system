@@ -39,6 +39,40 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     setSaving(true)
     setSavingMode(mode)
 
+    // 完了保存の場合は必須項目をチェック
+    if (mode === 'submit') {
+      const requiredFields = [
+        { field: 'dance_style', name: 'ダンスジャンル' },
+        { field: 'representative_name', name: '代表者氏名' },
+        { field: 'representative_furigana', name: '代表者フリガナ' },
+        { field: 'representative_email', name: '代表者メールアドレス' },
+        { field: 'partner_name', name: 'ペア氏名' },
+        { field: 'partner_furigana', name: 'ペアフリガナ' },
+        { field: 'phone_number', name: '代表者電話番号' }
+      ]
+
+      const missingFields: string[] = []
+      for (const { field, name } of requiredFields) {
+        const value = formData[field as keyof typeof formData]
+        if (typeof value === 'string' && (!value || value.trim() === '')) {
+          missingFields.push(name)
+        }
+      }
+
+      if (!formData.agreement_checked) {
+        missingFields.push('参加資格・要件への同意')
+      }
+      if (!formData.privacy_policy_checked) {
+        missingFields.push('プライバシーポリシーへの同意')
+      }
+
+      if (missingFields.length > 0) {
+        showToast(`以下の必須項目が入力されていません: ${missingFields.join('、')}`, 'error')
+        setSaving(false)
+        return
+      }
+    }
+
     try {
       let currentEntryId = entryId
 

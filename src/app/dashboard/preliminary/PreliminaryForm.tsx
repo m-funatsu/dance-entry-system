@@ -80,70 +80,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         if (error) throw error
       }
 
-      // 完了登録の場合は、基本情報が完全に入力されているかチェック
+      // 完了登録の場合は、ステータスを更新
       if (mode === 'submit') {
-        // 基本情報の存在確認
-        const { data: basicInfo } = await supabase
-          .from('basic_info')
-          .select('*')
-          .eq('entry_id', entryId)
-          .single()
-
-        if (!basicInfo) {
-          showToast('基本情報が未登録です。先に基本情報を入力してください。', 'error')
-          setSaving(false)
-          return
-        }
-
-        // 基本情報の必須項目チェック
-        const requiredBasicFields = [
-          'dance_style',
-          'representative_name',
-          'representative_furigana',
-          'representative_email',
-          'partner_name',
-          'partner_furigana',
-          'phone_number',
-          'choreographer',
-          'choreographer_furigana'
-        ]
-
-        const missingBasicFields = requiredBasicFields.filter(field => {
-          const value = basicInfo[field]
-          // ブール値の場合は特別な処理
-          if (typeof value === 'boolean') {
-            return value !== true
-          }
-          // 文字列の場合は空文字チェック
-          return !value || value.toString().trim() === ''
-        })
-        
-        if (missingBasicFields.length > 0) {
-          const fieldNames: { [key: string]: string } = {
-            'dance_style': 'ダンスジャンル',
-            'representative_name': '代表者名',
-            'representative_furigana': '代表者フリガナ',
-            'representative_email': '代表者メールアドレス',
-            'partner_name': 'パートナー名',
-            'partner_furigana': 'パートナーフリガナ',
-            'phone_number': '電話番号',
-            'choreographer': '振付師名',
-            'choreographer_furigana': '振付師フリガナ'
-          }
-          const missingFieldNames = missingBasicFields.map(field => fieldNames[field] || field).join('、')
-          showToast(`基本情報に未入力の必須項目があります。基本情報ページに戻って以下の項目を入力してください: ${missingFieldNames}`, 'error')
-          setSaving(false)
-          return
-        }
-
-        // 同意チェックの確認
-        if (!basicInfo.agreement_checked || !basicInfo.privacy_policy_checked) {
-          showToast('基本情報の同意事項にチェックが必要です。', 'error')
-          setSaving(false)
-          return
-        }
-
-        // すべてのチェックをパスしたらステータスを更新
         const { error: entryError } = await supabase
           .from('entries')
           .update({ 
