@@ -19,7 +19,8 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
-    song_count: '1曲'
+    song_count: '1曲',
+    player_photo_type: ''
   })
 
   useEffect(() => {
@@ -40,7 +41,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
 
       if (data) {
-        setProgramInfo(data)
+        // player_photo_typeが未設定の場合はデフォルト値を設定
+        setProgramInfo({
+          ...data,
+          player_photo_type: data.player_photo_type || ''
+        })
       }
     } catch (err) {
       console.error('プログラム情報の読み込みエラー:', err)
