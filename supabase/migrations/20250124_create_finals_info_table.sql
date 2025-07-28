@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS finals_info (
   copy_preliminary_music BOOLEAN DEFAULT false,
   work_title TEXT,
   work_character_story TEXT,
-  copyright_permission BOOLEAN DEFAULT false,
+  copyright_permission TEXT,
   music_title TEXT,
   cd_title TEXT,
   artist TEXT,
