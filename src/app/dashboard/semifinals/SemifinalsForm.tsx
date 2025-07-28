@@ -314,6 +314,368 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         </p>
       </div>
 
+      {/* 楽曲情報セクション */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          楽曲情報
+        </h3>
+        
+        <div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.music_change_from_preliminary}
+              onChange={(e) => setFormData({ ...formData, music_change_from_preliminary: e.target.checked })}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              予選から楽曲を変更する
+            </span>
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="work_title" className="block text-sm font-medium text-gray-700">
+              作品名
+            </label>
+            <input
+              type="text"
+              id="work_title"
+              value={formData.work_title}
+              onChange={(e) => setFormData({ ...formData, work_title: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="music_title" className="block text-sm font-medium text-gray-700">
+              楽曲名
+            </label>
+            <input
+              type="text"
+              id="music_title"
+              value={formData.music_title}
+              onChange={(e) => setFormData({ ...formData, music_title: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="artist" className="block text-sm font-medium text-gray-700">
+              アーティスト名
+            </label>
+            <input
+              type="text"
+              id="artist"
+              value={formData.artist}
+              onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="cd_title" className="block text-sm font-medium text-gray-700">
+              CD名・レーベル名
+            </label>
+            <input
+              type="text"
+              id="cd_title"
+              value={formData.cd_title}
+              onChange={(e) => setFormData({ ...formData, cd_title: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="work_character_story" className="block text-sm font-medium text-gray-700">
+            作品・人物・ストーリー
+          </label>
+          <textarea
+            id="work_character_story"
+            value={formData.work_character_story}
+            onChange={(e) => setFormData({ ...formData, work_character_story: e.target.value })}
+            rows={4}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="作品の背景やストーリー、表現したい内容について"
+          />
+        </div>
+        
+        <div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.copyright_permission}
+              onChange={(e) => setFormData({ ...formData, copyright_permission: e.target.checked })}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              著作権使用許可を取得済み
+            </span>
+          </label>
+        </div>
+      </div>
+
+      {/* 音響指示情報セクション */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          音響指示情報
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="sound_start_timing" className="block text-sm font-medium text-gray-700">
+              音響開始タイミング
+            </label>
+            <input
+              type="text"
+              id="sound_start_timing"
+              value={formData.sound_start_timing}
+              onChange={(e) => setFormData({ ...formData, sound_start_timing: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="例：客席の照明が落ちた後"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="chaser_song_designation" className="block text-sm font-medium text-gray-700">
+              チェイサー楽曲指定
+            </label>
+            <input
+              type="text"
+              id="chaser_song_designation"
+              value={formData.chaser_song_designation}
+              onChange={(e) => setFormData({ ...formData, chaser_song_designation: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="fade_out_start_time" className="block text-sm font-medium text-gray-700">
+              フェードアウト開始時間
+            </label>
+            <input
+              type="text"
+              id="fade_out_start_time"
+              value={formData.fade_out_start_time}
+              onChange={(e) => setFormData({ ...formData, fade_out_start_time: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="例：3分30秒から"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="fade_out_complete_time" className="block text-sm font-medium text-gray-700">
+              フェードアウト完了時間
+            </label>
+            <input
+              type="text"
+              id="fade_out_complete_time"
+              value={formData.fade_out_complete_time}
+              onChange={(e) => setFormData({ ...formData, fade_out_complete_time: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="例：4分00秒で完全に消音"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 照明指示情報セクション */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          照明指示情報
+        </h3>
+        
+        <div>
+          <label htmlFor="dance_start_timing" className="block text-sm font-medium text-gray-700">
+            ダンス開始タイミング
+          </label>
+          <input
+            type="text"
+            id="dance_start_timing"
+            value={formData.dance_start_timing}
+            onChange={(e) => setFormData({ ...formData, dance_start_timing: e.target.value })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="例：イントロ終了後、ボーカル開始と同時に"
+          />
+        </div>
+
+        {/* シーン1-5 */}
+        {[1, 2, 3, 4, 5].map((sceneNum) => (
+          <div key={sceneNum} className="bg-gray-50 p-4 rounded-md">
+            <h4 className="text-md font-medium text-gray-800 mb-4">シーン{sceneNum}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor={`scene${sceneNum}_time`} className="block text-sm font-medium text-gray-700">
+                  時間
+                </label>
+                <input
+                  type="text"
+                  id={`scene${sceneNum}_time`}
+                  value={formData[`scene${sceneNum}_time` as keyof typeof formData] as string || ''}
+                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_time`]: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="例：1:30-2:00"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor={`scene${sceneNum}_trigger`} className="block text-sm font-medium text-gray-700">
+                  きっかけ
+                </label>
+                <input
+                  type="text"
+                  id={`scene${sceneNum}_trigger`}
+                  value={formData[`scene${sceneNum}_trigger` as keyof typeof formData] as string || ''}
+                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_trigger`]: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="例：ボーカル開始"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor={`scene${sceneNum}_color_type`} className="block text-sm font-medium text-gray-700">
+                  照明色
+                </label>
+                <select
+                  id={`scene${sceneNum}_color_type`}
+                  value={formData[`scene${sceneNum}_color_type` as keyof typeof formData] as string || ''}
+                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_color_type`]: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">選択してください</option>
+                  <option value="red">赤</option>
+                  <option value="blue">青</option>
+                  <option value="green">緑</option>
+                  <option value="yellow">黄</option>
+                  <option value="purple">紫</option>
+                  <option value="orange">オレンジ</option>
+                  <option value="white">白</option>
+                  <option value="other">その他</option>
+                </select>
+              </div>
+            </div>
+            
+            {(formData[`scene${sceneNum}_color_type` as keyof typeof formData] as string) === 'other' && (
+              <div className="mt-4">
+                <label htmlFor={`scene${sceneNum}_color_other`} className="block text-sm font-medium text-gray-700">
+                  その他の照明色
+                </label>
+                <input
+                  type="text"
+                  id={`scene${sceneNum}_color_other`}
+                  value={formData[`scene${sceneNum}_color_other` as keyof typeof formData] as string || ''}
+                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_color_other`]: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="具体的な色を入力"
+                />
+              </div>
+            )}
+            
+            <div className="mt-4">
+              <label htmlFor={`scene${sceneNum}_notes`} className="block text-sm font-medium text-gray-700">
+                備考・詳細指示
+              </label>
+              <textarea
+                id={`scene${sceneNum}_notes`}
+                value={formData[`scene${sceneNum}_notes` as keyof typeof formData] as string || ''}
+                onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_notes`]: e.target.value })}
+                rows={2}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="照明に関する詳細な指示があれば記入"
+              />
+            </div>
+          </div>
+        ))}
+
+        {/* チェイサー/退場 */}
+        <div className="bg-gray-50 p-4 rounded-md">
+          <h4 className="text-md font-medium text-gray-800 mb-4">チェイサー/退場</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="chaser_exit_time" className="block text-sm font-medium text-gray-700">
+                時間
+              </label>
+              <input
+                type="text"
+                id="chaser_exit_time"
+                value={formData.chaser_exit_time}
+                onChange={(e) => setFormData({ ...formData, chaser_exit_time: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="例：3:45-4:00"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="chaser_exit_trigger" className="block text-sm font-medium text-gray-700">
+                きっかけ
+              </label>
+              <input
+                type="text"
+                id="chaser_exit_trigger"
+                value={formData.chaser_exit_trigger}
+                onChange={(e) => setFormData({ ...formData, chaser_exit_trigger: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="例：楽曲終了"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="chaser_exit_color_type" className="block text-sm font-medium text-gray-700">
+                照明色
+              </label>
+              <select
+                id="chaser_exit_color_type"
+                value={formData.chaser_exit_color_type}
+                onChange={(e) => setFormData({ ...formData, chaser_exit_color_type: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">選択してください</option>
+                <option value="red">赤</option>
+                <option value="blue">青</option>
+                <option value="green">緑</option>
+                <option value="yellow">黄</option>
+                <option value="purple">紫</option>
+                <option value="orange">オレンジ</option>
+                <option value="white">白</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+          </div>
+          
+          {formData.chaser_exit_color_type === 'other' && (
+            <div className="mt-4">
+              <label htmlFor="chaser_exit_color_other" className="block text-sm font-medium text-gray-700">
+                その他の照明色
+              </label>
+              <input
+                type="text"
+                id="chaser_exit_color_other"
+                value={formData.chaser_exit_color_other}
+                onChange={(e) => setFormData({ ...formData, chaser_exit_color_other: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="具体的な色を入力"
+              />
+            </div>
+          )}
+          
+          <div className="mt-4">
+            <label htmlFor="chaser_exit_notes" className="block text-sm font-medium text-gray-700">
+              備考・詳細指示
+            </label>
+            <textarea
+              id="chaser_exit_notes"
+              value={formData.chaser_exit_notes}
+              onChange={(e) => setFormData({ ...formData, chaser_exit_notes: e.target.value })}
+              rows={2}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="退場時の照明に関する詳細な指示があれば記入"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* 振付情報セクション */}
       <div className="space-y-6">
         <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
