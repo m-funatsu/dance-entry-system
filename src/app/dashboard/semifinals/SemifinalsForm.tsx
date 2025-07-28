@@ -297,6 +297,32 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         return
       }
 
+      // 楽曲情報の必須項目チェック（一時保存時はスキップ）
+      if (!isTemporary) {
+        const requiredMusicFields = [
+          { field: 'work_title', name: '作品タイトルまたはテーマ' },
+          { field: 'work_character_story', name: '作品キャラクター・ストーリー等' },
+          { field: 'copyright_permission', name: '楽曲著作権許諾' },
+          { field: 'music_title', name: '使用楽曲タイトル' },
+          { field: 'cd_title', name: '収録CDタイトル' },
+          { field: 'artist', name: 'アーティスト' },
+          { field: 'record_number', name: 'レコード番号' },
+          { field: 'jasrac_code', name: 'JASRAC作品コード' },
+          { field: 'music_type', name: '楽曲種類' },
+          { field: 'music_data_path', name: '楽曲データ' },
+          { field: 'music_usage_method', name: '音源使用方法' }
+        ]
+
+        const missingFields = requiredMusicFields.filter(
+          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
+        )
+
+        if (missingFields.length > 0) {
+          const fieldNames = missingFields.map(({ name }) => name).join('、')
+          throw new Error(`以下の楽曲情報は必須項目です：${fieldNames}`)
+        }
+      }
+
       // 50文字制限のチェック
       if (semifinalsInfo.work_character_story && semifinalsInfo.work_character_story.length > 50) {
         throw new Error('作品キャラクター・ストーリー等は50文字以内で入力してください')
@@ -429,7 +455,12 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       {/* 楽曲情報セクション */}
       {activeSection === 'music' && (
         <div className="space-y-4">
-          <h4 className="font-medium">楽曲情報</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium">楽曲情報</h4>
+            <p className="text-sm text-gray-500">
+              <span className="text-red-500">*</span> は必須項目です
+            </p>
+          </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -469,7 +500,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品タイトルまたはテーマ
+              作品タイトルまたはテーマ <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -484,7 +515,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品キャラクター・ストーリー等（50字以内）
+              作品キャラクター・ストーリー等（50字以内） <span className="text-red-500">*</span>
             </label>
             <textarea
               value={semifinalsInfo.work_character_story || ''}
@@ -503,7 +534,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              楽曲著作権許諾
+              楽曲著作権許諾 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -544,7 +575,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              使用楽曲タイトル
+              使用楽曲タイトル <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -559,7 +590,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              収録CDタイトル
+              収録CDタイトル <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -574,7 +605,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              アーティスト
+              アーティスト <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -589,7 +620,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              レコード番号
+              レコード番号 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -604,7 +635,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              JASRAC作品コード
+              JASRAC作品コード <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -619,7 +650,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              楽曲種類
+              楽曲種類 <span className="text-red-500">*</span>
             </label>
             <select
               value={semifinalsInfo.music_type || ''}
@@ -638,7 +669,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              楽曲データ
+              楽曲データ <span className="text-red-500">*</span>
             </label>
             <MusicFileUpload
               disabled={false}
@@ -649,7 +680,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              音源使用方法
+              音源使用方法 <span className="text-red-500">*</span>
             </label>
             <textarea
               value={semifinalsInfo.music_usage_method || ''}
