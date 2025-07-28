@@ -21,7 +21,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     entry_id: entry.id,
     music_change: false,
     copy_preliminary_music: false,
-    copyright_permission: false,
+    copyright_permission: '',
     sound_change_from_semifinals: false,
     lighting_change_from_semifinals: false,
     choreographer_change: false,
