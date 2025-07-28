@@ -33,10 +33,12 @@ export default function FinalsForm({ entry, initialFiles, userId }: FinalsFormPr
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit' = 'submit') => {
     e.preventDefault()
     setSaving(true)
+    setSavingMode(mode)
 
     try {
       const { error } = await supabase
@@ -49,7 +51,12 @@ export default function FinalsForm({ entry, initialFiles, userId }: FinalsFormPr
 
       if (error) throw error
 
-      showToast('本選情報を保存しました', 'success')
+      showToast(
+        mode === 'submit' 
+          ? '本選情報を保存しました' 
+          : '本選情報を一時保存しました', 
+        'success'
+      )
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving finals info:', error)
@@ -439,17 +446,31 @@ export default function FinalsForm({ entry, initialFiles, userId }: FinalsFormPr
         >
           キャンセル
         </button>
-        <button
-          type="submit"
-          disabled={saving || uploading}
-          className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-            saving || uploading
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-indigo-600 hover:bg-indigo-700'
-          }`}
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
+        <div className="space-x-3">
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
+            disabled={saving || uploading}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${
+              saving || uploading
+                ? 'bg-gray-400 text-white cursor-not-allowed' 
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            type="submit"
+            disabled={saving || uploading}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
+              saving || uploading
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+          >
+            {saving && savingMode === 'submit' ? '保存中...' : '保存'}
+          </button>
+        </div>
       </div>
     </form>
   )

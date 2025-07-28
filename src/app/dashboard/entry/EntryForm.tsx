@@ -83,13 +83,13 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit' = 'submit') => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // バリデーション
-    if (!formData.agreement_checked) {
+    // 完了登録の場合のみバリデーション
+    if (mode === 'submit' && !formData.agreement_checked) {
       setError('参加資格への同意が必要です')
       setLoading(false)
       return
@@ -175,7 +175,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
         }
       }
 
-      router.push('/dashboard?message=基本情報を保存しました')
+      router.push(`/dashboard?message=基本情報を${mode === 'submit' ? '保存' : '一時保存'}しました`)
     } catch {
       setError('基本情報の保存に失敗しました')
     } finally {
@@ -403,7 +403,7 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           <div className="text-red-600 text-sm">{error}</div>
         )}
 
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-between">
           <button
             type="button"
             onClick={() => router.push('/dashboard')}
@@ -411,13 +411,23 @@ export default function EntryForm({ userId, existingEntry }: EntryFormProps) {
           >
             キャンセル
           </button>
-          <button
-            type="submit"
-            disabled={loading || photoUploading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            {loading ? '保存中...' : '保存'}
-          </button>
+          <div className="space-x-3">
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
+              disabled={loading || photoUploading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              {loading ? '一時保存中...' : '一時保存'}
+            </button>
+            <button
+              type="submit"
+              disabled={loading || photoUploading}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {loading ? '保存中...' : '保存'}
+            </button>
+          </div>
         </div>
       </form>
     </div>
