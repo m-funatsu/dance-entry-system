@@ -341,7 +341,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
         // チェイサー曲が「必要」の場合、音源も必須
         if (semifinalsInfo.chaser_song_designation === 'required' && !semifinalsInfo.chaser_song) {
-          throw new Error('チェイサー（退場）曲音源を入力してください')
+          throw new Error('チェイサー（退場）曲音源をアップロードしてください')
         }
       }
 
@@ -786,12 +786,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 チェイサー（退場）曲音源 <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                value={semifinalsInfo.chaser_song || ''}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例：CD「○○」収録の△△、データファイル名など"
+              <MusicFileUpload
+                disabled={false}
+                value={semifinalsInfo.chaser_song}
+                onChange={(file) => handleFileUpload('chaser_song', file)}
               />
             </div>
           )}
