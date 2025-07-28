@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import type { Entry, SNSInfo } from '@/lib/types'
+import type { Entry, SnsInfo as SNSInfo } from '@/lib/types'
 
 interface SNSFormProps {
   userId: string

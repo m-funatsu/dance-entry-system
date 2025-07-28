@@ -256,7 +256,7 @@ export interface FinalsInfo {
   copy_preliminary_music?: boolean
   work_title?: string
   work_character_story?: string
-  copyright_permission?: boolean
+  copyright_permission?: string
   music_title?: string
   cd_title?: string
   artist?: string
@@ -379,7 +379,8 @@ export interface SnsInfo {
   entry_id: string
   practice_video_path?: string
   practice_video_filename?: string
-  introduction_highlight?: string
+  introduction_highlight_path?: string
+  introduction_highlight_filename?: string
   sns_notes?: string
   created_at: string
   created_by?: string
