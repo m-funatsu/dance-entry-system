@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import SemifinalsInfoForm from '@/components/dashboard/SemifinalsInfoForm'
+import SemifinalsForm from './SemifinalsForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
 export default async function SemifinalsPage() {
@@ -76,7 +76,7 @@ export default async function SemifinalsPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <SemifinalsInfoForm entry={entry} />
+              <SemifinalsForm userId={user.id} entry={entry} />
             </div>
           </div>
         </div>

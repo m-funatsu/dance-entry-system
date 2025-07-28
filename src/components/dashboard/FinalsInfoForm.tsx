@@ -42,8 +42,12 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         .eq('entry_id', entry.id)
         .single()
 
-      if (error && error.code !== 'PGRST116') {
-        throw error
+      if (error) {
+        // PGRST116は「No rows found」エラー（正常）
+        if (error.code !== 'PGRST116') {
+          console.error('Supabase error:', error)
+          throw error
+        }
       }
 
       if (data) {
@@ -51,7 +55,8 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       }
     } catch (err) {
       console.error('決勝情報の読み込みエラー:', err)
-      setError('決勝情報の読み込みに失敗しました')
+      console.error('エラー詳細:', JSON.stringify(err))
+      setError(`決勝情報の読み込みに失敗しました: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
