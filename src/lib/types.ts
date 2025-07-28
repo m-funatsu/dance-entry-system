@@ -178,7 +178,7 @@ export interface SemifinalsInfo {
   music_change_from_preliminary?: boolean
   work_title?: string
   work_character_story?: string
-  copyright_permission?: boolean
+  copyright_permission?: string
   music_title?: string
   cd_title?: string
   artist?: string

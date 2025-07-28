@@ -20,7 +20,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry.id,
     music_change_from_preliminary: false,
-    copyright_permission: false,
+    copyright_permission: '',
     choreographer_change_from_preliminary: false
   })
 
@@ -237,15 +237,44 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           </div>
 
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={semifinalsInfo.copyright_permission || false}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: e.target.checked }))}
-                className="mr-2"
-              />
-              著作権許諾
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              楽曲著作権許諾
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="commercial"
+                  checked={semifinalsInfo.copyright_permission === 'commercial'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
+                  className="mr-2"
+                />
+                A.市販の楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="licensed"
+                  checked={semifinalsInfo.copyright_permission === 'licensed'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
+                  className="mr-2"
+                />
+                B.自身で著作権に対し許諾を取った楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="original"
+                  checked={semifinalsInfo.copyright_permission === 'original'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
+                  className="mr-2"
+                />
+                C.独自に製作されたオリジナル楽曲を使用する
+              </label>
+            </div>
           </div>
 
           <div>

@@ -24,7 +24,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
     music_change_from_preliminary: false,
-    copyright_permission: false,
+    copyright_permission: '',
     choreographer_change_from_preliminary: false
   })
 
@@ -239,15 +239,33 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           <h4 className="font-medium">楽曲情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={semifinalsInfo.music_change_from_preliminary || false}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: e.target.checked }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               予選との楽曲情報の変更
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change"
+                  value="same"
+                  checked={!semifinalsInfo.music_change_from_preliminary}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                予選と同じ楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change"
+                  value="different"
+                  checked={semifinalsInfo.music_change_from_preliminary || false}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                予選とは異なる楽曲を使用する
+              </label>
+            </div>
           </div>
 
           <div>
@@ -279,15 +297,44 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           </div>
 
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={semifinalsInfo.copyright_permission || false}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: e.target.checked }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              著作権許諾
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              楽曲著作権許諾
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="commercial"
+                  checked={semifinalsInfo.copyright_permission === 'commercial'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                A.市販の楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="licensed"
+                  checked={semifinalsInfo.copyright_permission === 'licensed'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                B.自身で著作権に対し許諾を取った楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="original"
+                  checked={semifinalsInfo.copyright_permission === 'original'}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                C.独自に製作されたオリジナル楽曲を使用する
+              </label>
+            </div>
           </div>
 
           <div>
@@ -354,12 +401,16 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               楽曲種類
             </label>
-            <input
-              type="text"
+            <select
               value={semifinalsInfo.music_type || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            >
+              <option value="">選択してください</option>
+              <option value="cd">CD楽曲</option>
+              <option value="download">データダウンロード楽曲</option>
+              <option value="original">その他（オリジナル曲）</option>
+            </select>
           </div>
 
           <div>
