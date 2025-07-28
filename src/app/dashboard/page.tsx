@@ -75,53 +75,6 @@ export default async function DashboardPage() {
     programInfo = data
   }
 
-  // 音楽使用申請情報の取得
-  let musicInfo = null
-  if (entry) {
-    const { data } = await supabase
-      .from('music_info')
-      .select('*')
-      .eq('entry_id', entry.id)
-      .single()
-    
-    musicInfo = data
-  }
-
-  // SNS情報の取得
-  let snsInfo = null
-  if (entry) {
-    const { data } = await supabase
-      .from('sns_info')
-      .select('*')
-      .eq('entry_id', entry.id)
-      .single()
-    
-    snsInfo = data
-  }
-
-  // 各種申請情報の取得
-  let applicationsInfo = null
-  if (entry) {
-    const { data } = await supabase
-      .from('applications_info')
-      .select('*')
-      .eq('entry_id', entry.id)
-      .single()
-    
-    applicationsInfo = data
-  }
-
-  // 追加情報の取得
-  let additionalInfo = null
-  if (entry) {
-    const { data } = await supabase
-      .from('entries')
-      .select('sponsor, remarks, sound_semifinal, sound_final, lighting_semifinal, lighting_final')
-      .eq('id', entry.id)
-      .single()
-    
-    additionalInfo = data
-  }
 
   // プログラム掲載用情報の完了判定関数
   const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
@@ -221,57 +174,6 @@ export default async function DashboardPage() {
     })
   }
 
-  // 音楽使用申請の完了判定関数
-  const checkMusicInfoComplete = (musicInfo: { [key: string]: unknown } | null) => {
-    if (!musicInfo) return false
-    const requiredFields = [
-      'song_name',
-      'choreographer',
-      'composition_arrangement',
-      'lyrics'
-    ]
-    return requiredFields.every(field => {
-      const value = musicInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
-
-  // SNS情報の完了判定関数
-  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null) => {
-    if (!snsInfo) return false
-    const requiredFields = [
-      'practice_video_path',
-      'introduction_highlight'
-    ]
-    return requiredFields.every(field => {
-      const value = snsInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
-
-  // 各種申請情報の完了判定関数
-  const checkApplicationsInfoComplete = (applicationsInfo: { [key: string]: unknown } | null) => {
-    if (!applicationsInfo) return false
-    // 少なくとも1つの申請がされているかチェック
-    const hasRelatedTicket = ['related1_name', 'related2_name', 'related3_name', 'related4_name', 'related5_name']
-      .some(field => applicationsInfo[field] && applicationsInfo[field].toString().trim() !== '')
-    const hasCompanion = ['companion1_name', 'companion2_name', 'companion3_name']
-      .some(field => applicationsInfo[field] && applicationsInfo[field].toString().trim() !== '')
-    const hasMakeup = applicationsInfo['makeup_name'] && applicationsInfo['makeup_name'].toString().trim() !== ''
-    
-    return hasRelatedTicket || hasCompanion || hasMakeup
-  }
-
-  // 追加情報の完了判定関数
-  const checkAdditionalInfoComplete = (additionalInfo: { [key: string]: unknown } | null) => {
-    if (!additionalInfo) return false
-    // 少なくとも1つのフィールドが入力されているかチェック
-    const fields = ['sponsor', 'remarks', 'sound_semifinal', 'sound_final', 'lighting_semifinal', 'lighting_final']
-    return fields.some(field => {
-      const value = additionalInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
 
   // システム設定から期限を取得
   const { data: settings } = await supabase
@@ -792,7 +694,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                          {checkApplicationsInfoComplete(applicationsInfo) ? '申請済み' : applicationsInfo ? '入力中' : '未申請'}
+                          申請可能
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.applications_deadline)
@@ -829,161 +731,6 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* 音楽使用申請カード */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        音楽使用申請
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {checkMusicInfoComplete(musicInfo) ? '申請済み' : musicInfo ? '入力中' : '未申請'}
-                      </dd>
-                      {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.music_application_deadline)
-                        if (!deadline) return null
-                        return (
-                          <dd className={`text-xs mt-1 ${
-                            deadline.isExpired ? 'text-red-600' :
-                            deadline.isUrgent ? 'text-orange-600' :
-                            'text-gray-600'
-                          }`}>
-                            {deadline.isExpired ? 
-                              `期限切れ（${deadline.date}）` :
-                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
-                            }
-                          </dd>
-                        )
-                      })()}
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  {isFormEditable('music_application_deadline') ? (
-                    <Link href="/dashboard/music-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {musicInfo ? '編集' : '申請'} →
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* SNS掲載情報カード */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        SNS掲載情報
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {checkSnsInfoComplete(snsInfo) ? '登録済み' : snsInfo ? '入力中' : '未登録'}
-                      </dd>
-                      {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.sns_info_deadline)
-                        if (!deadline) return null
-                        return (
-                          <dd className={`text-xs mt-1 ${
-                            deadline.isExpired ? 'text-red-600' :
-                            deadline.isUrgent ? 'text-orange-600' :
-                            'text-gray-600'
-                          }`}>
-                            {deadline.isExpired ? 
-                              `期限切れ（${deadline.date}）` :
-                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
-                            }
-                          </dd>
-                        )
-                      })()}
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  {isFormEditable('sns_info_deadline') ? (
-                    <Link href="/dashboard/sns" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {snsInfo ? '編集' : '登録'} →
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* 追加情報カード */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        追加情報
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {checkAdditionalInfoComplete(additionalInfo) ? '登録済み' : additionalInfo ? '入力中' : '未登録'}
-                      </dd>
-                      {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.additional_info_deadline)
-                        if (!deadline) return null
-                        return (
-                          <dd className={`text-xs mt-1 ${
-                            deadline.isExpired ? 'text-red-600' :
-                            deadline.isUrgent ? 'text-orange-600' :
-                            'text-gray-600'
-                          }`}>
-                            {deadline.isExpired ? 
-                              `期限切れ（${deadline.date}）` :
-                              `期限: ${deadline.date}まで（残り${deadline.daysLeft}日）`
-                            }
-                          </dd>
-                        )
-                      })()}
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-5 py-3">
-                <div className="text-sm">
-                  {isFormEditable('additional_info_deadline') ? (
-                    <Link href="/dashboard/additional-info" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {additionalInfo ? '編集' : '登録'} →
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* エントリー情報詳細表示 */}
