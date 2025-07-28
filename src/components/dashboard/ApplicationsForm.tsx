@@ -84,7 +84,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     }))
   }
 
-  const handleSave = async () => {
+  const handleSave = async (isTemporary = false) => {
     setError(null)
     setSuccess(null)
     setSaving(true)
@@ -123,7 +123,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         if (error) throw error
       }
 
-      setSuccess('各種申請情報を保存しました')
+      setSuccess(isTemporary ? '各種申請情報を一時保存しました' : '各種申請情報を保存しました')
       router.refresh()
     } catch (err) {
       console.error('保存エラー:', err)
@@ -554,9 +554,16 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         </div>
       )}
 
-      <div className="flex justify-end pt-6">
+      <div className="flex justify-end pt-6 space-x-4">
         <button
-          onClick={handleSave}
+          onClick={() => handleSave(true)}
+          disabled={saving}
+          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+        >
+          {saving ? '一時保存中...' : '一時保存'}
+        </button>
+        <button
+          onClick={() => handleSave(false)}
           disabled={saving}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >

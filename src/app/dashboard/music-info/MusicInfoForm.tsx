@@ -74,7 +74,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, isTemporary = false) => {
     e.preventDefault()
     setSaving(true)
 
@@ -89,8 +89,10 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
 
       if (error) throw error
 
-      showToast('楽曲情報を保存しました', 'success')
-      router.push('/dashboard')
+      showToast(isTemporary ? '楽曲情報を一時保存しました' : '楽曲情報を保存しました', 'success')
+      if (!isTemporary) {
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Error saving music info:', error)
       showToast('保存に失敗しました', 'error')
@@ -336,17 +338,28 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
         >
           キャンセル
         </button>
-        <button
-          type="submit"
-          disabled={saving}
-          className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-            saving 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-indigo-600 hover:bg-indigo-700'
-          }`}
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
+        <div className="space-x-3">
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, true)}
+            disabled={saving}
+            className="px-4 py-2 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+          >
+            {saving ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            type="submit"
+            onClick={(e) => handleSubmit(e, false)}
+            disabled={saving}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
+              saving 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+          >
+            {saving ? '保存中...' : '保存'}
+          </button>
+        </div>
       </div>
     </form>
   )
