@@ -288,15 +288,44 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           </div>
 
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.copyright_permission || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, copyright_permission: e.target.checked }))}
-                className="mr-2"
-              />
-              楽曲著作権許諾
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              楽曲著作権許諾 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="commercial"
+                  checked={finalsInfo.copyright_permission === 'commercial'}
+                  onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                A.市販の楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="licensed"
+                  checked={finalsInfo.copyright_permission === 'licensed'}
+                  onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                B.自身で著作権に対し許諾を取った楽曲を使用する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="copyright_permission"
+                  value="original"
+                  checked={finalsInfo.copyright_permission === 'original'}
+                  onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                C.独自に製作されたオリジナル楽曲を使用する
+              </label>
+            </div>
           </div>
 
           <div>
