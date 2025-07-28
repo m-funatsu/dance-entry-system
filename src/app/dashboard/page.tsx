@@ -64,20 +64,66 @@ export default async function DashboardPage() {
   }
 
   // ファイル情報の取得
-  const fileStats = { music: 0, video: 0, photo: 0 }
+  const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0 }
   if (entry) {
     const { data: files } = await supabase
       .from('entry_files')
-      .select('file_type')
+      .select('file_type, purpose')
       .eq('entry_id', entry.id)
 
     if (files) {
       files.forEach(file => {
         if (file.file_type === 'music') fileStats.music++
-        else if (file.file_type === 'video') fileStats.video++
+        else if (file.file_type === 'video') {
+          fileStats.video++
+          if (file.purpose === 'preliminary') fileStats.preliminaryVideo++
+        }
         else if (file.file_type === 'photo') fileStats.photo++
       })
     }
+  }
+
+  // 必須項目のチェック関数
+  const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
+    if (!basicInfo) return false
+    const requiredFields = [
+      'dance_style',
+      'representative_name',
+      'representative_furigana',
+      'representative_email',
+      'partner_name',
+      'partner_furigana',
+      'phone_number',
+      'choreographer',
+      'choreographer_furigana',
+      'agreement_checked',
+      'privacy_policy_checked'
+    ]
+    return requiredFields.every(field => {
+      const value = basicInfo[field]
+      if (typeof value === 'boolean') return value === true
+      return value && value.toString().trim() !== ''
+    })
+  }
+
+  const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
+    if (!preliminaryInfo) return false
+    if (!hasVideo) return false
+    const requiredFields = [
+      'work_title',
+      'work_story',
+      'music_rights_cleared',
+      'music_title',
+      'cd_title',
+      'artist',
+      'record_number',
+      'jasrac_code',
+      'music_type'
+    ]
+    return requiredFields.every(field => {
+      const value = preliminaryInfo[field]
+      return value && value.toString().trim() !== ''
+    })
   }
 
   // 各種申請情報の取得
@@ -246,7 +292,7 @@ export default async function DashboardPage() {
                         基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {basicInfo ? '登録済み' : '未登録'}
+                        {checkBasicInfoComplete(basicInfo) ? '登録済み' : basicInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.basic_info_deadline)
@@ -298,7 +344,7 @@ export default async function DashboardPage() {
                         予選情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {preliminaryInfo ? '登録済み' : '未登録'}
+                        {checkPreliminaryInfoComplete(preliminaryInfo, fileStats.preliminaryVideo > 0) ? '登録済み' : preliminaryInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
