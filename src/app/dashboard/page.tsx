@@ -63,6 +63,53 @@ export default async function DashboardPage() {
     preliminaryInfo = data
   }
 
+  // プログラム掲載用情報の取得
+  let programInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('program_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    programInfo = data
+  }
+
+  // プログラム掲載用情報の完了判定関数
+  const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
+    if (!programInfo) return false
+    
+    // 必須フィールドのチェック
+    const requiredFields = [
+      'player_photo_type',
+      'player_photo_path',
+      'semifinal_story',
+      'semifinal_highlight',
+      'semifinal_image1_path',
+      'semifinal_image2_path',
+      'semifinal_image3_path',
+      'semifinal_image4_path'
+    ]
+    
+    // 2曲の場合の追加必須フィールド
+    if (programInfo['song_count'] === '2曲') {
+      requiredFields.push(
+        'final_player_photo_path',
+        'final_story',
+        'final_highlight',
+        'final_image1_path',
+        'final_image2_path',
+        'final_image3_path',
+        'final_image4_path'
+      )
+    }
+    
+    return requiredFields.every(field => {
+      const value = programInfo[field]
+      return value && value.toString().trim() !== ''
+    })
+  }
+
   // ファイル情報の取得
   const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0 }
   if (entry) {
@@ -448,7 +495,7 @@ export default async function DashboardPage() {
                         プログラム掲載用情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && entry.program_info_submitted ? '登録済み' : '未登録'}
+                        {checkProgramInfoComplete(programInfo) ? '登録済み' : programInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.program_info_deadline)
