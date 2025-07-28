@@ -322,9 +322,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           throw new Error(`以下の楽曲情報は必須項目です：${fieldNames}`)
         }
 
-        // 音響指示情報の必須項目チェック（チェイサー曲以外）
+        // 音響指示情報の必須項目チェック
         const requiredSoundFields = [
           { field: 'sound_start_timing', name: '音楽スタートのタイミング' },
+          { field: 'chaser_song_designation', name: 'チェイサー（退場）曲の指定' },
           { field: 'fade_out_start_time', name: 'フェードアウト開始時間' },
           { field: 'fade_out_complete_time', name: 'フェードアウト完了時間' }
         ]
@@ -741,7 +742,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              チェイサー（退場）曲の指定
+              チェイサー（退場）曲の指定 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -750,7 +751,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   name="chaser_designation"
                   value="included"
                   checked={semifinalsInfo.chaser_song_designation === 'included'}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'included' }))}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'included', chaser_song: '' }))}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 自作曲に組み込み
@@ -772,7 +773,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   name="chaser_designation"
                   value="not_required"
                   checked={semifinalsInfo.chaser_song_designation === 'not_required'}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'not_required' }))}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: 'not_required', chaser_song: '' }))}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 不要（無音）
