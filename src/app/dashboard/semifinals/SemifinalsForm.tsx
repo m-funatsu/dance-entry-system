@@ -641,7 +641,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               楽曲データ
             </label>
             <MusicFileUpload
-              disabled={!semifinalsInfo.music_change_from_preliminary}
+              disabled={false}
               value={semifinalsInfo.music_data_path}
               onChange={(file) => handleFileUpload('music_data_path', file)}
             />
@@ -651,25 +651,13 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               音源使用方法
             </label>
-            <div className="relative">
-              <textarea
-                value={semifinalsInfo.music_usage_method || ''}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
-                disabled={!semifinalsInfo.music_change_from_preliminary}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                  !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
-                }`}
-                rows={3}
-                placeholder="例：イントロから3分45秒まで使用、フェードアウト希望"
-              />
-              {!semifinalsInfo.music_change_from_preliminary && (
-                <div className="absolute top-2 right-2">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-              )}
-            </div>
+            <textarea
+              value={semifinalsInfo.music_usage_method || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              rows={3}
+              placeholder="例：イントロから3分45秒まで使用、フェードアウト希望"
+            />
             <p className="mt-1 text-xs text-gray-500">
               使用する部分、編集の要望などを具体的に記入してください
             </p>
