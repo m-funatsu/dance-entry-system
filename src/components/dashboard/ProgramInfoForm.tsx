@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, ProgramInfo } from '@/lib/types'
+import ImageUpload from '@/components/ui/ImageUpload'
 
 interface ProgramInfoFormProps {
   entry: Entry
@@ -247,23 +248,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
           {/* 選手紹介用画像 */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              選手紹介用画像 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) handleImageUpload('player_photo_path', file)
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            <ImageUpload
+              label="選手紹介用画像"
+              required
+              value={programInfo.player_photo_path}
+              onChange={(file) => handleImageUpload('player_photo_path', file)}
             />
-            {programInfo.player_photo_path && (
-              <div className="mt-2">
-                <img src={programInfo.player_photo_path} alt="選手紹介用画像" className="h-32 object-contain" />
-              </div>
-            )}
           </div>
 
           {/* あらすじ・ストーリー */}
@@ -301,31 +291,18 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           </div>
 
           {/* 作品イメージ */}
-          {[1, 2, 3, 4].map((num) => (
-            <div key={`semifinal_image${num}`} className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleImageUpload(`semifinal_image${num}_path`, file)
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-              {programInfo[`semifinal_image${num}_path` as keyof ProgramInfo] && (
-                <div className="mt-2">
-                  <img 
-                    src={programInfo[`semifinal_image${num}_path` as keyof ProgramInfo] as string} 
-                    alt={`作品イメージ${num}`} 
-                    className="h-32 object-contain" 
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((num) => (
+              <div key={`semifinal_image${num}`}>
+                <ImageUpload
+                  label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                  required
+                  value={programInfo[`semifinal_image${num}_path` as keyof ProgramInfo] as string}
+                  onChange={(file) => handleImageUpload(`semifinal_image${num}_path`, file)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 決勝用情報（2曲の場合のみ表示） */}
@@ -348,23 +325,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
             {/* 選手紹介用画像 */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                選手紹介用画像 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleImageUpload('final_player_photo_path', file)
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              <ImageUpload
+                label="選手紹介用画像"
+                required
+                value={programInfo.final_player_photo_path}
+                onChange={(file) => handleImageUpload('final_player_photo_path', file)}
               />
-              {programInfo.final_player_photo_path && (
-                <div className="mt-2">
-                  <img src={programInfo.final_player_photo_path} alt="選手紹介用画像" className="h-32 object-contain" />
-                </div>
-              )}
             </div>
 
             {/* あらすじ・ストーリー */}
@@ -402,31 +368,18 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             </div>
 
             {/* 作品イメージ */}
-            {[1, 2, 3, 4].map((num) => (
-              <div key={`final_image${num}`} className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) handleImageUpload(`final_image${num}_path`, file)
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-                {programInfo[`final_image${num}_path` as keyof ProgramInfo] && (
-                  <div className="mt-2">
-                    <img 
-                      src={programInfo[`final_image${num}_path` as keyof ProgramInfo] as string} 
-                      alt={`作品イメージ${num}`} 
-                      className="h-32 object-contain" 
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((num) => (
+                <div key={`final_image${num}`}>
+                  <ImageUpload
+                    label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                    required
+                    value={programInfo[`final_image${num}_path` as keyof ProgramInfo] as string}
+                    onChange={(file) => handleImageUpload(`final_image${num}_path`, file)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
