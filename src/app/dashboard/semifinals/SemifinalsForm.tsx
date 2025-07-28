@@ -321,6 +321,22 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           const fieldNames = missingFields.map(({ name }) => name).join('、')
           throw new Error(`以下の楽曲情報は必須項目です：${fieldNames}`)
         }
+
+        // 音響指示情報の必須項目チェック（チェイサー曲以外）
+        const requiredSoundFields = [
+          { field: 'sound_start_timing', name: '音楽スタートのタイミング' },
+          { field: 'fade_out_start_time', name: 'フェードアウト開始時間' },
+          { field: 'fade_out_complete_time', name: 'フェードアウト完了時間' }
+        ]
+
+        const missingSoundFields = requiredSoundFields.filter(
+          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
+        )
+
+        if (missingSoundFields.length > 0) {
+          const fieldNames = missingSoundFields.map(({ name }) => name).join('、')
+          throw new Error(`以下の音響指示情報は必須項目です：${fieldNames}`)
+        }
       }
 
       // 50文字制限のチェック
@@ -699,11 +715,16 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       {/* 音響指示情報セクション */}
       {activeSection === 'sound' && (
         <div className="space-y-4">
-          <h4 className="font-medium">音響指示情報</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium">音響指示情報</h4>
+            <p className="text-sm text-gray-500">
+              <span className="text-red-500">*</span> は必須項目です
+            </p>
+          </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              音楽スタートのタイミング（きっかけ、ポーズなど）
+              音楽スタートのタイミング（きっかけ、ポーズなど） <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -739,7 +760,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              フェードアウト開始時間
+              フェードアウト開始時間 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -752,7 +773,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              フェードアウト完了時間
+              フェードアウト完了時間 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
