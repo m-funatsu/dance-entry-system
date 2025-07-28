@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS semifinals_info (
   music_change_from_preliminary BOOLEAN DEFAULT false,
   work_title TEXT,
   work_character_story TEXT,
-  copyright_permission BOOLEAN DEFAULT false,
+  copyright_permission TEXT,
   music_title TEXT,
   cd_title TEXT,
   artist TEXT,

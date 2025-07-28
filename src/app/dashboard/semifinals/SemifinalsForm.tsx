@@ -387,8 +387,23 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving semifinals info:', error)
-      const errorMessage = error instanceof Error ? error.message : '準決勝情報の保存に失敗しました'
-      showToast(errorMessage, 'error')
+      
+      // エラーの詳細を確認
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = error.message || '準決勝情報の保存に失敗しました'
+        
+        // Supabaseのエラーレスポンスを詳しく表示
+        if ('details' in error) {
+          console.error('Error details:', error.details)
+        }
+        if ('hint' in error) {
+          console.error('Error hint:', error.hint)
+        }
+        
+        showToast(errorMessage, 'error')
+      } else {
+        showToast('準決勝情報の保存に失敗しました', 'error')
+      }
     } finally {
       setSaving(false)
     }
