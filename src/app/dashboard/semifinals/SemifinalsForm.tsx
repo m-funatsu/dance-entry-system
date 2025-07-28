@@ -17,99 +17,16 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const { showToast } = useToast()
   
   const [basicInfo, setBasicInfo] = useState<BasicInfo | null>(null)
-  const [semiInfo, setSemiInfo] = useState<SemifinalsInfo | null>(null)
   const [loading, setLoading] = useState(true)
-  
-  const [formData, setFormData] = useState({
-    // 楽曲情報
-    music_change_from_preliminary: false,
-    work_title: '',
-    work_character_story: '',
-    copyright_permission: false,
-    music_title: '',
-    cd_title: '',
-    artist: '',
-    record_number: '',
-    jasrac_code: '',
-    music_type: '',
-    music_data_path: '',
-    music_usage_method: '',
-    
-    // 音響指示情報
-    sound_start_timing: '',
-    chaser_song_designation: '',
-    chaser_song: '',
-    fade_out_start_time: '',
-    fade_out_complete_time: '',
-    
-    // 照明指示情報
-    dance_start_timing: '',
-    
-    // シーン1-5
-    scene1_time: '',
-    scene1_trigger: '',
-    scene1_color_type: '',
-    scene1_color_other: '',
-    scene1_image: '',
-    scene1_image_path: '',
-    scene1_notes: '',
-    
-    scene2_time: '',
-    scene2_trigger: '',
-    scene2_color_type: '',
-    scene2_color_other: '',
-    scene2_image: '',
-    scene2_image_path: '',
-    scene2_notes: '',
-    
-    scene3_time: '',
-    scene3_trigger: '',
-    scene3_color_type: '',
-    scene3_color_other: '',
-    scene3_image: '',
-    scene3_image_path: '',
-    scene3_notes: '',
-    
-    scene4_time: '',
-    scene4_trigger: '',
-    scene4_color_type: '',
-    scene4_color_other: '',
-    scene4_image: '',
-    scene4_image_path: '',
-    scene4_notes: '',
-    
-    scene5_time: '',
-    scene5_trigger: '',
-    scene5_color_type: '',
-    scene5_color_other: '',
-    scene5_image: '',
-    scene5_image_path: '',
-    scene5_notes: '',
-    
-    // チェイサー/退場
-    chaser_exit_time: '',
-    chaser_exit_trigger: '',
-    chaser_exit_color_type: '',
-    chaser_exit_color_other: '',
-    chaser_exit_image: '',
-    chaser_exit_image_path: '',
-    chaser_exit_notes: '',
-    
-    // 振付情報
-    choreographer_change_from_preliminary: false,
-    choreographer_name: '',
-    choreographer_name_kana: '',
-    
-    // 賞金振込先情報
-    bank_name: '',
-    branch_name: '',
-    account_type: '',
-    account_number: '',
-    account_holder: ''
-  })
-  
   const [saving, setSaving] = useState(false)
-  const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
+  const [activeSection, setActiveSection] = useState('music')
+  
+  const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
+    entry_id: entry?.id || '',
+    music_change_from_preliminary: false,
+    copyright_permission: false,
+    choreographer_change_from_preliminary: false
+  })
 
   // データを読み込む
   useEffect(() => {
@@ -136,81 +53,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           .single()
         
         if (semiData) {
-          setSemiInfo(semiData)
-          // 既存データでフォームを更新
-          setFormData({
-            music_change_from_preliminary: semiData.music_change_from_preliminary || false,
-            work_title: semiData.work_title || '',
-            work_character_story: semiData.work_character_story || '',
-            copyright_permission: semiData.copyright_permission || false,
-            music_title: semiData.music_title || '',
-            cd_title: semiData.cd_title || '',
-            artist: semiData.artist || '',
-            record_number: semiData.record_number || '',
-            jasrac_code: semiData.jasrac_code || '',
-            music_type: semiData.music_type || '',
-            music_data_path: semiData.music_data_path || '',
-            music_usage_method: semiData.music_usage_method || '',
-            sound_start_timing: semiData.sound_start_timing || '',
-            chaser_song_designation: semiData.chaser_song_designation || '',
-            chaser_song: semiData.chaser_song || '',
-            fade_out_start_time: semiData.fade_out_start_time || '',
-            fade_out_complete_time: semiData.fade_out_complete_time || '',
-            dance_start_timing: semiData.dance_start_timing || '',
-            scene1_time: semiData.scene1_time || '',
-            scene1_trigger: semiData.scene1_trigger || '',
-            scene1_color_type: semiData.scene1_color_type || '',
-            scene1_color_other: semiData.scene1_color_other || '',
-            scene1_image: semiData.scene1_image || '',
-            scene1_image_path: semiData.scene1_image_path || '',
-            scene1_notes: semiData.scene1_notes || '',
-            scene2_time: semiData.scene2_time || '',
-            scene2_trigger: semiData.scene2_trigger || '',
-            scene2_color_type: semiData.scene2_color_type || '',
-            scene2_color_other: semiData.scene2_color_other || '',
-            scene2_image: semiData.scene2_image || '',
-            scene2_image_path: semiData.scene2_image_path || '',
-            scene2_notes: semiData.scene2_notes || '',
-            scene3_time: semiData.scene3_time || '',
-            scene3_trigger: semiData.scene3_trigger || '',
-            scene3_color_type: semiData.scene3_color_type || '',
-            scene3_color_other: semiData.scene3_color_other || '',
-            scene3_image: semiData.scene3_image || '',
-            scene3_image_path: semiData.scene3_image_path || '',
-            scene3_notes: semiData.scene3_notes || '',
-            scene4_time: semiData.scene4_time || '',
-            scene4_trigger: semiData.scene4_trigger || '',
-            scene4_color_type: semiData.scene4_color_type || '',
-            scene4_color_other: semiData.scene4_color_other || '',
-            scene4_image: semiData.scene4_image || '',
-            scene4_image_path: semiData.scene4_image_path || '',
-            scene4_notes: semiData.scene4_notes || '',
-            scene5_time: semiData.scene5_time || '',
-            scene5_trigger: semiData.scene5_trigger || '',
-            scene5_color_type: semiData.scene5_color_type || '',
-            scene5_color_other: semiData.scene5_color_other || '',
-            scene5_image: semiData.scene5_image || '',
-            scene5_image_path: semiData.scene5_image_path || '',
-            scene5_notes: semiData.scene5_notes || '',
-            chaser_exit_time: semiData.chaser_exit_time || '',
-            chaser_exit_trigger: semiData.chaser_exit_trigger || '',
-            chaser_exit_color_type: semiData.chaser_exit_color_type || '',
-            chaser_exit_color_other: semiData.chaser_exit_color_other || '',
-            chaser_exit_image: semiData.chaser_exit_image || '',
-            chaser_exit_image_path: semiData.chaser_exit_image_path || '',
-            chaser_exit_notes: semiData.chaser_exit_notes || '',
-            choreographer_change_from_preliminary: semiData.choreographer_change_from_preliminary || false,
-            choreographer_name: semiData.choreographer_name || '',
-            choreographer_name_kana: semiData.choreographer_name_kana || '',
-            bank_name: semiData.bank_name || '',
-            branch_name: semiData.branch_name || '',
-            account_type: semiData.account_type || '',
-            account_number: semiData.account_number || '',
-            account_holder: semiData.account_holder || ''
-          })
+          setSemifinalsInfo(semiData)
         } else if (basicData) {
           // 新規作成時は基本情報から振付師情報をデフォルト設定
-          setFormData(prev => ({
+          setSemifinalsInfo(prev => ({
             ...prev,
             choreographer_name: basicData.choreographer || '',
             choreographer_name_kana: basicData.choreographer_furigana || ''
@@ -231,7 +77,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const handleChoreographerChange = (checked: boolean) => {
     if (checked) {
       // チェックが入った場合：クリア
-      setFormData(prev => ({
+      setSemifinalsInfo(prev => ({
         ...prev,
         choreographer_change_from_preliminary: true,
         choreographer_name: '',
@@ -239,7 +85,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       }))
     } else {
       // チェックが外れた場合：基本情報から復元
-      setFormData(prev => ({
+      setSemifinalsInfo(prev => ({
         ...prev,
         choreographer_change_from_preliminary: false,
         choreographer_name: basicInfo?.choreographer || '',
@@ -248,10 +94,8 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit' = 'submit') => {
-    e.preventDefault()
+  const handleSave = async (isTemporary = false) => {
     setSaving(true)
-    setSavingMode(mode)
 
     try {
       if (!entry?.id) {
@@ -260,32 +104,43 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         return
       }
 
-      const dataToSave = {
-        entry_id: entry.id,
-        ...formData
+      // 50文字制限のチェック
+      if (semifinalsInfo.work_character_story && semifinalsInfo.work_character_story.length > 50) {
+        throw new Error('作品キャラクター・ストーリー等は50文字以内で入力してください')
       }
 
-      if (semiInfo) {
+      const { data: existingData } = await supabase
+        .from('semifinals_info')
+        .select('id')
+        .eq('entry_id', entry.id)
+        .single()
+
+      if (existingData) {
         // 更新
         const { error } = await supabase
           .from('semifinals_info')
-          .update(dataToSave)
-          .eq('id', semiInfo.id)
+          .update({
+            ...semifinalsInfo,
+            entry_id: entry.id,
+            updated_at: new Date().toISOString()
+          })
+          .eq('entry_id', entry.id)
 
         if (error) throw error
       } else {
         // 新規作成
         const { error } = await supabase
           .from('semifinals_info')
-          .insert([dataToSave])
+          .insert({
+            ...semifinalsInfo,
+            entry_id: entry.id
+          })
 
         if (error) throw error
       }
 
       showToast(
-        mode === 'submit' 
-          ? '準決勝情報を保存しました' 
-          : '準決勝情報を一時保存しました', 
+        isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました', 
         'success'
       )
       router.push('/dashboard')
@@ -298,6 +153,31 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     }
   }
 
+  const handleFileUpload = async (field: string, file: File) => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${entry?.id}/semifinals/${field}_${Date.now()}.${fileExt}`
+      
+      const { error: uploadError } = await supabase.storage
+        .from('files')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('files')
+        .getPublicUrl(fileName)
+
+      setSemifinalsInfo(prev => ({
+        ...prev,
+        [field]: publicUrl
+      }))
+    } catch (err) {
+      console.error('ファイルアップロードエラー:', err)
+      showToast('ファイルのアップロードに失敗しました', 'error')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -306,514 +186,628 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     )
   }
 
+  const sections = [
+    { id: 'music', label: '楽曲情報' },
+    { id: 'sound', label: '音響指示情報' },
+    { id: 'lighting', label: '照明指示情報' },
+    { id: 'choreographer', label: '振付情報' },
+    { id: 'bank', label: '賞金振込先情報' }
+  ]
+
+  const colorTypes = [
+    '赤系',
+    '青系',
+    '緑系',
+    '黄系',
+    '紫系',
+    '白系',
+    '暖色系',
+    '寒色系',
+    'その他'
+  ]
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <p className="text-sm text-blue-800">
           準決勝に進出された場合の詳細情報をご記入ください。
         </p>
       </div>
 
-      {/* 楽曲情報セクション */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          楽曲情報
-        </h3>
-        
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={formData.music_change_from_preliminary}
-              onChange={(e) => setFormData({ ...formData, music_change_from_preliminary: e.target.checked })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <span className="text-sm font-medium text-gray-700">
-              予選から楽曲を変更する
-            </span>
-          </label>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="work_title" className="block text-sm font-medium text-gray-700">
-              作品名
-            </label>
-            <input
-              type="text"
-              id="work_title"
-              value={formData.work_title}
-              onChange={(e) => setFormData({ ...formData, work_title: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="music_title" className="block text-sm font-medium text-gray-700">
-              楽曲名
-            </label>
-            <input
-              type="text"
-              id="music_title"
-              value={formData.music_title}
-              onChange={(e) => setFormData({ ...formData, music_title: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="artist" className="block text-sm font-medium text-gray-700">
-              アーティスト名
-            </label>
-            <input
-              type="text"
-              id="artist"
-              value={formData.artist}
-              onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="cd_title" className="block text-sm font-medium text-gray-700">
-              CD名・レーベル名
-            </label>
-            <input
-              type="text"
-              id="cd_title"
-              value={formData.cd_title}
-              onChange={(e) => setFormData({ ...formData, cd_title: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="work_character_story" className="block text-sm font-medium text-gray-700">
-            作品・人物・ストーリー
-          </label>
-          <textarea
-            id="work_character_story"
-            value={formData.work_character_story}
-            onChange={(e) => setFormData({ ...formData, work_character_story: e.target.value })}
-            rows={4}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="作品の背景やストーリー、表現したい内容について"
-          />
-        </div>
-        
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={formData.copyright_permission}
-              onChange={(e) => setFormData({ ...formData, copyright_permission: e.target.checked })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <span className="text-sm font-medium text-gray-700">
-              著作権使用許可を取得済み
-            </span>
-          </label>
-        </div>
+      {/* セクションタブ */}
+      <div className="border-b">
+        <nav className="-mb-px flex space-x-8">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeSection === section.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
+      {/* 楽曲情報セクション */}
+      {activeSection === 'music' && (
+        <div className="space-y-4">
+          <h4 className="font-medium">楽曲情報</h4>
+          
+          <div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={semifinalsInfo.music_change_from_preliminary || false}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: e.target.checked }))}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              予選との楽曲情報の変更
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              作品タイトルまたはテーマ
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.work_title || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              作品キャラクター・ストーリー等（50字以内）
+            </label>
+            <textarea
+              value={semifinalsInfo.work_character_story || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_character_story: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              rows={2}
+              maxLength={50}
+            />
+            <div className="text-sm text-gray-500 mt-1">
+              {semifinalsInfo.work_character_story?.length || 0}/50文字
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={semifinalsInfo.copyright_permission || false}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, copyright_permission: e.target.checked }))}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              著作権許諾
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              使用楽曲タイトル
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.music_title || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              収録CDタイトル
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.cd_title || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              アーティスト
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.artist || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              レコード番号
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.record_number || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              JASRAC作品コード
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.jasrac_code || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              楽曲種類
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.music_type || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              楽曲データ
+            </label>
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleFileUpload('music_data_path', file)
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {semifinalsInfo.music_data_path && (
+              <div className="mt-2 text-sm text-gray-600">
+                アップロード済み
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              音源使用方法
+            </label>
+            <textarea
+              value={semifinalsInfo.music_usage_method || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              rows={3}
+            />
+          </div>
+        </div>
+      )}
+
       {/* 音響指示情報セクション */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          音響指示情報
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {activeSection === 'sound' && (
+        <div className="space-y-4">
+          <h4 className="font-medium">音響指示情報</h4>
+          
           <div>
-            <label htmlFor="sound_start_timing" className="block text-sm font-medium text-gray-700">
-              音響開始タイミング
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              音楽スタートのタイミング（きっかけ、ポーズなど）
             </label>
             <input
               type="text"
-              id="sound_start_timing"
-              value={formData.sound_start_timing}
-              onChange={(e) => setFormData({ ...formData, sound_start_timing: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="例：客席の照明が落ちた後"
+              value={semifinalsInfo.sound_start_timing || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, sound_start_timing: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="chaser_song_designation" className="block text-sm font-medium text-gray-700">
-              チェイサー楽曲指定
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              チェイサー（退場）曲の指定
             </label>
             <input
               type="text"
-              id="chaser_song_designation"
-              value={formData.chaser_song_designation}
-              onChange={(e) => setFormData({ ...formData, chaser_song_designation: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.chaser_song_designation || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="fade_out_start_time" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              チェイサー（退場）曲
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.chaser_song || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               フェードアウト開始時間
             </label>
             <input
               type="text"
-              id="fade_out_start_time"
-              value={formData.fade_out_start_time}
-              onChange={(e) => setFormData({ ...formData, fade_out_start_time: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="例：3分30秒から"
+              value={semifinalsInfo.fade_out_start_time || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, fade_out_start_time: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="例：3:45"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="fade_out_complete_time" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               フェードアウト完了時間
             </label>
             <input
               type="text"
-              id="fade_out_complete_time"
-              value={formData.fade_out_complete_time}
-              onChange={(e) => setFormData({ ...formData, fade_out_complete_time: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="例：4分00秒で完全に消音"
+              value={semifinalsInfo.fade_out_complete_time || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, fade_out_complete_time: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="例：4:00"
             />
           </div>
         </div>
-      </div>
+      )}
 
       {/* 照明指示情報セクション */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          照明指示情報
-        </h3>
-        
-        <div>
-          <label htmlFor="dance_start_timing" className="block text-sm font-medium text-gray-700">
-            ダンス開始タイミング
-          </label>
-          <input
-            type="text"
-            id="dance_start_timing"
-            value={formData.dance_start_timing}
-            onChange={(e) => setFormData({ ...formData, dance_start_timing: e.target.value })}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="例：イントロ終了後、ボーカル開始と同時に"
-          />
-        </div>
+      {activeSection === 'lighting' && (
+        <div className="space-y-6">
+          <h4 className="font-medium">照明指示情報</h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              準決勝 - 踊り出しタイミング
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.dance_start_timing || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, dance_start_timing: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
 
-        {/* シーン1-5 */}
-        {[1, 2, 3, 4, 5].map((sceneNum) => (
-          <div key={sceneNum} className="bg-gray-50 p-4 rounded-md">
-            <h4 className="text-md font-medium text-gray-800 mb-4">シーン{sceneNum}</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* シーン1-5とチェイサー/退場 */}
+          {[1, 2, 3, 4, 5].map((sceneNum) => (
+            <div key={`scene${sceneNum}`} className="border-t pt-4">
+              <h5 className="font-medium mb-3">シーン{sceneNum}</h5>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    時間
+                  </label>
+                  <input
+                    type="text"
+                    value={semifinalsInfo[`scene${sceneNum}_time` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_time`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="例：0:30"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    きっかけ
+                  </label>
+                  <input
+                    type="text"
+                    value={semifinalsInfo[`scene${sceneNum}_trigger` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_trigger`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    色・系統
+                  </label>
+                  <select
+                    value={semifinalsInfo[`scene${sceneNum}_color_type` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_type`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="">選択してください</option>
+                    {colorTypes.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    色・系統その他
+                  </label>
+                  <input
+                    type="text"
+                    value={semifinalsInfo[`scene${sceneNum}_color_other` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_other`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    イメージ
+                  </label>
+                  <input
+                    type="text"
+                    value={semifinalsInfo[`scene${sceneNum}_image` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_image`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    イメージ画像
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleFileUpload(`scene${sceneNum}_image_path`, file)
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    備考
+                  </label>
+                  <textarea
+                    value={semifinalsInfo[`scene${sceneNum}_notes` as keyof SemifinalsInfo] as string || ''}
+                    onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_notes`]: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* チェイサー/退場 */}
+          <div className="border-t pt-4">
+            <h5 className="font-medium mb-3">チェイサー/退場</h5>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor={`scene${sceneNum}_time`} className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   時間
                 </label>
                 <input
                   type="text"
-                  id={`scene${sceneNum}_time`}
-                  value={formData[`scene${sceneNum}_time` as keyof typeof formData] as string || ''}
-                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_time`]: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="例：1:30-2:00"
+                  value={semifinalsInfo.chaser_exit_time || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_time: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor={`scene${sceneNum}_trigger`} className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   きっかけ
                 </label>
                 <input
                   type="text"
-                  id={`scene${sceneNum}_trigger`}
-                  value={formData[`scene${sceneNum}_trigger` as keyof typeof formData] as string || ''}
-                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_trigger`]: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="例：ボーカル開始"
+                  value={semifinalsInfo.chaser_exit_trigger || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_trigger: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor={`scene${sceneNum}_color_type`} className="block text-sm font-medium text-gray-700">
-                  照明色
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  色・系統
                 </label>
                 <select
-                  id={`scene${sceneNum}_color_type`}
-                  value={formData[`scene${sceneNum}_color_type` as keyof typeof formData] as string || ''}
-                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_color_type`]: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  value={semifinalsInfo.chaser_exit_color_type || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_color_type: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="">選択してください</option>
-                  <option value="red">赤</option>
-                  <option value="blue">青</option>
-                  <option value="green">緑</option>
-                  <option value="yellow">黄</option>
-                  <option value="purple">紫</option>
-                  <option value="orange">オレンジ</option>
-                  <option value="white">白</option>
-                  <option value="other">その他</option>
+                  {colorTypes.map(color => (
+                    <option key={color} value={color}>{color}</option>
+                  ))}
                 </select>
               </div>
-            </div>
-            
-            {(formData[`scene${sceneNum}_color_type` as keyof typeof formData] as string) === 'other' && (
-              <div className="mt-4">
-                <label htmlFor={`scene${sceneNum}_color_other`} className="block text-sm font-medium text-gray-700">
-                  その他の照明色
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  色・系統その他
                 </label>
                 <input
                   type="text"
-                  id={`scene${sceneNum}_color_other`}
-                  value={formData[`scene${sceneNum}_color_other` as keyof typeof formData] as string || ''}
-                  onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_color_other`]: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="具体的な色を入力"
+                  value={semifinalsInfo.chaser_exit_color_other || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_color_other: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
-            )}
-            
-            <div className="mt-4">
-              <label htmlFor={`scene${sceneNum}_notes`} className="block text-sm font-medium text-gray-700">
-                備考・詳細指示
-              </label>
-              <textarea
-                id={`scene${sceneNum}_notes`}
-                value={formData[`scene${sceneNum}_notes` as keyof typeof formData] as string || ''}
-                onChange={(e) => setFormData({ ...formData, [`scene${sceneNum}_notes`]: e.target.value })}
-                rows={2}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="照明に関する詳細な指示があれば記入"
-              />
-            </div>
-          </div>
-        ))}
 
-        {/* チェイサー/退場 */}
-        <div className="bg-gray-50 p-4 rounded-md">
-          <h4 className="text-md font-medium text-gray-800 mb-4">チェイサー/退場</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="chaser_exit_time" className="block text-sm font-medium text-gray-700">
-                時間
-              </label>
-              <input
-                type="text"
-                id="chaser_exit_time"
-                value={formData.chaser_exit_time}
-                onChange={(e) => setFormData({ ...formData, chaser_exit_time: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例：3:45-4:00"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  イメージ
+                </label>
+                <input
+                  type="text"
+                  value={semifinalsInfo.chaser_exit_image || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_image: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  イメージ画像
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleFileUpload('chaser_exit_image_path', file)
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  備考
+                </label>
+                <textarea
+                  value={semifinalsInfo.chaser_exit_notes || ''}
+                  onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_exit_notes: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  rows={2}
+                />
+              </div>
             </div>
-            
-            <div>
-              <label htmlFor="chaser_exit_trigger" className="block text-sm font-medium text-gray-700">
-                きっかけ
-              </label>
-              <input
-                type="text"
-                id="chaser_exit_trigger"
-                value={formData.chaser_exit_trigger}
-                onChange={(e) => setFormData({ ...formData, chaser_exit_trigger: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例：楽曲終了"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="chaser_exit_color_type" className="block text-sm font-medium text-gray-700">
-                照明色
-              </label>
-              <select
-                id="chaser_exit_color_type"
-                value={formData.chaser_exit_color_type}
-                onChange={(e) => setFormData({ ...formData, chaser_exit_color_type: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">選択してください</option>
-                <option value="red">赤</option>
-                <option value="blue">青</option>
-                <option value="green">緑</option>
-                <option value="yellow">黄</option>
-                <option value="purple">紫</option>
-                <option value="orange">オレンジ</option>
-                <option value="white">白</option>
-                <option value="other">その他</option>
-              </select>
-            </div>
-          </div>
-          
-          {formData.chaser_exit_color_type === 'other' && (
-            <div className="mt-4">
-              <label htmlFor="chaser_exit_color_other" className="block text-sm font-medium text-gray-700">
-                その他の照明色
-              </label>
-              <input
-                type="text"
-                id="chaser_exit_color_other"
-                value={formData.chaser_exit_color_other}
-                onChange={(e) => setFormData({ ...formData, chaser_exit_color_other: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="具体的な色を入力"
-              />
-            </div>
-          )}
-          
-          <div className="mt-4">
-            <label htmlFor="chaser_exit_notes" className="block text-sm font-medium text-gray-700">
-              備考・詳細指示
-            </label>
-            <textarea
-              id="chaser_exit_notes"
-              value={formData.chaser_exit_notes}
-              onChange={(e) => setFormData({ ...formData, chaser_exit_notes: e.target.value })}
-              rows={2}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="退場時の照明に関する詳細な指示があれば記入"
-            />
           </div>
         </div>
-      </div>
+      )}
 
       {/* 振付情報セクション */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          振付情報
-        </h3>
-        
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={formData.choreographer_change_from_preliminary}
-              onChange={(e) => handleChoreographerChange(e.target.checked)}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <span className="text-sm font-medium text-gray-700">
-              予選から振付師を変更する
-            </span>
-          </label>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {activeSection === 'choreographer' && (
+        <div className="space-y-4">
+          <h4 className="font-medium">振付情報</h4>
+          
           <div>
-            <label htmlFor="choreographer_name" className="block text-sm font-medium text-gray-700">
-              振付師名
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={semifinalsInfo.choreographer_change_from_preliminary || false}
+                onChange={(e) => handleChoreographerChange(e.target.checked)}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              予選との振付師の変更
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              準決勝 - 振付師
             </label>
             <input
               type="text"
-              id="choreographer_name"
-              value={formData.choreographer_name}
-              onChange={(e) => setFormData({ ...formData, choreographer_name: e.target.value })}
-              disabled={!formData.choreographer_change_from_preliminary}
-              className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !formData.choreographer_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              value={semifinalsInfo.choreographer_name || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
+              disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.choreographer_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              準決勝 - 振付師（かな）
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.choreographer_name_kana || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
+              disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.choreographer_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
               }`}
             />
           </div>
           
-          <div>
-            <label htmlFor="choreographer_name_kana" className="block text-sm font-medium text-gray-700">
-              振付師名（ふりがな）
-            </label>
-            <input
-              type="text"
-              id="choreographer_name_kana"
-              value={formData.choreographer_name_kana}
-              onChange={(e) => setFormData({ ...formData, choreographer_name_kana: e.target.value })}
-              disabled={!formData.choreographer_change_from_preliminary}
-              className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !formData.choreographer_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
-              }`}
-            />
-          </div>
+          {!semifinalsInfo.choreographer_change_from_preliminary && (
+            <p className="text-xs text-gray-500">
+              基本情報で登録された振付師情報が使用されます。
+            </p>
+          )}
         </div>
-        
-        {!formData.choreographer_change_from_preliminary && (
-          <p className="text-xs text-gray-500">
-            基本情報で登録された振付師情報が使用されます。
-          </p>
-        )}
-      </div>
+      )}
 
       {/* 賞金振込先情報セクション */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          賞金振込先情報
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {activeSection === 'bank' && (
+        <div className="space-y-4">
+          <h4 className="font-medium">賞金振込先情報</h4>
+          
           <div>
-            <label htmlFor="bank_name" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               銀行名
             </label>
             <input
               type="text"
-              id="bank_name"
-              value={formData.bank_name}
-              onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.bank_name || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, bank_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="branch_name" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               支店名
             </label>
             <input
               type="text"
-              id="branch_name"
-              value={formData.branch_name}
-              onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.branch_name || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, branch_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="account_type" className="block text-sm font-medium text-gray-700">
-              口座種別
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              口座種類
             </label>
             <select
-              id="account_type"
-              value={formData.account_type}
-              onChange={(e) => setFormData({ ...formData, account_type: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.account_type || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_type: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">選択してください</option>
               <option value="普通">普通</option>
               <option value="当座">当座</option>
             </select>
           </div>
-          
+
           <div>
-            <label htmlFor="account_number" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               口座番号
             </label>
             <input
               type="text"
-              id="account_number"
-              value={formData.account_number}
-              onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.account_number || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_number: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          
-          <div className="md:col-span-2">
-            <label htmlFor="account_holder" className="block text-sm font-medium text-gray-700">
-              口座名義人
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              口座名義
             </label>
             <input
               type="text"
-              id="account_holder"
-              value={formData.account_holder}
-              onChange={(e) => setFormData({ ...formData, account_holder: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={semifinalsInfo.account_holder || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_holder: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="カタカナで入力してください"
             />
           </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
         <p className="text-sm text-yellow-800">
@@ -821,7 +815,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         </p>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-6">
         <button
           type="button"
           onClick={() => router.push('/dashboard')}
@@ -829,29 +823,28 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         >
           キャンセル
         </button>
-        <div className="space-x-3">
+        <div className="space-x-4">
           <button
-            type="button"
-            onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
+            onClick={() => handleSave(true)}
             disabled={saving || !entry}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${
+            className={`px-6 py-2 rounded-md text-sm font-medium ${
               saving || !entry
                 ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                : 'bg-gray-600 text-white hover:bg-gray-700'
             }`}
           >
-            {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
+            {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
-            type="submit"
+            onClick={() => handleSave(false)}
             disabled={saving || !entry}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
+            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
               saving || !entry
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {saving && savingMode === 'submit' ? '保存中...' : '保存'}
+            {saving ? '保存中...' : '保存'}
           </button>
         </div>
       </div>
@@ -863,6 +856,6 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           </p>
         </div>
       )}
-    </form>
+    </div>
   )
 }
