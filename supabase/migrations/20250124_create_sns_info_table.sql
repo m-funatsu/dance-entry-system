@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS sns_info (
   -- SNS掲載情報
   practice_video_path TEXT,
   practice_video_filename TEXT,
-  introduction_highlight TEXT,
+  introduction_highlight_path TEXT,
+  introduction_highlight_filename TEXT,
   sns_notes TEXT,
   
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
