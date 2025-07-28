@@ -343,6 +343,33 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         if (semifinalsInfo.chaser_song_designation === 'required' && !semifinalsInfo.chaser_song) {
           throw new Error('チェイサー（退場）曲音源をアップロードしてください')
         }
+
+        // 照明指示情報の必須項目チェック
+        const requiredLightingFields = [
+          { field: 'dance_start_timing', name: '準決勝 - 踊り出しタイミング' },
+          { field: 'scene1_time', name: 'シーン1 - 時間' },
+          { field: 'scene1_trigger', name: 'シーン1 - きっかけ' },
+          { field: 'scene1_color_type', name: 'シーン1 - 色・系統' },
+          { field: 'scene1_color_other', name: 'シーン1 - 色・系統その他' },
+          { field: 'scene1_image', name: 'シーン1 - イメージ' },
+          { field: 'scene1_image_path', name: 'シーン1 - イメージ画像' },
+          { field: 'chaser_exit_time', name: 'チェイサー/退場 - 時間' },
+          { field: 'chaser_exit_trigger', name: 'チェイサー/退場 - きっかけ' },
+          { field: 'chaser_exit_color_type', name: 'チェイサー/退場 - 色・系統' },
+          { field: 'chaser_exit_color_other', name: 'チェイサー/退場 - 色・系統その他' },
+          { field: 'chaser_exit_image', name: 'チェイサー/退場 - イメージ' },
+          { field: 'chaser_exit_image_path', name: 'チェイサー/退場 - イメージ画像' },
+          { field: 'chaser_exit_notes', name: 'チェイサー/退場 - 備考' }
+        ]
+
+        const missingLightingFields = requiredLightingFields.filter(
+          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
+        )
+
+        if (missingLightingFields.length > 0) {
+          const fieldNames = missingLightingFields.map(({ name }) => name).join('、')
+          throw new Error(`以下の照明指示情報は必須項目です：${fieldNames}`)
+        }
       }
 
       // 50文字制限のチェック
@@ -841,11 +868,16 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       {/* 照明指示情報セクション */}
       {activeSection === 'lighting' && (
         <div className="space-y-6">
-          <h4 className="font-medium">照明指示情報</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium">照明指示情報</h4>
+            <p className="text-sm text-gray-500">
+              <span className="text-red-500">*</span> は必須項目です
+            </p>
+          </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              準決勝 - 踊り出しタイミング
+              準決勝 - 踊り出しタイミング <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -863,7 +895,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    時間
+                    時間 {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="text"
@@ -876,7 +908,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    きっかけ
+                    きっかけ {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="text"
@@ -888,7 +920,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    色・系統
+                    色・系統 {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <select
                     value={semifinalsInfo[`scene${sceneNum}_color_type` as keyof SemifinalsInfo] as string || ''}
@@ -904,7 +936,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    色・系統その他
+                    色・系統その他 {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="text"
@@ -916,7 +948,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    イメージ
+                    イメージ {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="text"
@@ -928,7 +960,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    イメージ画像
+                    イメージ画像 {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="file"
@@ -963,7 +995,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  時間
+                  時間 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -975,7 +1007,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  きっかけ
+                  きっかけ <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -987,7 +1019,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  色・系統
+                  色・系統 <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={semifinalsInfo.chaser_exit_color_type || ''}
@@ -1003,7 +1035,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  色・系統その他
+                  色・系統その他 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1015,7 +1047,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  イメージ
+                  イメージ <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1027,7 +1059,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  イメージ画像
+                  イメージ画像 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
@@ -1042,7 +1074,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  備考
+                  備考 <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={semifinalsInfo.chaser_exit_notes || ''}
