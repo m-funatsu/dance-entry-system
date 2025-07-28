@@ -19,11 +19,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
-  // デバッグ用
-  if (preliminaryVideo) {
-    console.log('Preliminary video:', preliminaryVideo)
-    console.log('Video URL:', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}`)
-  }
   
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',
@@ -113,20 +108,30 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           'choreographer_furigana'
         ]
 
-        // デバッグ: 基本情報の内容を確認
-        console.log('Basic Info:', basicInfo)
-        
         const missingBasicFields = requiredBasicFields.filter(field => {
           const value = basicInfo[field]
-          const isMissing = !value || (typeof value === 'string' && value.trim() === '')
-          if (isMissing) {
-            console.log(`Missing field: ${field}, value: ${value}`)
+          // ブール値の場合は特別な処理
+          if (typeof value === 'boolean') {
+            return value !== true
           }
-          return isMissing
+          // 文字列の場合は空文字チェック
+          return !value || value.toString().trim() === ''
         })
         
         if (missingBasicFields.length > 0) {
-          showToast(`基本情報に未入力の必須項目があります: ${missingBasicFields.join(', ')}`, 'error')
+          const fieldNames: { [key: string]: string } = {
+            'dance_style': 'ダンスジャンル',
+            'representative_name': '代表者名',
+            'representative_furigana': '代表者フリガナ',
+            'representative_email': '代表者メールアドレス',
+            'partner_name': 'パートナー名',
+            'partner_furigana': 'パートナーフリガナ',
+            'phone_number': '電話番号',
+            'choreographer': '振付師名',
+            'choreographer_furigana': '振付師フリガナ'
+          }
+          const missingFieldNames = missingBasicFields.map(field => fieldNames[field] || field).join('、')
+          showToast(`基本情報に未入力の必須項目があります。基本情報ページに戻って以下の項目を入力してください: ${missingFieldNames}`, 'error')
           setSaving(false)
           return
         }

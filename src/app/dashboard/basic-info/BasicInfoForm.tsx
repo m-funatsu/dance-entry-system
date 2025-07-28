@@ -48,7 +48,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           .from('entries')
           .insert({
             user_id: userId,
-            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
             status: 'pending'
           })
           .select()
@@ -61,7 +61,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         const { error: updateError } = await supabase
           .from('entries')
           .update({
-            participant_names: `${formData.representative_name}\n${formData.partner_name}`,
+            participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
             updated_at: new Date().toISOString()
           })
           .eq('id', currentEntryId)
