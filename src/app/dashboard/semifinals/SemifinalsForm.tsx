@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import type { Entry, SemifinalsInfo, BasicInfo } from '@/lib/types'
+import type { Entry, SemifinalsInfo, BasicInfo, PreliminaryInfo } from '@/lib/types'
 
 interface SemifinalsFormProps {
   userId: string
@@ -17,6 +17,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const { showToast } = useToast()
   
   const [basicInfo, setBasicInfo] = useState<BasicInfo | null>(null)
+  const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState('music')
@@ -45,6 +46,17 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           setBasicInfo(basicData)
         }
         
+        // 予選情報を取得
+        const { data: prelimData } = await supabase
+          .from('preliminary_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .single()
+        
+        if (prelimData) {
+          setPreliminaryInfo(prelimData)
+        }
+        
         // 準決勝情報を取得
         const { data: semiData } = await supabase
           .from('semifinals_info')
@@ -54,13 +66,32 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         
         if (semiData) {
           setSemifinalsInfo(semiData)
-        } else if (basicData) {
-          // 新規作成時は基本情報から振付師情報をデフォルト設定
-          setSemifinalsInfo(prev => ({
-            ...prev,
-            choreographer_name: basicData.choreographer || '',
-            choreographer_name_kana: basicData.choreographer_furigana || ''
-          }))
+        } else {
+          // 新規作成時の初期設定
+          if (basicData) {
+            // 基本情報から振付師情報をデフォルト設定
+            setSemifinalsInfo(prev => ({
+              ...prev,
+              choreographer_name: basicData.choreographer || '',
+              choreographer_name_kana: basicData.choreographer_furigana || ''
+            }))
+          }
+          
+          if (prelimData) {
+            // 予選情報から楽曲情報をデフォルト設定（予選と同じ楽曲を選択状態）
+            setSemifinalsInfo(prev => ({
+              ...prev,
+              music_change_from_preliminary: false,
+              work_title: prelimData.work_title || '',
+              work_character_story: prelimData.work_story || '',
+              music_title: prelimData.music_title || '',
+              cd_title: prelimData.cd_title || '',
+              artist: prelimData.artist || '',
+              record_number: prelimData.record_number || '',
+              jasrac_code: prelimData.jasrac_code || '',
+              music_type: prelimData.music_type || ''
+            }))
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error)
@@ -72,6 +103,39 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     
     loadData()
   }, [entry?.id, supabase, showToast])
+
+  // 楽曲変更ラジオボタンの処理
+  const handleMusicChange = (useSameMusic: boolean) => {
+    if (useSameMusic) {
+      // 予選と同じ楽曲を使用する場合：予選情報からコピー
+      setSemifinalsInfo(prev => ({
+        ...prev,
+        music_change_from_preliminary: false,
+        work_title: preliminaryInfo?.work_title || '',
+        work_character_story: preliminaryInfo?.work_story || '',
+        music_title: preliminaryInfo?.music_title || '',
+        cd_title: preliminaryInfo?.cd_title || '',
+        artist: preliminaryInfo?.artist || '',
+        record_number: preliminaryInfo?.record_number || '',
+        jasrac_code: preliminaryInfo?.jasrac_code || '',
+        music_type: preliminaryInfo?.music_type || ''
+      }))
+    } else {
+      // 予選とは異なる楽曲を使用する場合：クリア
+      setSemifinalsInfo(prev => ({
+        ...prev,
+        music_change_from_preliminary: true,
+        work_title: '',
+        work_character_story: '',
+        music_title: '',
+        cd_title: '',
+        artist: '',
+        record_number: '',
+        jasrac_code: '',
+        music_type: ''
+      }))
+    }
+  }
 
   // 振付師変更チェックボックスの処理
   const handleChoreographerChange = (checked: boolean) => {
@@ -249,7 +313,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   name="music_change"
                   value="same"
                   checked={!semifinalsInfo.music_change_from_preliminary}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))}
+                  onChange={() => handleMusicChange(true)}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 予選と同じ楽曲を使用する
@@ -260,12 +324,18 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   name="music_change"
                   value="different"
                   checked={semifinalsInfo.music_change_from_preliminary || false}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))}
+                  onChange={() => handleMusicChange(false)}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 予選とは異なる楽曲を使用する
               </label>
             </div>
+            
+            {!semifinalsInfo.music_change_from_preliminary && (
+              <p className="text-xs text-gray-500 mt-2">
+                予選で登録された楽曲情報が使用されます。
+              </p>
+            )}
           </div>
 
           <div>
@@ -276,7 +346,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.work_title || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -287,7 +360,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <textarea
               value={semifinalsInfo.work_character_story || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_character_story: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
               rows={2}
               maxLength={50}
             />
@@ -345,7 +421,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.music_title || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -357,7 +436,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.cd_title || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -369,7 +451,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.artist || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -381,7 +466,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.record_number || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -393,7 +481,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               type="text"
               value={semifinalsInfo.jasrac_code || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             />
           </div>
 
@@ -404,7 +495,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             <select
               value={semifinalsInfo.music_type || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                !semifinalsInfo.music_change_from_preliminary ? 'bg-gray-100 text-gray-500' : ''
+              }`}
             >
               <option value="">選択してください</option>
               <option value="cd">CD楽曲</option>
