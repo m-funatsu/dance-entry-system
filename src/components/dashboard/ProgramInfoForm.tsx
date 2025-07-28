@@ -55,6 +55,41 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     setSaving(true)
 
     try {
+      // 必須項目のチェック
+      if (!programInfo.player_photo_type) {
+        throw new Error('選手紹介用写真の種類を選択してください')
+      }
+      if (!programInfo.player_photo_path) {
+        throw new Error('選手紹介用画像をアップロードしてください')
+      }
+      if (!programInfo.semifinal_story || programInfo.semifinal_story.trim() === '') {
+        throw new Error('作品目あらすじ・ストーリーを入力してください')
+      }
+      if (!programInfo.semifinal_highlight || programInfo.semifinal_highlight.trim() === '') {
+        throw new Error('作品目見所を入力してください')
+      }
+      if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
+          !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) {
+        throw new Error('作品目作品イメージ①〜④をすべてアップロードしてください')
+      }
+
+      // 2曲の場合の追加必須項目チェック
+      if (programInfo.song_count === '2曲') {
+        if (!programInfo.final_player_photo_path) {
+          throw new Error('決勝用の選手紹介用画像をアップロードしてください')
+        }
+        if (!programInfo.final_story || programInfo.final_story.trim() === '') {
+          throw new Error('決勝のあらすじ・ストーリーを入力してください')
+        }
+        if (!programInfo.final_highlight || programInfo.final_highlight.trim() === '') {
+          throw new Error('決勝の見所を入力してください')
+        }
+        if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
+            !programInfo.final_image3_path || !programInfo.final_image4_path) {
+          throw new Error('決勝の作品イメージ①〜④をすべてアップロードしてください')
+        }
+      }
+
       // 100文字制限のチェック
       if (programInfo.semifinal_story && programInfo.semifinal_story.length > 100) {
         throw new Error('準決勝のあらすじ・ストーリーは100文字以内で入力してください')
@@ -174,20 +209,25 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         {/* 選手紹介用写真の種類 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            選手紹介用写真の種類
+            選手紹介用写真の種類 <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
+          <select
             value={programInfo.player_photo_type || ''}
             onChange={(e) => setProgramInfo(prev => ({ ...prev, player_photo_type: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="例：個人写真、チーム写真など"
-          />
+            required
+          >
+            <option value="">選択してください</option>
+            <option value="Freedom's CUP撮影会での写真">Freedom&apos;s CUP撮影会での写真</option>
+            <option value="お持ちのデータを使用">お持ちのデータを使用</option>
+          </select>
         </div>
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">
-          <h4 className="font-medium mb-3">準決勝用情報</h4>
+          <h4 className="font-medium mb-3">
+            {programInfo.song_count === '1曲' ? '決勝・準決勝用情報' : '準決勝用情報'}
+          </h4>
           
           {/* 所属教室または所属 */}
           <div className="mb-4">
@@ -205,7 +245,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           {/* 選手紹介用画像 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              選手紹介用画像
+              選手紹介用画像 <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -226,7 +266,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           {/* あらすじ・ストーリー */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品目あらすじ・ストーリー（100文字以内）
+              作品目あらすじ・ストーリー（100文字以内） <span className="text-red-500">*</span>
             </label>
             <textarea
               value={programInfo.semifinal_story || ''}
@@ -243,7 +283,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           {/* 見所 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品目見所（50文字以内）
+              作品目見所（50文字以内） <span className="text-red-500">*</span>
             </label>
             <textarea
               value={programInfo.semifinal_highlight || ''}
@@ -261,7 +301,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           {[1, 2, 3, 4].map((num) => (
             <div key={`semifinal_image${num}`} className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}
+                作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'} <span className="text-red-500">*</span>
               </label>
               <input
                 type="file"
@@ -306,7 +346,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             {/* 選手紹介用画像 */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                選手紹介用画像
+                選手紹介用画像 <span className="text-red-500">*</span>
               </label>
               <input
                 type="file"
@@ -327,7 +367,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             {/* あらすじ・ストーリー */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目あらすじ・ストーリー（100文字以内）
+                作品目あらすじ・ストーリー（100文字以内） <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={programInfo.final_story || ''}
@@ -344,7 +384,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             {/* 見所 */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目見所（50文字以内）
+                作品目見所（50文字以内） <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={programInfo.final_highlight || ''}
@@ -362,7 +402,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             {[1, 2, 3, 4].map((num) => (
               <div key={`final_image${num}`} className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}
+                  作品目作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
