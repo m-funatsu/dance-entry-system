@@ -150,6 +150,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeSection, setActiveSection] = useState('music')
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
@@ -287,6 +288,92 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     }
   }
 
+  // 各タブの必須項目チェック
+  const validateSection = (sectionId: string): string[] => {
+    const errors: string[] = []
+
+    switch (sectionId) {
+      case 'music':
+        if (semifinalsInfo.music_change_from_preliminary === undefined) {
+          errors.push('「予選との楽曲情報の変更」を選択してください')
+        }
+        if (!semifinalsInfo.work_title) errors.push('作品タイトルまたはテーマ')
+        if (!semifinalsInfo.work_character_story) errors.push('作品キャラクター・ストーリー等')
+        if (!semifinalsInfo.copyright_permission) errors.push('楽曲著作権許諾')
+        if (!semifinalsInfo.music_title) errors.push('使用楽曲タイトル')
+        if (!semifinalsInfo.cd_title) errors.push('収録CDタイトル')
+        if (!semifinalsInfo.artist) errors.push('アーティスト')
+        if (!semifinalsInfo.record_number) errors.push('レコード番号')
+        if (!semifinalsInfo.jasrac_code) errors.push('JASRAC作品コード')
+        if (!semifinalsInfo.music_type) errors.push('楽曲種類')
+        if (!semifinalsInfo.music_data_path) errors.push('楽曲データ')
+        break
+
+      case 'sound':
+        if (!semifinalsInfo.sound_start_timing) errors.push('音楽スタートのタイミング')
+        if (!semifinalsInfo.chaser_song_designation) errors.push('チェイサー（退場）曲の指定')
+        if (semifinalsInfo.chaser_song_designation === 'required' && !semifinalsInfo.chaser_song) {
+          errors.push('チェイサー（退場）曲音源')
+        }
+        if (!semifinalsInfo.fade_out_start_time) errors.push('フェードアウト開始時間')
+        if (!semifinalsInfo.fade_out_complete_time) errors.push('フェードアウト完了時間')
+        break
+
+      case 'lighting':
+        if (!semifinalsInfo.dance_start_timing) errors.push('準決勝 - 踊り出しタイミング')
+        if (!semifinalsInfo.scene1_time) errors.push('シーン1 - 時間')
+        if (!semifinalsInfo.scene1_trigger) errors.push('シーン1 - きっかけ')
+        if (!semifinalsInfo.scene1_color_type) errors.push('シーン1 - 色・系統')
+        if (!semifinalsInfo.scene1_color_other) errors.push('シーン1 - 色・系統その他')
+        if (!semifinalsInfo.scene1_image) errors.push('シーン1 - イメージ')
+        if (!semifinalsInfo.scene1_image_path) errors.push('シーン1 - イメージ画像')
+        if (!semifinalsInfo.chaser_exit_time) errors.push('チェイサー/退場 - 時間')
+        if (!semifinalsInfo.chaser_exit_trigger) errors.push('チェイサー/退場 - きっかけ')
+        if (!semifinalsInfo.chaser_exit_color_type) errors.push('チェイサー/退場 - 色・系統')
+        if (!semifinalsInfo.chaser_exit_color_other) errors.push('チェイサー/退場 - 色・系統その他')
+        if (!semifinalsInfo.chaser_exit_image) errors.push('チェイサー/退場 - イメージ')
+        if (!semifinalsInfo.chaser_exit_image_path) errors.push('チェイサー/退場 - イメージ画像')
+        break
+
+      case 'choreographer':
+        // 振付情報は必須項目なし
+        break
+
+      case 'bank':
+        // 賞金振込先情報は必須項目なし（任意）
+        break
+    }
+
+    return errors
+  }
+
+  // 全セクションの検証
+  const validateAllSections = () => {
+    const allErrors: Record<string, string[]> = {}
+    const sectionIds = ['music', 'sound', 'lighting', 'choreographer', 'bank']
+    
+    sectionIds.forEach(sectionId => {
+      const errors = validateSection(sectionId)
+      if (errors.length > 0) {
+        allErrors[sectionId] = errors
+      }
+    })
+    
+    return allErrors
+  }
+
+  // タブ切り替え時の検証
+  const handleSectionChange = (sectionId: string) => {
+    // 現在のセクションの検証
+    const currentErrors = validateSection(activeSection)
+    setValidationErrors(prev => ({
+      ...prev,
+      [activeSection]: currentErrors
+    }))
+    
+    setActiveSection(sectionId)
+  }
+
   const handleSave = async (isTemporary = false) => {
     setSaving(true)
 
@@ -297,81 +384,23 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         return
       }
 
-      // 楽曲情報の必須項目チェック（一時保存時はスキップ）
+      // 必須項目チェック（一時保存時はスキップ）
       if (!isTemporary) {
-        // 予選との楽曲情報の変更フィールドのチェック
-        if (semifinalsInfo.music_change_from_preliminary === undefined) {
-          throw new Error('「予選との楽曲情報の変更」は必須項目です')
-        }
+        const allErrors = validateAllSections()
+        const errorSections = Object.entries(allErrors)
+          .filter(([, errors]) => errors.length > 0)
+          .map(([section, errors]) => {
+            const sectionName = sections.find(s => s.id === section)?.label || section
+            return `${sectionName}: ${errors.join('、')}`
+          })
 
-        const requiredMusicFields = [
-          { field: 'work_title', name: '作品タイトルまたはテーマ' },
-          { field: 'work_character_story', name: '作品キャラクター・ストーリー等' },
-          { field: 'copyright_permission', name: '楽曲著作権許諾' },
-          { field: 'music_title', name: '使用楽曲タイトル' },
-          { field: 'cd_title', name: '収録CDタイトル' },
-          { field: 'artist', name: 'アーティスト' },
-          { field: 'record_number', name: 'レコード番号' },
-          { field: 'jasrac_code', name: 'JASRAC作品コード' },
-          { field: 'music_type', name: '楽曲種類' },
-          { field: 'music_data_path', name: '楽曲データ' }
-        ]
-
-        const missingFields = requiredMusicFields.filter(
-          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
-        )
-
-        if (missingFields.length > 0) {
-          const fieldNames = missingFields.map(({ name }) => name).join('、')
-          throw new Error(`以下の楽曲情報は必須項目です：${fieldNames}`)
-        }
-
-        // 音響指示情報の必須項目チェック
-        const requiredSoundFields = [
-          { field: 'sound_start_timing', name: '音楽スタートのタイミング' },
-          { field: 'chaser_song_designation', name: 'チェイサー（退場）曲の指定' },
-          { field: 'fade_out_start_time', name: 'フェードアウト開始時間' },
-          { field: 'fade_out_complete_time', name: 'フェードアウト完了時間' }
-        ]
-
-        const missingSoundFields = requiredSoundFields.filter(
-          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
-        )
-
-        if (missingSoundFields.length > 0) {
-          const fieldNames = missingSoundFields.map(({ name }) => name).join('、')
-          throw new Error(`以下の音響指示情報は必須項目です：${fieldNames}`)
-        }
-
-        // チェイサー曲が「必要」の場合、音源も必須
-        if (semifinalsInfo.chaser_song_designation === 'required' && !semifinalsInfo.chaser_song) {
-          throw new Error('チェイサー（退場）曲音源をアップロードしてください')
-        }
-
-        // 照明指示情報の必須項目チェック
-        const requiredLightingFields = [
-          { field: 'dance_start_timing', name: '準決勝 - 踊り出しタイミング' },
-          { field: 'scene1_time', name: 'シーン1 - 時間' },
-          { field: 'scene1_trigger', name: 'シーン1 - きっかけ' },
-          { field: 'scene1_color_type', name: 'シーン1 - 色・系統' },
-          { field: 'scene1_color_other', name: 'シーン1 - 色・系統その他' },
-          { field: 'scene1_image', name: 'シーン1 - イメージ' },
-          { field: 'scene1_image_path', name: 'シーン1 - イメージ画像' },
-          { field: 'chaser_exit_time', name: 'チェイサー/退場 - 時間' },
-          { field: 'chaser_exit_trigger', name: 'チェイサー/退場 - きっかけ' },
-          { field: 'chaser_exit_color_type', name: 'チェイサー/退場 - 色・系統' },
-          { field: 'chaser_exit_color_other', name: 'チェイサー/退場 - 色・系統その他' },
-          { field: 'chaser_exit_image', name: 'チェイサー/退場 - イメージ' },
-          { field: 'chaser_exit_image_path', name: 'チェイサー/退場 - イメージ画像' }
-        ]
-
-        const missingLightingFields = requiredLightingFields.filter(
-          ({ field }) => !semifinalsInfo[field as keyof SemifinalsInfo]
-        )
-
-        if (missingLightingFields.length > 0) {
-          const fieldNames = missingLightingFields.map(({ name }) => name).join('、')
-          throw new Error(`以下の照明指示情報は必須項目です：${fieldNames}`)
+        if (errorSections.length > 0) {
+          setValidationErrors(allErrors)
+          showToast('必須項目を入力してください', 'error')
+          // 最初のエラーがあるセクションに移動
+          const firstErrorSection = Object.keys(allErrors)[0]
+          setActiveSection(firstErrorSection)
+          return
         }
       }
 
@@ -410,6 +439,9 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         if (error) throw error
       }
 
+      // 保存成功時はエラーをクリア
+      setValidationErrors({})
+      
       showToast(
         isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました', 
         'success'
@@ -435,6 +467,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       }
       
       showToast(errorMessage, 'error')
+      // エラーが発生してもデータは保持される（setStateで管理されているため）
     } finally {
       setSaving(false)
     }
@@ -481,6 +514,12 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     { id: 'bank', label: '賞金振込先情報' }
   ]
 
+  // セクションが完了しているかチェック
+  const isSectionComplete = (sectionId: string) => {
+    const errors = validateSection(sectionId)
+    return errors.length === 0
+  }
+
   const colorTypes = [
     '暖色系',
     '寒色系',
@@ -501,14 +540,26 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           {sections.map((section) => (
             <button
               key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              onClick={() => handleSectionChange(section.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm relative ${
                 activeSection === section.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              {section.label}
+              <span className="flex items-center">
+                {section.label}
+                {validationErrors[section.id]?.length > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                    !
+                  </span>
+                )}
+                {isSectionComplete(section.id) && !validationErrors[section.id] && (
+                  <svg className="ml-2 w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </span>
             </button>
           ))}
         </nav>
@@ -523,6 +574,17 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               <span className="text-red-500">*</span> は必須項目です
             </p>
           </div>
+          
+          {validationErrors.music && validationErrors.music.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-sm text-red-800 font-medium">以下の項目を入力してください：</p>
+              <ul className="list-disc list-inside text-sm text-red-700 mt-2">
+                {validationErrors.music.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -755,6 +817,17 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             </p>
           </div>
           
+          {validationErrors.sound && validationErrors.sound.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-sm text-red-800 font-medium">以下の項目を入力してください：</p>
+              <ul className="list-disc list-inside text-sm text-red-700 mt-2">
+                {validationErrors.sound.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               音楽スタートのタイミング（きっかけ、ポーズなど） <span className="text-red-500">*</span>
@@ -858,6 +931,17 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
               <span className="text-red-500">*</span> は必須項目です
             </p>
           </div>
+          
+          {validationErrors.lighting && validationErrors.lighting.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-sm text-red-800 font-medium">以下の項目を入力してください：</p>
+              <ul className="list-disc list-inside text-sm text-red-700 mt-2">
+                {validationErrors.lighting.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
