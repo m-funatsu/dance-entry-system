@@ -1286,31 +1286,54 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           <h4 className="font-medium">作品振付師出席情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.choreographer_attendance || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_attendance: e.target.checked }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              作品振付師が授賞式に出席する
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              作品振付師出席予定 <span className="text-red-500">*</span>
             </label>
+            <select
+              value={finalsInfo.choreographer_attendance || ''}
+              onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_attendance: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            >
+              <option value="">選択してください</option>
+              <option value="振付師本人が当日会場で席について観戦する">振付師本人が当日会場で席について観戦する</option>
+              <option value="振付師本人が当日会場にいる（役員・選手等）">振付師本人が当日会場にいる（役員・選手等）</option>
+              <option value="振付師の代理人が当日会場で席について観戦する">振付師の代理人が当日会場で席について観戦する</option>
+              <option value="振付師の代理人が当日会場にいる（役員等）">振付師の代理人が当日会場にいる（役員等）</option>
+              <option value="欠席する">欠席する</option>
+            </select>
           </div>
 
-          {finalsInfo.choreographer_attendance && (
-            <>
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={finalsInfo.choreographer_photo_permission || false}
-                    onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: e.target.checked }))}
-                    className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                  作品振付師の写真掲載を許可する
-                </label>
-              </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              作品振付師写真掲載 <span className="text-red-500">*</span>
+            </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_photo_permission"
+                  value="希望する"
+                  checked={finalsInfo.choreographer_photo_permission === '希望する'}
+                  onChange={() => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: '希望する' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                希望する
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_photo_permission"
+                  value="希望しない"
+                  checked={finalsInfo.choreographer_photo_permission === '希望しない'}
+                  onChange={() => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: '希望しない' }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                希望しない
+              </label>
+            </div>
+          </div>
 
+          {finalsInfo.choreographer_photo_permission === '希望する' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   作品振付師の写真
@@ -1328,7 +1351,6 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   授賞式に出席される振付師の写真をアップロードしてください
                 </p>
               </div>
-            </>
           )}
         </div>
       )}
