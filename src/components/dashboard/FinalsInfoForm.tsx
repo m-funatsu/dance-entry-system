@@ -17,10 +17,10 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('music')
+  const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('')
   const [finalsInfo, setFinalsInfo] = useState<Partial<FinalsInfo>>({
     entry_id: entry.id,
     music_change: false,
-    copy_preliminary_music: false,
     copyright_permission: '',
     sound_change_from_semifinals: false,
     lighting_change_from_semifinals: false,
@@ -52,6 +52,12 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
 
       if (data) {
         setFinalsInfo(data)
+        // music_changeの値に基づいてmusicChangeOptionを設定
+        if (data.music_change === false && data.music_title) {
+          setMusicChangeOption('unchanged')
+        } else if (data.music_change === true) {
+          setMusicChangeOption('changed')
+        }
       }
     } catch (err) {
       console.error('決勝情報の読み込みエラー:', err)
@@ -62,30 +68,61 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     }
   }
 
-  const handleCopyPreliminaryMusic = async () => {
-    try {
-      const { data: preliminaryData } = await supabase
-        .from('preliminary_info')
-        .select('*')
-        .eq('entry_id', entry.id)
-        .single()
+  const handleMusicChangeOption = async (option: 'changed' | 'unchanged') => {
+    setMusicChangeOption(option)
+    setError(null)
+    setSuccess(null)
+    
+    if (option === 'unchanged') {
+      // 準決勝からデータをコピー
+      try {
+        const { data: semifinalsData } = await supabase
+          .from('semifinals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .single()
 
-      if (preliminaryData) {
-        setFinalsInfo(prev => ({
-          ...prev,
-          work_title: preliminaryData.work_title,
-          music_title: preliminaryData.music_title,
-          artist: preliminaryData.artist,
-          cd_title: preliminaryData.cd_title,
-          record_number: preliminaryData.record_number,
-          jasrac_code: preliminaryData.jasrac_code,
-          music_type: preliminaryData.music_type
-        }))
-        setSuccess('予選楽曲情報をコピーしました')
+        if (semifinalsData) {
+          setFinalsInfo(prev => ({
+            ...prev,
+            music_change: false,
+            work_title: semifinalsData.work_title,
+            work_character_story: semifinalsData.work_character_story,
+            copyright_permission: semifinalsData.copyright_permission,
+            music_title: semifinalsData.music_title,
+            artist: semifinalsData.artist,
+            cd_title: semifinalsData.cd_title,
+            record_number: semifinalsData.record_number,
+            jasrac_code: semifinalsData.jasrac_code,
+            music_type: semifinalsData.music_type,
+            music_data_path: semifinalsData.music_data_path,
+            music_usage_method: semifinalsData.music_usage_method
+          }))
+          setSuccess('準決勝の楽曲情報をコピーしました')
+        } else {
+          setError('準決勝情報が見つかりません')
+        }
+      } catch (err) {
+        console.error('準決勝情報の読み込みエラー:', err)
+        setError('準決勝情報の読み込みに失敗しました')
       }
-    } catch (err) {
-      console.error('予選情報の読み込みエラー:', err)
-      setError('予選情報の読み込みに失敗しました')
+    } else if (option === 'changed') {
+      // 変更ありの場合はフィールドをクリア
+      setFinalsInfo(prev => ({
+        ...prev,
+        music_change: true,
+        work_title: '',
+        work_character_story: '',
+        copyright_permission: '',
+        music_title: '',
+        artist: '',
+        cd_title: '',
+        record_number: '',
+        jasrac_code: '',
+        music_type: '',
+        music_data_path: '',
+        music_usage_method: ''
+      }))
     }
   }
 
@@ -228,35 +265,33 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           <h4 className="font-medium">楽曲情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.music_change || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_change: e.target.checked }))}
-                className="mr-2"
-              />
-              楽曲情報の変更
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              楽曲情報の変更 <span className="text-red-500">*</span>
             </label>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.copy_preliminary_music || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, copy_preliminary_music: e.target.checked }))}
-                className="mr-2"
-              />
-              予選の楽曲情報をコピー
-            </label>
-            {finalsInfo.copy_preliminary_music && (
-              <button
-                onClick={handleCopyPreliminaryMusic}
-                className="px-4 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
-              >
-                コピー実行
-              </button>
-            )}
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change_option"
+                  value="unchanged"
+                  checked={musicChangeOption === 'unchanged'}
+                  onChange={() => handleMusicChangeOption('unchanged')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝から変更なし
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change_option"
+                  value="changed"
+                  checked={musicChangeOption === 'changed'}
+                  onChange={() => handleMusicChangeOption('changed')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝から変更あり
+              </label>
+            </div>
           </div>
 
           <div>
@@ -268,6 +303,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.work_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -281,6 +317,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               rows={2}
               maxLength={50}
+              disabled={musicChangeOption === 'unchanged'}
             />
             <div className="text-sm text-gray-500 mt-1">
               {finalsInfo.work_character_story?.length || 0}/50文字
@@ -300,6 +337,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   checked={finalsInfo.copyright_permission === 'commercial'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={musicChangeOption === 'unchanged'}
                 />
                 A.市販の楽曲を使用する
               </label>
@@ -311,6 +349,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   checked={finalsInfo.copyright_permission === 'licensed'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={musicChangeOption === 'unchanged'}
                 />
                 B.自身で著作権に対し許諾を取った楽曲を使用する
               </label>
@@ -322,6 +361,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   checked={finalsInfo.copyright_permission === 'original'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={musicChangeOption === 'unchanged'}
                 />
                 C.独自に製作されたオリジナル楽曲を使用する
               </label>
@@ -337,6 +377,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.music_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -349,6 +390,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.cd_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -361,6 +403,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.artist || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -373,6 +416,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.record_number || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -385,6 +429,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.jasrac_code || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
 
@@ -392,12 +437,17 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               楽曲種類
             </label>
-            <input
-              type="text"
+            <select
               value={finalsInfo.music_type || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+              disabled={musicChangeOption === 'unchanged'}
+            >
+              <option value="">選択してください</option>
+              <option value="CD楽曲">CD楽曲</option>
+              <option value="データダウンロード楽曲">データダウンロード楽曲</option>
+              <option value="その他（オリジナル曲）">その他（オリジナル曲）</option>
+            </select>
           </div>
 
           <div>
@@ -412,6 +462,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 if (file) handleFileUpload('music_data_path', file)
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={musicChangeOption === 'unchanged'}
             />
             {finalsInfo.music_data_path && (
               <div className="mt-2 text-sm text-gray-600">
@@ -429,6 +480,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               rows={3}
+              disabled={musicChangeOption === 'unchanged'}
             />
           </div>
         </div>
