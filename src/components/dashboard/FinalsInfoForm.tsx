@@ -116,8 +116,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             record_number: semifinalsData.record_number,
             jasrac_code: semifinalsData.jasrac_code,
             music_type: semifinalsData.music_type,
-            music_data_path: semifinalsData.music_data_path,
-            music_usage_method: semifinalsData.music_usage_method
+            music_data_path: semifinalsData.music_data_path
           }))
           setSuccess('準決勝の楽曲情報をコピーしました')
         } else {
@@ -141,8 +140,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         record_number: '',
         jasrac_code: '',
         music_type: '',
-        music_data_path: '',
-        music_usage_method: ''
+        music_data_path: ''
       }))
     }
   }
@@ -701,18 +699,6 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              音源使用方法
-            </label>
-            <textarea
-              value={finalsInfo.music_usage_method || ''}
-              onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows={3}
-              disabled={musicChangeOption === 'unchanged'}
-            />
-          </div>
         </div>
       )}
 

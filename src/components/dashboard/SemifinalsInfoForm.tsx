@@ -197,15 +197,33 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <h4 className="font-medium">楽曲情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={semifinalsInfo.music_change_from_preliminary || false}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: e.target.checked }))}
-                className="mr-2"
-              />
-              予選との楽曲情報の変更
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              予選との楽曲情報の変更 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change_option"
+                  value="true"
+                  checked={semifinalsInfo.music_change_from_preliminary === true}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                変更あり
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="music_change_option"
+                  value="false"
+                  checked={semifinalsInfo.music_change_from_preliminary === false}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                変更なし
+              </label>
+            </div>
           </div>
 
           <div>
@@ -369,17 +387,6 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              音源使用方法
-            </label>
-            <textarea
-              value={semifinalsInfo.music_usage_method || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows={3}
-            />
-          </div>
         </div>
       )}
 

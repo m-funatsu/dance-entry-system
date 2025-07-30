@@ -309,8 +309,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           { field: 'record_number', name: 'レコード番号' },
           { field: 'jasrac_code', name: 'JASRAC作品コード' },
           { field: 'music_type', name: '楽曲種類' },
-          { field: 'music_data_path', name: '楽曲データ' },
-          { field: 'music_usage_method', name: '音源使用方法' }
+          { field: 'music_data_path', name: '楽曲データ' }
         ]
 
         const missingFields = requiredMusicFields.filter(
@@ -736,21 +735,6 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              音源使用方法 <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={semifinalsInfo.music_usage_method || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_usage_method: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              rows={3}
-              placeholder="例：イントロから3分45秒まで使用、フェードアウト希望"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              使用する部分、編集の要望などを具体的に記入してください
-            </p>
-          </div>
         </div>
       )}
 
