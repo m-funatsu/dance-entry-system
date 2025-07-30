@@ -299,6 +299,11 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
       // 楽曲情報の必須項目チェック（一時保存時はスキップ）
       if (!isTemporary) {
+        // 予選との楽曲情報の変更フィールドのチェック
+        if (semifinalsInfo.music_change_from_preliminary === undefined) {
+          throw new Error('「予選との楽曲情報の変更」は必須項目です')
+        }
+
         const requiredMusicFields = [
           { field: 'work_title', name: '作品タイトルまたはテーマ' },
           { field: 'work_character_story', name: '作品キャラクター・ストーリー等' },
@@ -521,7 +526,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              予選との楽曲情報の変更
+              予選との楽曲情報の変更 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -532,6 +537,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   checked={!semifinalsInfo.music_change_from_preliminary}
                   onChange={() => handleMusicChange(true)}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  required
                 />
                 予選と同じ楽曲を使用する
               </label>
@@ -543,6 +549,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
                   checked={semifinalsInfo.music_change_from_preliminary || false}
                   onChange={() => handleMusicChange(false)}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  required
                 />
                 予選とは異なる楽曲を使用する
               </label>
