@@ -18,6 +18,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('music')
   const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('')
+  const [soundChangeOption, setSoundChangeOption] = useState<'same' | 'different' | ''>('')
   const [finalsInfo, setFinalsInfo] = useState<Partial<FinalsInfo>>({
     entry_id: entry.id,
     music_change: false,
@@ -57,6 +58,12 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           setMusicChangeOption('unchanged')
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
+        }
+        // sound_change_from_semifinalsの値に基づいてsoundChangeOptionを設定
+        if (data.sound_change_from_semifinals === false && data.sound_start_timing) {
+          setSoundChangeOption('same')
+        } else if (data.sound_change_from_semifinals === true) {
+          setSoundChangeOption('different')
         }
       }
     } catch (err) {
@@ -122,6 +129,52 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         music_type: '',
         music_data_path: '',
         music_usage_method: ''
+      }))
+    }
+  }
+
+  const handleSoundChangeOption = async (option: 'same' | 'different') => {
+    setSoundChangeOption(option)
+    setError(null)
+    setSuccess(null)
+    
+    if (option === 'same') {
+      // 準決勝から音響指示データをコピー
+      try {
+        const { data: semifinalsData } = await supabase
+          .from('semifinals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .single()
+
+        if (semifinalsData) {
+          setFinalsInfo(prev => ({
+            ...prev,
+            sound_change_from_semifinals: false,
+            sound_start_timing: semifinalsData.sound_start_timing,
+            chaser_song_designation: semifinalsData.chaser_song_designation,
+            chaser_song: semifinalsData.chaser_song,
+            fade_out_start_time: semifinalsData.fade_out_start_time,
+            fade_out_complete_time: semifinalsData.fade_out_complete_time
+          }))
+          setSuccess('準決勝の音響指示情報をコピーしました')
+        } else {
+          setError('準決勝情報が見つかりません')
+        }
+      } catch (err) {
+        console.error('準決勝情報の読み込みエラー:', err)
+        setError('準決勝情報の読み込みに失敗しました')
+      }
+    } else if (option === 'different') {
+      // 異なる音響指示の場合はフィールドをクリア
+      setFinalsInfo(prev => ({
+        ...prev,
+        sound_change_from_semifinals: true,
+        sound_start_timing: '',
+        chaser_song_designation: '',
+        chaser_song: '',
+        fade_out_start_time: '',
+        fade_out_complete_time: ''
       }))
     }
   }
@@ -492,15 +545,33 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           <h4 className="font-medium">音響指示情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.sound_change_from_semifinals || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, sound_change_from_semifinals: e.target.checked }))}
-                className="mr-2"
-              />
-              準決勝との音響指示変更の有無
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              準決勝との音響指示 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sound_change_option"
+                  value="same"
+                  checked={soundChangeOption === 'same'}
+                  onChange={() => handleSoundChangeOption('same')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝と同じ音響指示
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sound_change_option"
+                  value="different"
+                  checked={soundChangeOption === 'different'}
+                  onChange={() => handleSoundChangeOption('different')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝と異なる音響指示
+              </label>
+            </div>
           </div>
 
           <div>
@@ -512,6 +583,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.sound_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, sound_start_timing: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={soundChangeOption === 'same'}
             />
           </div>
 
@@ -519,25 +591,41 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               チェイサー（退場）曲の指定
             </label>
-            <input
-              type="text"
+            <select
               value={finalsInfo.chaser_song_designation || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_song_designation: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+              disabled={soundChangeOption === 'same'}
+            >
+              <option value="">選択してください</option>
+              <option value="自作曲に組み込み">自作曲に組み込み</option>
+              <option value="必要">必要</option>
+              <option value="不要（無音）">不要（無音）</option>
+            </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              チェイサー（退場）曲
-            </label>
-            <input
-              type="text"
-              value={finalsInfo.chaser_song || ''}
-              onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+          {finalsInfo.chaser_song_designation === '必要' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                チェイサー（退場）曲 音源
+              </label>
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleFileUpload('chaser_song', file)
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={soundChangeOption === 'same'}
+              />
+              {finalsInfo.chaser_song && (
+                <div className="mt-2 text-sm text-gray-600">
+                  アップロード済み
+                </div>
+              )}
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -549,6 +637,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, fade_out_start_time: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="例：3:45"
+              disabled={soundChangeOption === 'same'}
             />
           </div>
 
@@ -562,6 +651,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, fade_out_complete_time: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="例：4:00"
+              disabled={soundChangeOption === 'same'}
             />
           </div>
         </div>
