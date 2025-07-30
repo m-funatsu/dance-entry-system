@@ -320,8 +320,8 @@ export interface FinalsInfo {
   choreographer_name_kana?: string
   choreographer2_name?: string
   choreographer2_name_kana?: string
-  choreographer_attendance?: boolean
-  choreographer_photo_permission?: boolean
+  choreographer_attendance?: string
+  choreographer_photo_permission?: string
   choreographer_photo_path?: string
   created_at: string
   created_by?: string

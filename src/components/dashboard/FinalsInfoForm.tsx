@@ -19,6 +19,8 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [activeSection, setActiveSection] = useState('music')
   const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('')
   const [soundChangeOption, setSoundChangeOption] = useState<'same' | 'different' | ''>('')
+  const [lightingChangeOption, setLightingChangeOption] = useState<'same' | 'different' | ''>('')
+  const [choreographerChangeOption, setChoreographerChangeOption] = useState<'same' | 'different' | ''>('')
   const [finalsInfo, setFinalsInfo] = useState<Partial<FinalsInfo>>({
     entry_id: entry.id,
     music_change: false,
@@ -26,8 +28,8 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     sound_change_from_semifinals: false,
     lighting_change_from_semifinals: false,
     choreographer_change: false,
-    choreographer_attendance: false,
-    choreographer_photo_permission: false
+    choreographer_attendance: '',
+    choreographer_photo_permission: ''
   })
 
   useEffect(() => {
@@ -64,6 +66,18 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           setSoundChangeOption('same')
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
+        }
+        // lighting_change_from_semifinalsの値に基づいてlightingChangeOptionを設定
+        if (data.lighting_change_from_semifinals === false && data.dance_start_timing) {
+          setLightingChangeOption('same')
+        } else if (data.lighting_change_from_semifinals === true) {
+          setLightingChangeOption('different')
+        }
+        // choreographer_changeの値に基づいてchoreographerChangeOptionを設定
+        if (data.choreographer_change === false && data.choreographer_name) {
+          setChoreographerChangeOption('same')
+        } else if (data.choreographer_change === true) {
+          setChoreographerChangeOption('different')
         }
       }
     } catch (err) {
@@ -229,6 +243,168 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     }
   }
 
+  const handleLightingChangeOption = async (option: 'same' | 'different') => {
+    setLightingChangeOption(option)
+    setError(null)
+    setSuccess(null)
+    
+    if (option === 'same') {
+      // 準決勝から照明指示データをコピー
+      try {
+        const { data: semifinalsData } = await supabase
+          .from('semifinals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .single()
+
+        if (semifinalsData) {
+          setFinalsInfo(prev => ({
+            ...prev,
+            lighting_change_from_semifinals: false,
+            dance_start_timing: semifinalsData.dance_start_timing,
+            scene1_time: semifinalsData.scene1_time,
+            scene1_trigger: semifinalsData.scene1_trigger,
+            scene1_color_type: semifinalsData.scene1_color_type,
+            scene1_color_other: semifinalsData.scene1_color_other,
+            scene1_image: semifinalsData.scene1_image,
+            scene1_image_path: semifinalsData.scene1_image_path,
+            scene1_notes: semifinalsData.scene1_notes,
+            scene2_time: semifinalsData.scene2_time,
+            scene2_trigger: semifinalsData.scene2_trigger,
+            scene2_color_type: semifinalsData.scene2_color_type,
+            scene2_color_other: semifinalsData.scene2_color_other,
+            scene2_image: semifinalsData.scene2_image,
+            scene2_image_path: semifinalsData.scene2_image_path,
+            scene2_notes: semifinalsData.scene2_notes,
+            scene3_time: semifinalsData.scene3_time,
+            scene3_trigger: semifinalsData.scene3_trigger,
+            scene3_color_type: semifinalsData.scene3_color_type,
+            scene3_color_other: semifinalsData.scene3_color_other,
+            scene3_image: semifinalsData.scene3_image,
+            scene3_image_path: semifinalsData.scene3_image_path,
+            scene3_notes: semifinalsData.scene3_notes,
+            scene4_time: semifinalsData.scene4_time,
+            scene4_trigger: semifinalsData.scene4_trigger,
+            scene4_color_type: semifinalsData.scene4_color_type,
+            scene4_color_other: semifinalsData.scene4_color_other,
+            scene4_image: semifinalsData.scene4_image,
+            scene4_image_path: semifinalsData.scene4_image_path,
+            scene4_notes: semifinalsData.scene4_notes,
+            scene5_time: semifinalsData.scene5_time,
+            scene5_trigger: semifinalsData.scene5_trigger,
+            scene5_color_type: semifinalsData.scene5_color_type,
+            scene5_color_other: semifinalsData.scene5_color_other,
+            scene5_image: semifinalsData.scene5_image,
+            scene5_image_path: semifinalsData.scene5_image_path,
+            scene5_notes: semifinalsData.scene5_notes,
+            chaser_exit_time: semifinalsData.chaser_exit_time,
+            chaser_exit_trigger: semifinalsData.chaser_exit_trigger,
+            chaser_exit_color_type: semifinalsData.chaser_exit_color_type,
+            chaser_exit_color_other: semifinalsData.chaser_exit_color_other,
+            chaser_exit_image: semifinalsData.chaser_exit_image,
+            chaser_exit_image_path: semifinalsData.chaser_exit_image_path,
+            chaser_exit_notes: semifinalsData.chaser_exit_notes
+          }))
+          setSuccess('準決勝の照明指示情報をコピーしました')
+        } else {
+          setError('準決勝情報が見つかりません')
+        }
+      } catch (err) {
+        console.error('準決勝情報の読み込みエラー:', err)
+        setError('準決勝情報の読み込みに失敗しました')
+      }
+    } else if (option === 'different') {
+      // 異なる照明指示の場合はフィールドをクリア
+      setFinalsInfo(prev => ({
+        ...prev,
+        lighting_change_from_semifinals: true,
+        dance_start_timing: '',
+        scene1_time: '',
+        scene1_trigger: '',
+        scene1_color_type: '',
+        scene1_color_other: '',
+        scene1_image: '',
+        scene1_image_path: '',
+        scene1_notes: '',
+        scene2_time: '',
+        scene2_trigger: '',
+        scene2_color_type: '',
+        scene2_color_other: '',
+        scene2_image: '',
+        scene2_image_path: '',
+        scene2_notes: '',
+        scene3_time: '',
+        scene3_trigger: '',
+        scene3_color_type: '',
+        scene3_color_other: '',
+        scene3_image: '',
+        scene3_image_path: '',
+        scene3_notes: '',
+        scene4_time: '',
+        scene4_trigger: '',
+        scene4_color_type: '',
+        scene4_color_other: '',
+        scene4_image: '',
+        scene4_image_path: '',
+        scene4_notes: '',
+        scene5_time: '',
+        scene5_trigger: '',
+        scene5_color_type: '',
+        scene5_color_other: '',
+        scene5_image: '',
+        scene5_image_path: '',
+        scene5_notes: '',
+        chaser_exit_time: '',
+        chaser_exit_trigger: '',
+        chaser_exit_color_type: '',
+        chaser_exit_color_other: '',
+        chaser_exit_image: '',
+        chaser_exit_image_path: '',
+        chaser_exit_notes: ''
+      }))
+    }
+  }
+
+  const handleChoreographerChangeOption = async (option: 'same' | 'different') => {
+    setChoreographerChangeOption(option)
+    setError(null)
+    setSuccess(null)
+    
+    if (option === 'same') {
+      // 準決勝から振付師データをコピー
+      try {
+        const { data: semifinalsData } = await supabase
+          .from('semifinals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .single()
+
+        if (semifinalsData) {
+          setFinalsInfo(prev => ({
+            ...prev,
+            choreographer_change: false,
+            choreographer_name: semifinalsData.choreographer_name,
+            choreographer_name_kana: semifinalsData.choreographer_name_kana
+          }))
+          setSuccess('準決勝の振付師情報をコピーしました')
+        } else {
+          setError('準決勝情報が見つかりません')
+        }
+      } catch (err) {
+        console.error('準決勝情報の読み込みエラー:', err)
+        setError('準決勝情報の読み込みに失敗しました')
+      }
+    } else if (option === 'different') {
+      // 異なる振付師の場合はフィールドをクリア
+      setFinalsInfo(prev => ({
+        ...prev,
+        choreographer_change: true,
+        choreographer_name: '',
+        choreographer_name_kana: ''
+      }))
+    }
+  }
+
   const handleFileUpload = async (field: string, file: File) => {
     try {
       const fileExt = file.name.split('.').pop()
@@ -248,6 +424,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         ...prev,
         [field]: publicUrl
       }))
+      setSuccess('ファイルがアップロードされました')
     } catch (err) {
       console.error('ファイルアップロードエラー:', err)
       setError('ファイルのアップロードに失敗しました')
@@ -663,15 +840,33 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           <h4 className="font-medium">照明指示情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.lighting_change_from_semifinals || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, lighting_change_from_semifinals: e.target.checked }))}
-                className="mr-2"
-              />
-              準決勝との照明指示変更の有無
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              準決勝との照明指示変更の有無 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="lighting_change_option"
+                  value="same"
+                  checked={lightingChangeOption === 'same'}
+                  onChange={() => handleLightingChangeOption('same')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝と同じ照明指示
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="lighting_change_option"
+                  value="different"
+                  checked={lightingChangeOption === 'different'}
+                  onChange={() => handleLightingChangeOption('different')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝と異なる照明指示
+              </label>
+            </div>
           </div>
 
           <div>
@@ -683,6 +878,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.dance_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, dance_start_timing: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={lightingChangeOption === 'same'}
             />
           </div>
 
@@ -701,6 +897,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_time` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_time`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                     placeholder="例：0:30"
                   />
                 </div>
@@ -714,6 +911,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_trigger` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_trigger`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                   />
                 </div>
 
@@ -725,6 +923,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_color_type` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_type`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                   >
                     <option value="">選択してください</option>
                     {colorTypes.map(color => (
@@ -742,6 +941,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_color_other` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_other`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                   />
                 </div>
 
@@ -754,6 +954,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_image` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_image`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                   />
                 </div>
 
@@ -761,15 +962,42 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     イメージ画像
                   </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) handleFileUpload(`scene${sceneNum}_image_path`, file)
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id={`scene${sceneNum}_image_input`}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleFileUpload(`scene${sceneNum}_image_path`, file)
+                      }}
+                      className="hidden"
+                      disabled={lightingChangeOption === 'same'}
+                    />
+                    <label
+                      htmlFor={`scene${sceneNum}_image_input`}
+                      className={`flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        lightingChangeOption === 'same' 
+                          ? 'border-gray-200 bg-gray-50 cursor-not-allowed' 
+                          : 'border-gray-300 hover:border-indigo-500 hover:bg-indigo-50'
+                      }`}
+                    >
+                      <svg className="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm text-gray-600">
+                        クリックして画像を選択
+                      </span>
+                    </label>
+                    {finalsInfo[`scene${sceneNum}_image_path` as keyof FinalsInfo] && (
+                      <div className="mt-2 text-sm text-green-600 flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        アップロード済み
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="md:col-span-2">
@@ -780,6 +1008,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     value={finalsInfo[`scene${sceneNum}_notes` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_notes`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    disabled={lightingChangeOption === 'same'}
                     rows={2}
                   />
                 </div>
@@ -801,6 +1030,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_time || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_time: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                 />
               </div>
 
@@ -813,6 +1043,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_trigger || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_trigger: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                 />
               </div>
 
@@ -824,6 +1055,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_color_type || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_type: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                 >
                   <option value="">選択してください</option>
                   {colorTypes.map(color => (
@@ -841,6 +1073,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_color_other || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_other: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                 />
               </div>
 
@@ -853,6 +1086,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_image || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_image: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                 />
               </div>
 
@@ -860,15 +1094,42 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   イメージ画像
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) handleFileUpload('chaser_exit_image_path', file)
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="chaser_exit_image_input"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleFileUpload('chaser_exit_image_path', file)
+                    }}
+                    className="hidden"
+                    disabled={lightingChangeOption === 'same'}
+                  />
+                  <label
+                    htmlFor="chaser_exit_image_input"
+                    className={`flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                      lightingChangeOption === 'same' 
+                        ? 'border-gray-200 bg-gray-50 cursor-not-allowed' 
+                        : 'border-gray-300 hover:border-indigo-500 hover:bg-indigo-50'
+                    }`}
+                  >
+                    <svg className="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm text-gray-600">
+                      クリックして画像を選択
+                    </span>
+                  </label>
+                  {finalsInfo.chaser_exit_image_path && (
+                    <div className="mt-2 text-sm text-green-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      アップロード済み
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -879,6 +1140,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   value={finalsInfo.chaser_exit_notes || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_notes: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  disabled={lightingChangeOption === 'same'}
                   rows={2}
                 />
               </div>
@@ -893,15 +1155,33 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           <h4 className="font-medium">振付変更情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={finalsInfo.choreographer_change || false}
-                onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_change: e.target.checked }))}
-                className="mr-2"
-              />
-              振付師の変更
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              振付師の変更 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change_option"
+                  value="same"
+                  checked={choreographerChangeOption === 'same'}
+                  onChange={() => handleChoreographerChangeOption('same')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝と同じ振付師
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change_option"
+                  value="different"
+                  checked={choreographerChangeOption === 'different'}
+                  onChange={() => handleChoreographerChangeOption('different')}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝とは異なる振付師
+              </label>
+            </div>
           </div>
 
           <div>
@@ -913,6 +1193,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.choreographer_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={choreographerChangeOption === 'same'}
             />
           </div>
 
@@ -925,6 +1206,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.choreographer_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={choreographerChangeOption === 'same'}
             />
           </div>
 
@@ -937,6 +1219,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.choreographer2_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={choreographerChangeOption === 'same'}
             />
           </div>
 
@@ -949,54 +1232,98 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               value={finalsInfo.choreographer2_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name_kana: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={choreographerChangeOption === 'same'}
             />
           </div>
 
           <div className="border-t pt-4">
             <h4 className="font-medium mb-3">作品振付師出席情報</h4>
             
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={finalsInfo.choreographer_attendance || false}
-                  onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_attendance: e.target.checked }))}
-                  className="mr-2"
-                />
-                作品振付師出席予定
-              </label>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  作品振付師出席予定 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={finalsInfo.choreographer_attendance || ''}
+                  onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_attendance: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">選択してください</option>
+                  <option value="振付師本人が当日会場で席について観戦する">振付師本人が当日会場で席について観戦する</option>
+                  <option value="振付師本人が当日会場にいる（役員・選手等）">振付師本人が当日会場にいる（役員・選手等）</option>
+                  <option value="振付師の代理人が当日会場で席について観戦する">振付師の代理人が当日会場で席について観戦する</option>
+                  <option value="振付師の代理人が当日会場にいる（役員等）">振付師の代理人が当日会場にいる（役員等）</option>
+                  <option value="欠席する">欠席する</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  作品振付師写真掲載 <span className="text-red-500">*</span>
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="choreographer_photo_permission"
+                      value="希望する"
+                      checked={finalsInfo.choreographer_photo_permission === '希望する'}
+                      onChange={() => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: '希望する' }))}
+                      className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    希望する
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="choreographer_photo_permission"
+                      value="希望しない"
+                      checked={finalsInfo.choreographer_photo_permission === '希望しない'}
+                      onChange={() => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: '希望しない' }))}
+                      className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    希望しない
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={finalsInfo.choreographer_photo_permission || false}
-                  onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_photo_permission: e.target.checked }))}
-                  className="mr-2"
-                />
-                作品振付師写真掲載
-              </label>
-            </div>
-
-            <div>
+            <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 作品振付師写真
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleFileUpload('choreographer_photo_path', file)
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-              {finalsInfo.choreographer_photo_path && (
-                <div className="mt-2 text-sm text-gray-600">
-                  アップロード済み
-                </div>
-              )}
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="choreographer_photo_input"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleFileUpload('choreographer_photo_path', file)
+                  }}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="choreographer_photo_input"
+                  className="flex items-center justify-center px-6 py-3 border-2 border-dashed border-indigo-300 rounded-lg cursor-pointer transition-all hover:border-indigo-500 hover:bg-indigo-50 bg-gradient-to-br from-indigo-50 to-purple-50"
+                >
+                  <svg className="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-base font-medium text-indigo-600">
+                    クリックして写真を選択
+                  </span>
+                </label>
+                {finalsInfo.choreographer_photo_path && (
+                  <div className="mt-3 p-3 bg-green-50 rounded-lg flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium text-green-700">写真がアップロードされました</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
