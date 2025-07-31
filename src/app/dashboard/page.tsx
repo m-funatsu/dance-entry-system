@@ -87,6 +87,30 @@ export default async function DashboardPage() {
     semifinalsInfo = data
   }
 
+  // 決勝情報の取得
+  let finalsInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('finals_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    finalsInfo = data
+  }
+
+  // SNS情報の取得
+  let snsInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('sns_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    snsInfo = data
+  }
+
 
   // プログラム掲載用情報の完了判定関数
   const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
@@ -238,6 +262,29 @@ export default async function DashboardPage() {
       if (typeof value === 'boolean') return value !== null && value !== undefined
       return value && value.toString().trim() !== ''
     })
+  }
+
+  // 決勝情報の完了判定関数
+  const checkFinalsInfoComplete = (finalsInfo: { [key: string]: unknown } | null) => {
+    if (!finalsInfo) return false
+    
+    // 必須フィールドのチェック（決勝情報フォームに合わせて後で調整）
+    const requiredFields = [
+      'music_title',
+      'artist'
+    ]
+    
+    return requiredFields.every(field => {
+      const value = finalsInfo[field]
+      return value && value.toString().trim() !== ''
+    })
+  }
+
+  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null) => {
+    if (!snsInfo) return false
+    
+    // SNS情報フォームには必須項目がないため、保存されていればOK
+    return true
   }
 
 
@@ -655,7 +702,7 @@ export default async function DashboardPage() {
                         決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && (entry.final_music_title || entry.final_original_artist) ? '登録済み' : '未登録'}
+                        {checkFinalsInfoComplete(finalsInfo) ? '登録済み' : finalsInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.finals_deadline)
@@ -681,7 +728,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   {isFormEditable('finals_deadline') ? (
                     <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {entry && (entry.final_music_title || entry.final_original_artist) ? '編集' : '登録'} →
+                      {finalsInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
@@ -707,7 +754,7 @@ export default async function DashboardPage() {
                         SNS情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && (entry.instagram || entry.twitter || entry.facebook) ? '登録済み' : '未登録'}
+                        {checkSnsInfoComplete(snsInfo) ? '登録済み' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.sns_deadline)
@@ -924,22 +971,44 @@ export default async function DashboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">準決勝用楽曲</label>
-                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.music_title || '未設定'}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.work_title || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">使用楽曲タイトル</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.music_title || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">アーティスト</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.artist || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">音楽スタートタイミング</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.sound_start_timing || '未設定'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
-                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.artist || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
-                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.work_title || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">振込先銀行</label>
-                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.bank_name ? `${semifinalsInfo.bank_name} ${semifinalsInfo.branch_name || ''}` : '未設定'}</p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">踊り出しタイミング</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.dance_start_timing || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.choreographer_name || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">賞金振込先銀行</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {semifinalsInfo?.bank_name ? `${semifinalsInfo.bank_name} ${semifinalsInfo.branch_name || ''}` : '未設定'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">口座名義</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.account_holder || '未設定'}</p>
+                      </div>
                     </div>
                   </div>
                   
@@ -993,12 +1062,36 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">決勝用楽曲</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.final_music_title || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">作品タイトル</label>
+                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.work_title || '未設定'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">決勝用原曲アーティスト</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.final_original_artist || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">使用楽曲タイトル</label>
+                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.music_title || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
+                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.artist || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">楽曲変更</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {finalsInfo?.music_change 
+                          ? (finalsInfo?.copy_preliminary_music ? '予選と同じ楽曲' : '新しい楽曲')
+                          : '準決勝と同じ楽曲'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">音響指示変更</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {finalsInfo?.sound_change_from_semifinals ? '変更あり' : '準決勝と同じ'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">照明指示変更</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {finalsInfo?.lighting_change_from_semifinals ? '変更あり' : '準決勝と同じ'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1021,16 +1114,22 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Instagram</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.instagram || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">練習風景動画</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {snsInfo?.practice_video_path ? 'アップロード済み' : '未設定'}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Twitter</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.twitter || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">選手紹介・見所動画</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {snsInfo?.introduction_highlight_path ? 'アップロード済み' : '未設定'}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Facebook</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.facebook || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">備考</label>
+                      <p className="mt-1 text-base text-gray-900">
+                        {snsInfo?.sns_notes || '未設定'}
+                      </p>
                     </div>
                   </div>
                 </div>
