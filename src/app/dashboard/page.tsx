@@ -283,8 +283,16 @@ export default async function DashboardPage() {
   const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null) => {
     if (!snsInfo) return false
     
-    // SNS情報フォームには必須項目がないため、保存されていればOK
-    return true
+    // 必須項目のチェック
+    const requiredFields = [
+      'practice_video_path',
+      'introduction_highlight_path'
+    ]
+    
+    return requiredFields.every(field => {
+      const value = snsInfo[field]
+      return value && value.toString().trim() !== ''
+    })
   }
 
 

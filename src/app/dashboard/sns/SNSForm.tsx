@@ -179,6 +179,13 @@ export default function SNSForm({ entry }: SNSFormProps) {
     sns_notes: ''
   })
 
+  // 必須項目が全て入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    if (!snsInfo.practice_video_path) return false
+    if (!snsInfo.introduction_highlight_path) return false
+    return true
+  }
+
   // データを読み込む
   useEffect(() => {
     if (!entry?.id) return
@@ -213,6 +220,20 @@ export default function SNSForm({ entry }: SNSFormProps) {
         showToast('基本情報を先に保存してください', 'error')
         router.push('/dashboard/basic-info')
         return
+      }
+
+      // 一時保存でない場合は必須項目をチェック
+      if (!isTemporary) {
+        if (!snsInfo.practice_video_path) {
+          showToast('練習風景動画をアップロードしてください', 'error')
+          setSaving(false)
+          return
+        }
+        if (!snsInfo.introduction_highlight_path) {
+          showToast('選手紹介・見所動画をアップロードしてください', 'error')
+          setSaving(false)
+          return
+        }
       }
 
       const { data: existingData } = await supabase
@@ -329,12 +350,13 @@ export default function SNSForm({ entry }: SNSFormProps) {
       <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <p className="text-sm text-blue-800">
           SNS掲載に使用する動画や情報をアップロードしてください。
+          <span className="text-red-600 font-medium">（* は必須項目です）</span>
         </p>
       </div>
 
       {/* 練習風景動画 */}
       <VideoFileUpload
-        label="練習風景（1分程度）"
+        label="練習風景（約30秒）横長動画 *"
         disabled={false}
         value={snsInfo.practice_video_path}
         fileName={snsInfo.practice_video_filename}
@@ -344,7 +366,7 @@ export default function SNSForm({ entry }: SNSFormProps) {
 
       {/* 選手紹介・見所動画 */}
       <VideoFileUpload
-        label="選手紹介・見所（30秒）"
+        label="選手紹介・見所（30秒） *"
         disabled={false}
         value={snsInfo.introduction_highlight_path}
         fileName={snsInfo.introduction_highlight_filename}
@@ -394,9 +416,9 @@ export default function SNSForm({ entry }: SNSFormProps) {
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving || !entry}
+            disabled={saving || !entry || !isAllRequiredFieldsValid()}
             className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
-              saving || !entry
+              saving || !entry || !isAllRequiredFieldsValid()
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
