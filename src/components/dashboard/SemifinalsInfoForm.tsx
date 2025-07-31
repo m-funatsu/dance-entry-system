@@ -54,6 +54,9 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
   // 全ての必須項目が入力されているかチェック
   const isAllRequiredFieldsValid = () => {
+    // 初期状態では必須項目が選択されていないので無効にする
+    if (!hasLoadedInitialData) return false
+    
     return isTabValid('music') && isTabValid('sound') && isTabValid('lighting') && 
            isTabValid('choreographer') && isTabValid('bank')
   }
@@ -85,6 +88,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           choreographer_change_from_preliminary: data.choreographer_change_from_preliminary === false ? undefined : data.choreographer_change_from_preliminary
         }
         setSemifinalsInfo(processedData)
+        
+        // データベースに保存されたboolean値がある場合は、ユーザーが選択済みとして扱う
+        if (data.music_change_from_preliminary !== null && data.music_change_from_preliminary !== undefined) {
+          setUserSelectedFields(prev => new Set(prev).add('music_change_from_preliminary'))
+        }
+        if (data.choreographer_change_from_preliminary !== null && data.choreographer_change_from_preliminary !== undefined) {
+          setUserSelectedFields(prev => new Set(prev).add('choreographer_change_from_preliminary'))
+        }
       }
       setHasLoadedInitialData(true)
     } catch (err) {
