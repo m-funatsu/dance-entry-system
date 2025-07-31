@@ -43,10 +43,19 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         // 振付情報の必須項目（ユーザーが選択したかチェック）
         return userSelectedFields.has('choreographer_change_from_preliminary')
       case 'bank':
-        // 賞金振込先情報の必須項目
-        return !!(semifinalsInfo.bank_name && semifinalsInfo.branch_name && 
-                 semifinalsInfo.account_type && semifinalsInfo.account_number && 
-                 semifinalsInfo.account_holder)
+        // 賞金振込先情報の必須項目（全フィールドが必須）
+        return !!(
+          semifinalsInfo.bank_name && 
+          semifinalsInfo.bank_name.trim() !== '' &&
+          semifinalsInfo.branch_name && 
+          semifinalsInfo.branch_name.trim() !== '' &&
+          semifinalsInfo.account_type && 
+          semifinalsInfo.account_type.trim() !== '' &&
+          semifinalsInfo.account_number && 
+          semifinalsInfo.account_number.trim() !== '' &&
+          semifinalsInfo.account_holder &&
+          semifinalsInfo.account_holder.trim() !== ''
+        )
       default:
         return true
     }
@@ -898,6 +907,13 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         <>
           <div className="space-y-4">
           <h4 className="font-medium">賞金振込先情報</h4>
+          
+          {!isTabValid('bank') && (
+            <div className="bg-yellow-50 text-yellow-800 p-4 rounded-md">
+              <p className="font-medium">全ての項目が必須です</p>
+              <p className="text-sm mt-1">銀行名、支店名、口座種類、口座番号、口座名義を全て入力してください。</p>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
