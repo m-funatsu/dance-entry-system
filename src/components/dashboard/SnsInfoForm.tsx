@@ -23,6 +23,13 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     sns_notes: ''
   })
 
+  // 必須項目が全て入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    if (!snsInfo.practice_video_path) return false
+    if (!snsInfo.introduction_highlight_path) return false
+    return true
+  }
+
   useEffect(() => {
     loadSnsInfo()
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -147,6 +154,20 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     setSaving(true)
 
     try {
+      // 一時保存でない場合は必須項目をチェック
+      if (!isTemporary) {
+        if (!snsInfo.practice_video_path) {
+          setError('練習風景動画をアップロードしてください')
+          setSaving(false)
+          return
+        }
+        if (!snsInfo.introduction_highlight_path) {
+          setError('選手紹介・見所動画をアップロードしてください')
+          setSaving(false)
+          return
+        }
+      }
+
       const { data: existingData } = await supabase
         .from('sns_info')
         .select('id')
@@ -192,7 +213,12 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">SNS掲載情報</h3>
+      <div>
+        <h3 className="text-lg font-semibold">SNS掲載情報</h3>
+        <p className="text-sm text-gray-600 mt-1">
+          <span className="text-red-500">*</span> は必須項目です
+        </p>
+      </div>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
@@ -209,7 +235,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
       <div className="space-y-6">
         {/* 練習動画 */}
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h4 className="text-base font-medium text-gray-900 mb-4">練習動画（約30秒）</h4>
+          <h4 className="text-base font-medium text-gray-900 mb-4">練習動画（約30秒）横長動画 <span className="text-red-500">*</span></h4>
           <p className="text-sm text-gray-600 mb-4">
             横長動画で約30秒の練習風景を撮影してアップロードしてください。
           </p>
@@ -302,7 +328,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
         {/* 紹介・見どころ動画 */}
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h4 className="text-base font-medium text-gray-900 mb-4">紹介・見どころ動画（約30秒）</h4>
+          <h4 className="text-base font-medium text-gray-900 mb-4">選手紹介・見所（30秒） <span className="text-red-500">*</span></h4>
           <p className="text-sm text-gray-600 mb-4">
             横長動画で約30秒の作品の見どころや選手の紹介を撮影してアップロードしてください。
           </p>
@@ -412,14 +438,22 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
         <button
           onClick={() => handleSave(true)}
           disabled={saving}
-          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          className={`px-6 py-2 rounded-md text-white ${
+            saving
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           {saving ? '一時保存中...' : '一時保存'}
         </button>
         <button
           onClick={() => handleSave(false)}
-          disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          disabled={saving || !isAllRequiredFieldsValid()}
+          className={`px-6 py-2 rounded-md text-white ${
+            saving || !isAllRequiredFieldsValid()
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
           {saving ? '保存中...' : '保存'}
         </button>
