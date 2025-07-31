@@ -23,6 +23,28 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     player_photo_type: ''
   })
 
+  // 必須項目が全て入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    // 基本的な必須項目
+    if (!programInfo.player_photo_type) return false
+    if (!programInfo.player_photo_path) return false
+    if (!programInfo.semifinal_story || !programInfo.semifinal_story.trim()) return false
+    if (!programInfo.semifinal_highlight || !programInfo.semifinal_highlight.trim()) return false
+    if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
+        !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) return false
+
+    // 2曲の場合の追加必須項目
+    if (programInfo.song_count === '2曲') {
+      if (!programInfo.final_player_photo_path) return false
+      if (!programInfo.final_story || !programInfo.final_story.trim()) return false
+      if (!programInfo.final_highlight || !programInfo.final_highlight.trim()) return false
+      if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
+          !programInfo.final_image3_path || !programInfo.final_image4_path) return false
+    }
+
+    return true
+  }
+
   useEffect(() => {
     loadProgramInfo()
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -407,14 +429,22 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         <button
           onClick={() => handleSave(true)}
           disabled={saving}
-          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          className={`px-6 py-2 rounded-md text-white ${
+            saving
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           {saving ? '一時保存中...' : '一時保存'}
         </button>
         <button
           onClick={() => handleSave(false)}
-          disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          disabled={saving || !isAllRequiredFieldsValid()}
+          className={`px-6 py-2 rounded-md text-white ${
+            saving || !isAllRequiredFieldsValid()
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
           {saving ? '保存中...' : '保存'}
         </button>
