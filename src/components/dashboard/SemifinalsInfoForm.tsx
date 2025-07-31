@@ -27,27 +27,31 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     loadSemifinalsInfo()
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 必須項目が全て入力されているかチェック
-  const isFormValid = () => {
-    // 楽曲情報の必須項目
-    if (semifinalsInfo.music_change_from_preliminary === undefined) return false
-    
-    // 振付情報の必須項目
-    if (semifinalsInfo.choreographer_change_from_preliminary === undefined) return false
-    
-    // 音響指示情報の必須項目
-    if (!semifinalsInfo.sound_start_timing) return false
-    
-    // 照明指示情報の必須項目
-    if (!semifinalsInfo.dance_start_timing) return false
-    
-    // 賞金振込先情報の必須項目
-    if (!semifinalsInfo.bank_name || !semifinalsInfo.branch_name || 
-        !semifinalsInfo.account_type || !semifinalsInfo.account_number || 
-        !semifinalsInfo.account_holder) return false
-    
-    return true
+  // 各タブの必須項目が入力されているかチェック
+  const isTabValid = (tab: string) => {
+    switch (tab) {
+      case 'music':
+        // 楽曲情報の必須項目
+        return semifinalsInfo.music_change_from_preliminary !== undefined
+      case 'sound':
+        // 音響指示情報の必須項目
+        return !!semifinalsInfo.sound_start_timing
+      case 'lighting':
+        // 照明指示情報の必須項目
+        return !!semifinalsInfo.dance_start_timing
+      case 'choreographer':
+        // 振付情報の必須項目
+        return semifinalsInfo.choreographer_change_from_preliminary !== undefined
+      case 'bank':
+        // 賞金振込先情報の必須項目
+        return !!(semifinalsInfo.bank_name && semifinalsInfo.branch_name && 
+                 semifinalsInfo.account_type && semifinalsInfo.account_number && 
+                 semifinalsInfo.account_holder)
+      default:
+        return true
+    }
   }
+
 
   const loadSemifinalsInfo = async () => {
     setLoading(true)
@@ -198,15 +202,23 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         </div>
       )}
 
-      {!isFormValid() && (
+      {!isTabValid(activeSection) && (
         <div className="bg-yellow-50 text-yellow-800 p-4 rounded-md">
-          <p className="font-medium">全ての必須項目を入力してください。</p>
+          <p className="font-medium">このタブの必須項目を入力してください。</p>
           <ul className="mt-2 text-sm list-disc list-inside">
-            <li>楽曲情報：予選との楽曲情報の変更</li>
-            <li>音響指示情報：音楽スタートのタイミング</li>
-            <li>照明指示情報：踊り出しタイミング</li>
-            <li>振付情報：予選との振付師の変更</li>
-            <li>賞金振込先情報：全項目</li>
+            {activeSection === 'music' && <li>予選との楽曲情報の変更を選択してください</li>}
+            {activeSection === 'sound' && <li>音楽スタートのタイミングを入力してください</li>}
+            {activeSection === 'lighting' && <li>踊り出しタイミングを入力してください</li>}
+            {activeSection === 'choreographer' && <li>予選との振付師の変更を選択してください</li>}
+            {activeSection === 'bank' && (
+              <>
+                <li>銀行名を入力してください</li>
+                <li>支店名を入力してください</li>
+                <li>口座種類を選択してください</li>
+                <li>口座番号を入力してください</li>
+                <li>口座名義を入力してください</li>
+              </>
+            )}
           </ul>
         </div>
       )}
@@ -433,14 +445,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving || !isFormValid()}
+              disabled={saving || !isTabValid('music')}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving || !isFormValid()}
+              disabled={saving || !isTabValid('music')}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
@@ -522,14 +534,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
+            disabled={saving || !isTabValid('sound')}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
+            disabled={saving || !isTabValid('sound')}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -760,14 +772,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
+            disabled={saving || !isTabValid('lighting')}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
+            disabled={saving || !isTabValid('lighting')}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -841,14 +853,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
+            disabled={saving || !isTabValid('choreographer')}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
+            disabled={saving || !isTabValid('choreographer')}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -931,14 +943,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving || !isFormValid()}
+              disabled={saving || !isTabValid('bank')}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving || !isFormValid()}
+              disabled={saving || !isTabValid('bank')}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
