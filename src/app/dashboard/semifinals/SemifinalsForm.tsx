@@ -340,7 +340,12 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         break
 
       case 'bank':
-        // 賞金振込先情報は必須項目なし（任意）
+        // 賞金振込先情報の必須項目
+        if (!semifinalsInfo.bank_name) errors.push('銀行名')
+        if (!semifinalsInfo.branch_name) errors.push('支店名')
+        if (!semifinalsInfo.account_type) errors.push('口座種類')
+        if (!semifinalsInfo.account_number) errors.push('口座番号')
+        if (!semifinalsInfo.account_holder) errors.push('口座名義')
         break
     }
 
@@ -1217,11 +1222,27 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       {/* 賞金振込先情報セクション */}
       {activeSection === 'bank' && (
         <div className="space-y-4">
-          <h4 className="font-medium">賞金振込先情報</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium">賞金振込先情報</h4>
+            <p className="text-sm text-gray-500">
+              <span className="text-red-500">*</span> は必須項目です
+            </p>
+          </div>
+          
+          {validationErrors.bank && validationErrors.bank.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-sm text-red-800 font-medium">以下の項目を入力してください：</p>
+              <ul className="list-disc list-inside text-sm text-red-700 mt-2">
+                {validationErrors.bank.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              銀行名
+              銀行名 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -1233,7 +1254,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              支店名
+              支店名 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -1245,7 +1266,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座種類
+              口座種類 <span className="text-red-500">*</span>
             </label>
             <select
               value={semifinalsInfo.account_type || ''}
@@ -1260,7 +1281,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座番号
+              口座番号 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -1272,7 +1293,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座名義
+              口座名義 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
