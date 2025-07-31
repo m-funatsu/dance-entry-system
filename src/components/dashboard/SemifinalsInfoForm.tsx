@@ -51,6 +51,12 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     }
   }
 
+  // 全ての必須項目が入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    return isTabValid('music') && isTabValid('sound') && isTabValid('lighting') && 
+           isTabValid('choreographer') && isTabValid('bank')
+  }
+
 
   const loadSemifinalsInfo = async () => {
     setLoading(true)
@@ -198,23 +204,15 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         </div>
       )}
 
-      {!isTabValid(activeSection) && (
+      {!isAllRequiredFieldsValid() && (
         <div className="bg-yellow-50 text-yellow-800 p-4 rounded-md">
-          <p className="font-medium">このタブの必須項目を入力してください。</p>
+          <p className="font-medium">全ての必須項目を入力してください。</p>
           <ul className="mt-2 text-sm list-disc list-inside">
-            {activeSection === 'music' && <li>予選との楽曲情報の変更を選択してください</li>}
-            {activeSection === 'sound' && <li>音楽スタートのタイミングを入力してください</li>}
-            {activeSection === 'lighting' && <li>踊り出しタイミングを入力してください</li>}
-            {activeSection === 'choreographer' && <li>予選との振付師の変更を選択してください</li>}
-            {activeSection === 'bank' && (
-              <>
-                <li>銀行名を入力してください</li>
-                <li>支店名を入力してください</li>
-                <li>口座種類を選択してください</li>
-                <li>口座番号を入力してください</li>
-                <li>口座名義を入力してください</li>
-              </>
-            )}
+            {!isTabValid('music') && <li>楽曲情報：予選との楽曲情報の変更</li>}
+            {!isTabValid('sound') && <li>音響指示情報：音楽スタートのタイミング</li>}
+            {!isTabValid('lighting') && <li>照明指示情報：踊り出しタイミング</li>}
+            {!isTabValid('choreographer') && <li>振付情報：予選との振付師の変更</li>}
+            {!isTabValid('bank') && <li>賞金振込先情報：全項目（銀行名、支店名、口座種類、口座番号、口座名義）</li>}
           </ul>
         </div>
       )}
@@ -441,14 +439,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving || !isTabValid('music')}
+              disabled={saving || !isAllRequiredFieldsValid()}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving || !isTabValid('music')}
+              disabled={saving || !isAllRequiredFieldsValid()}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
@@ -530,14 +528,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving || !isTabValid('sound')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving || !isTabValid('sound')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -768,14 +766,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving || !isTabValid('lighting')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving || !isTabValid('lighting')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -849,14 +847,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
           <button
             onClick={() => handleSave(true)}
-            disabled={saving || !isTabValid('choreographer')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             {saving ? '一時保存中...' : '一時保存'}
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving || !isTabValid('choreographer')}
+            disabled={saving || !isAllRequiredFieldsValid()}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? '保存中...' : '保存'}
@@ -939,14 +937,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving || !isTabValid('bank')}
+              disabled={saving || !isAllRequiredFieldsValid()}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving || !isTabValid('bank')}
+              disabled={saving || !isAllRequiredFieldsValid()}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
