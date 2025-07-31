@@ -75,6 +75,18 @@ export default async function DashboardPage() {
     programInfo = data
   }
 
+  // 準決勝情報の取得
+  let semifinalsInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('semifinals_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+    
+    semifinalsInfo = data
+  }
+
 
   // プログラム掲載用情報の完了判定関数
   const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
@@ -170,6 +182,60 @@ export default async function DashboardPage() {
     ]
     return requiredFields.every(field => {
       const value = preliminaryInfo[field]
+      return value && value.toString().trim() !== ''
+    })
+  }
+
+  // 準決勝情報の完了判定関数
+  const checkSemifinalsInfoComplete = (semifinalsInfo: { [key: string]: unknown } | null) => {
+    if (!semifinalsInfo) return false
+    
+    // 必須フィールドのチェック
+    const requiredFields = [
+      // 楽曲情報
+      'music_change_from_preliminary',
+      'work_title',
+      'work_character_story',
+      'copyright_permission',
+      'music_title',
+      'cd_title',
+      'artist',
+      'record_number',
+      'jasrac_code',
+      'music_type',
+      'music_data_path',
+      // 音響指示情報
+      'sound_start_timing',
+      'chaser_song_designation',
+      'fade_out_start_time',
+      'fade_out_complete_time',
+      // 照明指示情報
+      'dance_start_timing',
+      'scene1_time',
+      'scene1_trigger',
+      'scene1_color_type',
+      'scene1_color_other',
+      'scene1_image',
+      'scene1_image_path',
+      'chaser_exit_time',
+      'chaser_exit_trigger',
+      'chaser_exit_color_type',
+      'chaser_exit_color_other',
+      'chaser_exit_image',
+      'chaser_exit_image_path',
+      // 振付情報
+      'choreographer_change_from_preliminary',
+      // 賞金振込先情報
+      'bank_name',
+      'branch_name', 
+      'account_type',
+      'account_number',
+      'account_holder'
+    ]
+    
+    return requiredFields.every(field => {
+      const value = semifinalsInfo[field]
+      if (typeof value === 'boolean') return value !== null && value !== undefined
       return value && value.toString().trim() !== ''
     })
   }
@@ -537,7 +603,7 @@ export default async function DashboardPage() {
                         準決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {entry && (entry.music_title || entry.original_artist) ? '登録済み' : '未登録'}
+                        {checkSemifinalsInfoComplete(semifinalsInfo) ? '登録済み' : semifinalsInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
@@ -563,7 +629,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
                     <Link href="/dashboard/semifinals" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      {entry && (entry.music_title || entry.original_artist) ? '編集' : '登録'} →
+                      {semifinalsInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
@@ -861,15 +927,19 @@ export default async function DashboardPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-500">準決勝用楽曲</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.music_title || '未設定'}</p>
+                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.music_title || '未設定'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">原曲アーティスト</label>
-                      <p className="mt-1 text-base text-gray-900">{entry.original_artist || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
+                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.artist || '未設定'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">ストーリー・コンセプト</label>
-                      <p className="mt-1 text-base text-gray-900 whitespace-pre-line">{entry.story || '未設定'}</p>
+                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
+                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.work_title || '未設定'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">振込先銀行</label>
+                      <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.bank_name ? `${semifinalsInfo.bank_name} ${semifinalsInfo.branch_name || ''}` : '未設定'}</p>
                     </div>
                   </div>
                   
