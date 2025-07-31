@@ -603,7 +603,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {saving && savingMode === 'submit' ? '登録中...' : '完了登録'}
+            {saving && savingMode === 'submit' ? '保存中...' : '保存'}
           </button>
         </div>
       </div>
