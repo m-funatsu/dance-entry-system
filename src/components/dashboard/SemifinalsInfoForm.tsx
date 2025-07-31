@@ -16,7 +16,13 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('music')
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
-    entry_id: entry.id
+    entry_id: entry.id,
+    // 賞金振込先情報を明示的に空文字で初期化
+    bank_name: '',
+    branch_name: '',
+    account_type: '',
+    account_number: '',
+    account_holder: ''
   })
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
@@ -63,9 +69,6 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
   // 全ての必須項目が入力されているかチェック
   const isAllRequiredFieldsValid = () => {
-    // 初期状態では必須項目が選択されていないので無効にする
-    if (!hasLoadedInitialData) return false
-    
     return isTabValid('music') && isTabValid('sound') && isTabValid('lighting') && 
            isTabValid('choreographer') && isTabValid('bank')
   }
