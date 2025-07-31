@@ -19,6 +19,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     entry_id: entry.id
   })
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
+  const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!hasLoadedInitialData) {
@@ -30,8 +31,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const isTabValid = (tab: string) => {
     switch (tab) {
       case 'music':
-        // 楽曲情報の必須項目（boolean値なので、true/falseが設定されているかチェック）
-        return typeof semifinalsInfo.music_change_from_preliminary === 'boolean'
+        // 楽曲情報の必須項目（ユーザーが選択したかチェック）
+        return userSelectedFields.has('music_change_from_preliminary')
       case 'sound':
         // 音響指示情報の必須項目
         return !!semifinalsInfo.sound_start_timing
@@ -39,8 +40,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         // 照明指示情報の必須項目
         return !!semifinalsInfo.dance_start_timing
       case 'choreographer':
-        // 振付情報の必須項目（boolean値なので、true/falseが設定されているかチェック）
-        return typeof semifinalsInfo.choreographer_change_from_preliminary === 'boolean'
+        // 振付情報の必須項目（ユーザーが選択したかチェック）
+        return userSelectedFields.has('choreographer_change_from_preliminary')
       case 'bank':
         // 賞金振込先情報の必須項目
         return !!(semifinalsInfo.bank_name && semifinalsInfo.branch_name && 
@@ -77,7 +78,13 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
       if (data) {
         // データベースからのデータを設定
-        setSemifinalsInfo(data)
+        // boolean型のフィールドがfalseの場合、未選択として扱うためにundefinedに設定
+        const processedData = {
+          ...data,
+          music_change_from_preliminary: data.music_change_from_preliminary === false ? undefined : data.music_change_from_preliminary,
+          choreographer_change_from_preliminary: data.choreographer_change_from_preliminary === false ? undefined : data.choreographer_change_from_preliminary
+        }
+        setSemifinalsInfo(processedData)
       }
       setHasLoadedInitialData(true)
     } catch (err) {
@@ -253,7 +260,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   name="music_change_option"
                   value="true"
                   checked={semifinalsInfo.music_change_from_preliminary === true}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))}
+                  onChange={() => {
+                    setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))
+                    setUserSelectedFields(prev => new Set(prev).add('music_change_from_preliminary'))
+                  }}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 変更あり
@@ -264,7 +274,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   name="music_change_option"
                   value="false"
                   checked={semifinalsInfo.music_change_from_preliminary === false}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))}
+                  onChange={() => {
+                    setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))
+                    setUserSelectedFields(prev => new Set(prev).add('music_change_from_preliminary'))
+                  }}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
                 変更なし
@@ -799,7 +812,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   name="choreographer_change"
                   value="true"
                   checked={semifinalsInfo.choreographer_change_from_preliminary === true}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: true }))}
+                  onChange={() => {
+                    setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: true }))
+                    setUserSelectedFields(prev => new Set(prev).add('choreographer_change_from_preliminary'))
+                  }}
                   className="mr-2"
                 />
                 変更あり
@@ -810,7 +826,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   name="choreographer_change"
                   value="false"
                   checked={semifinalsInfo.choreographer_change_from_preliminary === false}
-                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: false }))}
+                  onChange={() => {
+                    setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: false }))
+                    setUserSelectedFields(prev => new Set(prev).add('choreographer_change_from_preliminary'))
+                  }}
                   className="mr-2"
                 />
                 変更なし
