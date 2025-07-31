@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, SemifinalsInfo } from '@/lib/types'
 
@@ -10,7 +9,6 @@ interface SemifinalsInfoFormProps {
 }
 
 export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -98,7 +96,9 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       }
 
       setSuccess(isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました')
-      router.refresh()
+      // router.refresh() を削除 - データを保持するため
+      // 保存後も最新データを再取得
+      await loadSemifinalsInfo()
     } catch (err) {
       console.error('保存エラー:', err)
       setError(err instanceof Error ? err.message : '準決勝情報の保存に失敗しました')
@@ -193,8 +193,9 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
       {/* 楽曲情報セクション */}
       {activeSection === 'music' && (
-        <div className="space-y-4">
-          <h4 className="font-medium">楽曲情報</h4>
+        <>
+          <div className="space-y-4">
+            <h4 className="font-medium">楽曲情報</h4>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -387,13 +388,33 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             )}
           </div>
 
-        </div>
+          </div>
+
+          {/* 保存ボタン */}
+          <div className="flex justify-end pt-6 space-x-4">
+            <button
+              onClick={() => handleSave(true)}
+              disabled={saving}
+              className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+            >
+              {saving ? '一時保存中...' : '一時保存'}
+            </button>
+            <button
+              onClick={() => handleSave(false)}
+              disabled={saving}
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              {saving ? '保存中...' : '保存'}
+            </button>
+          </div>
+        </>
       )}
 
       {/* 音響指示情報セクション */}
       {activeSection === 'sound' && (
-        <div className="space-y-4">
-          <h4 className="font-medium">音響指示情報</h4>
+        <>
+          <div className="space-y-4">
+            <h4 className="font-medium">音響指示情報</h4>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -456,12 +477,32 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               placeholder="例：4:00"
             />
           </div>
-        </div>
+          </div>
+
+          {/* 保存ボタン */}
+          <div className="flex justify-end pt-6 space-x-4">
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving}
+            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          >
+            {saving ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {saving ? '保存中...' : '保存'}
+          </button>
+          </div>
+        </>
       )}
 
       {/* 照明指示情報セクション */}
       {activeSection === 'lighting' && (
-        <div className="space-y-6">
+        <>
+          <div className="space-y-6">
           <h4 className="font-medium">照明指示情報</h4>
           
           <div>
@@ -674,12 +715,32 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               </div>
             </div>
           </div>
-        </div>
+          </div>
+
+          {/* 保存ボタン */}
+          <div className="flex justify-end pt-6 space-x-4">
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving}
+            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          >
+            {saving ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {saving ? '保存中...' : '保存'}
+          </button>
+          </div>
+        </>
       )}
 
       {/* 振付情報セクション */}
       {activeSection === 'choreographer' && (
-        <div className="space-y-4">
+        <>
+          <div className="space-y-4">
           <h4 className="font-medium">振付情報</h4>
           
           <div>
@@ -717,12 +778,32 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
-        </div>
+          </div>
+
+          {/* 保存ボタン */}
+          <div className="flex justify-end pt-6 space-x-4">
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving}
+            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          >
+            {saving ? '一時保存中...' : '一時保存'}
+          </button>
+          <button
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {saving ? '保存中...' : '保存'}
+          </button>
+          </div>
+        </>
       )}
 
       {/* 賞金振込先情報セクション */}
       {activeSection === 'bank' && (
-        <div className="space-y-4">
+        <>
+          <div className="space-y-4">
           <h4 className="font-medium">賞金振込先情報</h4>
           
           <div>
@@ -787,25 +868,27 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
-        </div>
-      )}
+          </div>
 
-      <div className="flex justify-end pt-6 space-x-4">
-        <button
-          onClick={() => handleSave(true)}
-          disabled={saving}
-          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
-        >
-          {saving ? '一時保存中...' : '一時保存'}
-        </button>
-        <button
-          onClick={() => handleSave(false)}
-          disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
-      </div>
+          {/* 保存ボタン */}
+          <div className="flex justify-end pt-6 space-x-4">
+            <button
+              onClick={() => handleSave(true)}
+              disabled={saving}
+              className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+            >
+              {saving ? '一時保存中...' : '一時保存'}
+            </button>
+            <button
+              onClick={() => handleSave(false)}
+              disabled={saving}
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              {saving ? '保存中...' : '保存'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
