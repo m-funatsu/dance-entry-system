@@ -27,6 +27,28 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     loadSemifinalsInfo()
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 必須項目が全て入力されているかチェック
+  const isFormValid = () => {
+    // 楽曲情報の必須項目
+    if (semifinalsInfo.music_change_from_preliminary === undefined) return false
+    
+    // 振付情報の必須項目
+    if (semifinalsInfo.choreographer_change_from_preliminary === undefined) return false
+    
+    // 音響指示情報の必須項目
+    if (!semifinalsInfo.sound_start_timing) return false
+    
+    // 照明指示情報の必須項目
+    if (!semifinalsInfo.dance_start_timing) return false
+    
+    // 賞金振込先情報の必須項目
+    if (!semifinalsInfo.bank_name || !semifinalsInfo.branch_name || 
+        !semifinalsInfo.account_type || !semifinalsInfo.account_number || 
+        !semifinalsInfo.account_holder) return false
+    
+    return true
+  }
+
   const loadSemifinalsInfo = async () => {
     setLoading(true)
     try {
@@ -173,6 +195,19 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       {success && (
         <div className="bg-green-50 text-green-600 p-4 rounded-md">
           {success}
+        </div>
+      )}
+
+      {!isFormValid() && (
+        <div className="bg-yellow-50 text-yellow-800 p-4 rounded-md">
+          <p className="font-medium">全ての必須項目を入力してください。</p>
+          <ul className="mt-2 text-sm list-disc list-inside">
+            <li>楽曲情報：予選との楽曲情報の変更</li>
+            <li>音響指示情報：音楽スタートのタイミング</li>
+            <li>照明指示情報：踊り出しタイミング</li>
+            <li>振付情報：予選との振付師の変更</li>
+            <li>賞金振込先情報：全項目</li>
+          </ul>
         </div>
       )}
 
@@ -398,14 +433,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving}
+              disabled={saving || !isFormValid()}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving}
+              disabled={saving || !isFormValid()}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
@@ -422,7 +457,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              音楽スタートのタイミング（きっかけ、ポーズなど）
+              音楽スタートのタイミング（きっかけ、ポーズなど） <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -511,7 +546,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              準決勝 - 踊り出しタイミング
+              準決勝 - 踊り出しタイミング <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -748,15 +783,33 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <h4 className="font-medium">振付情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={semifinalsInfo.choreographer_change_from_preliminary || false}
-                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: e.target.checked }))}
-                className="mr-2"
-              />
-              予選との振付師の変更
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              予選との振付師の変更 <span className="text-red-500">*</span>
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change"
+                  value="true"
+                  checked={semifinalsInfo.choreographer_change_from_preliminary === true}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: true }))}
+                  className="mr-2"
+                />
+                変更あり
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change"
+                  value="false"
+                  checked={semifinalsInfo.choreographer_change_from_preliminary === false}
+                  onChange={() => setSemifinalsInfo(prev => ({ ...prev, choreographer_change_from_preliminary: false }))}
+                  className="mr-2"
+                />
+                変更なし
+              </label>
+            </div>
           </div>
 
           <div>
@@ -812,7 +865,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              銀行名
+              銀行名 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -824,7 +877,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              支店名
+              支店名 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -836,7 +889,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座種類
+              口座種類 <span className="text-red-500">*</span>
             </label>
             <select
               value={semifinalsInfo.account_type || ''}
@@ -851,7 +904,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座番号
+              口座番号 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -863,7 +916,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座名義
+              口座名義 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -878,14 +931,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           <div className="flex justify-end pt-6 space-x-4">
             <button
               onClick={() => handleSave(true)}
-              disabled={saving}
+              disabled={saving || !isFormValid()}
               className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
             >
               {saving ? '一時保存中...' : '一時保存'}
             </button>
             <button
               onClick={() => handleSave(false)}
-              disabled={saving}
+              disabled={saving || !isFormValid()}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
