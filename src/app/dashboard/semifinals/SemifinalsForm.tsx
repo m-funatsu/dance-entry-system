@@ -367,6 +367,12 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
     return allErrors
   }
 
+  // 全ての必須項目が入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    const allErrors = validateAllSections()
+    return Object.keys(allErrors).length === 0
+  }
+
   // タブ切り替え時の検証
   const handleSectionChange = (sectionId: string) => {
     // 現在のセクションの検証
@@ -1334,9 +1340,9 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           </button>
           <button
             onClick={() => handleSave(false)}
-            disabled={saving || !entry}
+            disabled={saving || !entry || !isAllRequiredFieldsValid()}
             className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
-              saving || !entry
+              saving || !entry || !isAllRequiredFieldsValid()
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}

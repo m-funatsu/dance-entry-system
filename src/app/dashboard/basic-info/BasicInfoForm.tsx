@@ -34,6 +34,29 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const [saving, setSaving] = useState(false)
   const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
 
+  // 必須項目が全て入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    // ダンススタイルが選択されているか
+    if (!formData.dance_style) return false
+    
+    // 代表者情報
+    if (!formData.representative_name || !formData.representative_name.trim()) return false
+    if (!formData.representative_furigana || !formData.representative_furigana.trim()) return false
+    if (!formData.representative_email || !formData.representative_email.trim()) return false
+    if (!formData.phone_number || !formData.phone_number.trim()) return false
+    
+    // ペアの場合はペア情報も必須
+    if (formData.dance_style === 'couple') {
+      if (!formData.partner_name || !formData.partner_name.trim()) return false
+      if (!formData.partner_furigana || !formData.partner_furigana.trim()) return false
+    }
+    
+    // 同意チェック
+    if (!formData.agreement_checked || !formData.privacy_policy_checked) return false
+    
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit' = 'submit') => {
     e.preventDefault()
     setSaving(true)
@@ -364,21 +387,21 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             type="button"
             onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
             disabled={saving}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${
+            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
               saving
-                ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
           </button>
           <button
             type="submit"
-            disabled={saving}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-              saving 
+            disabled={saving || !isAllRequiredFieldsValid()}
+            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
+              saving || !isAllRequiredFieldsValid()
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             {saving && savingMode === 'submit' ? '保存中...' : '保存'}

@@ -37,6 +37,21 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const [uploadProgress, setUploadProgress] = useState(0)
   const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
 
+  // 必須項目が全て入力されているかチェック
+  const isAllRequiredFieldsValid = () => {
+    if (!formData.work_title || !formData.work_title.trim()) return false
+    if (!formData.work_story || !formData.work_story.trim()) return false
+    if (!formData.music_title || !formData.music_title.trim()) return false
+    if (!formData.cd_title || !formData.cd_title.trim()) return false
+    if (!formData.artist || !formData.artist.trim()) return false
+    if (!formData.record_number || !formData.record_number.trim()) return false
+    if (!formData.jasrac_code || !formData.jasrac_code.trim()) return false
+    if (!formData.music_type) return false
+    if (!formData.music_rights_cleared) return false
+    
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit') => {
     e.preventDefault()
 
@@ -569,11 +584,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           <button
             type="button"
             onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
-            disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${
-              saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared
+            disabled={saving || uploading || !isAllRequiredFieldsValid()}
+            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
+              saving || uploading || !isAllRequiredFieldsValid()
                 ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
@@ -582,10 +597,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             type="button"
             onClick={(e) => handleSubmit(e as React.FormEvent, 'submit')}
             disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared || !preliminaryVideo}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-              saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared || !preliminaryVideo
+            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
+              saving || uploading || !isAllRequiredFieldsValid() || !preliminaryVideo
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             {saving && savingMode === 'submit' ? '登録中...' : '完了登録'}
