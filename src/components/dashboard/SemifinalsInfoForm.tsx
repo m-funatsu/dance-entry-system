@@ -15,24 +15,23 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('music')
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
-    entry_id: entry.id,
-    music_change_from_preliminary: false,
-    copyright_permission: '',
-    choreographer_change_from_preliminary: false
+    entry_id: entry.id
   })
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
 
   useEffect(() => {
-    loadSemifinalsInfo()
-  }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!hasLoadedInitialData) {
+      loadSemifinalsInfo()
+    }
+  }, [entry.id, hasLoadedInitialData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 各タブの必須項目が入力されているかチェック
   const isTabValid = (tab: string) => {
     switch (tab) {
       case 'music':
-        // 楽曲情報の必須項目
-        return semifinalsInfo.music_change_from_preliminary !== undefined
+        // 楽曲情報の必須項目（boolean値なので、true/falseが設定されているかチェック）
+        return typeof semifinalsInfo.music_change_from_preliminary === 'boolean'
       case 'sound':
         // 音響指示情報の必須項目
         return !!semifinalsInfo.sound_start_timing
@@ -40,8 +39,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         // 照明指示情報の必須項目
         return !!semifinalsInfo.dance_start_timing
       case 'choreographer':
-        // 振付情報の必須項目
-        return semifinalsInfo.choreographer_change_from_preliminary !== undefined
+        // 振付情報の必須項目（boolean値なので、true/falseが設定されているかチェック）
+        return typeof semifinalsInfo.choreographer_change_from_preliminary === 'boolean'
       case 'bank':
         // 賞金振込先情報の必須項目
         return !!(semifinalsInfo.bank_name && semifinalsInfo.branch_name && 
@@ -71,13 +70,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       }
 
       if (data) {
-        if (isInitialLoad) {
-          // 初回読み込み時のみデータを設定
-          setSemifinalsInfo(data)
-          setIsInitialLoad(false)
-        }
-        // 初回以降は現在の入力を保持
+        // データベースからのデータを設定
+        setSemifinalsInfo(data)
       }
+      setHasLoadedInitialData(true)
     } catch (err) {
       console.error('準決勝情報の読み込みエラー:', err)
       console.error('エラー詳細:', JSON.stringify(err))
