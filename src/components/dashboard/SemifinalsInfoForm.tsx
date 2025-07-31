@@ -15,6 +15,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('music')
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry.id,
     music_change_from_preliminary: false,
@@ -44,7 +45,12 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       }
 
       if (data) {
-        setSemifinalsInfo(data)
+        if (isInitialLoad) {
+          // 初回読み込み時のみデータを設定
+          setSemifinalsInfo(data)
+          setIsInitialLoad(false)
+        }
+        // 初回以降は現在の入力を保持
       }
     } catch (err) {
       console.error('準決勝情報の読み込みエラー:', err)
@@ -96,9 +102,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       }
 
       setSuccess(isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました')
-      // router.refresh() を削除 - データを保持するため
-      // 保存後も最新データを再取得
-      await loadSemifinalsInfo()
+      // データを保持するため、再読み込みはしない
     } catch (err) {
       console.error('保存エラー:', err)
       setError(err instanceof Error ? err.message : '準決勝情報の保存に失敗しました')
