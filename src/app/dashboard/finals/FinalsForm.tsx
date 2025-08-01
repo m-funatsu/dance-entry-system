@@ -288,18 +288,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
   // 音響指示変更チェックボックスの処理
   const handleSoundChange = (checked: boolean) => {
     if (checked) {
-      // チェックが入った場合：クリア
-      setFinalsInfo(prev => ({
-        ...prev,
-        sound_change_from_semifinals: true,
-        sound_start_timing: '',
-        chaser_song_designation: '',
-        chaser_song: '',
-        fade_out_start_time: '',
-        fade_out_complete_time: ''
-      }))
-    } else {
-      // チェックが外れた場合：準決勝情報から復元
+      // チェックが入った場合：準決勝から変更なし（準決勝情報から復元）
       setFinalsInfo(prev => ({
         ...prev,
         sound_change_from_semifinals: false,
@@ -309,6 +298,17 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
         fade_out_start_time: semifinalsInfo?.fade_out_start_time || '',
         fade_out_complete_time: semifinalsInfo?.fade_out_complete_time || ''
       }))
+    } else {
+      // チェックが外れた場合：変更あり（クリア）
+      setFinalsInfo(prev => ({
+        ...prev,
+        sound_change_from_semifinals: true,
+        sound_start_timing: '',
+        chaser_song_designation: '',
+        chaser_song: '',
+        fade_out_start_time: '',
+        fade_out_complete_time: ''
+      }))
     }
   }
 
@@ -316,22 +316,22 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
   // 振付師変更チェックボックスの処理
   const handleChoreographerChange = (checked: boolean) => {
     if (checked) {
-      // チェックが入った場合：クリア
-      setFinalsInfo(prev => ({
-        ...prev,
-        choreographer_change: true,
-        choreographer_name: '',
-        choreographer_name_kana: '',
-        choreographer2_name: '',
-        choreographer2_name_kana: ''
-      }))
-    } else {
-      // チェックが外れた場合：基本情報から復元
+      // チェックが入った場合：準決勝から変更なし（基本情報から復元）
       setFinalsInfo(prev => ({
         ...prev,
         choreographer_change: false,
         choreographer_name: basicInfo?.choreographer || '',
         choreographer_name_kana: basicInfo?.choreographer_furigana || '',
+        choreographer2_name: '',
+        choreographer2_name_kana: ''
+      }))
+    } else {
+      // チェックが外れた場合：変更あり（クリア）
+      setFinalsInfo(prev => ({
+        ...prev,
+        choreographer_change: true,
+        choreographer_name: '',
+        choreographer_name_kana: '',
         choreographer2_name: '',
         choreographer2_name_kana: ''
       }))
@@ -573,7 +573,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              準決勝との楽曲情報の変更
+              楽曲情報
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -585,7 +585,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   onChange={() => handleMusicChange('none')}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                準決勝と同じ楽曲を使用する
+                準決勝から変更なし
               </label>
               <label className="flex items-center">
                 <input
@@ -596,7 +596,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   onChange={() => handleMusicChange('fromPreliminary')}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                予選と同じ楽曲を使用する
+                予選から変更なし
               </label>
               <label className="flex items-center">
                 <input
@@ -607,7 +607,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   onChange={() => handleMusicChange('new')}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                予選・準決勝とは異なる楽曲を使用する
+                新しい楽曲を使用
               </label>
             </div>
           </div>
@@ -842,11 +842,11 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={finalsInfo.sound_change_from_semifinals || false}
+                checked={!finalsInfo.sound_change_from_semifinals}
                 onChange={(e) => handleSoundChange(e.target.checked)}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              準決勝との音響指示の変更
+              準決勝から変更なし
             </label>
           </div>
           
@@ -1209,11 +1209,11 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={finalsInfo.choreographer_change || false}
+                checked={!finalsInfo.choreographer_change}
                 onChange={(e) => handleChoreographerChange(e.target.checked)}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              準決勝・予選との振付師の変更
+              準決勝から変更なし
             </label>
           </div>
 
