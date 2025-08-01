@@ -320,14 +320,30 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
       setFinalsInfo(prev => ({
         ...prev,
         lighting_change_from_semifinals: true,
-        dance_start_timing: ''
+        dance_start_timing: '',
+        // シーン1-5をクリア
+        scene1_time: '', scene1_trigger: '', scene1_color_type: '', scene1_color_other: '', scene1_image: '', scene1_image_path: '', scene1_notes: '',
+        scene2_time: '', scene2_trigger: '', scene2_color_type: '', scene2_color_other: '', scene2_image: '', scene2_image_path: '', scene2_notes: '',
+        scene3_time: '', scene3_trigger: '', scene3_color_type: '', scene3_color_other: '', scene3_image: '', scene3_image_path: '', scene3_notes: '',
+        scene4_time: '', scene4_trigger: '', scene4_color_type: '', scene4_color_other: '', scene4_image: '', scene4_image_path: '', scene4_notes: '',
+        scene5_time: '', scene5_trigger: '', scene5_color_type: '', scene5_color_other: '', scene5_image: '', scene5_image_path: '', scene5_notes: '',
+        // チェイサー/退場をクリア
+        chaser_exit_time: '', chaser_exit_trigger: '', chaser_exit_color_type: '', chaser_exit_color_other: '', chaser_exit_image: '', chaser_exit_image_path: '', chaser_exit_notes: ''
       }))
     } else {
       // チェックが外れた場合：準決勝情報から復元
       setFinalsInfo(prev => ({
         ...prev,
         lighting_change_from_semifinals: false,
-        dance_start_timing: semifinalsInfo?.dance_start_timing || ''
+        dance_start_timing: semifinalsInfo?.dance_start_timing || '',
+        // シーン1-5を準決勝からコピー
+        scene1_time: semifinalsInfo?.scene1_time || '', scene1_trigger: semifinalsInfo?.scene1_trigger || '', scene1_color_type: semifinalsInfo?.scene1_color_type || '', scene1_color_other: semifinalsInfo?.scene1_color_other || '', scene1_image: semifinalsInfo?.scene1_image || '', scene1_image_path: semifinalsInfo?.scene1_image_path || '', scene1_notes: semifinalsInfo?.scene1_notes || '',
+        scene2_time: semifinalsInfo?.scene2_time || '', scene2_trigger: semifinalsInfo?.scene2_trigger || '', scene2_color_type: semifinalsInfo?.scene2_color_type || '', scene2_color_other: semifinalsInfo?.scene2_color_other || '', scene2_image: semifinalsInfo?.scene2_image || '', scene2_image_path: semifinalsInfo?.scene2_image_path || '', scene2_notes: semifinalsInfo?.scene2_notes || '',
+        scene3_time: semifinalsInfo?.scene3_time || '', scene3_trigger: semifinalsInfo?.scene3_trigger || '', scene3_color_type: semifinalsInfo?.scene3_color_type || '', scene3_color_other: semifinalsInfo?.scene3_color_other || '', scene3_image: semifinalsInfo?.scene3_image || '', scene3_image_path: semifinalsInfo?.scene3_image_path || '', scene3_notes: semifinalsInfo?.scene3_notes || '',
+        scene4_time: semifinalsInfo?.scene4_time || '', scene4_trigger: semifinalsInfo?.scene4_trigger || '', scene4_color_type: semifinalsInfo?.scene4_color_type || '', scene4_color_other: semifinalsInfo?.scene4_color_other || '', scene4_image: semifinalsInfo?.scene4_image || '', scene4_image_path: semifinalsInfo?.scene4_image_path || '', scene4_notes: semifinalsInfo?.scene4_notes || '',
+        scene5_time: semifinalsInfo?.scene5_time || '', scene5_trigger: semifinalsInfo?.scene5_trigger || '', scene5_color_type: semifinalsInfo?.scene5_color_type || '', scene5_color_other: semifinalsInfo?.scene5_color_other || '', scene5_image: semifinalsInfo?.scene5_image || '', scene5_image_path: semifinalsInfo?.scene5_image_path || '', scene5_notes: semifinalsInfo?.scene5_notes || '',
+        // チェイサー/退場を準決勝からコピー
+        chaser_exit_time: semifinalsInfo?.chaser_exit_time || '', chaser_exit_trigger: semifinalsInfo?.chaser_exit_trigger || '', chaser_exit_color_type: semifinalsInfo?.chaser_exit_color_type || '', chaser_exit_color_other: semifinalsInfo?.chaser_exit_color_other || '', chaser_exit_image: semifinalsInfo?.chaser_exit_image || '', chaser_exit_image_path: semifinalsInfo?.chaser_exit_image_path || '', chaser_exit_notes: semifinalsInfo?.chaser_exit_notes || ''
       }))
     }
   }
