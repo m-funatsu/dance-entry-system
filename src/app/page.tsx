@@ -14,7 +14,7 @@ export default async function HomePage() {
     .from('users')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!userProfile) {
     redirect('/auth/login')

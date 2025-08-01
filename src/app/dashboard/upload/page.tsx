@@ -18,7 +18,7 @@ export default async function UploadPage() {
     .from('users')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!userProfile) {
     redirect('/auth/login')
@@ -32,7 +32,7 @@ export default async function UploadPage() {
     .from('entries')
     .select('*')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!entry) {
     redirect('/dashboard/entry?message=先にエントリー情報を入力してください')

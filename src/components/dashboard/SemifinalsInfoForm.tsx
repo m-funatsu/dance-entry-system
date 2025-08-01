@@ -81,7 +81,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         .from('semifinals_info')
         .select('*')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (error) {
         // PGRST116は「No rows found」エラー（正常）
@@ -134,7 +134,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         .from('semifinals_info')
         .select('id')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (existingData) {
         // 更新

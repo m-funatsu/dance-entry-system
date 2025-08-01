@@ -7,7 +7,7 @@ export async function getFaviconUrl(): Promise<string | null> {
     const { data: settings } = await supabase
       .from('system_settings')
       .select('favicon_url')
-      .single()
+      .maybeSingle()
 
     return settings?.favicon_url || null
   } catch (error) {
@@ -23,7 +23,7 @@ export async function getSiteTitle(): Promise<string> {
     const { data: settings } = await supabase
       .from('system_settings')
       .select('site_title')
-      .single()
+      .maybeSingle()
 
     return settings?.site_title || '2025 バルカーカップ ダンスエントリーシステム'
   } catch (error) {

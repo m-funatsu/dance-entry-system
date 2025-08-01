@@ -41,7 +41,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
         .from('sns_info')
         .select('*')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') {
         throw error
@@ -172,7 +172,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
         .from('sns_info')
         .select('id')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (existingData) {
         // 更新

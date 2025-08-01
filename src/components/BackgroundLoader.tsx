@@ -19,7 +19,7 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
           .from('settings')
           .select('value')
           .eq('key', settingKey)
-          .single()
+          .maybeSingle()
         
         if (data?.value) {
           // CSS変数を設定

@@ -9,7 +9,7 @@ export async function getBackgroundImage(page: BackgroundPage): Promise<string |
       .from('settings')
       .select('value')
       .eq('key', `${page}_background_image`)
-      .single()
+      .maybeSingle()
     
     return setting?.value || null
   } catch {

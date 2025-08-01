@@ -38,7 +38,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .from('applications_info')
         .select('*')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') {
         throw error
@@ -98,7 +98,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .from('applications_info')
         .select('id')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (existingData) {
         // 更新
