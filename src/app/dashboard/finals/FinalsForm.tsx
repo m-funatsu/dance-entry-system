@@ -173,7 +173,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           .from('basic_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (basicData) {
           setBasicInfo(basicData)
@@ -184,7 +184,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           .from('preliminary_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (prelimData) {
           setPreliminaryInfo(prelimData)
@@ -195,18 +195,22 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           .from('semifinals_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (semiData) {
           setSemifinalsInfo(semiData)
         }
         
         // 決勝情報を取得
-        const { data: finalsData } = await supabase
+        const { data: finalsData, error: finalsError } = await supabase
           .from('finals_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
+        
+        if (finalsError && finalsError.code !== 'PGRST116') {
+          console.error('Error loading finals info:', finalsError)
+        }
         
         if (finalsData) {
           setFinalsInfo(finalsData)
