@@ -129,7 +129,7 @@ function MusicFileUpload({
         
         {uploadingFile && !value && (
           <div className="mt-3">
-            <div className="bg-gray-200 rounded-full h-2 w-full">
+            <div className="bg-gray-300 rounded-full h-2 w-full">
               <div className="bg-indigo-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
             </div>
             <p className="text-xs text-gray-600 mt-1">アップロード中...</p>
@@ -623,7 +623,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -639,7 +639,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               rows={2}
@@ -717,7 +717,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -734,7 +734,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -751,7 +751,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -768,7 +768,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -785,7 +785,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -801,7 +801,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             >
@@ -861,7 +861,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.sound_change_from_semifinals}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.sound_change_from_semifinals 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -947,7 +947,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.sound_change_from_semifinals}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.sound_change_from_semifinals 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               placeholder="例：3:45"
@@ -965,7 +965,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.sound_change_from_semifinals}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.sound_change_from_semifinals 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               placeholder="例：4:00"
@@ -1228,7 +1228,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.choreographer_change}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.choreographer_change 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -1245,7 +1245,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.choreographer_change}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.choreographer_change 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -1262,7 +1262,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.choreographer_change}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.choreographer_change 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
@@ -1279,7 +1279,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               disabled={!finalsInfo.choreographer_change}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
                 !finalsInfo.choreographer_change 
-                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
