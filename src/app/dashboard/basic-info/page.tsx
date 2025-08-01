@@ -30,7 +30,7 @@ export default async function BasicInfoPage() {
       .from('basic_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     basicInfo = data
   }

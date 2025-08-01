@@ -19,7 +19,7 @@ export default async function DashboardPage() {
     .from('users')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!userProfile) {
     redirect('/auth/login')
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
       .from('basic_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     basicInfo = data
   }
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
       .from('preliminary_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     preliminaryInfo = data
   }
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
       .from('program_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     programInfo = data
   }
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
       .from('semifinals_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     semifinalsInfo = data
   }
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
       .from('finals_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     finalsInfo = data
   }
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
       .from('sns_info')
       .select('*')
       .eq('entry_id', entry.id)
-      .single()
+      .maybeSingle()
     
     snsInfo = data
   }

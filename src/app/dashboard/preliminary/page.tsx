@@ -32,7 +32,7 @@ export default async function PreliminaryPage() {
     .from('preliminary_info')
     .select('*')
     .eq('entry_id', entry.id)
-    .single()
+    .maybeSingle()
 
   // ファイル情報の取得（予選動画のみ）
   const { data: files } = await supabase

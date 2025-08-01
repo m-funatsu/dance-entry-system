@@ -109,7 +109,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             status: 'pending'
           })
           .select()
-          .single()
+          .maybeSingle()
 
         if (entryError) throw entryError
         currentEntryId = newEntry.id

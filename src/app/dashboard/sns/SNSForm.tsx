@@ -197,7 +197,7 @@ export default function SNSForm({ entry }: SNSFormProps) {
           .from('sns_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (snsData) {
           setSnsInfo(snsData)
@@ -240,7 +240,7 @@ export default function SNSForm({ entry }: SNSFormProps) {
         .from('sns_info')
         .select('id')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (existingData) {
         // 更新

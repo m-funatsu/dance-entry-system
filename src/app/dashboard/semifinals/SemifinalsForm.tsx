@@ -170,7 +170,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           .from('basic_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (basicData) {
           setBasicInfo(basicData)
@@ -181,7 +181,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           .from('preliminary_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (prelimData) {
           setPreliminaryInfo(prelimData)
@@ -192,7 +192,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           .from('semifinals_info')
           .select('*')
           .eq('entry_id', entry.id)
-          .single()
+          .maybeSingle()
         
         if (semiData) {
           setSemifinalsInfo(semiData)
@@ -424,7 +424,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         .from('semifinals_info')
         .select('id')
         .eq('entry_id', entry.id)
-        .single()
+        .maybeSingle()
 
       if (existingData) {
         // 更新
