@@ -1047,9 +1047,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   </label>
                   <input
                     type="text"
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_time` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_time`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                     placeholder="例：0:30"
                   />
                 </div>
@@ -1060,9 +1065,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   </label>
                   <input
                     type="text"
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_trigger` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_trigger`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                   />
                 </div>
 
@@ -1071,9 +1081,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                     色・系統 {sceneNum === 1 && <span className="text-red-500">*</span>}
                   </label>
                   <select
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_color_type` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_type`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                   >
                     <option value="">選択してください</option>
                     {colorTypes.map(color => (
@@ -1088,9 +1103,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   </label>
                   <input
                     type="text"
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_color_other` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_other`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                   />
                 </div>
 
@@ -1100,9 +1120,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   </label>
                   <input
                     type="text"
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_image` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_image`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                   />
                 </div>
 
@@ -1113,11 +1138,16 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   <input
                     type="file"
                     accept="image/*"
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) handleFileUpload(`scene${sceneNum}_image_path`, file)
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                   />
                 </div>
 
@@ -1126,9 +1156,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                     備考
                   </label>
                   <textarea
+                    disabled={!finalsInfo.lighting_change_from_semifinals}
                     value={finalsInfo[`scene${sceneNum}_notes` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_notes`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                      !finalsInfo.lighting_change_from_semifinals
+                        ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                        : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
                     rows={2}
                   />
                 </div>
@@ -1147,9 +1182,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                 </label>
                 <input
                   type="text"
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_time || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_time: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 />
               </div>
 
@@ -1159,9 +1199,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                 </label>
                 <input
                   type="text"
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_trigger || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_trigger: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 />
               </div>
 
@@ -1170,9 +1215,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   色・系統 <span className="text-red-500">*</span>
                 </label>
                 <select
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_color_type || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_type: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 >
                   <option value="">選択してください</option>
                   {colorTypes.map(color => (
@@ -1187,9 +1237,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                 </label>
                 <input
                   type="text"
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_color_other || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_other: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 />
               </div>
 
@@ -1199,9 +1254,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                 </label>
                 <input
                   type="text"
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_image || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_image: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 />
               </div>
 
@@ -1212,11 +1272,16 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                 <input
                   type="file"
                   accept="image/*"
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) handleFileUpload('chaser_exit_image_path', file)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                 />
               </div>
 
@@ -1225,9 +1290,14 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   備考
                 </label>
                 <textarea
+                  disabled={!finalsInfo.lighting_change_from_semifinals}
                   value={finalsInfo.chaser_exit_notes || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_notes: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                    !finalsInfo.lighting_change_from_semifinals
+                      ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
                   rows={2}
                 />
               </div>
