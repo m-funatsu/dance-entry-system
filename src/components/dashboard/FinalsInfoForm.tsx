@@ -530,7 +530,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.work_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -557,7 +559,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               楽曲著作権許諾 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
-              <label className="flex items-center">
+              <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
@@ -569,7 +571,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 />
                 A.市販の楽曲を使用する
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
@@ -581,7 +583,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 />
                 B.自身で著作権に対し許諾を取った楽曲を使用する
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
@@ -604,7 +606,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.music_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -617,7 +621,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.cd_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -630,7 +636,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.artist || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -643,7 +651,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.record_number || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -656,7 +666,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.jasrac_code || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
           </div>
@@ -668,7 +680,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             <select
               value={finalsInfo.music_type || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             >
               <option value="">選択してください</option>
@@ -689,7 +703,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 const file = e.target.files?.[0]
                 if (file) handleFileUpload('music_data_path', file)
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                musicChangeOption === 'unchanged' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={musicChangeOption === 'unchanged'}
             />
             {finalsInfo.music_data_path && (
@@ -745,7 +761,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.sound_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, sound_start_timing: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                soundChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={soundChangeOption === 'same'}
             />
           </div>
@@ -757,7 +775,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             <select
               value={finalsInfo.chaser_song_designation || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_song_designation: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                soundChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={soundChangeOption === 'same'}
             >
               <option value="">選択してください</option>
@@ -863,7 +883,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.dance_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, dance_start_timing: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={lightingChangeOption === 'same'}
             />
           </div>
@@ -882,7 +904,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     type="text"
                     value={finalsInfo[`scene${sceneNum}_time` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_time`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                     placeholder="例：0:30"
                   />
@@ -896,7 +920,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     type="text"
                     value={finalsInfo[`scene${sceneNum}_trigger` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_trigger`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                   />
                 </div>
@@ -908,7 +934,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   <select
                     value={finalsInfo[`scene${sceneNum}_color_type` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_type`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                   >
                     <option value="">選択してください</option>
@@ -926,7 +954,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     type="text"
                     value={finalsInfo[`scene${sceneNum}_color_other` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_color_other`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                   />
                 </div>
@@ -939,7 +969,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                     type="text"
                     value={finalsInfo[`scene${sceneNum}_image` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_image`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                   />
                 </div>
@@ -993,7 +1025,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   <textarea
                     value={finalsInfo[`scene${sceneNum}_notes` as keyof FinalsInfo] as string || ''}
                     onChange={(e) => setFinalsInfo(prev => ({ ...prev, [`scene${sceneNum}_notes`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                      lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                    }`}
                     disabled={lightingChangeOption === 'same'}
                     rows={2}
                   />
@@ -1015,7 +1049,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   type="text"
                   value={finalsInfo.chaser_exit_time || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_time: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                 />
               </div>
@@ -1028,7 +1064,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   type="text"
                   value={finalsInfo.chaser_exit_trigger || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_trigger: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                 />
               </div>
@@ -1040,7 +1078,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 <select
                   value={finalsInfo.chaser_exit_color_type || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_type: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                 >
                   <option value="">選択してください</option>
@@ -1058,7 +1098,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   type="text"
                   value={finalsInfo.chaser_exit_color_other || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_other: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                 />
               </div>
@@ -1071,7 +1113,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                   type="text"
                   value={finalsInfo.chaser_exit_image || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_image: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                 />
               </div>
@@ -1125,7 +1169,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
                 <textarea
                   value={finalsInfo.chaser_exit_notes || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_notes: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                    lightingChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+                  }`}
                   disabled={lightingChangeOption === 'same'}
                   rows={2}
                 />
@@ -1178,7 +1224,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.choreographer_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                choreographerChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={choreographerChangeOption === 'same'}
             />
           </div>
@@ -1191,7 +1239,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.choreographer_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                choreographerChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={choreographerChangeOption === 'same'}
             />
           </div>
@@ -1204,7 +1254,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.choreographer2_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                choreographerChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={choreographerChangeOption === 'same'}
             />
           </div>
@@ -1217,7 +1269,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               type="text"
               value={finalsInfo.choreographer2_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name_kana: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                choreographerChangeOption === 'same' ? 'bg-gray-300 cursor-not-allowed' : ''
+              }`}
               disabled={choreographerChangeOption === 'same'}
             />
           </div>
