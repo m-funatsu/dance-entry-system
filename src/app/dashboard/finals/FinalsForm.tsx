@@ -1186,7 +1186,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_time || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_time: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1203,7 +1203,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_trigger || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_trigger: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1219,7 +1219,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_color_type || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_type: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1241,7 +1241,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_color_other || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_color_other: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1258,7 +1258,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_image || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_image: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1278,7 +1278,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                     if (file) handleFileUpload('chaser_exit_image_path', file)
                   }}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
@@ -1294,7 +1294,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   value={finalsInfo.chaser_exit_notes || ''}
                   onChange={(e) => setFinalsInfo(prev => ({ ...prev, chaser_exit_notes: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                    !finalsInfo.lighting_change_from_semifinals
+                    finalsInfo.lighting_change_from_semifinals
                       ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
                       : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   }`}
