@@ -636,8 +636,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.work_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -650,8 +652,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.work_character_story || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_character_story: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               rows={2}
               maxLength={50}
@@ -666,36 +670,51 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               楽曲著作権許諾 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="commercial"
                   checked={finalsInfo.copyright_permission === 'commercial'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 A.市販の楽曲を使用する
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="licensed"
                   checked={finalsInfo.copyright_permission === 'licensed'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 B.自身で著作権に対し許諾を取った楽曲を使用する
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="original"
                   checked={finalsInfo.copyright_permission === 'original'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 C.独自に製作されたオリジナル楽曲を使用する
               </label>
@@ -711,8 +730,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.music_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -726,8 +747,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.cd_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -741,8 +764,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.artist || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -756,8 +781,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.record_number || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -771,8 +798,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.jasrac_code || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -785,8 +814,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.music_type || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
               disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             >
               <option value="">選択してください</option>
@@ -797,11 +828,13 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={`block text-sm font-medium mb-1 ${
+              !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : 'text-gray-700'
+            }`}>
               楽曲データ <span className="text-red-500">*</span>
             </label>
             <MusicFileUpload
-              disabled={false}
+              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
               value={finalsInfo.music_data_path}
               onChange={(file) => handleFileUpload('music_data_path', file)}
             />
@@ -841,8 +874,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.sound_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, sound_start_timing: e.target.value }))}
               disabled={!finalsInfo.sound_change_from_semifinals}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.sound_change_from_semifinals ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.sound_change_from_semifinals 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -852,7 +887,7 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               チェイサー（退場）曲の指定 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.sound_change_from_semifinals ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="chaser_designation"
@@ -860,11 +895,15 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   checked={finalsInfo.chaser_song_designation === 'included'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, chaser_song_designation: 'included', chaser_song: '' }))}
                   disabled={!finalsInfo.sound_change_from_semifinals}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.sound_change_from_semifinals 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 自作曲に組み込み
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.sound_change_from_semifinals ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="chaser_designation"
@@ -872,11 +911,15 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   checked={finalsInfo.chaser_song_designation === 'required'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, chaser_song_designation: 'required' }))}
                   disabled={!finalsInfo.sound_change_from_semifinals}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.sound_change_from_semifinals 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 必要
               </label>
-              <label className="flex items-center">
+              <label className={`flex items-center ${!finalsInfo.sound_change_from_semifinals ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="chaser_designation"
@@ -884,7 +927,11 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
                   checked={finalsInfo.chaser_song_designation === 'not_required'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, chaser_song_designation: 'not_required', chaser_song: '' }))}
                   disabled={!finalsInfo.sound_change_from_semifinals}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className={`mr-2 h-4 w-4 border-gray-300 ${
+                    !finalsInfo.sound_change_from_semifinals 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-indigo-600 focus:ring-indigo-500'
+                  }`}
                 />
                 不要（無音）
               </label>
@@ -913,8 +960,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.fade_out_start_time || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, fade_out_start_time: e.target.value }))}
               disabled={!finalsInfo.sound_change_from_semifinals}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.sound_change_from_semifinals ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.sound_change_from_semifinals 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               placeholder="例：3:45"
             />
@@ -929,8 +978,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.fade_out_complete_time || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, fade_out_complete_time: e.target.value }))}
               disabled={!finalsInfo.sound_change_from_semifinals}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.sound_change_from_semifinals ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.sound_change_from_semifinals 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
               placeholder="例：4:00"
             />
@@ -968,8 +1019,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.dance_start_timing || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, dance_start_timing: e.target.value }))}
               disabled={!finalsInfo.lighting_change_from_semifinals}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.lighting_change_from_semifinals ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.lighting_change_from_semifinals 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             >
               <option value="">選択してください</option>
@@ -1205,8 +1258,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.choreographer_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
               disabled={!finalsInfo.choreographer_change}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.choreographer_change ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.choreographer_change 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -1220,8 +1275,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.choreographer_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
               disabled={!finalsInfo.choreographer_change}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.choreographer_change ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.choreographer_change 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -1235,8 +1292,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.choreographer2_name || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name: e.target.value }))}
               disabled={!finalsInfo.choreographer_change}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.choreographer_change ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.choreographer_change 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
@@ -1250,8 +1309,10 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               value={finalsInfo.choreographer2_name_kana || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, choreographer2_name_kana: e.target.value }))}
               disabled={!finalsInfo.choreographer_change}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                !finalsInfo.choreographer_change ? 'bg-gray-100 text-gray-500' : ''
+              className={`w-full px-3 py-2 border rounded-md shadow-sm ${
+                !finalsInfo.choreographer_change 
+                  ? 'bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
             />
           </div>
