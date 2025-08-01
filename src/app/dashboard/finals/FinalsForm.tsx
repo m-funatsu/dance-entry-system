@@ -839,15 +839,33 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           </div>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={!finalsInfo.sound_change_from_semifinals}
-                onChange={(e) => handleSoundChange(e.target.checked)}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              準決勝から変更なし
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              音響指示情報
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sound_change"
+                  value="none"
+                  checked={!finalsInfo.sound_change_from_semifinals}
+                  onChange={() => handleSoundChange(true)}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝から変更なし
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sound_change"
+                  value="new"
+                  checked={finalsInfo.sound_change_from_semifinals}
+                  onChange={() => handleSoundChange(false)}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                新しい音響指示を使用
+              </label>
+            </div>
           </div>
           
           <div>
@@ -1206,15 +1224,33 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
           <h4 className="font-medium">振付情報</h4>
           
           <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={!finalsInfo.choreographer_change}
-                onChange={(e) => handleChoreographerChange(e.target.checked)}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              準決勝から変更なし
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              振付師情報
             </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change"
+                  value="none"
+                  checked={!finalsInfo.choreographer_change}
+                  onChange={() => handleChoreographerChange(true)}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                準決勝から変更なし
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="choreographer_change"
+                  value="new"
+                  checked={finalsInfo.choreographer_change}
+                  onChange={() => handleChoreographerChange(false)}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                新しい振付師を登録
+              </label>
+            </div>
           </div>
 
           <div>
