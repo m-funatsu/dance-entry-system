@@ -40,9 +40,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     representative_furigana: { 
       required: true,
       pattern: /^[\u30A0-\u30FF\s]+$/,
-      custom: (value: string) => {
+      custom: (value: unknown) => {
         if (!value) return true
-        if (!/^[\u30A0-\u30FF\s]+$/.test(value)) {
+        const strValue = String(value)
+        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
           return 'カタカナで入力してください'
         }
         return true
@@ -51,9 +52,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     representative_email: { 
       required: true,
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      custom: (value: string) => {
+      custom: (value: unknown) => {
         if (!value) return true
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        const strValue = String(value)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
           return '正しいメールアドレスを入力してください'
         }
         return true
@@ -61,8 +63,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     },
     partner_name: { 
       required: formData.dance_style === 'couple',
-      custom: (value: string) => {
-        if (formData.dance_style === 'couple' && !value) {
+      custom: (value: unknown) => {
+        const strValue = String(value || '')
+        if (formData.dance_style === 'couple' && !strValue) {
           return 'ペアの場合は必須です'
         }
         return true
@@ -71,10 +74,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     partner_furigana: { 
       required: formData.dance_style === 'couple',
       pattern: /^[\u30A0-\u30FF\s]+$/,
-      custom: (value: string) => {
+      custom: (value: unknown) => {
+        const strValue = String(value || '')
         if (formData.dance_style === 'couple') {
-          if (!value) return 'ペアの場合は必須です'
-          if (!/^[\u30A0-\u30FF\s]+$/.test(value)) {
+          if (!strValue) return 'ペアの場合は必須です'
+          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
             return 'カタカナで入力してください'
           }
         }
@@ -84,9 +88,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     phone_number: { 
       required: true,
       pattern: /^[\d-]+$/,
-      custom: (value: string) => {
+      custom: (value: unknown) => {
         if (!value) return true
-        if (!/^[\d-]+$/.test(value)) {
+        const strValue = String(value)
+        if (!/^[\d-]+$/.test(strValue)) {
           return '電話番号は数字とハイフンのみで入力してください'
         }
         return true
