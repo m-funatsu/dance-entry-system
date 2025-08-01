@@ -620,9 +620,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.work_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -636,9 +636,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
             <textarea
               value={finalsInfo.work_character_story || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, work_character_story: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -655,48 +655,48 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               楽曲著作権許諾 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
-              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
+              <label className={`flex items-center ${!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="commercial"
                   checked={finalsInfo.copyright_permission === 'commercial'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'commercial' }))}
-                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
                   className={`mr-2 h-4 w-4 border-gray-300 ${
-                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                    !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                       ? 'text-gray-400 cursor-not-allowed' 
                       : 'text-indigo-600 focus:ring-indigo-500'
                   }`}
                 />
                 A.市販の楽曲を使用する
               </label>
-              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
+              <label className={`flex items-center ${!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="licensed"
                   checked={finalsInfo.copyright_permission === 'licensed'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'licensed' }))}
-                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
                   className={`mr-2 h-4 w-4 border-gray-300 ${
-                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                    !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                       ? 'text-gray-400 cursor-not-allowed' 
                       : 'text-indigo-600 focus:ring-indigo-500'
                   }`}
                 />
                 B.自身で著作権に対し許諾を取った楽曲を使用する
               </label>
-              <label className={`flex items-center ${!finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : ''}`}>
+              <label className={`flex items-center ${!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) ? 'text-gray-500' : ''}`}>
                 <input
                   type="radio"
                   name="copyright_permission"
                   value="original"
                   checked={finalsInfo.copyright_permission === 'original'}
                   onChange={() => setFinalsInfo(prev => ({ ...prev, copyright_permission: 'original' }))}
-                  disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+                  disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
                   className={`mr-2 h-4 w-4 border-gray-300 ${
-                    !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                    !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                       ? 'text-gray-400 cursor-not-allowed' 
                       : 'text-indigo-600 focus:ring-indigo-500'
                   }`}
@@ -714,9 +714,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.music_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_title: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -731,9 +731,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.cd_title || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, cd_title: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -748,9 +748,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.artist || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, artist: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -765,9 +765,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.record_number || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, record_number: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -782,9 +782,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
               type="text"
               value={finalsInfo.jasrac_code || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, jasrac_code: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -798,9 +798,9 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
             <select
               value={finalsInfo.music_type || ''}
               onChange={(e) => setFinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               className={`w-full px-3 py-2 border rounded-md shadow-sm ${
-                !finalsInfo.music_change && !finalsInfo.copy_preliminary_music 
+                !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) 
                   ? 'bg-gray-300 text-gray-700 border-gray-300 cursor-not-allowed' 
                   : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
               }`}
@@ -814,12 +814,12 @@ export default function FinalsForm({ entry }: FinalsFormProps) {
 
           <div>
             <label className={`block text-sm font-medium mb-1 ${
-              !finalsInfo.music_change && !finalsInfo.copy_preliminary_music ? 'text-gray-500' : 'text-gray-700'
+              !finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music) ? 'text-gray-500' : 'text-gray-700'
             }`}>
               楽曲データ <span className="text-red-500">*</span>
             </label>
             <MusicFileUpload
-              disabled={!finalsInfo.music_change && !finalsInfo.copy_preliminary_music}
+              disabled={!finalsInfo.music_change || (finalsInfo.music_change && finalsInfo.copy_preliminary_music)}
               value={finalsInfo.music_data_path}
               onChange={(file) => handleFileUpload('music_data_path', file)}
             />
