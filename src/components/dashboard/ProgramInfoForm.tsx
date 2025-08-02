@@ -21,70 +21,107 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     player_photo_type: ''
   })
 
-  // バリデーションルール（動的に変更される）
-  const getValidationRules = () => {
-    const rules: Record<string, unknown> = {
-      player_photo_type: { required: true },
-      player_photo_path: { required: true },
-      semifinal_story: { 
-        required: true,
-        maxLength: 100,
-        custom: (value: unknown) => {
+  // バリデーションルール（静的に定義）
+  const validationRules = {
+    player_photo_type: { required: true },
+    player_photo_path: { required: true },
+    semifinal_story: { 
+      required: true,
+      maxLength: 100,
+      custom: (value: unknown) => {
+        const strValue = String(value || '').trim()
+        if (!strValue) return 'この項目は必須です'
+        if (strValue.length > 100) return '100文字以内で入力してください'
+        return true
+      }
+    },
+    semifinal_highlight: { 
+      required: true,
+      maxLength: 50,
+      custom: (value: unknown) => {
+        const strValue = String(value || '').trim()
+        if (!strValue) return 'この項目は必須です'
+        if (strValue.length > 50) return '50文字以内で入力してください'
+        return true
+      }
+    },
+    semifinal_image1_path: { required: true },
+    semifinal_image2_path: { required: true },
+    semifinal_image3_path: { required: true },
+    semifinal_image4_path: { required: true },
+    // 2曲の場合の追加ルール（条件付きで適用）
+    final_player_photo_path: { 
+      required: programInfo.song_count === '2曲',
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲' && !value) {
+          return 'この項目は必須です'
+        }
+        return true
+      }
+    },
+    final_story: { 
+      required: programInfo.song_count === '2曲',
+      maxLength: 100,
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲') {
           const strValue = String(value || '').trim()
           if (!strValue) return 'この項目は必須です'
           if (strValue.length > 100) return '100文字以内で入力してください'
-          return true
         }
-      },
-      semifinal_highlight: { 
-        required: true,
-        maxLength: 50,
-        custom: (value: unknown) => {
+        return true
+      }
+    },
+    final_highlight: { 
+      required: programInfo.song_count === '2曲',
+      maxLength: 50,
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲') {
           const strValue = String(value || '').trim()
           if (!strValue) return 'この項目は必須です'
           if (strValue.length > 50) return '50文字以内で入力してください'
-          return true
         }
-      },
-      semifinal_image1_path: { required: true },
-      semifinal_image2_path: { required: true },
-      semifinal_image3_path: { required: true },
-      semifinal_image4_path: { required: true }
-    }
-
-    // 2曲の場合の追加ルール
-    if (programInfo.song_count === '2曲') {
-      rules.final_player_photo_path = { required: true }
-      rules.final_story = { 
-        required: true,
-        maxLength: 100,
-        custom: (value: unknown) => {
-          const strValue = String(value || '').trim()
-          if (!strValue) return 'この項目は必須です'
-          if (strValue.length > 100) return '100文字以内で入力してください'
-          return true
-        }
+        return true
       }
-      rules.final_highlight = { 
-        required: true,
-        maxLength: 50,
-        custom: (value: unknown) => {
-          const strValue = String(value || '').trim()
-          if (!strValue) return 'この項目は必須です'
-          if (strValue.length > 50) return '50文字以内で入力してください'
-          return true
+    },
+    final_image1_path: { 
+      required: programInfo.song_count === '2曲',
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲' && !value) {
+          return 'この項目は必須です'
         }
+        return true
       }
-      rules.final_image1_path = { required: true }
-      rules.final_image2_path = { required: true }
-      rules.final_image3_path = { required: true }
-      rules.final_image4_path = { required: true }
+    },
+    final_image2_path: { 
+      required: programInfo.song_count === '2曲',
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲' && !value) {
+          return 'この項目は必須です'
+        }
+        return true
+      }
+    },
+    final_image3_path: { 
+      required: programInfo.song_count === '2曲',
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲' && !value) {
+          return 'この項目は必須です'
+        }
+        return true
+      }
+    },
+    final_image4_path: { 
+      required: programInfo.song_count === '2曲',
+      custom: (value: unknown) => {
+        if (programInfo.song_count === '2曲' && !value) {
+          return 'この項目は必須です'
+        }
+        return true
+      }
     }
-
-    return rules
   }
 
-  const { errors, validateAll, validateSingleField, isAllRequiredFieldsValid } = useFormValidation(programInfo, getValidationRules())
+  const { errors, validateAll, validateSingleField, isAllRequiredFieldsValid } = useFormValidation(programInfo, validationRules)
 
   // フォーム保存フック
   const { save, saving, error, success, setError, setSuccess } = useFormSave({
