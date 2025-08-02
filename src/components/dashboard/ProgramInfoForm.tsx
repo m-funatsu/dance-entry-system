@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { FormField, TemporarySaveButton, SaveButton, Alert, ImageUpload } from '@/components/ui'
+import { useFormSave, useFormValidation, useFileUpload } from '@/hooks'
 import type { Entry, ProgramInfo } from '@/lib/types'
-import ImageUpload from '@/components/ui/ImageUpload'
 
 interface ProgramInfoFormProps {
   entry: Entry
@@ -14,36 +15,98 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
     song_count: '1曲',
     player_photo_type: ''
   })
 
-  // 必須項目が全て入力されているかチェック
-  const isAllRequiredFieldsValid = () => {
-    // 基本的な必須項目
-    if (!programInfo.player_photo_type) return false
-    if (!programInfo.player_photo_path) return false
-    if (!programInfo.semifinal_story || !programInfo.semifinal_story.trim()) return false
-    if (!programInfo.semifinal_highlight || !programInfo.semifinal_highlight.trim()) return false
-    if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
-        !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) return false
-
-    // 2曲の場合の追加必須項目
-    if (programInfo.song_count === '2曲') {
-      if (!programInfo.final_player_photo_path) return false
-      if (!programInfo.final_story || !programInfo.final_story.trim()) return false
-      if (!programInfo.final_highlight || !programInfo.final_highlight.trim()) return false
-      if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
-          !programInfo.final_image3_path || !programInfo.final_image4_path) return false
+  // バリデーションルール（動的に変更される）
+  const getValidationRules = () => {
+    const rules: Record<string, unknown> = {
+      player_photo_type: { required: true },
+      player_photo_path: { required: true },
+      semifinal_story: { 
+        required: true,
+        maxLength: 100,
+        custom: (value: unknown) => {
+          const strValue = String(value || '').trim()
+          if (!strValue) return 'この項目は必須です'
+          if (strValue.length > 100) return '100文字以内で入力してください'
+          return true
+        }
+      },
+      semifinal_highlight: { 
+        required: true,
+        maxLength: 50,
+        custom: (value: unknown) => {
+          const strValue = String(value || '').trim()
+          if (!strValue) return 'この項目は必須です'
+          if (strValue.length > 50) return '50文字以内で入力してください'
+          return true
+        }
+      },
+      semifinal_image1_path: { required: true },
+      semifinal_image2_path: { required: true },
+      semifinal_image3_path: { required: true },
+      semifinal_image4_path: { required: true }
     }
 
-    return true
+    // 2曲の場合の追加ルール
+    if (programInfo.song_count === '2曲') {
+      rules.final_player_photo_path = { required: true }
+      rules.final_story = { 
+        required: true,
+        maxLength: 100,
+        custom: (value: unknown) => {
+          const strValue = String(value || '').trim()
+          if (!strValue) return 'この項目は必須です'
+          if (strValue.length > 100) return '100文字以内で入力してください'
+          return true
+        }
+      }
+      rules.final_highlight = { 
+        required: true,
+        maxLength: 50,
+        custom: (value: unknown) => {
+          const strValue = String(value || '').trim()
+          if (!strValue) return 'この項目は必須です'
+          if (strValue.length > 50) return '50文字以内で入力してください'
+          return true
+        }
+      }
+      rules.final_image1_path = { required: true }
+      rules.final_image2_path = { required: true }
+      rules.final_image3_path = { required: true }
+      rules.final_image4_path = { required: true }
+    }
+
+    return rules
   }
+
+  const { errors, validateAll, validateSingleField, isAllRequiredFieldsValid } = useFormValidation(programInfo, getValidationRules())
+
+  // フォーム保存フック
+  const { save, saving, error, success, setError, setSuccess } = useFormSave({
+    tableName: 'program_info',
+    uniqueField: 'entry_id',
+    redirectPath: undefined,
+    onSuccess: (message) => setSuccess(message),
+    onError: (error) => setError(error)
+  })
+
+  // ファイルアップロードフック
+  const { uploadImage, uploading } = useFileUpload({
+    onSuccess: (url, field) => {
+      if (field) {
+        setProgramInfo(prev => ({
+          ...prev,
+          [field]: url
+        }))
+      }
+    },
+    onError: (error) => setError(error)
+  })
 
   useEffect(() => {
     loadProgramInfo()
@@ -63,7 +126,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
 
       if (data) {
-        // player_photo_typeが未設定の場合はデフォルト値を設定
         setProgramInfo({
           ...data,
           player_photo_type: data.player_photo_type || ''
@@ -77,128 +139,33 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
-    setError(null)
-    setSuccess(null)
-    setSaving(true)
-
-    try {
-      // 一時保存でない場合のみ必須項目をチェック
-      if (!isTemporary) {
-        // 必須項目のチェック
-        if (!programInfo.player_photo_type) {
-          throw new Error('選手紹介用写真の種類を選択してください')
-        }
-        if (!programInfo.player_photo_path) {
-          throw new Error('選手紹介用画像をアップロードしてください')
-        }
-        if (!programInfo.semifinal_story || programInfo.semifinal_story.trim() === '') {
-          throw new Error('作品目あらすじ・ストーリーを入力してください')
-        }
-        if (!programInfo.semifinal_highlight || programInfo.semifinal_highlight.trim() === '') {
-          throw new Error('作品目見所を入力してください')
-        }
-        if (!programInfo.semifinal_image1_path || !programInfo.semifinal_image2_path || 
-            !programInfo.semifinal_image3_path || !programInfo.semifinal_image4_path) {
-          throw new Error('作品目作品イメージ①〜④をすべてアップロードしてください')
-        }
-
-        // 2曲の場合の追加必須項目チェック
-        if (programInfo.song_count === '2曲') {
-          if (!programInfo.final_player_photo_path) {
-            throw new Error('決勝用の選手紹介用画像をアップロードしてください')
-          }
-          if (!programInfo.final_story || programInfo.final_story.trim() === '') {
-            throw new Error('決勝のあらすじ・ストーリーを入力してください')
-          }
-          if (!programInfo.final_highlight || programInfo.final_highlight.trim() === '') {
-            throw new Error('決勝の見所を入力してください')
-          }
-          if (!programInfo.final_image1_path || !programInfo.final_image2_path || 
-              !programInfo.final_image3_path || !programInfo.final_image4_path) {
-            throw new Error('決勝の作品イメージ①〜④をすべてアップロードしてください')
-          }
-        }
-      }
-
-      // 100文字制限のチェック
-      if (programInfo.semifinal_story && programInfo.semifinal_story.length > 100) {
-        throw new Error('準決勝のあらすじ・ストーリーは100文字以内で入力してください')
-      }
-      if (programInfo.final_story && programInfo.final_story.length > 100) {
-        throw new Error('決勝のあらすじ・ストーリーは100文字以内で入力してください')
-      }
-
-      // 50文字制限のチェック
-      if (programInfo.semifinal_highlight && programInfo.semifinal_highlight.length > 50) {
-        throw new Error('準決勝の見所は50文字以内で入力してください')
-      }
-      if (programInfo.final_highlight && programInfo.final_highlight.length > 50) {
-        throw new Error('決勝の見所は50文字以内で入力してください')
-      }
-
-      const { data: existingData } = await supabase
-        .from('program_info')
-        .select('id')
-        .eq('entry_id', entry.id)
-        .maybeSingle()
-
-      if (existingData) {
-        // 更新
-        const { error } = await supabase
-          .from('program_info')
-          .update({
-            ...programInfo,
-            updated_at: new Date().toISOString()
-          })
-          .eq('entry_id', entry.id)
-
-        if (error) throw error
-      } else {
-        // 新規作成
-        const { error } = await supabase
-          .from('program_info')
-          .insert({
-            ...programInfo,
-            entry_id: entry.id
-          })
-
-        if (error) throw error
-      }
-
-      setSuccess(isTemporary ? 'プログラム掲載用情報を一時保存しました' : 'プログラム掲載用情報を保存しました')
-      router.refresh()
-    } catch (err) {
-      console.error('保存エラー:', err)
-      setError(err instanceof Error ? err.message : 'プログラム掲載用情報の保存に失敗しました')
-    } finally {
-      setSaving(false)
-    }
+  const handleFieldChange = (field: string, value: string | boolean) => {
+    setProgramInfo(prev => ({ ...prev, [field]: value }))
+    validateSingleField(field, value)
   }
 
   const handleImageUpload = async (field: string, file: File) => {
-    try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${entry.id}/${field}_${Date.now()}.${fileExt}`
-      
-      const { error: uploadError } = await supabase.storage
-        .from('files')
-        .upload(fileName, file)
+    await uploadImage(file, entry.id, field)
+  }
 
-      if (uploadError) throw uploadError
+  const handleSave = async (isTemporary = false) => {
+    setError(null)
+    setSuccess(null)
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('files')
-        .getPublicUrl(fileName)
-
-      setProgramInfo(prev => ({
-        ...prev,
-        [field]: publicUrl
-      }))
-    } catch (err) {
-      console.error('画像アップロードエラー:', err)
-      setError('画像のアップロードに失敗しました')
+    // 完了保存の場合はバリデーション
+    if (!isTemporary) {
+      if (!validateAll(programInfo)) {
+        setError('入力内容に誤りがあります')
+        return
+      }
     }
+
+    await save({
+      ...programInfo,
+      entry_id: entry.id
+    }, isTemporary)
+
+    router.refresh()
   }
 
   if (loading) {
@@ -209,50 +176,36 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">プログラム掲載用情報</h3>
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 text-green-600 p-4 rounded-md">
-          {success}
-        </div>
-      )}
+      {error && <Alert type="error" message={error} />}
+      {success && <Alert type="success" message={success} />}
 
       <div className="space-y-4">
         {/* 楽曲数 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            楽曲数
-          </label>
-          <select
-            value={programInfo.song_count || '1曲'}
-            onChange={(e) => setProgramInfo(prev => ({ ...prev, song_count: e.target.value as '1曲' | '2曲' }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          >
-            <option value="1曲">1曲（準決勝と決勝で同じ楽曲を使用する）</option>
-            <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
-          </select>
-        </div>
+        <FormField
+          label="楽曲数"
+          name="song_count"
+          type="select"
+          value={programInfo.song_count || '1曲'}
+          onChange={(e) => handleFieldChange('song_count', e.target.value)}
+        >
+          <option value="1曲">1曲（準決勝と決勝で同じ楽曲を使用する）</option>
+          <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
+        </FormField>
 
         {/* 選手紹介用写真の種類 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            選手紹介用写真の種類 <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={programInfo.player_photo_type || ''}
-            onChange={(e) => setProgramInfo(prev => ({ ...prev, player_photo_type: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          >
-            <option value="">選択してください</option>
-            <option value="Freedom's CUP撮影会での写真">Freedom&apos;s CUP撮影会での写真</option>
-            <option value="お持ちのデータを使用">お持ちのデータを使用</option>
-          </select>
-        </div>
+        <FormField
+          label="選手紹介用写真の種類"
+          name="player_photo_type"
+          type="select"
+          value={programInfo.player_photo_type || ''}
+          onChange={(e) => handleFieldChange('player_photo_type', e.target.value)}
+          required
+          error={errors.player_photo_type}
+        >
+          <option value="">選択してください</option>
+          <option value="Freedom's CUP撮影会での写真">Freedom&apos;s CUP撮影会での写真</option>
+          <option value="お持ちのデータを使用">お持ちのデータを使用</option>
+        </FormField>
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">
@@ -261,17 +214,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           </h4>
           
           {/* 所属教室または所属 */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              所属教室または所属（任意）
-            </label>
-            <input
-              type="text"
-              value={programInfo.affiliation || ''}
-              onChange={(e) => setProgramInfo(prev => ({ ...prev, affiliation: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+          <FormField
+            label="所属教室または所属（任意）"
+            name="affiliation"
+            value={programInfo.affiliation || ''}
+            onChange={(e) => handleFieldChange('affiliation', e.target.value)}
+          />
 
           {/* 選手紹介用画像 */}
           <div className="mb-4">
@@ -281,41 +229,36 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               value={programInfo.player_photo_path}
               onChange={(file) => handleImageUpload('player_photo_path', file)}
             />
+            {errors.player_photo_path && (
+              <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
+            )}
           </div>
 
           {/* あらすじ・ストーリー */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品目あらすじ・ストーリー（100文字以内） <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={programInfo.semifinal_story || ''}
-              onChange={(e) => setProgramInfo(prev => ({ ...prev, semifinal_story: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows={3}
-              maxLength={100}
-            />
-            <div className="text-sm text-gray-500 mt-1">
-              {programInfo.semifinal_story?.length || 0}/100文字
-            </div>
-          </div>
+          <FormField
+            label="作品目あらすじ・ストーリー（100文字以内）"
+            name="semifinal_story"
+            type="textarea"
+            value={programInfo.semifinal_story || ''}
+            onChange={(e) => handleFieldChange('semifinal_story', e.target.value)}
+            required
+            maxLength={100}
+            rows={3}
+            error={errors.semifinal_story}
+          />
 
           {/* 見所 */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品目見所（50文字以内） <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={programInfo.semifinal_highlight || ''}
-              onChange={(e) => setProgramInfo(prev => ({ ...prev, semifinal_highlight: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows={2}
-              maxLength={50}
-            />
-            <div className="text-sm text-gray-500 mt-1">
-              {programInfo.semifinal_highlight?.length || 0}/50文字
-            </div>
-          </div>
+          <FormField
+            label="作品目見所（50文字以内）"
+            name="semifinal_highlight"
+            type="textarea"
+            value={programInfo.semifinal_highlight || ''}
+            onChange={(e) => handleFieldChange('semifinal_highlight', e.target.value)}
+            required
+            maxLength={50}
+            rows={2}
+            error={errors.semifinal_highlight}
+          />
 
           {/* 作品イメージ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -327,6 +270,9 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                   value={programInfo[`semifinal_image${num}_path` as keyof ProgramInfo] as string}
                   onChange={(file) => handleImageUpload(`semifinal_image${num}_path`, file)}
                 />
+                {errors[`semifinal_image${num}_path`] && (
+                  <p className="mt-1 text-sm text-red-600">{errors[`semifinal_image${num}_path`]}</p>
+                )}
               </div>
             ))}
           </div>
@@ -338,17 +284,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             <h4 className="font-medium mb-3">決勝用情報</h4>
             
             {/* 所属教室または所属 */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                所属教室または所属（任意）
-              </label>
-              <input
-                type="text"
-                value={programInfo.final_affiliation || ''}
-                onChange={(e) => setProgramInfo(prev => ({ ...prev, final_affiliation: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
+            <FormField
+              label="所属教室または所属（任意）"
+              name="final_affiliation"
+              value={programInfo.final_affiliation || ''}
+              onChange={(e) => handleFieldChange('final_affiliation', e.target.value)}
+            />
 
             {/* 選手紹介用画像 */}
             <div className="mb-4">
@@ -358,41 +299,36 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 value={programInfo.final_player_photo_path}
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
               />
+              {errors.final_player_photo_path && (
+                <p className="mt-1 text-sm text-red-600">{errors.final_player_photo_path}</p>
+              )}
             </div>
 
             {/* あらすじ・ストーリー */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目あらすじ・ストーリー（100文字以内） <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={programInfo.final_story || ''}
-                onChange={(e) => setProgramInfo(prev => ({ ...prev, final_story: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                rows={3}
-                maxLength={100}
-              />
-              <div className="text-sm text-gray-500 mt-1">
-                {programInfo.final_story?.length || 0}/100文字
-              </div>
-            </div>
+            <FormField
+              label="作品目あらすじ・ストーリー（100文字以内）"
+              name="final_story"
+              type="textarea"
+              value={programInfo.final_story || ''}
+              onChange={(e) => handleFieldChange('final_story', e.target.value)}
+              required
+              maxLength={100}
+              rows={3}
+              error={errors.final_story}
+            />
 
             {/* 見所 */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                作品目見所（50文字以内） <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={programInfo.final_highlight || ''}
-                onChange={(e) => setProgramInfo(prev => ({ ...prev, final_highlight: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                rows={2}
-                maxLength={50}
-              />
-              <div className="text-sm text-gray-500 mt-1">
-                {programInfo.final_highlight?.length || 0}/50文字
-              </div>
-            </div>
+            <FormField
+              label="作品目見所（50文字以内）"
+              name="final_highlight"
+              type="textarea"
+              value={programInfo.final_highlight || ''}
+              onChange={(e) => handleFieldChange('final_highlight', e.target.value)}
+              required
+              maxLength={50}
+              rows={2}
+              error={errors.final_highlight}
+            />
 
             {/* 作品イメージ */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -404,6 +340,9 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                     value={programInfo[`final_image${num}_path` as keyof ProgramInfo] as string}
                     onChange={(file) => handleImageUpload(`final_image${num}_path`, file)}
                   />
+                  {errors[`final_image${num}_path`] && (
+                    <p className="mt-1 text-sm text-red-600">{errors[`final_image${num}_path`]}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -412,13 +351,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
         {/* 備考欄 */}
         <div className="border-t pt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            備考欄
-          </label>
-          <textarea
+          <FormField
+            label="備考欄"
+            name="notes"
+            type="textarea"
             value={programInfo.notes || ''}
-            onChange={(e) => setProgramInfo(prev => ({ ...prev, notes: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            onChange={(e) => handleFieldChange('notes', e.target.value)}
             rows={4}
             placeholder="その他の連絡事項があれば記入してください"
           />
@@ -426,28 +364,16 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       </div>
 
       <div className="flex justify-end space-x-4">
-        <button
+        <TemporarySaveButton
           onClick={() => handleSave(true)}
-          disabled={saving}
-          className={`px-6 py-2 rounded-md text-white ${
-            saving
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-gray-600 hover:bg-gray-700'
-          }`}
-        >
-          {saving ? '一時保存中...' : '一時保存'}
-        </button>
-        <button
+          disabled={saving || uploading}
+          loading={saving}
+        />
+        <SaveButton
           onClick={() => handleSave(false)}
-          disabled={saving || !isAllRequiredFieldsValid()}
-          className={`px-6 py-2 rounded-md text-white ${
-            saving || !isAllRequiredFieldsValid()
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
+          disabled={saving || uploading || !isAllRequiredFieldsValid(programInfo)}
+          loading={saving}
+        />
       </div>
     </div>
   )
