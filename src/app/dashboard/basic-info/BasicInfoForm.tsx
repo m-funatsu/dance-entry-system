@@ -153,9 +153,23 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     let hasErrors = false
     const fieldErrors: Record<string, string> = {}
     
+    // デバッグ用：各フィールドの状態を詳細に出力
+    console.log('=== validateAllWithDynamicRules DEBUG ===')
+    console.log('Current dance_style:', formData.dance_style)
+    console.log('Current rules:', Object.keys(currentRules))
+    
     Object.keys(currentRules).forEach(field => {
       const rule = currentRules[field]
       const value = formData[field as keyof BasicInfoFormData]
+      
+      console.log(`Field: ${field}`, {
+        value,
+        valueType: typeof value,
+        isEmpty: !value || value === '',
+        required: rule.required,
+        hasPattern: !!rule.pattern,
+        hasCustom: !!rule.custom
+      })
       
       if (rule.required && (!value || value === '')) {
         hasErrors = true
@@ -172,6 +186,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         fieldErrors[field] = 'Pattern mismatch'
       }
     })
+    
+    console.log('Field errors:', fieldErrors)
+    console.log('Has errors:', hasErrors)
+    console.log('=== END DEBUG ===')
     
     return !hasErrors
   }
@@ -242,15 +260,17 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
   // 必須項目のチェック（同意事項を含む）
   const isFormValid = () => {
+    console.log('=== isFormValid START ===')
+    console.log('Full formData:', JSON.stringify(formData, null, 2))
     const hasAllRequired = validateAllWithDynamicRules()
     const result = hasAllRequired && checkboxes.agreement_checked && checkboxes.privacy_policy_checked
-    console.log('isFormValid debug:', {
+    console.log('isFormValid summary:', {
       hasAllRequired,
       agreement_checked: checkboxes.agreement_checked,
       privacy_policy_checked: checkboxes.privacy_policy_checked,
-      formData,
       result
     })
+    console.log('=== isFormValid END ===')
     return result
   }
 
