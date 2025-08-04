@@ -44,7 +44,6 @@ export default function SNSForm({ entry }: SNSFormProps) {
     handleFieldChange,
     save,
     saving,
-    errors,
     error,
     success,
     setError,
@@ -178,8 +177,8 @@ export default function SNSForm({ entry }: SNSFormProps) {
             onChange={(file) => handleFileUpload('practice_video', file)}
             maxSizeMB={200}
           />
-          {errors.practice_video_path && (
-            <p className="mt-1 text-sm text-red-600">{errors.practice_video_path}</p>
+          {!formData.practice_video_path && (
+            <p className="mt-1 text-sm text-red-600">練習風景動画をアップロードしてください</p>
           )}
         </div>
 
@@ -193,8 +192,8 @@ export default function SNSForm({ entry }: SNSFormProps) {
             onChange={(file) => handleFileUpload('introduction_highlight', file)}
             maxSizeMB={100}
           />
-          {errors.introduction_highlight_path && (
-            <p className="mt-1 text-sm text-red-600">{errors.introduction_highlight_path}</p>
+          {!formData.introduction_highlight_path && (
+            <p className="mt-1 text-sm text-red-600">選手紹介・見所動画をアップロードしてください</p>
           )}
         </div>
 

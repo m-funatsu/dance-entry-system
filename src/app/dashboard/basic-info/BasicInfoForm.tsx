@@ -159,18 +159,28 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       
       if (rule.required && (!value || value === '')) {
         hasErrors = true
-        fieldErrors[field] = 'Required but empty'
+        fieldErrors[field] = 'この項目は必須です'
       } else if (rule.custom) {
         // カスタムバリデーションはvalueを引数として渡す
         const result = rule.custom(value)
         if (result !== true) {
           hasErrors = true
-          fieldErrors[field] = typeof result === 'string' ? result : 'Custom validation failed'
+          fieldErrors[field] = typeof result === 'string' ? result : '入力値が正しくありません'
         }
       } else if (rule.pattern && typeof value === 'string' && value && !rule.pattern.test(value)) {
         hasErrors = true
-        fieldErrors[field] = 'Pattern mismatch'
+        fieldErrors[field] = '正しい形式で入力してください'
       }
+    })
+    
+    // エラーを更新
+    Object.keys(errors).forEach(field => {
+      if (!fieldErrors[field]) {
+        validateField(field as keyof BasicInfoFormData)
+      }
+    })
+    Object.entries(fieldErrors).forEach(([field, error]) => {
+      errors[field] = error
     })
     
     return !hasErrors
@@ -234,10 +244,46 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     }
   }
 
+  // 各フィールドのエラーメッセージを保持
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  
   // フィールド変更時のバリデーション
   const handleFieldChangeWithValidation = (field: keyof BasicInfoFormData, value: string) => {
     handleFieldChange(field, value)
-    validateField(field)
+    
+    // 動的ルールに基づいてバリデーション
+    const currentRules = getValidationRules(
+      field === 'dance_style' ? value : formData.dance_style
+    )
+    const rule = currentRules[field]
+    
+    if (rule) {
+      let error = ''
+      
+      if (rule.required && (!value || value === '')) {
+        error = 'この項目は必須です'
+      } else if (value) { // 値がある場合のみ追加バリデーション
+        if (rule.custom) {
+          const result = rule.custom(value)
+          if (result !== true) {
+            error = typeof result === 'string' ? result : '入力値が正しくありません'
+          }
+        } else if (rule.pattern && !rule.pattern.test(value)) {
+          error = '正しい形式で入力してください'
+        }
+      }
+      
+      // エラーメッセージを更新
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        if (error) {
+          newErrors[field] = error
+        } else {
+          delete newErrors[field]
+        }
+        return newErrors
+      })
+    }
   }
 
   // 必須項目のチェック（同意事項を含む）
@@ -288,7 +334,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.representative_name}
               onChange={(e) => handleFieldChangeWithValidation('representative_name', e.target.value)}
               required
-              error={errors.representative_name}
+              error={fieldErrors.representative_name || errors.representative_name}
             />
             <FormField
               label="代表者フリガナ"
@@ -297,7 +343,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('representative_furigana', e.target.value)}
               required
               placeholder="カタカナで入力"
-              error={errors.representative_furigana}
+              error={fieldErrors.representative_furigana || errors.representative_furigana}
             />
             <FormField
               label="ペア氏名"
@@ -305,7 +351,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_name', e.target.value)}
               required={formData.dance_style === 'couple'}
-              error={errors.partner_name}
+              error={fieldErrors.partner_name || errors.partner_name}
             />
             <FormField
               label="ペアフリガナ"
@@ -314,7 +360,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('partner_furigana', e.target.value)}
               required={formData.dance_style === 'couple'}
               placeholder="カタカナで入力"
-              error={errors.partner_furigana}
+              error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
           </div>
         </div>
@@ -328,7 +374,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
             required
             placeholder="example@email.com"
-            error={errors.representative_email}
+            error={fieldErrors.representative_email || errors.representative_email}
           />
           <FormField
             label="代表者電話番号"
@@ -338,7 +384,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
             required
             placeholder="090-1234-5678"
-            error={errors.phone_number}
+            error={fieldErrors.phone_number || errors.phone_number}
           />
         </div>
 
@@ -354,8 +400,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             label="振付師フリガナ"
             name="choreographer_furigana"
             value={formData.choreographer_furigana || ''}
-            onChange={(e) => handleFieldChange('choreographer_furigana', e.target.value)}
+            onChange={(e) => handleFieldChangeWithValidation('choreographer_furigana', e.target.value)}
             placeholder="カタカナで入力"
+            error={fieldErrors.choreographer_furigana}
           />
         </div>
 

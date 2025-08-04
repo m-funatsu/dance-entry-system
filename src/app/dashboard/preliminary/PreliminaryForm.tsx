@@ -49,7 +49,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     music_rights_cleared: { required: true }
   }
 
-  const { errors, validateAll, isAllRequiredFieldsValid } = useFormValidation(formData, validationRules)
+  const { errors, validateAll, isAllRequiredFieldsValid, validateSingleField } = useFormValidation(formData, validationRules)
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -84,6 +84,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    // リアルタイムバリデーション
+    validateSingleField(field, value)
   }
 
   const saveVideoFileInfo = async (filePath: string) => {
@@ -244,6 +246,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           <h4 className="text-base font-medium text-gray-900 mb-4">
             予選提出動画 <span className="text-red-500">*</span>
           </h4>
+          
+          {!videoFile && (
+            <p className="text-sm text-red-600 mb-4">予選動画のアップロードは必須です</p>
+          )}
           
           {videoFile ? (
             <div className="space-y-4">
