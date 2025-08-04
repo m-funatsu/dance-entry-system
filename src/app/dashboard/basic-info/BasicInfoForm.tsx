@@ -116,23 +116,19 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const validateAllWithDynamicRules = () => {
     const currentRules = getValidationRules(formData.dance_style)
     let hasErrors = false
-    const newErrors: Record<string, string> = {}
     
     Object.keys(currentRules).forEach(field => {
       const rule = currentRules[field]
       const value = formData[field as keyof BasicInfoFormData]
       
       if (rule.required && (!value || value === '')) {
-        newErrors[field] = 'この項目は必須です'
         hasErrors = true
       } else if (rule.custom) {
         const result = rule.custom(value)
         if (typeof result === 'string') {
-          newErrors[field] = result
           hasErrors = true
         }
-      } else if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
-        newErrors[field] = '正しい形式で入力してください'
+      } else if (rule.pattern && typeof value === 'string' && value && !rule.pattern.test(value)) {
         hasErrors = true
       }
     })
@@ -206,9 +202,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
   // 必須項目のチェック（同意事項を含む）
   const isFormValid = () => {
-    const hasNoErrors = Object.keys(errors).length === 0
     const hasAllRequired = validateAllWithDynamicRules()
-    return hasAllRequired && hasNoErrors && checkboxes.agreement_checked && checkboxes.privacy_policy_checked
+    return hasAllRequired && checkboxes.agreement_checked && checkboxes.privacy_policy_checked
   }
 
   return (
