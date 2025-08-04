@@ -51,10 +51,16 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       choreographer: ValidationPresets.optionalText(50),
       choreographer_furigana: {
         required: false,
-        custom: Validators.when(
-          (formData) => !!formData.choreographer,
-          Validators.katakana('振付師フリガナはカタカナで入力してください')
-        )
+        custom: (formData: any) => {
+          // 振付師が入力されている場合のみカタカナチェック
+          if (formData.choreographer && formData.choreographer_furigana) {
+            const pattern = /^[\u30A0-\u30FF\s]+$/
+            if (!pattern.test(formData.choreographer_furigana)) {
+              return '振付師フリガナはカタカナで入力してください'
+            }
+          }
+          return true
+        }
       }
     } as Record<string, {
       required?: boolean
@@ -127,9 +133,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         fieldErrors[field] = 'Required but empty'
       } else if (rule.custom) {
         const result = rule.custom(formData)
-        if (typeof result === 'string') {
+        if (result !== true) {
           hasErrors = true
-          fieldErrors[field] = result
+          fieldErrors[field] = typeof result === 'string' ? result : 'Custom validation failed'
         }
       } else if (rule.pattern && typeof value === 'string' && value && !rule.pattern.test(value)) {
         hasErrors = true
