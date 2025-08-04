@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useErrorHandler } from './useErrorHandler'
 
 interface UseFileUploadOptions {
   bucketName?: string
@@ -13,6 +16,7 @@ export const useFileUpload = ({
   onError
 }: UseFileUploadOptions = {}) => {
   const supabase = createClient()
+  const { handleError: handleErrorInternal } = useErrorHandler()
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
@@ -37,8 +41,13 @@ export const useFileUpload = ({
 
       return publicUrl
     } catch (err) {
-      console.error('ファイルアップロードエラー:', err)
       const errorMessage = err instanceof Error ? err.message : 'ファイルのアップロードに失敗しました'
+      
+      handleErrorInternal(err, {
+        fallbackMessage: errorMessage,
+        logToConsole: true
+      })
+      
       setUploadError(errorMessage)
       
       if (onError) {

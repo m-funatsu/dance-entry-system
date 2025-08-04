@@ -1,6 +1,9 @@
+'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useErrorHandler } from './useErrorHandler'
 
 interface UseFormSaveOptions {
   tableName: string
@@ -19,6 +22,7 @@ export const useFormSave = ({
 }: UseFormSaveOptions) => {
   const router = useRouter()
   const supabase = createClient()
+  const { handleError: handleErrorInternal } = useErrorHandler()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -75,8 +79,13 @@ export const useFormSave = ({
       
       router.refresh()
     } catch (err) {
-      console.error('保存エラー:', err)
       const errorMessage = err instanceof Error ? err.message : 'データの保存に失敗しました'
+      
+      handleErrorInternal(err, {
+        fallbackMessage: errorMessage,
+        logToConsole: true
+      })
+      
       setError(errorMessage)
       
       if (onError) {

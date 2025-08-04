@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useErrorHandler } from '@/hooks/useErrorHandler'
 
 interface EmailSenderProps {
   recipientEmail: string
@@ -11,6 +12,7 @@ interface EmailSenderProps {
 export default function EmailSender({ recipientEmail, recipientName, entryData }: EmailSenderProps) {
   const [sending, setSending] = useState(false)
   const [templateId, setTemplateId] = useState('entry-confirmation')
+  const { handleError } = useErrorHandler()
 
   const sendEmail = async () => {
     setSending(true)
@@ -37,13 +39,21 @@ export default function EmailSender({ recipientEmail, recipientName, entryData }
       const result = await response.json()
 
       if (!response.ok) {
-        alert(result.error || 'メール送信に失敗しました')
+        const errorMessage = result.error || 'メール送信に失敗しました'
+        handleError(new Error(errorMessage), {
+          fallbackMessage: errorMessage,
+          showToast: true
+        })
+        alert(errorMessage)
         return
       }
 
       alert('メールを送信しました')
     } catch (error) {
-      console.error('Email send error:', error)
+      handleError(error, {
+        fallbackMessage: 'メール送信中にエラーが発生しました',
+        showToast: true
+      })
       alert('メール送信中にエラーが発生しました')
     } finally {
       setSending(false)

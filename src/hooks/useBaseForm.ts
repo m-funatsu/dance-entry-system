@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useFormValidation } from './useFormValidation'
+import { useErrorHandler } from './useErrorHandler'
 // ValidationRulesはuseFormValidation内で定義されている
 
 export interface UseBaseFormOptions<T extends Record<string, unknown>> {
@@ -62,6 +63,7 @@ export function useBaseForm<T extends Record<string, unknown>>({
 }: UseBaseFormOptions<T>): UseBaseFormReturn<T> {
   const router = useRouter()
   const supabase = createClient()
+  const { handleError: handleErrorInternal } = useErrorHandler()
   
   // 状態管理
   const [formData, setFormData] = useState<T>(initialData)
@@ -178,8 +180,13 @@ export function useBaseForm<T extends Record<string, unknown>>({
       return true
       
     } catch (err) {
-      console.error('保存エラー:', err)
       const errorMessage = err instanceof Error ? err.message : 'データの保存に失敗しました'
+      
+      handleErrorInternal(err, {
+        fallbackMessage: errorMessage,
+        logToConsole: true
+      })
+      
       setError(errorMessage)
       
       if (onError) {
@@ -190,7 +197,7 @@ export function useBaseForm<T extends Record<string, unknown>>({
     } finally {
       setSaving(false)
     }
-  }, [formData, tableName, uniqueField, validateBeforeSave, validation, supabase, router, redirectPath, onSuccess, onError])
+  }, [formData, tableName, uniqueField, validateBeforeSave, validation, supabase, router, redirectPath, onSuccess, onError, handleErrorInternal])
   
   // バリデーションヘルパー
   const validateField = useCallback((field: keyof T): boolean => {
