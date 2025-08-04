@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FormField, TemporarySaveButton, SaveButton, Alert, ImageUpload } from '@/components/ui'
-import { useFormSave, useFormValidation, useFileUpload } from '@/hooks'
+import { FormField, TemporarySaveButton, SaveButton, Alert } from '@/components/ui'
+import { FileUploadField } from '@/components/ui/FileUploadField'
+import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { Entry, ProgramInfo } from '@/lib/types'
 
 interface ProgramInfoFormProps {
@@ -133,16 +134,21 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   })
 
   // ファイルアップロードフック
-  const { uploadImage, uploading } = useFileUpload({
-    onSuccess: (url, field) => {
-      if (field) {
+  const { uploadImage, uploading } = useFileUploadV2({
+    category: 'image',
+    generatePath: (fileName: string, fileInfo?: { field?: string }) => {
+      if (!entry.id || !fileInfo?.field) return fileName
+      return `${entry.id}/program/${fileInfo.field}/${fileName}`
+    },
+    onSuccess: (result: { field?: string; url?: string }) => {
+      if (result.field && result.url) {
         setProgramInfo(prev => ({
           ...prev,
-          [field]: url
+          [result.field as string]: result.url
         }))
       }
     },
-    onError: (error) => setError(error)
+    onError: (error: string) => setError(error)
   })
 
   useEffect(() => {
@@ -182,7 +188,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   }
 
   const handleImageUpload = async (field: string, file: File) => {
-    await uploadImage(file, entry.id, field)
+    await uploadImage(file, { entryId: entry.id, field })
   }
 
   const handleSave = async (isTemporary = false) => {
@@ -260,11 +266,17 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
           {/* 選手紹介用画像 */}
           <div className="mb-4">
-            <ImageUpload
+            <FileUploadField
               label="選手紹介用画像"
               required
               value={programInfo.player_photo_path}
               onChange={(file) => handleImageUpload('player_photo_path', file)}
+              onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, player_photo_path: url }))}
+              category="image"
+              disabled={uploading}
+              maxSizeMB={100}
+              accept="image/*"
+              uploadPath={(fileName) => `${entry.id}/program/player_photo_path/${fileName}`}
             />
             {errors.player_photo_path && (
               <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
@@ -299,19 +311,28 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
           {/* 作品イメージ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((num) => (
-              <div key={`semifinal_image${num}`}>
-                <ImageUpload
-                  label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
-                  required
-                  value={programInfo[`semifinal_image${num}_path` as keyof ProgramInfo] as string}
-                  onChange={(file) => handleImageUpload(`semifinal_image${num}_path`, file)}
-                />
-                {errors[`semifinal_image${num}_path`] && (
-                  <p className="mt-1 text-sm text-red-600">{errors[`semifinal_image${num}_path`]}</p>
-                )}
-              </div>
-            ))}
+            {[1, 2, 3, 4].map((num) => {
+              const fieldName = `semifinal_image${num}_path` as keyof ProgramInfo
+              return (
+                <div key={fieldName}>
+                  <FileUploadField
+                    label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                    required
+                    value={programInfo[fieldName] as string}
+                    onChange={(file) => handleImageUpload(fieldName, file)}
+                    onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, [fieldName]: url }))}
+                    category="image"
+                    disabled={uploading}
+                    maxSizeMB={100}
+                    accept="image/*"
+                    uploadPath={(fileName) => `${entry.id}/program/${fieldName}/${fileName}`}
+                  />
+                  {errors[fieldName] && (
+                    <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -330,11 +351,17 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
             {/* 選手紹介用画像 */}
             <div className="mb-4">
-              <ImageUpload
+              <FileUploadField
                 label="選手紹介用画像"
                 required
                 value={programInfo.final_player_photo_path}
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
+                onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, final_player_photo_path: url }))}
+                category="image"
+                disabled={uploading}
+                maxSizeMB={100}
+                accept="image/*"
+                uploadPath={(fileName) => `${entry.id}/program/final_player_photo_path/${fileName}`}
               />
               {errors.final_player_photo_path && (
                 <p className="mt-1 text-sm text-red-600">{errors.final_player_photo_path}</p>
@@ -369,19 +396,28 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
             {/* 作品イメージ */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((num) => (
-                <div key={`final_image${num}`}>
-                  <ImageUpload
-                    label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
-                    required
-                    value={programInfo[`final_image${num}_path` as keyof ProgramInfo] as string}
-                    onChange={(file) => handleImageUpload(`final_image${num}_path`, file)}
-                  />
-                  {errors[`final_image${num}_path`] && (
-                    <p className="mt-1 text-sm text-red-600">{errors[`final_image${num}_path`]}</p>
-                  )}
-                </div>
-              ))}
+              {[1, 2, 3, 4].map((num) => {
+                const fieldName = `final_image${num}_path` as keyof ProgramInfo
+                return (
+                  <div key={fieldName}>
+                    <FileUploadField
+                      label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                      required
+                      value={programInfo[fieldName] as string}
+                      onChange={(file) => handleImageUpload(fieldName, file)}
+                      onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, [fieldName]: url }))}
+                      category="image"
+                      disabled={uploading}
+                      maxSizeMB={100}
+                      accept="image/*"
+                      uploadPath={(fileName) => `${entry.id}/program/${fieldName}/${fileName}`}
+                    />
+                    {errors[fieldName] && (
+                      <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}

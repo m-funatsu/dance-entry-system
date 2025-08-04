@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { uploadFile as uploadFileToStorage } from '@/lib/storage'
 import type { Entry, User, EntryFile } from '@/lib/types'
 import Image from 'next/image'
 import {
@@ -41,9 +40,13 @@ interface FormData {
   
   // ファイル
   photo?: File
+  photoUrl?: string
   music?: File
+  musicUrl?: string
   music2?: File
+  music2Url?: string
   video?: File
+  videoUrl?: string
 }
 
 export default function IntegratedEntryForm({ userId, existingEntry, userProfile }: IntegratedEntryFormProps) {
@@ -62,6 +65,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     video: 0,
     music: 0
   })
+  
   
   const [formData, setFormData] = useState<FormData>({
     dance_style: existingEntry?.dance_style || '',
@@ -156,6 +160,11 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
 
   const handleFileChange = (field: string, file: File | undefined) => {
     setFormData(prev => ({ ...prev, [field]: file }))
+  }
+  
+  const handleFileUploaded = (field: string, url: string) => {
+    setFormData(prev => ({ ...prev, [`${field}Url`]: url }))
+    setFileListRefreshKey(prev => prev + 1)
   }
 
   const handleFileDeleted = (fileType: string) => {
@@ -253,10 +262,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
           }
           break
         case 'music':
-          // 楽曲情報はファイルのみなので、ファイルアップロード処理を実行
-          if (formData.photo || formData.video || formData.music || formData.music2) {
-            await handleFilesUpload()
-          }
+          // 楽曲情報はファイルのみなので、バリデーションのみ実行
           setSectionSaved({ ...sectionSaved, [section]: true })
           setSectionLoading({ ...sectionLoading, [section]: false })
           return
@@ -308,57 +314,6 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     }
   }
 
-  const handleFilesUpload = async () => {
-    if (!entryId) {
-      setErrors({ submit: '基本情報を先に保存してください' })
-      return
-    }
-
-    const uploadPromises = []
-    if (formData.photo) {
-      uploadPromises.push(uploadFile(formData.photo, 'photo', entryId))
-    }
-    if (formData.music) {
-      uploadPromises.push(uploadFile(formData.music, 'music', entryId))
-    }
-    if (formData.music2) {
-      uploadPromises.push(uploadFile(formData.music2, 'audio', entryId))
-    }
-    if (formData.video) {
-      uploadPromises.push(uploadFile(formData.video, 'video', entryId))
-    }
-
-    await Promise.all(uploadPromises)
-    
-    // ファイルをリセット
-    setFormData(prev => ({
-      ...prev,
-      photo: undefined,
-      music: undefined,
-      music2: undefined,
-      video: undefined,
-    }))
-    
-    // ファイルリストをリフレッシュ
-    setFileListRefreshKey(prev => prev + 1)
-  }
-
-  const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'audio' | 'video', entryId: string) => {
-    try {
-      const result = await uploadFileToStorage({
-        userId,
-        entryId,
-        fileType,
-        file
-      })
-      if (result.error) {
-        throw new Error(result.error)
-      }
-    } catch (error) {
-      console.error(`Error uploading ${fileType}:`, error)
-      throw error
-    }
-  }
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="max-w-4xl mx-auto">
@@ -420,9 +375,13 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
               formData={{
                 use_different_songs: formData.use_different_songs,
                 photo: formData.photo,
+                photoUrl: formData.photoUrl,
                 music: formData.music,
+                musicUrl: formData.musicUrl,
                 music2: formData.music2,
-                video: formData.video
+                music2Url: formData.music2Url,
+                video: formData.video,
+                videoUrl: formData.videoUrl
               }}
               errors={errors}
               entryId={entryId}
@@ -430,6 +389,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
               fileListRefreshKey={fileListRefreshKey}
               onChange={handleFieldChange}
               onFileChange={handleFileChange}
+              onFileUploaded={handleFileUploaded}
               onFileDeleted={handleFileDeleted}
               getFilePreview={getFilePreview}
             />

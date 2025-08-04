@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert, VideoUpload } from '@/components/ui'
-import { useFormSave, useFormValidation } from '@/hooks'
+import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert } from '@/components/ui'
+import { FileUploadField } from '@/components/ui/FileUploadField'
+import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
 interface PreliminaryFormProps {
@@ -15,7 +16,7 @@ interface PreliminaryFormProps {
   userId: string
 }
 
-export default function PreliminaryForm({ entryId, initialData, preliminaryVideo, userId }: PreliminaryFormProps) {
+export default function PreliminaryForm({ entryId, initialData, preliminaryVideo }: PreliminaryFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
@@ -32,9 +33,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     music_type: initialData?.music_type || 'cd'
   })
   
-  const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
+  const [videoUrl, setVideoUrl] = useState<string | null>(preliminaryVideo?.file_path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}` : null)
 
   // バリデーションルール
   const validationRules = {
@@ -59,6 +59,23 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     onSuccess: (message) => showToast(message, 'success'),
     onError: (error) => showToast(error, 'error')
   })
+  
+  // ファイルアップロードフック
+  const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
+    category: 'video',
+    generatePath: (fileName: string) => {
+      if (!entryId) return fileName
+      return `${entryId}/preliminary/${fileName}`
+    },
+    onSuccess: (result: { url?: string; path?: string }) => {
+      if (result.url) {
+        setVideoUrl(result.url)
+        // ファイル情報をデータベースに保存
+        saveVideoFileInfo(result.path || '')
+      }
+    },
+    onError: (error: string) => showToast(error, 'error')
+  })
 
   // 動画ファイルの状態を監視
   useEffect(() => {
@@ -69,6 +86,30 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const saveVideoFileInfo = async (filePath: string) => {
+    try {
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert({
+          entry_id: entryId,
+          file_type: 'video',
+          file_name: filePath.split('/').pop() || '',
+          file_path: filePath,
+          purpose: 'preliminary'
+        })
+        .select()
+        .single()
+
+      if (dbError) throw dbError
+
+      setVideoFile(fileData)
+      showToast('予選動画をアップロードしました', 'success')
+    } catch (error) {
+      console.error('Error saving file info:', error)
+      showToast('ファイル情報の保存に失敗しました', 'error')
+    }
+  }
+  
   const handleFileUpload = async (file: File) => {
     if (!entryId) {
       showToast('基本情報を先に保存してください', 'error')
@@ -80,85 +121,34 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
-    setUploading(true)
-    setUploadProgress(0)
-
-    try {
-      // ファイル名をサニタイズ
-      const timestamp = Date.now()
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-      const fileName = `preliminary_${userId}_${timestamp}_${sanitizedName}`
-
-      // アップロード進捗のシミュレーション
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 90))
-      }, 500)
-
-      // アップロード
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('files')
-        .upload(fileName, file)
-
-      clearInterval(progressInterval)
-      setUploadProgress(100)
-
-      if (uploadError) throw uploadError
-
-      // ファイル情報をデータベースに保存
-      const { data: fileData, error: dbError } = await supabase
-        .from('entry_files')
-        .insert({
-          entry_id: entryId,
-          file_type: 'video',
-          file_name: file.name,
-          file_path: uploadData.path,
-          file_size: file.size,
-          mime_type: file.type,
-          purpose: 'preliminary'
-        })
-        .select()
-        .single()
-
-      if (dbError) throw dbError
-
-      setVideoFile(fileData)
-      showToast('予選動画をアップロードしました', 'success')
-    } catch (error) {
-      console.error('Error uploading file:', error)
-      showToast('アップロードに失敗しました', 'error')
-    } finally {
-      setUploading(false)
-      setUploadProgress(0)
-    }
+    await uploadVideo(file, { entryId })
   }
 
   const handleFileDelete = async () => {
     if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
 
-    setUploading(true)
     try {
       // ストレージから削除
-      const { error: storageError } = await supabase.storage
-        .from('files')
-        .remove([videoFile.file_path])
+      const deleteSuccess = await deleteFile(videoFile.file_path)
+      
+      if (deleteSuccess) {
+        // データベースから削除
+        const { error: dbError } = await supabase
+          .from('entry_files')
+          .delete()
+          .eq('id', videoFile.id)
 
-      if (storageError) throw storageError
+        if (dbError) throw dbError
 
-      // データベースから削除
-      const { error: dbError } = await supabase
-        .from('entry_files')
-        .delete()
-        .eq('id', videoFile.id)
-
-      if (dbError) throw dbError
-
-      setVideoFile(null)
-      showToast('予選動画を削除しました', 'success')
+        setVideoFile(null)
+        setVideoUrl(null)
+        showToast('予選動画を削除しました', 'success')
+      } else {
+        throw new Error('ファイルの削除に失敗しました')
+      }
     } catch (error) {
       console.error('Error deleting file:', error)
       showToast('削除に失敗しました', 'error')
-    } finally {
-      setUploading(false)
     }
   }
 
@@ -334,29 +324,22 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               </div>
             </div>
           ) : (
-            <VideoUpload
+            <FileUploadField
               label="予選提出動画"
-              value={undefined}
+              value={videoUrl}
               onChange={handleFileUpload}
-              disabled={uploading || !!videoFile}
+              onUploadComplete={(url) => setVideoUrl(url)}
+              category="video"
+              disabled={uploading || !!videoFile || !entryId}
               required
               maxSizeMB={200}
+              accept="video/*"
+              uploadPath={(fileName) => `${entryId}/preliminary/${fileName}`}
+              placeholder={{
+                title: "予選提出動画をドラッグ&ドロップ",
+                formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
+              }}
             />
-          )}
-          
-          {uploading && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-700">アップロード中</span>
-                <span className="text-sm font-medium text-gray-700">{uploadProgress}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
-              </div>
-            </div>
           )}
         </div>
 

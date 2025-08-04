@@ -2,14 +2,19 @@
 
 import React from 'react'
 import FileList from '@/components/FileList'
+import { FileUploadField } from '@/components/ui/FileUploadField'
 
 interface MusicInfoSectionProps {
   formData: {
     use_different_songs: boolean
     photo?: File
+    photoUrl?: string
     music?: File
+    musicUrl?: string
     music2?: File
+    music2Url?: string
     video?: File
+    videoUrl?: string
   }
   errors: Record<string, string>
   entryId: string
@@ -21,6 +26,7 @@ interface MusicInfoSectionProps {
   fileListRefreshKey: number
   onChange: (field: string, value: boolean) => void
   onFileChange: (field: string, file: File | undefined) => void
+  onFileUploaded?: (field: string, url: string) => void
   onFileDeleted: (fileType: string) => void
   getFilePreview: (file: File, type: string) => React.ReactNode
 }
@@ -32,29 +38,26 @@ export const MusicInfoSection: React.FC<MusicInfoSectionProps> = ({
   fileListRefreshKey,
   onChange,
   onFileChange,
-  onFileDeleted,
-  getFilePreview
+  onFileUploaded,
+  onFileDeleted
 }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">楽曲情報</h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          写真 <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="file"
+        <FileUploadField
+          label="写真"
+          required
+          value={formData.photoUrl}
+          onChange={(file) => onFileChange('photo', file)}
+          onUploadComplete={onFileUploaded ? (url) => onFileUploaded('photo', url) : undefined}
+          category="image"
+          disabled={!entryId}
+          maxSizeMB={100}
           accept="image/*"
-          onChange={(e) => onFileChange('photo', e.target.files?.[0])}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          uploadPath={entryId ? (fileName) => `${entryId}/photo/${fileName}` : undefined}
         />
-        {formData.photo && (
-          <>
-            <p className="mt-1 text-sm text-gray-600">選択: {formData.photo.name}</p>
-            {getFilePreview(formData.photo, 'photo')}
-          </>
-        )}
       </div>
 
       {/* 写真のアップロード済みファイル */}
@@ -72,41 +75,38 @@ export const MusicInfoSection: React.FC<MusicInfoSectionProps> = ({
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          動画 <span className="text-red-500">*</span>
-          {uploadedFiles.video > 0 && (
-            <span className="ml-2 text-sm text-gray-500">
-              （{uploadedFiles.video}/1 アップロード済み）
-            </span>
-          )}
-        </label>
         {uploadedFiles.video >= 1 && !formData.video ? (
-          <div className="p-4 bg-gray-100 rounded-md">
-            <p className="text-sm text-gray-600">
-              動画は既に1つアップロードされています。
-              新しい動画をアップロードする場合は、下のファイルリストから既存の動画を削除してください。
-            </p>
-          </div>
-        ) : (
           <>
-            <input
-              type="file"
-              accept="video/*"
-              onChange={(e) => onFileChange('video', e.target.files?.[0])}
-              disabled={uploadedFiles.video >= 1}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            {formData.video && (
-              <>
-                <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
-                {getFilePreview(formData.video, 'video')}
-              </>
-            )}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              動画 <span className="text-red-500">*</span>
+              <span className="ml-2 text-sm text-gray-500">
+                （{uploadedFiles.video}/1 アップロード済み）
+              </span>
+            </label>
+            <div className="p-4 bg-gray-100 rounded-md">
+              <p className="text-sm text-gray-600">
+                動画は既に1つアップロードされています。
+                新しい動画をアップロードする場合は、下のファイルリストから既存の動画を削除してください。
+              </p>
+            </div>
           </>
+        ) : (
+          <FileUploadField
+            label="動画"
+            required
+            value={formData.videoUrl}
+            onChange={(file) => onFileChange('video', file)}
+            onUploadComplete={onFileUploaded ? (url) => onFileUploaded('video', url) : undefined}
+            category="video"
+            disabled={!entryId || uploadedFiles.video >= 1}
+            maxSizeMB={200}
+            accept="video/*"
+            uploadPath={entryId ? (fileName) => `${entryId}/video/${fileName}` : undefined}
+            placeholder={{
+              formats: "※ 動画ファイルは200MBまでアップロード可能です（最大1ファイル）"
+            }}
+          />
         )}
-        <p className="mt-2 text-sm text-gray-500">
-          ※ 動画ファイルは200MBまでアップロード可能です（最大1ファイル）
-        </p>
       </div>
 
       {/* 動画のアップロード済みファイル */}
@@ -142,48 +142,52 @@ export const MusicInfoSection: React.FC<MusicInfoSectionProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          楽曲ファイル {formData.use_different_songs ? '（準決勝用）' : ''} <span className="text-red-500">*</span>
-          {uploadedFiles.music > 0 && !formData.use_different_songs && (
-            <span className="ml-2 text-sm text-gray-500">
-              （{uploadedFiles.music}/1 アップロード済み）
-            </span>
-          )}
-        </label>
         {uploadedFiles.music >= (formData.use_different_songs ? 2 : 1) && !formData.music ? (
-          <div className="p-4 bg-gray-100 rounded-md">
-            <p className="text-sm text-gray-600">
-              楽曲ファイルは既に必要数アップロードされています。
-              新しい楽曲をアップロードする場合は、下のファイルリストから既存のファイルを削除してください。
-            </p>
-          </div>
-        ) : (
           <>
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={(e) => onFileChange('music', e.target.files?.[0])}
-              disabled={!formData.use_different_songs && uploadedFiles.music >= 1}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            {formData.music && <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              楽曲ファイル {formData.use_different_songs ? '（準決勝用）' : ''} <span className="text-red-500">*</span>
+              {uploadedFiles.music > 0 && !formData.use_different_songs && (
+                <span className="ml-2 text-sm text-gray-500">
+                  （{uploadedFiles.music}/1 アップロード済み）
+                </span>
+              )}
+            </label>
+            <div className="p-4 bg-gray-100 rounded-md">
+              <p className="text-sm text-gray-600">
+                楽曲ファイルは既に必要数アップロードされています。
+                新しい楽曲をアップロードする場合は、下のファイルリストから既存のファイルを削除してください。
+              </p>
+            </div>
           </>
+        ) : (
+          <FileUploadField
+            label={`楽曲ファイル${formData.use_different_songs ? ' （準決勝用）' : ''}`}
+            required
+            value={formData.musicUrl}
+            onChange={(file) => onFileChange('music', file)}
+            onUploadComplete={onFileUploaded ? (url) => onFileUploaded('music', url) : undefined}
+            category="audio"
+            disabled={!entryId || (!formData.use_different_songs && uploadedFiles.music >= 1)}
+            maxSizeMB={100}
+            accept="audio/*"
+            uploadPath={entryId ? (fileName) => `${entryId}/music/${fileName}` : undefined}
+          />
         )}
       </div>
 
       {formData.use_different_songs && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            楽曲ファイル（決勝用） <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={(e) => onFileChange('music2', e.target.files?.[0])}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-          />
-          {formData.music2 && <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>}
-        </div>
+        <FileUploadField
+          label="楽曲ファイル（決勝用）"
+          required
+          value={formData.music2Url}
+          onChange={(file) => onFileChange('music2', file)}
+          onUploadComplete={onFileUploaded ? (url) => onFileUploaded('music2', url) : undefined}
+          category="audio"
+          disabled={!entryId}
+          maxSizeMB={100}
+          accept="audio/*"
+          uploadPath={entryId ? (fileName) => `${entryId}/music2/${fileName}` : undefined}
+        />
       )}
 
       {/* 楽曲のアップロード済みファイル */}

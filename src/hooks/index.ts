@@ -1,6 +1,8 @@
 export { useFormSave } from './useFormSave'
 export { useFormValidation } from './useFormValidation'
 export { useFileUpload } from './useFileUpload'
+export { useFileUploadV2 } from './useFileUploadV2'
+export { useErrorHandler } from './useErrorHandler'
 export { useBaseForm } from './useBaseForm'
 export { useSectionForm } from './useSectionForm'
 export type { UseBaseFormOptions, UseBaseFormReturn } from './useBaseForm'

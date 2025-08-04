@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { FormField, VideoUpload } from '@/components/ui'
-import { useBaseForm, useFileUpload } from '@/hooks'
+import { useBaseForm } from '@/hooks'
+import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { FormContainer, FormFooter } from '@/components/forms'
 import { ValidationPresets } from '@/lib/validation'
 import type { Entry, SnsFormData } from '@/lib/types'
@@ -59,11 +60,16 @@ export default function SNSForm({ entry }: SNSFormProps) {
     onError: (error) => showToast(error, 'error')
   })
 
-  // ファイルアップロードフック
-  const { uploadVideo, uploading } = useFileUpload({
-    onSuccess: (url, field) => {
-      if (field) {
-        handleFieldChange(`${field}_path` as keyof SnsFormData, url)
+  // ファイルアップロードフック（新システム）
+  const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
+    category: 'video',
+    generatePath: (fileName, fileInfo) => {
+      if (!fileInfo?.entryId || !fileInfo?.field) return fileName
+      return `${fileInfo.entryId}/sns/${fileInfo.field}/${fileName}`
+    },
+    onSuccess: (result) => {
+      if (result.field && result.url) {
+        handleFieldChange(`${result.field}_path` as keyof SnsFormData, result.url)
       }
     },
     onError: (error) => setError(error)
@@ -115,20 +121,18 @@ export default function SNSForm({ entry }: SNSFormProps) {
     const pathField = `${field}_path` as keyof SnsFormData
     const oldPath = formData[pathField]
     if (oldPath && typeof oldPath === 'string') {
-      const oldFileName = oldPath.split('/').pop()
-      if (oldFileName) {
-        try {
-          await supabase.storage
-            .from('files')
-            .remove([`${entry.id}/sns/${oldFileName}`])
-        } catch {
-          // エラーは無視（古いファイルが存在しない可能性もある）
-        }
+      // URLからパスを抽出
+      const pathMatch = oldPath.match(/files\/(.+)$/)
+      if (pathMatch) {
+        await deleteFile(pathMatch[1])
       }
     }
 
     // 新しいファイルをアップロード
-    await uploadVideo(file, entry.id, field)
+    await uploadVideo(file, {
+      entryId: entry.id,
+      field
+    })
   }
 
   const handleSave = async (isTemporary = false) => {
