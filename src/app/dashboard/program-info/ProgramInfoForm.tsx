@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import type { Entry } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 interface ProgramInfoFormProps {
   entryId: string | null
@@ -63,7 +64,10 @@ export default function ProgramInfoForm({ entryId, initialData }: ProgramInfoFor
       )
       router.push('/dashboard')
     } catch (error) {
-      console.error('Error saving program info:', error)
+      logger.error('プログラム情報の保存エラー', error, {
+        action: 'save_program_info',
+        entryId
+      })
       showToast('保存に失敗しました', 'error')
     } finally {
       setSaving(false)

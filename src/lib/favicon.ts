@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/logger'
 
 export async function getFaviconUrl(): Promise<string | null> {
   try {
@@ -11,7 +12,9 @@ export async function getFaviconUrl(): Promise<string | null> {
 
     return settings?.favicon_url || null
   } catch (error) {
-    console.error('ファビコン取得エラー:', error)
+    logger.error('ファビコン取得エラー', error, {
+      action: 'get_favicon_url'
+    })
     return null
   }
 }
@@ -27,7 +30,9 @@ export async function getSiteTitle(): Promise<string> {
 
     return settings?.site_title || '2025 バルカーカップ ダンスエントリーシステム'
   } catch (error) {
-    console.error('サイトタイトル取得エラー:', error)
+    logger.error('サイトタイトル取得エラー', error, {
+      action: 'get_site_title'
+    })
     return '2025 バルカーカップ ダンスエントリーシステム'
   }
 }

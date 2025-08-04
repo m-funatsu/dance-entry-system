@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { EmailTemplateData } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
+  let to: string | undefined
+  let subject: string | undefined
+  let templateId: string | undefined
+  
   try {
     // 認証チェック
     const supabase = await createClient()
@@ -23,7 +28,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '管理者権限が必要です' }, { status: 403 })
     }
 
-    const { to, subject, templateId, data } = await request.json()
+    const requestData = await request.json()
+    to = requestData.to
+    subject = requestData.subject
+    templateId = requestData.templateId
+    const data = requestData.data
 
     if (!to || !subject || !templateId) {
       return NextResponse.json({ error: '必須パラメータが不足しています' }, { status: 400 })
@@ -65,7 +74,10 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Send email error:', error)
+    logger.error('メール送信エラー', error as Error, {
+      action: 'send_custom_email',
+      metadata: { to, subject, templateId }
+    })
     return NextResponse.json(
       { error: 'メール送信処理中にエラーが発生しました' },
       { status: 500 }

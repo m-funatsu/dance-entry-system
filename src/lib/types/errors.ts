@@ -48,6 +48,10 @@ export interface ErrorHandlerOptions {
   logToConsole?: boolean
   logToServer?: boolean
   fallbackMessage?: string
+  context?: {
+    action?: string
+    [key: string]: unknown
+  }
 }
 
 export interface ErrorLogger {

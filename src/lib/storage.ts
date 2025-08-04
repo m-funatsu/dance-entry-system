@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/logger'
 
 // filesバケットのみ使用（他は存在しないため）
 const POSSIBLE_BUCKETS = ['files']
@@ -67,15 +68,20 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
   const fileName = `${timestamp}-${sanitizedFileName}`
   const filePath = `${userId}/${entryId}/${fileType}/${fileName}`
 
-  console.log('Upload attempt:', {
-    bucket: STORAGE_BUCKET,
-    filePath,
-    originalFileName: file.name,
-    sanitizedFileName,
-    finalFileName: fileName,
-    fileType: file.type,
-    fileSize: file.size,
-    maxSize: fileType === 'video' ? '200MB' : '100MB'
+  logger.debug('Upload attempt', {
+    userId,
+    entryId,
+    action: 'file_upload',
+    metadata: {
+      bucket: STORAGE_BUCKET,
+      filePath,
+      originalFileName: file.name,
+      sanitizedFileName,
+      finalFileName: fileName,
+      fileType: file.type,
+      fileSize: file.size,
+      maxSize: fileType === 'video' ? '200MB' : '100MB'
+    }
   })
 
   try {
@@ -95,10 +101,20 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
         data = result.data
         error = null
         usedBucket = bucketName
-        console.log(`Successfully uploaded to bucket: ${bucketName}`)
+        logger.info(`Successfully uploaded to bucket: ${bucketName}`, {
+          action: 'file_upload_success',
+          userId,
+          entryId,
+          metadata: { bucketName, filePath }
+        })
         break
       } else {
-        console.log(`Failed to upload to bucket ${bucketName}:`, result.error)
+        logger.warn(`Failed to upload to bucket ${bucketName}`, {
+          action: 'file_upload_attempt_failed',
+          userId,
+          entryId,
+          metadata: { bucketName, error: result.error }
+        })
         error = result.error
         
         // 413エラー（Payload too large）の場合は早期に終了
@@ -109,10 +125,16 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     }
 
     if (error || !data) {
-      console.error('Storage upload error (all buckets failed):', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
-      console.error('File path:', filePath)
-      console.error('Tried buckets:', POSSIBLE_BUCKETS)
+      logger.error('Storage upload error (all buckets failed)', error, {
+        userId,
+        entryId,
+        action: 'file_upload_failed',
+        metadata: {
+          filePath,
+          triedBuckets: POSSIBLE_BUCKETS,
+          errorDetails: error
+        }
+      })
       // エラータイプに応じたメッセージを生成
       let errorMessage = 'ファイルのアップロードに失敗しました。'
       const errorObj = error as unknown as { statusCode?: string; error?: string; message?: string }

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/logger'
 
 interface BackgroundLoaderProps {
   pageType: 'login' | 'dashboard' | 'entry' | 'music'
@@ -23,13 +24,22 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
         
         if (data?.value) {
           // CSS変数を設定
-          console.log(`Setting ${cssVar} to: ${data.value}`)
+          logger.debug(`背景画像を設定: ${cssVar}`, {
+            action: 'set_background_image',
+            metadata: { pageType, cssVar, value: data.value }
+          })
           document.documentElement.style.setProperty(cssVar, `url(${data.value})`)
         } else {
-          console.log(`No background image found for ${settingKey}`)
+          logger.debug(`背景画像が見つかりません: ${settingKey}`, {
+            action: 'background_image_not_found',
+            metadata: { pageType, settingKey }
+          })
         }
       } catch (error) {
-        console.log(`${pageType}背景画像の読み込みに失敗:`, error)
+        logger.warn(`${pageType}背景画像の読み込みに失敗`, {
+          action: 'load_background_image_failed',
+          metadata: { pageType, error: String(error) }
+        })
       }
     }
 

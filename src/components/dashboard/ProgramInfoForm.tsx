@@ -7,6 +7,7 @@ import { FormField, TemporarySaveButton, SaveButton, Alert } from '@/components/
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { Entry, ProgramInfo } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 interface ProgramInfoFormProps {
   entry: Entry
@@ -175,7 +176,10 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         })
       }
     } catch (err) {
-      console.error('プログラム情報の読み込みエラー:', err)
+      logger.error('プログラム情報の読み込みエラー', err, {
+        action: 'load_program_info',
+        entryId: entry.id
+      })
       setError('プログラム情報の読み込みに失敗しました')
     } finally {
       setLoading(false)

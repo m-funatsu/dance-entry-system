@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { ErrorType, ErrorSeverity, AppError, ErrorHandlerOptions } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 // エラーメッセージのマッピング
 const ERROR_MESSAGES: Record<ErrorType, string> = {
@@ -131,7 +132,6 @@ export function useErrorHandler(): UseErrorHandlerReturn {
   const handleError = useCallback((error: unknown, options: ErrorHandlerOptions = {}) => {
     const {
       showToast = true,
-      logToConsole = process.env.NODE_ENV === 'development',
       logToServer = process.env.NODE_ENV === 'production',
       fallbackMessage
     } = options
@@ -143,17 +143,32 @@ export function useErrorHandler(): UseErrorHandlerReturn {
       appError.message = fallbackMessage
     }
     
-    // 開発環境でコンソールログ
-    if (logToConsole) {
-      console.group(`🚨 ${appError.type} Error`)
-      console.error('Message:', appError.message)
-      if (appError.details) console.error('Details:', appError.details)
-      if (appError.context) console.error('Context:', appError.context)
-      if (appError.stack) console.error('Stack:', appError.stack)
-      console.groupEnd()
+    // ログ出力
+    const logContext = {
+      action: options.context?.action,
+      metadata: {
+        type: appError.type,
+        severity: appError.severity,
+        details: appError.details,
+        code: appError.code,
+        ...options.context
+      }
     }
     
-    // 本番環境でサーバーログ（将来的に実装）
+    // 重要度によってログレベルを変更
+    switch (appError.severity) {
+      case ErrorSeverity.HIGH:
+        logger.error(appError.message, error, logContext)
+        break
+      case ErrorSeverity.MEDIUM:
+        logger.warn(appError.message, logContext)
+        break
+      case ErrorSeverity.LOW:
+        logger.info(appError.message, logContext)
+        break
+    }
+    
+    // エラーキューに追加（バッチ送信用）
     if (logToServer) {
       errorQueueRef.current.push(appError)
     }
