@@ -141,7 +141,14 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       currentRules: Object.keys(currentRules),
       fieldErrors,
       hasErrors,
-      formData
+      formData,
+      detailedRules: Object.entries(currentRules).map(([field, rule]) => ({
+        field,
+        required: rule.required,
+        hasCustom: !!rule.custom,
+        hasPattern: !!rule.pattern,
+        value: formData[field as keyof BasicInfoFormData]
+      }))
     })
     
     return !hasErrors
