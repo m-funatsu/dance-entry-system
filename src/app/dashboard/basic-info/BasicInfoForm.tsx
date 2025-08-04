@@ -7,6 +7,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { FormField } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import { FormContainer, FormFooter } from '@/components/forms'
+import { ValidationPresets, Validators } from '@/lib/validation'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
 interface BasicInfoFormProps {
@@ -40,45 +41,20 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   }
 
-  // バリデーションルール
+  // バリデーションルール（新しいヘルパーを使用）
   const [validationRules] = useState({
     dance_style: { required: true },
-    representative_name: { required: true },
-    representative_furigana: { 
-      required: true,
-      pattern: /^[\u30A0-\u30FF\s]+$/,
-      custom: (value: unknown) => {
-        if (!value) return true
-        const strValue = String(value)
-        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
-          return 'カタカナで入力してください'
-        }
-        return true
-      }
-    },
-    representative_email: { 
-      required: true,
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      custom: (value: unknown) => {
-        if (!value) return true
-        const strValue = String(value)
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
-          return '正しいメールアドレスを入力してください'
-        }
-        return true
-      }
-    },
-    phone_number: { 
-      required: true,
-      pattern: /^[\d-]+$/,
-      custom: (value: unknown) => {
-        if (!value) return true
-        const strValue = String(value)
-        if (!/^[\d-]+$/.test(strValue)) {
-          return '電話番号は数字とハイフンのみで入力してください'
-        }
-        return true
-      }
+    representative_name: ValidationPresets.name,
+    representative_furigana: ValidationPresets.nameKana,
+    representative_email: ValidationPresets.email,
+    phone_number: ValidationPresets.phone,
+    choreographer: ValidationPresets.optionalText(50),
+    choreographer_furigana: {
+      required: false,
+      custom: Validators.when(
+        (formData) => !!formData.choreographer,
+        Validators.katakana('振付師フリガナはカタカナで入力してください')
+      )
     }
   } as Record<string, {
     required?: boolean

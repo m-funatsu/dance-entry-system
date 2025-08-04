@@ -7,6 +7,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { FormField, VideoUpload } from '@/components/ui'
 import { useBaseForm, useFileUpload } from '@/hooks'
 import { FormContainer, FormFooter } from '@/components/forms'
+import { ValidationPresets } from '@/lib/validation'
 import type { Entry, SnsFormData } from '@/lib/types'
 
 interface SNSFormProps {
@@ -30,22 +31,11 @@ export default function SNSForm({ entry }: SNSFormProps) {
     sns_notes: ''
   }
 
-  // バリデーションルール
+  // バリデーションルール（新しいヘルパーを使用）
   const validationRules = {
-    practice_video_path: { 
-      required: true,
-      custom: (value: unknown) => {
-        if (!value) return '練習風景動画をアップロードしてください'
-        return true
-      }
-    },
-    introduction_highlight_path: { 
-      required: true,
-      custom: (value: unknown) => {
-        if (!value) return '選手紹介・見所動画をアップロードしてください'
-        return true
-      }
-    }
+    practice_video_path: ValidationPresets.requiredFile('練習風景動画をアップロードしてください'),
+    introduction_highlight_path: ValidationPresets.requiredFile('選手紹介・見所動画をアップロードしてください'),
+    sns_notes: ValidationPresets.optionalText(500)
   }
 
   // useBaseFormフックを使用
