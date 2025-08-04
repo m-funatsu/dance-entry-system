@@ -18,6 +18,22 @@ export interface EntryFormData extends BaseFormData {
   status?: 'pending' | 'submitted' | 'selected' | 'rejected'
 }
 
+// 基本情報フォームデータ
+export interface BasicInfoFormData extends BaseFormData {
+  entry_id?: string
+  dance_style: string
+  representative_name: string
+  representative_furigana: string
+  representative_email: string
+  partner_name?: string
+  partner_furigana?: string
+  phone_number: string
+  choreographer?: string
+  choreographer_furigana?: string
+  agreement_checked: boolean
+  privacy_policy_checked: boolean
+}
+
 // 予選フォームデータ
 export interface PreliminaryFormData extends BaseFormData {
   entry_id: string
@@ -84,6 +100,11 @@ export interface SnsFormData extends BaseFormData {
   entry_id: string
   instagram_id?: string
   tiktok_id?: string
+  practice_video_path?: string
+  practice_video_filename?: string
+  introduction_highlight_path?: string
+  introduction_highlight_filename?: string
+  sns_notes?: string
 }
 
 // チームメンバーフォームデータ
