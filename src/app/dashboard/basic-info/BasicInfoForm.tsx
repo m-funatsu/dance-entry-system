@@ -173,15 +173,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       }
     })
     
-    // エラーを更新
-    Object.keys(errors).forEach(field => {
-      if (!fieldErrors[field]) {
-        validateField(field as keyof BasicInfoFormData)
-      }
-    })
-    Object.entries(fieldErrors).forEach(([field, error]) => {
-      errors[field] = error
-    })
+    // エラーを更新（直接変更しない）
     
     return !hasErrors
   }
