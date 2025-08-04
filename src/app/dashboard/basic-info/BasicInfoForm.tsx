@@ -102,25 +102,22 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       custom?: (value: unknown) => boolean | string
     }>
     
-    // ダンススタイルが'couple'の場合のみパートナー情報を必須に
-    // 注意: 実際のダンススタイルの値をチェック
-    if (danceStyle === 'couple' || danceStyle === '社交ダンス') {
-      baseRules.partner_name = { 
-        required: true,
-        maxLength: 50
-      }
-      baseRules.partner_furigana = { 
-        required: true,
-        maxLength: 50,
-        pattern: /^[\u30A0-\u30FF\s]+$/,
-        custom: (value: unknown) => {
-          if (!value) return 'ペアフリガナは必須です'
-          const strValue = String(value)
-          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
-            return 'カタカナで入力してください'
-          }
-          return true
+    // ペア情報は常に必須
+    baseRules.partner_name = { 
+      required: true,
+      maxLength: 50
+    }
+    baseRules.partner_furigana = { 
+      required: true,
+      maxLength: 50,
+      pattern: /^[\u30A0-\u30FF\s]+$/,
+      custom: (value: unknown) => {
+        if (!value) return 'ペアフリガナは必須です'
+        const strValue = String(value)
+        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+          return 'カタカナで入力してください'
         }
+        return true
       }
     }
     
@@ -342,7 +339,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="partner_name"
               value={formData.partner_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_name', e.target.value)}
-              required={formData.dance_style === 'couple' || formData.dance_style === '社交ダンス'}
+              required
               error={fieldErrors.partner_name || errors.partner_name}
             />
             <FormField
@@ -350,7 +347,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="partner_furigana"
               value={formData.partner_furigana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_furigana', e.target.value)}
-              required={formData.dance_style === 'couple' || formData.dance_style === '社交ダンス'}
+              required
               placeholder="カタカナで入力"
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
