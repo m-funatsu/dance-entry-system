@@ -2,10 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import FileList from '@/components/FileList'
 import { uploadFile as uploadFileToStorage } from '@/lib/storage'
 import type { Entry, User, EntryFile } from '@/lib/types'
 import Image from 'next/image'
+import {
+  BasicInfoSection,
+  MusicInfoSection,
+  AdditionalInfoSection,
+  OptionalApplicationSection
+} from '@/components/dashboard/form-sections'
 
 interface IntegratedEntryFormProps {
   userId: string
@@ -48,7 +53,11 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
   const [sectionSaved, setSectionSaved] = useState<Record<string, boolean>>({})
   const [entryId, setEntryId] = useState<string>(existingEntry?.id || '')
   const [fileListRefreshKey, setFileListRefreshKey] = useState(0)
-  const [uploadedFiles, setUploadedFiles] = useState<Record<string, number>>({
+  const [uploadedFiles, setUploadedFiles] = useState<{
+    photo: number
+    video: number
+    music: number
+  }>({
     photo: 0,
     video: 0,
     music: 0
@@ -141,11 +150,25 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     setActiveSection(section)
   }
 
-  const handleFileChange = (field: 'photo' | 'music' | 'music2' | 'video', file: File | undefined) => {
+  const handleFieldChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleFileChange = (field: string, file: File | undefined) => {
     setFormData(prev => ({ ...prev, [field]: file }))
   }
 
-  const getFilePreview = (file: File | undefined, type: 'photo' | 'music' | 'video') => {
+  const handleFileDeleted = (fileType: string) => {
+    setFileListRefreshKey(prev => prev + 1)
+    if (fileType === 'photo' || fileType === 'video' || fileType === 'music') {
+      setUploadedFiles(prev => ({
+        ...prev,
+        [fileType]: Math.max(0, prev[fileType] - 1)
+      }))
+    }
+  }
+
+  const getFilePreview = (file: File | undefined, type: string): React.ReactNode => {
     if (!file) return null
 
     const objectUrl = URL.createObjectURL(file)
@@ -298,61 +321,76 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     if (formData.music) {
       uploadPromises.push(uploadFile(formData.music, 'music', entryId))
     }
+    if (formData.music2) {
+      uploadPromises.push(uploadFile(formData.music2, 'audio', entryId))
+    }
     if (formData.video) {
       uploadPromises.push(uploadFile(formData.video, 'video', entryId))
     }
-    if (formData.use_different_songs && formData.music2) {
-      uploadPromises.push(uploadFile(formData.music2, 'music', entryId))
-    }
 
-    if (uploadPromises.length > 0) {
-      await Promise.all(uploadPromises)
-      // ファイルリストを更新
-      setFileListRefreshKey(prev => prev + 1)
-    }
+    await Promise.all(uploadPromises)
+    
+    // ファイルをリセット
+    setFormData(prev => ({
+      ...prev,
+      photo: undefined,
+      music: undefined,
+      music2: undefined,
+      video: undefined,
+    }))
+    
+    // ファイルリストをリフレッシュ
+    setFileListRefreshKey(prev => prev + 1)
   }
 
-  const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'video', uploadEntryId: string) => {
-    const result = await uploadFileToStorage({
-      userId: userId,
-      entryId: uploadEntryId,
-      fileType: fileType,
-      file: file
-    })
-
-    if (!result.success) {
-      throw new Error(result.error || 'アップロードに失敗しました')
+  const uploadFile = async (file: File, fileType: 'photo' | 'music' | 'audio' | 'video', entryId: string) => {
+    try {
+      const result = await uploadFileToStorage({
+        userId,
+        entryId,
+        fileType,
+        file
+      })
+      if (result.error) {
+        throw new Error(result.error)
+      }
+    } catch (error) {
+      console.error(`Error uploading ${fileType}:`, error)
+      throw error
     }
-
-    return result
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // フォーム全体の送信は無効化（各セクションで個別保存するため）
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* タブナビゲーション */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+    <form onSubmit={(e) => e.preventDefault()} className="max-w-4xl mx-auto">
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* ヘッダー */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
+          <h2 className="text-2xl font-bold text-white">エントリーフォーム</h2>
+          <p className="text-purple-100 mt-1">必要な情報を入力してください</p>
+        </div>
+
+        {/* タブナビゲーション */}
+        <div className="border-b">
+          <nav className="flex -mb-px px-6 pt-4">
             {sections.map((section) => (
               <button
                 key={section.id}
                 type="button"
                 onClick={() => handleSectionChange(section.id)}
                 className={`
-                  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                  py-2 px-4 mr-2 border-b-2 font-medium text-sm rounded-t-lg transition-colors
                   ${activeSection === section.id
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
                   }
+                  ${sectionSaved[section.id] ? 'bg-green-50' : ''}
                 `}
               >
                 {section.label}
                 {section.required && <span className="text-red-500 ml-1">*</span>}
+                {sectionSaved[section.id] && (
+                  <span className="ml-2 text-green-600">✓</span>
+                )}
               </button>
             ))}
           </nav>
@@ -361,437 +399,58 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
         <div className="px-6 py-6">
           {/* 基本情報セクション */}
           {activeSection === 'basic' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">基本情報</h3>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  ダンスジャンル <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.dance_style}
-                  onChange={(e) => setFormData(prev => ({ ...prev, dance_style: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="">選択してください</option>
-                  <option value="JAZZ">JAZZ</option>
-                  <option value="HIPHOP">HIPHOP</option>
-                  <option value="CONTEMPORARY">CONTEMPORARY</option>
-                  <option value="その他">その他</option>
-                </select>
-                {errors.dance_style && <p className="mt-1 text-sm text-red-600">{errors.dance_style}</p>}
-              </div>
-
-
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    代表者名
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.representative_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, representative_name: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    代表者フリガナ
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.representative_furigana}
-                    onChange={(e) => setFormData(prev => ({ ...prev, representative_furigana: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    パートナー名
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.partner_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, partner_name: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    パートナーフリガナ
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.partner_furigana}
-                    onChange={(e) => setFormData(prev => ({ ...prev, partner_furigana: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  電話番号 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone_number}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
-                {errors.phone_number && <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>}
-              </div>
-
-
-              {/* 参加資格への同意 */}
-              <div className="space-y-4 mt-6">
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">参加資格</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p>• ペアにおける性別は問わない</p>
-                    <p>• ペアの年齢合計は20歳以上90歳未満とする</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <input
-                    id="agreement"
-                    type="checkbox"
-                    checked={formData.agreement_checked}
-                    onChange={(e) => setFormData(prev => ({ ...prev, agreement_checked: e.target.checked }))}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="agreement" className="ml-2 block text-sm text-gray-900">
-                    上記の参加資格に同意します *
-                  </label>
-                </div>
-                {errors.agreement && <p className="mt-1 text-sm text-red-600">{errors.agreement}</p>}
-              </div>
-              
-              {/* 基本情報保存ボタン */}
-              <div className="mt-6 flex justify-end space-x-3">
-                {sectionSaved.basic && (
-                  <span className="text-sm text-green-600">✓ 保存済み</span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleSaveSection('basic')}
-                  disabled={sectionLoading.basic}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sectionLoading.basic ? '保存中...' : '基本情報を保存'}
-                </button>
-              </div>
-            </div>
+            <BasicInfoSection
+              formData={{
+                dance_style: formData.dance_style,
+                representative_name: formData.representative_name,
+                representative_furigana: formData.representative_furigana,
+                partner_name: formData.partner_name,
+                partner_furigana: formData.partner_furigana,
+                phone_number: formData.phone_number,
+                agreement_checked: formData.agreement_checked
+              }}
+              errors={errors}
+              onChange={handleFieldChange}
+            />
           )}
 
           {/* 楽曲情報セクション */}
           {activeSection === 'music' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">楽曲情報</h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  写真 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange('photo', e.target.files?.[0])}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-                {formData.photo && (
-                  <>
-                    <p className="mt-1 text-sm text-gray-600">選択: {formData.photo.name}</p>
-                    {getFilePreview(formData.photo, 'photo')}
-                  </>
-                )}
-              </div>
-
-              {/* 写真のアップロード済みファイル */}
-              {entryId && (
-                <div className="mt-4 ml-4">
-                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの写真</h5>
-                  <FileList 
-                    entryId={entryId} 
-                    fileType="photo"
-                    editable={true}
-                    refreshKey={fileListRefreshKey}
-                    onFileDeleted={() => {
-                      setFileListRefreshKey(prev => prev + 1)
-                      setUploadedFiles(prev => ({
-                        ...prev,
-                        photo: Math.max(0, prev.photo - 1)
-                      }))
-                    }}
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  動画 <span className="text-red-500">*</span>
-                  {uploadedFiles.video > 0 && (
-                    <span className="ml-2 text-sm text-gray-500">
-                      （{uploadedFiles.video}/1 アップロード済み）
-                    </span>
-                  )}
-                </label>
-                {uploadedFiles.video >= 1 && !formData.video ? (
-                  <div className="p-4 bg-gray-100 rounded-md">
-                    <p className="text-sm text-gray-600">
-                      動画は既に1つアップロードされています。
-                      新しい動画をアップロードする場合は、下のファイルリストから既存の動画を削除してください。
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => handleFileChange('video', e.target.files?.[0])}
-                      disabled={uploadedFiles.video >= 1}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {formData.video && (
-                      <>
-                        <p className="mt-1 text-sm text-gray-600">選択: {formData.video.name}</p>
-                        {getFilePreview(formData.video, 'video')}
-                      </>
-                    )}
-                  </>
-                )}
-                <p className="mt-2 text-sm text-gray-500">
-                  ※ 動画ファイルは200MBまでアップロード可能です（最大1ファイル）
-                </p>
-              </div>
-
-              {/* 動画のアップロード済みファイル */}
-              {entryId && (
-                <div className="mt-4 ml-4">
-                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの動画</h5>
-                  <FileList 
-                    entryId={entryId} 
-                    fileType="video"
-                    editable={true}
-                    refreshKey={fileListRefreshKey}
-                    onFileDeleted={() => {
-                      setFileListRefreshKey(prev => prev + 1)
-                      setUploadedFiles(prev => ({
-                        ...prev,
-                        video: Math.max(0, prev.video - 1)
-                      }))
-                    }}
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  楽曲ファイル（音源） <span className="text-red-500">*</span>
-                  {uploadedFiles.music > 0 && (
-                    <span className="ml-2 text-sm text-gray-500">
-                      （{uploadedFiles.music}/2 アップロード済み）
-                    </span>
-                  )}
-                </label>
-                {uploadedFiles.music >= 2 && !formData.music && !formData.use_different_songs ? (
-                  <div className="p-4 bg-gray-100 rounded-md">
-                    <p className="text-sm text-gray-600">
-                      音源は既に2つアップロードされています。
-                      新しい音源をアップロードする場合は、下のファイルリストから既存の音源を削除してください。
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      onChange={(e) => handleFileChange('music', e.target.files?.[0])}
-                      disabled={uploadedFiles.music >= 2}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {formData.music && (
-                      <>
-                        <p className="mt-1 text-sm text-gray-600">選択: {formData.music.name}</p>
-                        {getFilePreview(formData.music, 'music')}
-                      </>
-                    )}
-                  </>
-                )}
-                <p className="mt-2 text-sm text-gray-500">
-                  ※ この音源は準決勝・決勝共通で使用されます
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <input
-                    id="use_different_songs"
-                    type="checkbox"
-                    checked={formData.use_different_songs}
-                    onChange={(e) => setFormData(prev => ({ ...prev, use_different_songs: e.target.checked }))}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
-                  />
-                  <label htmlFor="use_different_songs" className="ml-2 block text-sm text-gray-900">
-                    準決勝と決勝で異なる曲を使用する場合
-                  </label>
-                </div>
-                
-                {formData.use_different_songs && (
-                  <div className="ml-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      決勝用楽曲ファイル（音源） <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      onChange={(e) => handleFileChange('music2', e.target.files?.[0])}
-                      disabled={uploadedFiles.music >= 2}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {formData.music2 && (
-                      <>
-                        <p className="mt-1 text-sm text-gray-600">選択: {formData.music2.name}</p>
-                        {getFilePreview(formData.music2, 'music')}
-                      </>
-                    )}
-                    {uploadedFiles.music >= 1 && (
-                      <p className="mt-2 text-sm text-yellow-600">
-                        ※ 音源は最大2つまでです。既に{uploadedFiles.music}つアップロード済みです。
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 音源のアップロード済みファイル */}
-              {entryId && (
-                <div className="mt-8">
-                  <h5 className="text-sm font-medium text-gray-700 mb-2">アップロード済みの音源</h5>
-                  <div className="space-y-4">
-                    <div className="ml-4">
-                      <FileList 
-                        entryId={entryId} 
-                        fileType="music"
-                        editable={true}
-                        refreshKey={fileListRefreshKey}
-                        showMusicLabels={true}
-                        useDifferentSongs={formData.use_different_songs}
-                        onFileDeleted={() => {
-                          setFileListRefreshKey(prev => prev + 1)
-                          setUploadedFiles(prev => ({
-                            ...prev,
-                            music: Math.max(0, prev.music - 1)
-                          }))
-                        }}
-                      />
-                      {uploadedFiles.music > 0 && !formData.use_different_songs && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          ※ 音源がアップロードされた順に表示されています。
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* 楽曲情報保存ボタン */}
-              <div className="mt-6 flex justify-end space-x-3">
-                {!entryId && (
-                  <p className="text-sm text-red-600">※ 基本情報を先に保存してください</p>
-                )}
-                {sectionSaved.music && (
-                  <span className="text-sm text-green-600">✓ 保存済み</span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleSaveSection('music')}
-                  disabled={sectionLoading.music || !entryId}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sectionLoading.music ? 'アップロード中...' : '楽曲情報を保存'}
-                </button>
-              </div>
-            </div>
+            <MusicInfoSection
+              formData={{
+                use_different_songs: formData.use_different_songs,
+                photo: formData.photo,
+                music: formData.music,
+                music2: formData.music2,
+                video: formData.video
+              }}
+              errors={errors}
+              entryId={entryId}
+              uploadedFiles={uploadedFiles}
+              fileListRefreshKey={fileListRefreshKey}
+              onChange={handleFieldChange}
+              onFileChange={handleFileChange}
+              onFileDeleted={handleFileDeleted}
+              getFilePreview={getFilePreview}
+            />
           )}
 
           {/* 追加情報セクション */}
           {activeSection === 'additional' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">追加情報</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    振付師
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.choreographer}
-                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    振付師フリガナ
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.choreographer_furigana}
-                    onChange={(e) => setFormData(prev => ({ ...prev, choreographer_furigana: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  ストーリー・作品説明
-                </label>
-                <textarea
-                  value={formData.story}
-                  onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
-                  rows={5}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="作品のストーリーや説明を入力してください"
-                />
-              </div>
-              
-              {/* 追加情報保存ボタン */}
-              <div className="mt-6 flex justify-end space-x-3">
-                {!entryId && (
-                  <p className="text-sm text-red-600">※ 基本情報を先に保存してください</p>
-                )}
-                {sectionSaved.additional && (
-                  <span className="text-sm text-green-600">✓ 保存済み</span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleSaveSection('additional')}
-                  disabled={sectionLoading.additional || !entryId}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sectionLoading.additional ? '保存中...' : '追加情報を保存'}
-                </button>
-              </div>
-            </div>
+            <AdditionalInfoSection
+              formData={{
+                choreographer: formData.choreographer,
+                choreographer_furigana: formData.choreographer_furigana,
+                story: formData.story
+              }}
+              errors={errors}
+              onChange={handleFieldChange}
+            />
           )}
 
           {/* 任意申請セクション */}
           {activeSection === 'optional' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">任意申請</h3>
-              <p className="text-sm text-gray-600">
-                今後、任意の申請事項がある場合はこちらに表示されます。
-              </p>
-            </div>
+            <OptionalApplicationSection />
           )}
 
           {/* エラー表示 */}
@@ -800,6 +459,48 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
               <p className="text-sm text-red-800">{errors.submit}</p>
             </div>
           )}
+
+          {/* 保存ボタン */}
+          <div className="mt-8 flex justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                const currentIndex = sections.findIndex(s => s.id === activeSection)
+                if (currentIndex > 0) {
+                  setActiveSection(sections[currentIndex - 1].id)
+                }
+              }}
+              disabled={sections.findIndex(s => s.id === activeSection) === 0}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              前へ
+            </button>
+            
+            <div className="space-x-4">
+              <button
+                type="button"
+                onClick={() => handleSaveSection(activeSection)}
+                disabled={sectionLoading[activeSection]}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {sectionLoading[activeSection] ? '保存中...' : 'このセクションを保存'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  const currentIndex = sections.findIndex(s => s.id === activeSection)
+                  if (currentIndex < sections.length - 1) {
+                    handleSectionChange(sections[currentIndex + 1].id)
+                  }
+                }}
+                disabled={sections.findIndex(s => s.id === activeSection) === sections.length - 1}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                次へ
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
