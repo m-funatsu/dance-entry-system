@@ -3,9 +3,13 @@ import { logger } from '@/lib/logger'
 
 // XSS対策: HTMLエスケープ
 export function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
 }
 
 // SQLインジェクション対策: 特殊文字のエスケープ

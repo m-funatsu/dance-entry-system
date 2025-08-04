@@ -1,8 +1,9 @@
+// サーバーサイド専用のCSRF機能
+// このファイルはサーバーコンポーネントとAPIルートでのみ使用してください
+
 import { createHash, randomBytes } from 'crypto'
 import { cookies } from 'next/headers'
 import { logger } from '@/lib/logger'
-
-// CSRFトークンの生成と検証を行うユーティリティ
 
 const CSRF_TOKEN_LENGTH = 32
 const CSRF_COOKIE_NAME = 'csrf-token'

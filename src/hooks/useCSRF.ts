@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { logger } from '@/lib/logger'
+import { 
+  getCSRFTokenFromStorage, 
+  setCSRFTokenToStorage, 
+  clearCSRFTokenFromStorage 
+} from '@/lib/csrf-client'
 
 interface UseCSRFReturn {
   csrfToken: string | null
@@ -31,7 +36,11 @@ export function useCSRF(): UseCSRFReturn {
       }
 
       const data = await response.json()
-      setCsrfToken(data.token)
+      const token = data.token
+      
+      // ローカルストレージに保存
+      setCSRFTokenToStorage(token)
+      setCsrfToken(token)
       
       logger.debug('CSRFトークンを取得しました', {
         action: 'fetch_csrf_token_success'
@@ -48,7 +57,14 @@ export function useCSRF(): UseCSRFReturn {
   }
 
   useEffect(() => {
-    fetchCSRFToken()
+    // まずローカルストレージから取得を試みる
+    const storedToken = getCSRFTokenFromStorage()
+    if (storedToken) {
+      setCsrfToken(storedToken)
+      setLoading(false)
+    } else {
+      fetchCSRFToken()
+    }
   }, [])
 
   return {
@@ -59,8 +75,10 @@ export function useCSRF(): UseCSRFReturn {
   }
 }
 
-// APIリクエスト時にCSRFトークンを含めるヘルパー関数
+// APIリクエスト時にCSRFトークンを含めるヘルパー関数（非推奨: csrf-clientのaddCSRFHeaderを使用）
 export function withCSRFHeaders(headers: HeadersInit = {}, csrfToken: string | null): HeadersInit {
+  console.warn('withCSRFHeaders is deprecated. Use addCSRFHeader from csrf-client instead.')
+  
   if (!csrfToken) return headers
 
   return {

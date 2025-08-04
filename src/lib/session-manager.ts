@@ -1,3 +1,6 @@
+// サーバーサイド専用のセッション管理機能
+// このファイルはサーバーコンポーネントとAPI Route でのみ使用してください
+
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { logger } from '@/lib/logger'
