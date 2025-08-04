@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, VideoUpload } from '@/components/ui'
+import { FormField, VideoUpload, Alert, Button } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
-import { FormContainer, FormFooter } from '@/components/forms'
 import { ValidationPresets } from '@/lib/validation'
 import type { Entry, SnsFormData } from '@/lib/types'
 
@@ -154,19 +153,20 @@ export default function SNSForm({ entry }: SNSFormProps) {
   }
 
   return (
-    <FormContainer
-      title="SNS掲載情報"
-      description="SNS掲載に使用する動画や情報をアップロードしてください"
-      error={error}
-      success={success}
-    >
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      {error && <Alert type="error" message={error} />}
+      {success && <Alert type="success" message={success} />}
+
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          SNS掲載情報の登録
+        </h3>
+        <p className="text-sm text-gray-600 mb-6">
+          SNS掲載に使用する動画や情報をアップロードしてください。
+        </p>
+      </div>
+
       <div className="space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-          <p className="text-sm text-blue-800">
-            SNS掲載に使用する動画や情報をアップロードしてください。
-            <span className="text-red-600 font-medium">（* は必須項目です）</span>
-          </p>
-        </div>
 
         {/* 練習風景動画 */}
         <div>
@@ -215,16 +215,6 @@ export default function SNSForm({ entry }: SNSFormProps) {
           </p>
         </div>
 
-        <FormFooter
-          onCancel={() => router.push('/dashboard')}
-          onTemporarySave={() => handleSave(true)}
-          onSave={() => handleSave(false)}
-          saving={saving}
-          loading={uploading}
-          disabled={!entry}
-          showCancel
-        />
-
         {!entry && (
           <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
             <p className="text-sm text-yellow-800">
@@ -232,7 +222,33 @@ export default function SNSForm({ entry }: SNSFormProps) {
             </p>
           </div>
         )}
+
+        {/* ボタン */}
+        <div className="flex justify-end space-x-4 pt-6">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => router.push('/dashboard')}
+          >
+            キャンセル
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => handleSave(true)}
+            disabled={saving || uploading || !entry}
+          >
+            一時保存
+          </Button>
+          <Button
+            type="button"
+            onClick={() => handleSave(false)}
+            disabled={saving || uploading || !entry}
+          >
+            {saving ? '保存中...' : '保存'}
+          </Button>
+        </div>
       </div>
-    </FormContainer>
+    </form>
   )
 }

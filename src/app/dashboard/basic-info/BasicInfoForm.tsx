@@ -4,9 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField } from '@/components/ui'
+import { FormField, Alert, Button } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
-import { FormContainer, FormFooter } from '@/components/forms'
 import { ValidationPresets, Validators } from '@/lib/validation'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
@@ -213,12 +212,19 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   }
 
   return (
-    <FormContainer
-      title="基本情報"
-      description="ダンスジャンルと参加者の基本情報を入力してください"
-      error={error}
-      success={success}
-    >
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      {error && <Alert type="error" message={error} />}
+      {success && <Alert type="success" message={success} />}
+
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          基本情報の登録
+        </h3>
+        <p className="text-sm text-gray-600 mb-6">
+          ダンスジャンルと参加者の基本情報を入力してください。
+        </p>
+      </div>
+
       <div className="space-y-6">
         <FormField
           label="ダンスジャンル"
@@ -374,15 +380,32 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           </div>
         </div>
 
-        <FormFooter
-          onCancel={() => router.push('/dashboard')}
-          onTemporarySave={() => handleSubmit(true)}
-          onSave={() => handleSubmit(false)}
-          saving={saving}
-          disabled={!isFormValid() && !saving}
-          showCancel
-        />
+        {/* ボタン */}
+        <div className="flex justify-end space-x-4 pt-6">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => router.push('/dashboard')}
+          >
+            キャンセル
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => handleSubmit(true)}
+            disabled={saving}
+          >
+            一時保存
+          </Button>
+          <Button
+            type="button"
+            onClick={() => handleSubmit(false)}
+            disabled={saving || !isFormValid()}
+          >
+            {saving ? '保存中...' : '保存'}
+          </Button>
+        </div>
       </div>
-    </FormContainer>
+    </form>
   )
 }
