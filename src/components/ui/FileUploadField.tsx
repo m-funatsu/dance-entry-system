@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, memo, useCallback, useMemo } from 'react'
 import { FileCategory, formatFileSize, validateFile } from '@/lib/file-upload'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
@@ -23,7 +23,7 @@ export interface FileUploadFieldProps {
   }
 }
 
-export const FileUploadField: React.FC<FileUploadFieldProps> = ({
+export const FileUploadField = memo<FileUploadFieldProps>(({
   label,
   value,
   onChange,
@@ -54,31 +54,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
   const error = localError || uploadError
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    if (!disabled) {
-      setIsDragging(true)
-    }
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    
-    if (disabled) return
-    
-    const files = e.dataTransfer.files
-    if (files.length > 0) {
-      handleFile(files[0])
-    }
-  }
-
-  const handleFile = async (file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     setLocalError(null)
     
     // ローカルバリデーション
@@ -99,16 +75,40 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
     if (uploadPath && onUploadComplete) {
       await upload(file)
     }
-  }
+  }, [category, maxSizeMB, onChange, uploadPath, onUploadComplete, upload])
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    if (!disabled) {
+      setIsDragging(true)
+    }
+  }, [disabled])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    
+    if (disabled) return
+    
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      handleFile(files[0])
+    }
+  }, [disabled, handleFile])
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       handleFile(file)
     }
-  }
+  }, [handleFile])
 
-  const getDefaultIcon = () => {
+  const getDefaultIcon = useMemo(() => {
     switch (category) {
       case 'image':
         return (
@@ -135,9 +135,9 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
           </svg>
         )
     }
-  }
+  }, [category])
 
-  const getDefaultFormats = () => {
+  const getDefaultFormats = useMemo(() => {
     switch (category) {
       case 'image':
         return 'JPG, PNG, GIF など'
@@ -148,7 +148,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
       default:
         return 'すべてのファイル形式'
     }
-  }
+  }, [category])
 
   return (
     <div className={`relative ${disabled ? 'opacity-50' : ''}`}>
@@ -224,7 +224,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
           </div>
         ) : (
           <div className="space-y-2">
-            {placeholder?.icon || getDefaultIcon()}
+            {placeholder?.icon || getDefaultIcon}
             <p className="text-sm font-medium text-gray-700">
               {placeholder?.title || `${category === 'image' ? '画像' : category === 'video' ? '動画' : category === 'audio' ? '音声' : ''}ファイルをドラッグ&ドロップ`}
             </p>
@@ -232,7 +232,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
               {placeholder?.subtitle || <>または<span className="text-indigo-600">クリックして選択</span></>}
             </p>
             <p className="text-xs text-gray-400">
-              {placeholder?.formats || `対応形式: ${getDefaultFormats()}`}
+              {placeholder?.formats || `対応形式: ${getDefaultFormats}`}
               {maxSizeMB && ` （最大${maxSizeMB}MB）`}
             </p>
           </div>
@@ -240,4 +240,6 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
       </div>
     </div>
   )
-}
+})
+
+FileUploadField.displayName = 'FileUploadField'

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { memo, useCallback } from 'react'
 import { Alert } from '@/components/ui/Alert'
 import { SaveButton, TemporarySaveButton, CancelButton } from '@/components/ui/Button'
 
@@ -14,7 +14,7 @@ export interface FormContainerProps {
   className?: string
 }
 
-export const FormContainer: React.FC<FormContainerProps> = ({
+export const FormContainer = memo<FormContainerProps>(({
   children,
   title,
   description,
@@ -23,12 +23,12 @@ export const FormContainer: React.FC<FormContainerProps> = ({
   onSubmit,
   className = ''
 }) => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (onSubmit) {
       onSubmit(e)
     }
-  }
+  }, [onSubmit])
 
   return (
     <form onSubmit={handleSubmit} className={`max-w-4xl mx-auto ${className}`}>
@@ -61,7 +61,9 @@ export const FormContainer: React.FC<FormContainerProps> = ({
       </div>
     </form>
   )
-}
+})
+
+FormContainer.displayName = 'FormContainer'
 
 // フォームセクションコンポーネント
 export interface FormSectionProps {
@@ -71,7 +73,7 @@ export interface FormSectionProps {
   className?: string
 }
 
-export const FormSection: React.FC<FormSectionProps> = ({
+export const FormSection = memo<FormSectionProps>(({
   children,
   title,
   description,
@@ -84,7 +86,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
       {children}
     </div>
   )
-}
+})
+
+FormSection.displayName = 'FormSection'
 
 // フォームフッターコンポーネント
 export interface FormFooterProps {
@@ -102,7 +106,7 @@ export interface FormFooterProps {
   className?: string
 }
 
-export const FormFooter: React.FC<FormFooterProps> = ({
+export const FormFooter = memo<FormFooterProps>(({
   onTemporarySave,
   onSave,
   onCancel,
@@ -145,7 +149,9 @@ export const FormFooter: React.FC<FormFooterProps> = ({
       </div>
     </div>
   )
-}
+})
+
+FormFooter.displayName = 'FormFooter'
 
 // セクションナビゲーションコンポーネント
 export interface SectionNavigationProps {
@@ -160,13 +166,16 @@ export interface SectionNavigationProps {
   className?: string
 }
 
-export const SectionNavigation: React.FC<SectionNavigationProps> = ({
+export const SectionNavigation = memo<SectionNavigationProps>(({
   sections,
   activeSection,
   sectionSaved = {},
   onSectionChange,
   className = ''
 }) => {
+  const handleSectionClick = useCallback((sectionId: string) => {
+    onSectionChange(sectionId)
+  }, [onSectionChange])
   return (
     <div className={`border-b ${className}`}>
       <nav className="flex -mb-px px-6 pt-4">
@@ -174,7 +183,7 @@ export const SectionNavigation: React.FC<SectionNavigationProps> = ({
           <button
             key={section.id}
             type="button"
-            onClick={() => onSectionChange(section.id)}
+            onClick={() => handleSectionClick(section.id)}
             className={`
               py-2 px-4 mr-2 border-b-2 font-medium text-sm rounded-t-lg transition-colors
               ${activeSection === section.id
@@ -194,7 +203,9 @@ export const SectionNavigation: React.FC<SectionNavigationProps> = ({
       </nav>
     </div>
   )
-}
+})
+
+SectionNavigation.displayName = 'SectionNavigation'
 
 // セクション付きフォームコンテナー
 export interface SectionFormContainerProps extends FormContainerProps {

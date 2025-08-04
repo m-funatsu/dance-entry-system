@@ -1,15 +1,20 @@
 'use client'
 
+import React, { memo, useCallback } from 'react'
 import { TabNavigationProps } from '@/lib/types'
 
-export const TabNavigation: React.FC<TabNavigationProps> = ({ tabs, activeTab, onTabChange }) => {
+export const TabNavigation = memo<TabNavigationProps>(({ tabs, activeTab, onTabChange }) => {
+  const handleTabClick = useCallback((tabId: string) => {
+    onTabChange(tabId)
+  }, [onTabChange])
+  
   return (
     <div className="border-b">
       <nav className="-mb-px flex space-x-8">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => handleTabClick(tab.id)}
             className={`py-2 px-1 border-b-2 font-medium text-sm relative ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
@@ -34,4 +39,6 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({ tabs, activeTab, o
       </nav>
     </div>
   )
-}
+})
+
+TabNavigation.displayName = 'TabNavigation'

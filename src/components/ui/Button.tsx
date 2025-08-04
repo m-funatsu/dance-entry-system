@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { memo, useMemo } from 'react'
 import type { ButtonProps } from '@/lib/types'
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = memo<ButtonProps>(({
   type = 'button',
   variant = 'primary',
   size = 'md',
@@ -14,23 +14,25 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   fullWidth = false
 }) => {
-  const baseClass = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-  
-  const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500',
-    cancel: 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500'
-  }
-  
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
-  }
-  
-  const widthClass = fullWidth ? 'w-full' : ''
-  
-  const combinedClassName = `${baseClass} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${className}`
+  const combinedClassName = useMemo(() => {
+    const baseClass = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+    
+    const variantClasses = {
+      primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
+      secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500',
+      cancel: 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500'
+    }
+    
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-4 py-2 text-sm',
+      lg: 'px-6 py-3 text-base'
+    }
+    
+    const widthClass = fullWidth ? 'w-full' : ''
+    
+    return `${baseClass} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${className}`
+  }, [variant, size, fullWidth, className])
   
   return (
     <button
@@ -48,25 +50,30 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? '処理中...' : children}
     </button>
   )
-}
+})
+
+Button.displayName = 'Button'
 
 // 一時保存ボタン用のプリセット
-export const TemporarySaveButton: React.FC<Omit<ButtonProps, 'variant' | 'children'>> = (props) => (
+export const TemporarySaveButton = memo<Omit<ButtonProps, 'variant' | 'children'>>((props) => (
   <Button variant="secondary" {...props}>
     一時保存
   </Button>
-)
+))
+TemporarySaveButton.displayName = 'TemporarySaveButton'
 
 // 保存ボタン用のプリセット
-export const SaveButton: React.FC<Omit<ButtonProps, 'variant' | 'children'>> = (props) => (
+export const SaveButton = memo<Omit<ButtonProps, 'variant' | 'children'>>((props) => (
   <Button variant="primary" {...props}>
     保存
   </Button>
-)
+))
+SaveButton.displayName = 'SaveButton'
 
 // キャンセルボタン用のプリセット
-export const CancelButton: React.FC<Omit<ButtonProps, 'variant' | 'children'>> = (props) => (
+export const CancelButton = memo<Omit<ButtonProps, 'variant' | 'children'>>((props) => (
   <Button variant="cancel" {...props}>
     キャンセル
   </Button>
-)
+))
+CancelButton.displayName = 'CancelButton'

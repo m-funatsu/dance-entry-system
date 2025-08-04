@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { memo } from 'react'
 import type { FormFieldProps } from '@/lib/types'
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = memo<FormFieldProps>(({
   label,
   name,
   type = 'text',
@@ -89,4 +89,6 @@ export const FormField: React.FC<FormFieldProps> = ({
       )}
     </div>
   )
-}
+})
+
+FormField.displayName = 'FormField'
