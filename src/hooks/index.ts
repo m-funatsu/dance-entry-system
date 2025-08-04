@@ -1,3 +1,7 @@
 export { useFormSave } from './useFormSave'
 export { useFormValidation } from './useFormValidation'
 export { useFileUpload } from './useFileUpload'
+export { useBaseForm } from './useBaseForm'
+export { useSectionForm } from './useSectionForm'
+export type { UseBaseFormOptions, UseBaseFormReturn } from './useBaseForm'
+export type { FormSection, UseSectionFormOptions, UseSectionFormReturn } from './useSectionForm'
