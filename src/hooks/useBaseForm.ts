@@ -7,6 +7,7 @@ import { useFormValidation } from './useFormValidation'
 import { useErrorHandler } from './useErrorHandler'
 // ValidationRulesはuseFormValidation内で定義されている
 
+// Tは最低限idフィールドを持つオブジェクトである必要がある
 export interface UseBaseFormOptions<T extends Record<string, unknown>> {
   initialData: T
   tableName: string

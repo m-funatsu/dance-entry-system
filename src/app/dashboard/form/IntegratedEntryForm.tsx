@@ -237,7 +237,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
       const supabase = createClient()
       
       // エントリーデータの準備
-      let updateData: Record<string, unknown> = {}
+      let updateData: Partial<Entry> = {}
       
       switch (section) {
         case 'basic':

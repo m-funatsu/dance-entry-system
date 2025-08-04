@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useErrorHandler } from './useErrorHandler'
+import type { BaseFormData } from '@/lib/types'
 
 interface UseFormSaveOptions {
   tableName: string
@@ -27,7 +28,7 @@ export const useFormSave = ({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const save = async (data: Record<string, unknown>, isTemporary = false) => {
+  const save = async <T extends BaseFormData>(data: T, isTemporary = false) => {
     setSaving(true)
     setError(null)
     setSuccess(null)

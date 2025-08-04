@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { useErrorHandler } from '@/hooks/useErrorHandler'
+import type { EmailTemplateData } from '@/lib/types'
 
 interface EmailSenderProps {
   recipientEmail: string
   recipientName: string
-  entryData?: Record<string, unknown>
+  entryData?: Partial<EmailTemplateData>
 }
 
 export default function EmailSender({ recipientEmail, recipientName, entryData }: EmailSenderProps) {

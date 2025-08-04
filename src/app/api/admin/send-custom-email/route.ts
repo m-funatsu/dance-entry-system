@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { EmailTemplateData } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,8 +74,8 @@ export async function POST(request: NextRequest) {
 }
 
 // メールテンプレート生成
-async function generateEmailTemplate(templateId: string, data: Record<string, unknown>): Promise<string> {
-  const templates: Record<string, (data: Record<string, unknown>) => string> = {
+async function generateEmailTemplate(templateId: string, data: Partial<EmailTemplateData>): Promise<string> {
+  const templates: Record<string, (data: Partial<EmailTemplateData>) => string> = {
     'entry-confirmation': (data) => `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #333;">エントリー確認</h1>
