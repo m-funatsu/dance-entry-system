@@ -42,25 +42,55 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   }
 
   // バリデーションルール（新しいヘルパーを使用）
-  const [validationRules, setValidationRules] = useState({
-    dance_style: { required: true },
-    representative_name: ValidationPresets.name,
-    representative_furigana: ValidationPresets.nameKana,
-    representative_email: ValidationPresets.email,
-    phone_number: ValidationPresets.phone,
-    choreographer: ValidationPresets.optionalText(50),
-    choreographer_furigana: {
-      required: false,
-      custom: Validators.when(
-        (formData) => !!formData.choreographer,
-        Validators.katakana('振付師フリガナはカタカナで入力してください')
-      )
+  const getValidationRules = (danceStyle: string) => {
+    const baseRules = {
+      dance_style: { required: true },
+      representative_name: ValidationPresets.name,
+      representative_furigana: ValidationPresets.nameKana,
+      representative_email: ValidationPresets.email,
+      phone_number: ValidationPresets.phone,
+      choreographer: ValidationPresets.optionalText(50),
+      choreographer_furigana: {
+        required: false,
+        custom: Validators.when(
+          (formData) => !!formData.choreographer,
+          Validators.katakana('振付師フリガナはカタカナで入力してください')
+        )
+      }
+    } as Record<string, {
+      required?: boolean
+      pattern?: RegExp
+      custom?: (value: unknown) => boolean | string
+    }>
+    
+    // ダンススタイルが'couple'の場合のみパートナー情報を必須に
+    if (danceStyle === 'couple') {
+      baseRules.partner_name = { 
+        required: true,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) {
+            return 'ペアの場合は必須です'
+          }
+          return true
+        }
+      }
+      baseRules.partner_furigana = { 
+        required: true,
+        pattern: /^[\u30A0-\u30FF\s]+$/,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) return 'ペアの場合は必須です'
+          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+            return 'カタカナで入力してください'
+          }
+          return true
+        }
+      }
     }
-  } as Record<string, {
-    required?: boolean
-    pattern?: RegExp
-    custom?: (value: unknown) => boolean | string
-  }>)
+    
+    return baseRules
+  }
 
   // useBaseFormフックを使用
   const {
@@ -77,49 +107,40 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     initialData: formInitialData,
     tableName: 'basic_info',
     uniqueField: 'entry_id',
-    validationRules,
+    validationRules: getValidationRules(formInitialData.dance_style), // 初期状態のルールを設定
     redirectPath: '/dashboard',
     onSuccess: (message) => showToast(message, 'success'),
     onError: (error) => showToast(error, 'error'),
     validateBeforeSave: false // カスタムバリデーションを行うため
   })
 
-  // ダンススタイルに応じた動的バリデーション
-  useEffect(() => {
-    setValidationRules(prev => {
-      const newRules = { ...prev }
+  // カスタムバリデーション関数
+  const validateAllWithDynamicRules = () => {
+    const currentRules = getValidationRules(formData.dance_style)
+    let hasErrors = false
+    const newErrors: Record<string, string> = {}
+    
+    Object.keys(currentRules).forEach(field => {
+      const rule = currentRules[field]
+      const value = formData[field as keyof BasicInfoFormData]
       
-      if (formData.dance_style === 'couple') {
-        newRules.partner_name = { 
-          required: true,
-          custom: (value: unknown) => {
-            const strValue = String(value || '')
-            if (!strValue) {
-              return 'ペアの場合は必須です'
-            }
-            return true
-          }
+      if (rule.required && (!value || value === '')) {
+        newErrors[field] = 'この項目は必須です'
+        hasErrors = true
+      } else if (rule.custom) {
+        const result = rule.custom(value)
+        if (typeof result === 'string') {
+          newErrors[field] = result
+          hasErrors = true
         }
-        newRules.partner_furigana = { 
-          required: true,
-          pattern: /^[\u30A0-\u30FF\s]+$/,
-          custom: (value: unknown) => {
-            const strValue = String(value || '')
-            if (!strValue) return 'ペアの場合は必須です'
-            if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
-              return 'カタカナで入力してください'
-            }
-            return true
-          }
-        }
-      } else {
-        delete newRules.partner_name
-        delete newRules.partner_furigana
+      } else if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
+        newErrors[field] = '正しい形式で入力してください'
+        hasErrors = true
       }
-      
-      return newRules
     })
-  }, [formData.dance_style])
+    
+    return !hasErrors
+  }
 
   const handleCheckboxChange = (field: 'agreement_checked' | 'privacy_policy_checked', value: boolean) => {
     setCheckboxes(prev => ({ ...prev, [field]: value }))
@@ -129,7 +150,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const handleSubmit = async (isTemporary = false) => {
     // 完了保存の場合は全体バリデーション
     if (!isTemporary) {
-      if (!validateAll()) {
+      if (!validateAllWithDynamicRules()) {
         showToast('入力内容に誤りがあります', 'error')
         return
       }
@@ -188,7 +209,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   // 必須項目のチェック（同意事項を含む）
   const isFormValid = () => {
     const hasNoErrors = Object.keys(errors).length === 0
-    const hasAllRequired = validateAll()
+    const hasAllRequired = validateAllWithDynamicRules()
     return hasAllRequired && hasNoErrors && checkboxes.agreement_checked && checkboxes.privacy_policy_checked
   }
 
