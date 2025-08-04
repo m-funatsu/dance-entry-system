@@ -103,7 +103,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     }>
     
     // ダンススタイルが'couple'の場合のみパートナー情報を必須に
-    if (danceStyle === 'couple') {
+    // 注意: 実際のダンススタイルの値をチェック
+    if (danceStyle === 'couple' || danceStyle === '社交ダンス') {
       baseRules.partner_name = { 
         required: true,
         maxLength: 50
@@ -341,7 +342,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="partner_name"
               value={formData.partner_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_name', e.target.value)}
-              required={formData.dance_style === 'couple'}
+              required={formData.dance_style === 'couple' || formData.dance_style === '社交ダンス'}
               error={fieldErrors.partner_name || errors.partner_name}
             />
             <FormField
@@ -349,7 +350,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="partner_furigana"
               value={formData.partner_furigana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_furigana', e.target.value)}
-              required={formData.dance_style === 'couple'}
+              required={formData.dance_style === 'couple' || formData.dance_style === '社交ダンス'}
               placeholder="カタカナで入力"
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
@@ -384,8 +385,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             label="振付師氏名"
             name="choreographer"
             value={formData.choreographer || ''}
-            onChange={(e) => handleFieldChange('choreographer', e.target.value)}
+            onChange={(e) => handleFieldChangeWithValidation('choreographer', e.target.value)}
             placeholder="振付師の氏名"
+            error={fieldErrors.choreographer}
           />
           <FormField
             label="振付師フリガナ"
