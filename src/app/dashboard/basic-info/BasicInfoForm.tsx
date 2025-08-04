@@ -134,8 +134,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     saving,
     errors,
     error,
-    success,
-    validateField
+    success
   } = useBaseForm<BasicInfoFormData>({
     initialData: formInitialData,
     tableName: 'basic_info',
