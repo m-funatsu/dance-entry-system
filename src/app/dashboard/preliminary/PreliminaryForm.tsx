@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert, VideoUpload } from '@/components/ui'
+import { useFormSave, useFormValidation } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
 interface PreliminaryFormProps {
@@ -17,8 +19,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  
   
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',
@@ -32,126 +32,51 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     music_type: initialData?.music_type || 'cd'
   })
   
-  const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [savingMode, setSavingMode] = useState<'save' | 'submit'>('save')
+  const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
 
-  // 必須項目が全て入力されているかチェック
-  const isAllRequiredFieldsValid = () => {
-    if (!formData.work_title || !formData.work_title.trim()) return false
-    if (!formData.work_story || !formData.work_story.trim()) return false
-    if (!formData.music_title || !formData.music_title.trim()) return false
-    if (!formData.cd_title || !formData.cd_title.trim()) return false
-    if (!formData.artist || !formData.artist.trim()) return false
-    if (!formData.record_number || !formData.record_number.trim()) return false
-    if (!formData.jasrac_code || !formData.jasrac_code.trim()) return false
-    if (!formData.music_type) return false
-    if (!formData.music_rights_cleared) return false
-    
-    return true
+  // バリデーションルール
+  const validationRules = {
+    work_title: { required: true },
+    work_story: { required: true, maxLength: 50 },
+    music_title: { required: true },
+    cd_title: { required: true },
+    artist: { required: true },
+    record_number: { required: true },
+    jasrac_code: { required: true },
+    music_type: { required: true },
+    music_rights_cleared: { required: true }
   }
 
-  const handleSubmit = async (e: React.FormEvent, mode: 'save' | 'submit') => {
-    e.preventDefault()
+  const { errors, validateAll, isAllRequiredFieldsValid } = useFormValidation(formData, validationRules)
 
+  // フォーム保存フック
+  const { save, saving, error, success } = useFormSave({
+    tableName: 'preliminary_info',
+    uniqueField: 'entry_id',
+    redirectPath: '/dashboard',
+    onSuccess: (message) => showToast(message, 'success'),
+    onError: (error) => showToast(error, 'error')
+  })
+
+  // 動画ファイルの状態を監視
+  useEffect(() => {
+    setVideoFile(preliminaryVideo)
+  }, [preliminaryVideo])
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleFileUpload = async (file: File) => {
     if (!entryId) {
       showToast('基本情報を先に保存してください', 'error')
-      router.push('/dashboard/basic-info')
       return
     }
 
-    // 完了登録の場合は動画が必須
-    if (mode === 'submit' && !preliminaryVideo) {
-      showToast('予選動画をアップロードしてください', 'error')
-      return
-    }
-
-    setSaving(true)
-    setSavingMode(mode)
-
-    try {
-      const dataToSave = {
-        entry_id: entryId,
-        ...formData,
-        video_submitted: !!preliminaryVideo,
-        updated_at: new Date().toISOString()
-      }
-
-      if (initialData) {
-        // 更新
-        const { error } = await supabase
-          .from('preliminary_info')
-          .update(dataToSave)
-          .eq('id', initialData.id)
-
-        if (error) throw error
-      } else {
-        // 新規作成
-        const { error } = await supabase
-          .from('preliminary_info')
-          .insert(dataToSave)
-
-        if (error) throw error
-      }
-
-      // 完了登録の場合は、ステータスを更新
-      if (mode === 'submit') {
-        const { error: entryError } = await supabase
-          .from('entries')
-          .update({ 
-            status: 'submitted',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', entryId)
-
-        if (entryError) throw entryError
-      }
-
-      showToast(
-        mode === 'submit' 
-          ? '予選情報を登録しました' 
-          : '予選情報を一時保存しました', 
-        'success'
-      )
-      router.push('/dashboard')
-    } catch (error) {
-      console.error('Error saving preliminary info:', error)
-      showToast('保存に失敗しました', 'error')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // 既に動画がアップロードされている場合はエラー
-    if (preliminaryVideo) {
+    if (videoFile) {
       showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-      return
-    }
-
-    // ファイルサイズチェック（200MB）
-    const maxSize = 200 * 1024 * 1024
-    if (file.size > maxSize) {
-      showToast('ファイルサイズが200MBを超えています', 'error')
-      return
-    }
-
-    // ファイル形式チェック
-    const allowedTypes = ['video/mp4', 'video/quicktime', 'video/avi', 'video/mov']
-    if (!allowedTypes.includes(file.type)) {
-      showToast('MP4、MOV、AVI形式のファイルを選択してください', 'error')
-      return
-    }
-
-    if (!entryId) {
-      showToast('基本情報を先に保存してください', 'error')
       return
     }
 
@@ -164,15 +89,23 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
       const fileName = `preliminary_${userId}_${timestamp}_${sanitizedName}`
 
+      // アップロード進捗のシミュレーション
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90))
+      }, 500)
+
       // アップロード
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('files')
         .upload(fileName, file)
 
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
       if (uploadError) throw uploadError
 
       // ファイル情報をデータベースに保存
-      const { error: dbError } = await supabase
+      const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
         .insert({
           entry_id: entryId,
@@ -183,32 +116,31 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           mime_type: file.type,
           purpose: 'preliminary'
         })
+        .select()
+        .single()
 
       if (dbError) throw dbError
 
+      setVideoFile(fileData)
       showToast('予選動画をアップロードしました', 'success')
-      router.refresh()
     } catch (error) {
       console.error('Error uploading file:', error)
       showToast('アップロードに失敗しました', 'error')
     } finally {
       setUploading(false)
       setUploadProgress(0)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
     }
   }
 
   const handleFileDelete = async () => {
-    if (!preliminaryVideo || !window.confirm('予選動画を削除してもよろしいですか？')) return
+    if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
 
     setUploading(true)
     try {
       // ストレージから削除
       const { error: storageError } = await supabase.storage
         .from('files')
-        .remove([preliminaryVideo.file_path])
+        .remove([videoFile.file_path])
 
       if (storageError) throw storageError
 
@@ -216,12 +148,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       const { error: dbError } = await supabase
         .from('entry_files')
         .delete()
-        .eq('id', preliminaryVideo.id)
+        .eq('id', videoFile.id)
 
       if (dbError) throw dbError
 
+      setVideoFile(null)
       showToast('予選動画を削除しました', 'success')
-      router.refresh()
     } catch (error) {
       console.error('Error deleting file:', error)
       showToast('削除に失敗しました', 'error')
@@ -230,8 +162,55 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
 
+  const handleSave = async (isTemporary = false) => {
+    if (!entryId) {
+      showToast('基本情報を先に保存してください', 'error')
+      router.push('/dashboard/basic-info')
+      return
+    }
+
+    // 完了登録の場合は動画が必須
+    if (!isTemporary && !videoFile) {
+      showToast('予選動画をアップロードしてください', 'error')
+      return
+    }
+
+    // バリデーション
+    if (!isTemporary && !validateAll(formData)) {
+      return
+    }
+
+    const dataToSave = {
+      entry_id: entryId,
+      ...formData,
+      video_submitted: !!videoFile
+    }
+
+    const savedData = await save(dataToSave, isTemporary)
+    
+    // 完了登録の場合は、ステータスを更新
+    if (!isTemporary && savedData) {
+      try {
+        const { error: entryError } = await supabase
+          .from('entries')
+          .update({ 
+            status: 'submitted',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', entryId)
+
+        if (entryError) throw entryError
+      } catch (error) {
+        console.error('Error updating entry status:', error)
+      }
+    }
+  }
+
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      {error && <Alert type="error" message={error} />}
+      {success && <Alert type="success" message={success} />}
+
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           予選情報の登録
@@ -246,39 +225,28 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
           <h4 className="text-base font-medium text-gray-900">作品情報</h4>
           
-          <div>
-            <label htmlFor="work_title" className="block text-sm font-medium text-gray-700">
-              作品タイトルまたはテーマ <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="work_title"
-              value={formData.work_title}
-              onChange={(e) => setFormData({ ...formData, work_title: e.target.value })}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="例：情熱のタンゴ"
-            />
-          </div>
+          <FormField
+            label="作品タイトルまたはテーマ"
+            name="work_title"
+            value={formData.work_title}
+            onChange={(e) => handleFieldChange('work_title', e.target.value)}
+            required
+            placeholder="例：情熱のタンゴ"
+            error={errors.work_title}
+          />
 
-          <div>
-            <label htmlFor="work_story" className="block text-sm font-medium text-gray-700">
-              作品キャラクター・ストーリー等（50字以内） <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="work_story"
-              value={formData.work_story}
-              onChange={(e) => setFormData({ ...formData, work_story: e.target.value })}
-              required
-              maxLength={50}
-              rows={2}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="作品の概要やキャラクター設定などを簡潔に"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              {formData.work_story.length}/50文字
-            </p>
-          </div>
+          <FormField
+            label="作品キャラクター・ストーリー等（50字以内）"
+            name="work_story"
+            type="textarea"
+            value={formData.work_story}
+            onChange={(e) => handleFieldChange('work_story', e.target.value)}
+            required
+            maxLength={50}
+            rows={2}
+            placeholder="作品の概要やキャラクター設定などを簡潔に"
+            error={errors.work_story}
+          />
         </div>
 
         {/* 予選提出動画セクション */}
@@ -287,7 +255,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             予選提出動画 <span className="text-red-500">*</span>
           </h4>
           
-          {preliminaryVideo ? (
+          {videoFile ? (
             <div className="space-y-4">
               {/* 動画プレビュー */}
               <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
@@ -295,8 +263,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   <video
                     controls
                     className="w-full h-full object-contain bg-black"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}`}
-                    key={preliminaryVideo.id}
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${videoFile.file_path}`}
+                    key={videoFile.id}
                   >
                     お使いのブラウザは動画タグをサポートしていません。
                   </video>
@@ -316,10 +284,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 truncate">
-                        {preliminaryVideo.file_name}
+                        {videoFile.file_name}
                       </p>
                       <p className="text-sm text-gray-600">
-                        ビデオファイル • {preliminaryVideo.file_size && `${(preliminaryVideo.file_size / 1024 / 1024).toFixed(2)} MB`}
+                        ビデオファイル • {videoFile.file_size && `${(videoFile.file_size / 1024 / 1024).toFixed(2)} MB`}
                       </p>
                       <p className="text-xs text-green-600 mt-1 flex items-center">
                         <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -366,36 +334,14 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               </div>
             </div>
           ) : (
-            <div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="video/mp4,video/quicktime,video/avi,video/mov"
-                onChange={handleFileUpload}
-                disabled={uploading || !!preliminaryVideo}
-                className="hidden"
-                id="video-upload"
-              />
-              <label
-                htmlFor="video-upload"
-                className={`relative block w-full rounded-lg border-2 border-dashed p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 ${
-                  uploading || preliminaryVideo ? 'border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 bg-white hover:bg-gray-50'
-                }`}
-              >
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 01-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25H13.5" />
-                </svg>
-                <span className="mt-2 block text-sm font-semibold text-gray-900">
-                  {uploading ? 'アップロード中...' : 'クリックして動画を選択'}
-                </span>
-                <span className="mt-1 block text-xs text-gray-600">
-                  またはドラッグ＆ドロップ
-                </span>
-                <span className="mt-2 block text-xs text-gray-500">
-                  MP4、MOV、AVI形式（最大200MB）
-                </span>
-              </label>
-            </div>
+            <VideoUpload
+              label="予選提出動画"
+              value={videoFile?.file_path}
+              onChange={handleFileUpload}
+              disabled={uploading || !!videoFile}
+              required
+              maxSizeMB={200}
+            />
           )}
           
           {uploading && (
@@ -431,7 +377,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     name="music_rights_cleared"
                     value="A"
                     checked={formData.music_rights_cleared === 'A'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
@@ -445,7 +391,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     name="music_rights_cleared"
                     value="B"
                     checked={formData.music_rights_cleared === 'B'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
@@ -459,7 +405,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     name="music_rights_cleared"
                     value="C"
                     checked={formData.music_rights_cleared === 'C'}
-                    onChange={(e) => setFormData({ ...formData, music_rights_cleared: e.target.value })}
+                    onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
@@ -468,143 +414,92 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   </span>
                 </label>
               </div>
+              {errors.music_rights_cleared && (
+                <p className="mt-1 text-sm text-red-600">{errors.music_rights_cleared}</p>
+              )}
             </div>
 
-            {/* 使用楽曲タイトル */}
-            <div>
-              <label htmlFor="music_title" className="block text-sm font-medium text-gray-700">
-                使用楽曲タイトル <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="music_title"
-                value={formData.music_title}
-                onChange={(e) => setFormData({ ...formData, music_title: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="楽曲名"
-              />
-            </div>
+            <FormField
+              label="使用楽曲タイトル"
+              name="music_title"
+              value={formData.music_title}
+              onChange={(e) => handleFieldChange('music_title', e.target.value)}
+              required
+              placeholder="楽曲名"
+              error={errors.music_title}
+            />
 
-            {/* 収録CDタイトル */}
-            <div>
-              <label htmlFor="cd_title" className="block text-sm font-medium text-gray-700">
-                収録CDタイトル <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="cd_title"
-                value={formData.cd_title}
-                onChange={(e) => setFormData({ ...formData, cd_title: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="CD/アルバム名"
-              />
-            </div>
+            <FormField
+              label="収録CDタイトル"
+              name="cd_title"
+              value={formData.cd_title}
+              onChange={(e) => handleFieldChange('cd_title', e.target.value)}
+              required
+              placeholder="CD/アルバム名"
+              error={errors.cd_title}
+            />
 
-            {/* アーティスト */}
-            <div>
-              <label htmlFor="artist" className="block text-sm font-medium text-gray-700">
-                アーティスト <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="artist"
-                value={formData.artist}
-                onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="アーティスト名"
-              />
-            </div>
+            <FormField
+              label="アーティスト"
+              name="artist"
+              value={formData.artist}
+              onChange={(e) => handleFieldChange('artist', e.target.value)}
+              required
+              placeholder="アーティスト名"
+              error={errors.artist}
+            />
 
-            {/* レコード番号 */}
-            <div>
-              <label htmlFor="record_number" className="block text-sm font-medium text-gray-700">
-                レコード番号 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="record_number"
-                value={formData.record_number}
-                onChange={(e) => setFormData({ ...formData, record_number: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例：ABCD-12345"
-              />
-            </div>
+            <FormField
+              label="レコード番号"
+              name="record_number"
+              value={formData.record_number}
+              onChange={(e) => handleFieldChange('record_number', e.target.value)}
+              required
+              placeholder="例：ABCD-12345"
+              error={errors.record_number}
+            />
 
-            {/* JASRAC作品コード */}
-            <div>
-              <label htmlFor="jasrac_code" className="block text-sm font-medium text-gray-700">
-                JASRAC作品コード <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="jasrac_code"
-                value={formData.jasrac_code}
-                onChange={(e) => setFormData({ ...formData, jasrac_code: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例：123-4567-8"
-              />
-            </div>
+            <FormField
+              label="JASRAC作品コード"
+              name="jasrac_code"
+              value={formData.jasrac_code}
+              onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
+              required
+              placeholder="例：123-4567-8"
+              error={errors.jasrac_code}
+            />
 
-            {/* 楽曲種類 */}
-            <div>
-              <label htmlFor="music_type" className="block text-sm font-medium text-gray-700">
-                楽曲種類 <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="music_type"
-                value={formData.music_type}
-                onChange={(e) => setFormData({ ...formData, music_type: e.target.value })}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">選択してください</option>
-                <option value="cd">CD楽曲</option>
-                <option value="download">データダウンロード楽曲</option>
-                <option value="other">その他（オリジナル曲）</option>
-              </select>
-            </div>
+            <FormField
+              label="楽曲種類"
+              name="music_type"
+              type="select"
+              value={formData.music_type}
+              onChange={(e) => handleFieldChange('music_type', e.target.value)}
+              required
+              error={errors.music_type}
+            >
+              <option value="">選択してください</option>
+              <option value="cd">CD楽曲</option>
+              <option value="download">データダウンロード楽曲</option>
+              <option value="other">その他（オリジナル曲）</option>
+            </FormField>
           </div>
         </div>
       </div>
 
       <div className="flex justify-between pt-6">
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard')}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          キャンセル
-        </button>
+        <CancelButton onClick={() => router.push('/dashboard')} />
         <div className="space-x-4">
-          <button
-            type="button"
-            onClick={(e) => handleSubmit(e as React.FormEvent, 'save')}
-            disabled={saving || uploading || !isAllRequiredFieldsValid()}
-            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
-              saving || uploading || !isAllRequiredFieldsValid()
-                ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-gray-600 hover:bg-gray-700'
-            }`}
-          >
-            {saving && savingMode === 'save' ? '一時保存中...' : '一時保存'}
-          </button>
-          <button
-            type="button"
-            onClick={(e) => handleSubmit(e as React.FormEvent, 'submit')}
-            disabled={saving || uploading || !formData.work_title || !formData.work_story || !formData.music_title || !formData.cd_title || !formData.artist || !formData.record_number || !formData.jasrac_code || !formData.music_type || !formData.music_rights_cleared || !preliminaryVideo}
-            className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
-              saving || uploading || !isAllRequiredFieldsValid() || !preliminaryVideo
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {saving && savingMode === 'submit' ? '保存中...' : '保存'}
-          </button>
+          <TemporarySaveButton
+            onClick={() => handleSave(true)}
+            disabled={saving || uploading || !isAllRequiredFieldsValid(formData)}
+            loading={saving}
+          />
+          <SaveButton
+            onClick={() => handleSave(false)}
+            disabled={saving || uploading || !isAllRequiredFieldsValid(formData) || !videoFile}
+            loading={saving}
+          />
         </div>
       </div>
     </form>
