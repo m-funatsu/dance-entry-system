@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -101,7 +101,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     errors,
     error,
     success,
-    validateAll,
     validateField
   } = useBaseForm<BasicInfoFormData>({
     initialData: formInitialData,
