@@ -42,7 +42,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   }
 
   // バリデーションルール（新しいヘルパーを使用）
-  const [validationRules] = useState({
+  const [validationRules, setValidationRules] = useState({
     dance_style: { required: true },
     representative_name: ValidationPresets.name,
     representative_furigana: ValidationPresets.nameKana,
@@ -86,34 +86,40 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
   // ダンススタイルに応じた動的バリデーション
   useEffect(() => {
-    if (formData.dance_style === 'couple') {
-      validationRules.partner_name = { 
-        required: true,
-        custom: (value: unknown) => {
-          const strValue = String(value || '')
-          if (!strValue) {
-            return 'ペアの場合は必須です'
+    setValidationRules(prev => {
+      const newRules = { ...prev }
+      
+      if (formData.dance_style === 'couple') {
+        newRules.partner_name = { 
+          required: true,
+          custom: (value: unknown) => {
+            const strValue = String(value || '')
+            if (!strValue) {
+              return 'ペアの場合は必須です'
+            }
+            return true
           }
-          return true
         }
-      }
-      validationRules.partner_furigana = { 
-        required: true,
-        pattern: /^[\u30A0-\u30FF\s]+$/,
-        custom: (value: unknown) => {
-          const strValue = String(value || '')
-          if (!strValue) return 'ペアの場合は必須です'
-          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
-            return 'カタカナで入力してください'
+        newRules.partner_furigana = { 
+          required: true,
+          pattern: /^[\u30A0-\u30FF\s]+$/,
+          custom: (value: unknown) => {
+            const strValue = String(value || '')
+            if (!strValue) return 'ペアの場合は必須です'
+            if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+              return 'カタカナで入力してください'
+            }
+            return true
           }
-          return true
         }
+      } else {
+        delete newRules.partner_name
+        delete newRules.partner_furigana
       }
-    } else {
-      delete validationRules.partner_name
-      delete validationRules.partner_furigana
-    }
-  }, [formData.dance_style]) // eslint-disable-line react-hooks/exhaustive-deps
+      
+      return newRules
+    })
+  }, [formData.dance_style])
 
   const handleCheckboxChange = (field: 'agreement_checked' | 'privacy_policy_checked', value: boolean) => {
     setCheckboxes(prev => ({ ...prev, [field]: value }))
