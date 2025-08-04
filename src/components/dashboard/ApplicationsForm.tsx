@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, ApplicationsInfo } from '@/lib/types'
 
@@ -13,7 +13,7 @@ const TICKET_PRICE = 5000 // チケット単価（円）
 const COMPANION_FEE = 3000 // 同伴料（円）
 
 export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
-  const router = useRouter()
+  // const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -124,7 +124,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       }
 
       setSuccess(isTemporary ? '各種申請情報を一時保存しました' : '各種申請情報を保存しました')
-      router.refresh()
+      // router.refresh()を削除して再レンダリングを防ぐ
     } catch (err) {
       console.error('保存エラー:', err)
       setError(err instanceof Error ? err.message : '各種申請情報の保存に失敗しました')

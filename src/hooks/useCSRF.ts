@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { logger } from '@/lib/logger'
 import { 
   getCSRFTokenFromStorage, 
-  setCSRFTokenToStorage, 
-  clearCSRFTokenFromStorage 
+  setCSRFTokenToStorage
+  // clearCSRFTokenFromStorage 
 } from '@/lib/csrf-client'
 
 interface UseCSRFReturn {

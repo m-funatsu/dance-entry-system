@@ -76,9 +76,9 @@ export const useFormSave = ({
 
       if (!isTemporary && redirectPath) {
         router.push(redirectPath)
+      } else {
+        // router.refresh()を削除して再レンダリングを防ぐ
       }
-      
-      router.refresh()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'データの保存に失敗しました'
       

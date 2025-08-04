@@ -175,9 +175,10 @@ export function useBaseForm<T extends Record<string, unknown>>({
         setTimeout(() => {
           router.push(redirectPath)
         }, 1000)
+      } else {
+        // router.refresh()を削除して再レンダリングを防ぐ
       }
       
-      router.refresh()
       return true
       
     } catch (err) {
