@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import SnsInfoForm from '@/components/dashboard/SnsInfoForm'
+import SnsForm from './SnsForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
 export default async function SNSPage() {
@@ -76,7 +76,7 @@ export default async function SNSPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <SnsInfoForm entry={entry} />
+              <SnsForm userId={user.id} entry={entry} />
             </div>
           </div>
         </div>
