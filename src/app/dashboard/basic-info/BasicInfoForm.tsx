@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { FormField, Alert, Button } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
-import { ValidationPresets } from '@/lib/validation'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
 interface BasicInfoFormProps {
@@ -44,18 +43,52 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const getValidationRules = (danceStyle: string) => {
     const baseRules = {
       dance_style: { required: true },
-      representative_name: ValidationPresets.name,
-      representative_furigana: ValidationPresets.nameKana,
-      representative_email: ValidationPresets.email,
-      phone_number: ValidationPresets.phone,
-      choreographer: ValidationPresets.optionalText(50),
+      representative_name: { required: true, maxLength: 50 },
+      representative_furigana: { 
+        required: true, 
+        maxLength: 50,
+        pattern: /^[\u30A0-\u30FF\s]+$/,
+        custom: (value: unknown) => {
+          if (!value) return 'フリガナは必須です'
+          const strValue = String(value)
+          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+            return 'カタカナで入力してください'
+          }
+          return true
+        }
+      },
+      representative_email: { 
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        custom: (value: unknown) => {
+          if (!value) return 'メールアドレスは必須です'
+          const strValue = String(value)
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
+            return '正しいメールアドレスを入力してください'
+          }
+          return true
+        }
+      },
+      phone_number: { 
+        required: true,
+        pattern: /^0\d{1,4}-?\d{1,4}-?\d{4}$/,
+        custom: (value: unknown) => {
+          if (!value) return '電話番号は必須です'
+          const strValue = String(value)
+          if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+            return '正しい電話番号を入力してください（例: 090-1234-5678）'
+          }
+          return true
+        }
+      },
+      choreographer: { required: false, maxLength: 50 },
       choreographer_furigana: {
         required: false,
-        custom: (formData: Record<string, unknown>) => {
+        custom: (value: unknown) => {
           // 振付師が入力されている場合のみカタカナチェック
-          if (formData.choreographer && formData.choreographer_furigana) {
+          if (formData.choreographer && value) {
             const pattern = /^[\u30A0-\u30FF\s]+$/
-            if (!pattern.test(String(formData.choreographer_furigana))) {
+            if (!pattern.test(String(value))) {
               return '振付師フリガナはカタカナで入力してください'
             }
           }
@@ -65,6 +98,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     } as Record<string, {
       required?: boolean
       pattern?: RegExp
+      maxLength?: number
       custom?: (value: unknown) => boolean | string
     }>
     
@@ -72,20 +106,15 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     if (danceStyle === 'couple') {
       baseRules.partner_name = { 
         required: true,
-        custom: (value: unknown) => {
-          const strValue = String(value || '')
-          if (!strValue) {
-            return 'ペアの場合は必須です'
-          }
-          return true
-        }
+        maxLength: 50
       }
       baseRules.partner_furigana = { 
         required: true,
+        maxLength: 50,
         pattern: /^[\u30A0-\u30FF\s]+$/,
         custom: (value: unknown) => {
-          const strValue = String(value || '')
-          if (!strValue) return 'ペアの場合は必須です'
+          if (!value) return 'ペアフリガナは必須です'
+          const strValue = String(value)
           if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
             return 'カタカナで入力してください'
           }
@@ -132,7 +161,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         hasErrors = true
         fieldErrors[field] = 'Required but empty'
       } else if (rule.custom) {
-        const result = rule.custom(formData)
+        // カスタムバリデーションはvalueを引数として渡す
+        const result = rule.custom(value)
         if (result !== true) {
           hasErrors = true
           fieldErrors[field] = typeof result === 'string' ? result : 'Custom validation failed'
@@ -141,20 +171,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         hasErrors = true
         fieldErrors[field] = 'Pattern mismatch'
       }
-    })
-    
-    console.log('validateAllWithDynamicRules debug:', {
-      currentRules: Object.keys(currentRules),
-      fieldErrors,
-      hasErrors,
-      formData,
-      detailedRules: Object.entries(currentRules).map(([field, rule]) => ({
-        field,
-        required: rule.required,
-        hasCustom: !!rule.custom,
-        hasPattern: !!rule.pattern,
-        value: formData[field as keyof BasicInfoFormData]
-      }))
     })
     
     return !hasErrors
