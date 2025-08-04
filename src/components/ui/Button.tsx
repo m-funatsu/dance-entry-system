@@ -1,18 +1,7 @@
 'use client'
 
 import React from 'react'
-
-interface ButtonProps {
-  type?: 'button' | 'submit' | 'reset'
-  variant?: 'primary' | 'secondary' | 'cancel'
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-  loading?: boolean
-  onClick?: () => void
-  children: React.ReactNode
-  className?: string
-  fullWidth?: boolean
-}
+import type { ButtonProps } from '@/lib/types'
 
 export const Button: React.FC<ButtonProps> = ({
   type = 'button',

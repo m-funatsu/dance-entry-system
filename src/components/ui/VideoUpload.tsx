@@ -1,16 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-
-interface VideoUploadProps {
-  label: string
-  value?: string
-  onChange: (file: File) => void
-  disabled?: boolean
-  required?: boolean
-  maxSizeMB?: number
-  accept?: string
-}
+import { VideoUploadProps } from '@/lib/types'
 
 export const VideoUpload: React.FC<VideoUploadProps> = ({
   label,

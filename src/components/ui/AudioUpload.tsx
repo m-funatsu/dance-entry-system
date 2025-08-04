@@ -1,16 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-
-interface AudioUploadProps {
-  label: string
-  value?: string
-  onChange: (file: File) => void
-  disabled?: boolean
-  required?: boolean
-  maxSizeMB?: number
-  accept?: string
-}
+import { AudioUploadProps } from '@/lib/types'
 
 export const AudioUpload: React.FC<AudioUploadProps> = ({
   label,

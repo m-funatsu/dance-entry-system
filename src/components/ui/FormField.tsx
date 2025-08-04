@@ -1,23 +1,7 @@
 'use client'
 
 import React from 'react'
-
-interface FormFieldProps {
-  label: string
-  name: string
-  type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select'
-  value: string | number
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
-  required?: boolean
-  disabled?: boolean
-  placeholder?: string
-  error?: string
-  maxLength?: number
-  rows?: number
-  children?: React.ReactNode // for select options
-  className?: string
-  autoComplete?: string
-}
+import type { FormFieldProps } from '@/lib/types'
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,

@@ -198,11 +198,10 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
       entry_id: entry.id
     }
 
-    const savedData = await save(dataToSave, isTemporary)
-    if (savedData) {
-      // 保存成功時はエラーをクリア
-      setValidationErrors({})
-    }
+    await save(dataToSave, isTemporary)
+    // save関数が例外をスローしなければ成功とみなす
+    // 保存成功時はエラーをクリア
+    setValidationErrors({})
   }
 
   if (loading) {

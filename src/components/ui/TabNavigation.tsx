@@ -1,17 +1,6 @@
 'use client'
 
-interface Tab {
-  id: string
-  label: string
-  hasErrors?: boolean
-  isComplete?: boolean
-}
-
-interface TabNavigationProps {
-  tabs: Tab[]
-  activeTab: string
-  onTabChange: (tabId: string) => void
-}
+import { TabNavigationProps } from '@/lib/types'
 
 export const TabNavigation: React.FC<TabNavigationProps> = ({ tabs, activeTab, onTabChange }) => {
   return (

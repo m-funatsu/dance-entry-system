@@ -47,7 +47,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     tableName: 'finals_info',
     uniqueField: 'entry_id',
     redirectPath: '/dashboard',
-    onSuccess: (message) => router.refresh(),
+    onSuccess: () => router.refresh(),
     onError: (message) => console.error(message)
   })
 
@@ -241,17 +241,17 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       
       // シーン1-5とチェイサー情報をクリア
       for (let i = 1; i <= 5; i++) {
-        clearedData[`scene${i}_time` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_image` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = ''
-        clearedData[`scene${i}_notes` as keyof FinalsInfo] = ''
+        clearedData[`scene${i}_time` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_image` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_notes` as keyof FinalsInfo] = undefined
       }
       
-      clearedData.chaser_exit_time = ''
-      clearedData.chaser_exit_trigger = ''
+      clearedData.chaser_exit_time = undefined
+      clearedData.chaser_exit_trigger = undefined
       clearedData.chaser_exit_color_type = ''
       clearedData.chaser_exit_color_other = ''
       clearedData.chaser_exit_image = ''
@@ -357,11 +357,10 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       entry_id: entry.id
     }
 
-    const savedData = await save(dataToSave, isTemporary)
-    if (savedData) {
-      // 保存成功時はエラーをクリア
-      setValidationErrors({})
-    }
+    await save(dataToSave, isTemporary)
+    // save関数が例外をスローしなければ成功とみなす
+    // 保存成功時はエラーをクリア
+    setValidationErrors({})
   }
 
   if (loading) {

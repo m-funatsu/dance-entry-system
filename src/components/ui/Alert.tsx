@@ -1,13 +1,7 @@
 'use client'
 
 import React from 'react'
-
-interface AlertProps {
-  type: 'error' | 'success' | 'info' | 'warning'
-  message: string
-  onClose?: () => void
-  className?: string
-}
+import type { AlertProps } from '@/lib/types'
 
 export const Alert: React.FC<AlertProps> = ({
   type,

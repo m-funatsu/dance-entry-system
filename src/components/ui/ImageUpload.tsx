@@ -2,14 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
-
-interface ImageUploadProps {
-  value?: string
-  onChange: (file: File) => void
-  label?: string
-  required?: boolean
-  accept?: string
-}
+import { ImageUploadProps } from '@/lib/types'
 
 export default function ImageUpload({ 
   value, 
@@ -19,7 +12,7 @@ export default function ImageUpload({
   accept = "image/*" 
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
-  const [preview, setPreview] = useState<string | null>(value || null)
+  const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDrag = useCallback((e: React.DragEvent) => {

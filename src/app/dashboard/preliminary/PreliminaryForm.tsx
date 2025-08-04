@@ -336,7 +336,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           ) : (
             <VideoUpload
               label="予選提出動画"
-              value={videoFile?.file_path}
+              value={undefined}
               onChange={handleFileUpload}
               disabled={uploading || !!videoFile}
               required
