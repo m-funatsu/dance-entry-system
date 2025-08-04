@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { FormField, Alert, Button } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
-import { ValidationPresets, Validators } from '@/lib/validation'
+import { ValidationPresets } from '@/lib/validation'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
 interface BasicInfoFormProps {
@@ -51,11 +51,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       choreographer: ValidationPresets.optionalText(50),
       choreographer_furigana: {
         required: false,
-        custom: (formData: any) => {
+        custom: (formData: Record<string, unknown>) => {
           // 振付師が入力されている場合のみカタカナチェック
           if (formData.choreographer && formData.choreographer_furigana) {
             const pattern = /^[\u30A0-\u30FF\s]+$/
-            if (!pattern.test(formData.choreographer_furigana)) {
+            if (!pattern.test(String(formData.choreographer_furigana))) {
               return '振付師フリガナはカタカナで入力してください'
             }
           }
