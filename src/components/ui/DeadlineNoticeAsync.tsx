@@ -17,20 +17,16 @@ export function DeadlineNoticeAsync({ deadlineKey, className = '' }: DeadlineNot
   useEffect(() => {
     async function fetchDeadline() {
       try {
-        console.log(`Fetching deadline for key: ${deadlineKey}`)
         const fetchedDeadline = await getDeadline(deadlineKey)
-        console.log(`Fetched deadline: ${fetchedDeadline}`)
         
         if (fetchedDeadline) {
           setDeadline(fetchedDeadline)
         } else {
           // データベースから取得できない場合はハードコードされた値を使用
-          console.log('Using config deadline as fallback')
           const configDeadline = getDeadlineFromConfig(deadlineKey)
           setDeadline(configDeadline)
         }
       } catch (error) {
-        console.error('Failed to fetch deadline:', error)
         // エラーの場合もハードコードされた値を使用
         const configDeadline = getDeadlineFromConfig(deadlineKey)
         setDeadline(configDeadline)

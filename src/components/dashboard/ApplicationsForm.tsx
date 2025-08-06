@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import type { Entry, ApplicationsInfo } from '@/lib/types'
-import TableDebug from '@/app/dashboard/applications/TableDebug'
 
 interface ApplicationsFormProps {
   entry: Entry
@@ -187,9 +186,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       <h3 className="text-lg font-semibold">各種申請</h3>
 
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
-      
-      {/* TODO: デバッグ用コンポーネント - 問題解決後に削除 */}
-      <TableDebug />
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
