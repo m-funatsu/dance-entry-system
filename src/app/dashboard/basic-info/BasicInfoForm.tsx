@@ -241,9 +241,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     handleFieldChange(field, value)
     
     // 動的ルールに基づいてバリデーション
-    const currentRules = getValidationRules(
-      field === 'dance_style' ? value : formData.dance_style
-    )
+    const currentRules = getValidationRules()
     const rule = currentRules[field]
     
     if (rule) {
