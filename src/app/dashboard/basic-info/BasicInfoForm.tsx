@@ -40,7 +40,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   }
 
   // バリデーションルール（新しいヘルパーを使用）
-  const getValidationRules = (danceStyle: string) => {
+  const getValidationRules = () => {
     const baseRules = {
       dance_style: { required: true },
       representative_name: { required: true, maxLength: 50 },
@@ -137,7 +137,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     initialData: formInitialData,
     tableName: 'basic_info',
     uniqueField: 'entry_id',
-    validationRules: getValidationRules(formInitialData.dance_style), // 初期状態のルールを設定
+    validationRules: getValidationRules(), // 初期状態のルールを設定
     redirectPath: '/dashboard',
     onSuccess: (message) => showToast(message, 'success'),
     onError: (error) => showToast(error, 'error'),
@@ -146,7 +146,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
   // カスタムバリデーション関数
   const validateAllWithDynamicRules = () => {
-    const currentRules = getValidationRules(formData.dance_style)
+    const currentRules = getValidationRules()
     let hasErrors = false
     const fieldErrors: Record<string, string> = {}
     

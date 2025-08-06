@@ -16,7 +16,7 @@ interface PreliminaryFormProps {
   userId: string
 }
 
-export default function PreliminaryForm({ entryId, initialData, preliminaryVideo }: PreliminaryFormProps) {
+export default function PreliminaryForm({ entryId, initialData, preliminaryVideo, userId }: PreliminaryFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
@@ -34,7 +34,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   })
   
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
-  const [videoUrl, setVideoUrl] = useState<string | null>(preliminaryVideo?.file_path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${preliminaryVideo.file_path}` : null)
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
 
   // バリデーションルール
   const validationRules = {
@@ -64,8 +64,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
     category: 'video',
     generatePath: (fileName: string) => {
-      if (!entryId) return fileName
-      return `${entryId}/preliminary/${fileName}`
+      if (!entryId || !userId) return fileName
+      return `${userId}/${entryId}/preliminary/${fileName}`
     },
     onSuccess: (result: { url?: string; path?: string }) => {
       if (result.url) {
@@ -77,10 +77,22 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     onError: (error: string) => showToast(error, 'error')
   })
 
-  // 動画ファイルの状態を監視
+  // 動画ファイルの状態を監視とURL取得
   useEffect(() => {
     setVideoFile(preliminaryVideo)
-  }, [preliminaryVideo])
+    if (preliminaryVideo?.file_path) {
+      // 署名付きURLを取得
+      const getVideoUrl = async () => {
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(preliminaryVideo.file_path, 3600)
+        if (data?.signedUrl) {
+          setVideoUrl(data.signedUrl)
+        }
+      }
+      getVideoUrl()
+    }
+  }, [preliminaryVideo, supabase.storage])
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -123,7 +135,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
-    await uploadVideo(file, { entryId })
+    await uploadVideo(file, { entryId, userId })
   }
 
   const handleFileDelete = async () => {
@@ -259,7 +271,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   <video
                     controls
                     className="w-full h-full object-contain bg-black"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${videoFile.file_path}`}
+                    src={videoUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${videoFile.file_path}`}
                     key={videoFile.id}
                   >
                     お使いのブラウザは動画タグをサポートしていません。
@@ -340,7 +352,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               required
               maxSizeMB={200}
               accept="video/*"
-              uploadPath={(fileName) => `${entryId}/preliminary/${fileName}`}
+              uploadPath={(fileName) => `${userId}/${entryId}/preliminary/${fileName}`}
               placeholder={{
                 title: "予選提出動画をドラッグ&ドロップ",
                 formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
