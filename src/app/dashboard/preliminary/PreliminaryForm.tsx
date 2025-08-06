@@ -354,11 +354,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               category="video"
               disabled={uploading || !!videoFile || !entryId}
               required
-              maxSizeMB={200}
+              maxSizeMB={250}
               accept="video/*"
               placeholder={{
                 title: "予選提出動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
+                formats: "対応形式: MP4, MOV, AVI など（最大250MB）"
               }}
             />
           )}
