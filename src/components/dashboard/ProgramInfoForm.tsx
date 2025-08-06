@@ -137,15 +137,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   // ファイルアップロードフック
   const { uploadImage, uploading } = useFileUploadV2({
     category: 'image',
-    generatePath: (fileName: string, fileInfo?: { field?: string }) => {
-      if (!entry.id || !fileInfo?.field) return fileName
-      return `${entry.id}/program/${fileInfo.field}/${fileName}`
-    },
-    onSuccess: (result: { field?: string; url?: string }) => {
-      if (result.field && result.url) {
+    onSuccess: (result: { field?: string; url?: string; path?: string }) => {
+      if (result.field && (result.url || result.path)) {
         setProgramInfo(prev => ({
           ...prev,
-          [result.field as string]: result.url
+          [result.field as string]: result.url || result.path
         }))
       }
     },
@@ -170,9 +166,30 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
 
       if (data) {
+        // 画像フィールドの署名付きURLを取得
+        const updatedData = { ...data }
+        const imageFields = [
+          'player_photo_path',
+          'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
+          'final_player_photo_path',
+          'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
+        ]
+        
+        for (const field of imageFields) {
+          const fieldValue = (data as Record<string, unknown>)[field] as string
+          if (fieldValue) {
+            const { data: urlData } = await supabase.storage
+              .from('files')
+              .createSignedUrl(fieldValue, 3600)
+            if (urlData?.signedUrl) {
+              (updatedData as Record<string, unknown>)[field] = urlData.signedUrl
+            }
+          }
+        }
+        
         setProgramInfo({
-          ...data,
-          player_photo_type: data.player_photo_type || ''
+          ...updatedData,
+          player_photo_type: updatedData.player_photo_type || ''
         })
       }
     } catch (err) {
@@ -192,7 +209,9 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   }
 
   const handleImageUpload = async (field: string, file: File) => {
-    await uploadImage(file, { entryId: entry.id, field })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await uploadImage(file, { userId: user.id, entryId: entry.id, field, folder: 'program' })
   }
 
   const handleSave = async (isTemporary = false) => {
@@ -280,7 +299,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               disabled={uploading}
               maxSizeMB={100}
               accept="image/*"
-              uploadPath={(fileName) => `${entry.id}/program/player_photo_path/${fileName}`}
             />
             {errors.player_photo_path && (
               <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
@@ -329,7 +347,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                     disabled={uploading}
                     maxSizeMB={100}
                     accept="image/*"
-                    uploadPath={(fileName) => `${entry.id}/program/${fieldName}/${fileName}`}
                   />
                   {errors[fieldName] && (
                     <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
@@ -365,7 +382,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 disabled={uploading}
                 maxSizeMB={100}
                 accept="image/*"
-                uploadPath={(fileName) => `${entry.id}/program/final_player_photo_path/${fileName}`}
               />
               {errors.final_player_photo_path && (
                 <p className="mt-1 text-sm text-red-600">{errors.final_player_photo_path}</p>
@@ -414,8 +430,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                       disabled={uploading}
                       maxSizeMB={100}
                       accept="image/*"
-                      uploadPath={(fileName) => `${entry.id}/program/${fieldName}/${fileName}`}
-                    />
+                      />
                     {errors[fieldName] && (
                       <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
                     )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, memo, useCallback, useMemo } from 'react'
+import Image from 'next/image'
 import { FileCategory, formatFileSize, validateFile } from '@/lib/file-upload'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
@@ -209,9 +210,22 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
           </div>
         ) : value ? (
           <div className="space-y-2">
-            <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            {category === 'image' && typeof value === 'string' ? (
+              <div className="relative inline-block mx-auto">
+                <Image 
+                  src={value} 
+                  alt={label}
+                  width={192}
+                  height={192}
+                  className="rounded-lg object-contain"
+                  style={{ maxHeight: '12rem', width: 'auto' }}
+                />
+              </div>
+            ) : (
+              <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
             <p className="text-sm font-medium text-green-700">アップロード済み</p>
             {selectedFile && (
               <p className="text-xs text-gray-600">
