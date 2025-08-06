@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { DeadlineNoticeAsync } from '@/components/ui'
 import type { Entry, ApplicationsInfo } from '@/lib/types'
 
 interface ApplicationsFormProps {
@@ -183,6 +184,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">各種申請</h3>
+
+      <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
