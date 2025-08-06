@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Alert, TabNavigation, TemporarySaveButton, SaveButton, DeadlineNotice } from '@/components/ui'
+import { Alert, TabNavigation, TemporarySaveButton, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { useFormSave } from '@/hooks'
 import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
 import { 
@@ -378,7 +378,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">決勝情報</h3>
 
-      <DeadlineNotice deadline="2025年3月31日 23:59" />
+      <DeadlineNoticeAsync deadlineKey="finals_deadline" />
 
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}

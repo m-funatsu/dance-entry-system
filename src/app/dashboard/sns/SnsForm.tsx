@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, VideoUpload, Alert, Button, DeadlineNotice } from '@/components/ui'
+import { FormField, VideoUpload, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
@@ -156,7 +156,7 @@ export default function SNSForm({ entry }: SNSFormProps) {
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
 
-      <DeadlineNotice deadline="2025年3月31日 23:59" />
+      <DeadlineNoticeAsync deadlineKey="sns_deadline" />
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
