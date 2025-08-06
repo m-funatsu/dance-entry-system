@@ -26,7 +26,7 @@ export function DeadlineNoticeAsync({ deadlineKey, className = '' }: DeadlineNot
           const configDeadline = getDeadlineFromConfig(deadlineKey)
           setDeadline(configDeadline)
         }
-      } catch (error) {
+      } catch {
         // エラーの場合もハードコードされた値を使用
         const configDeadline = getDeadlineFromConfig(deadlineKey)
         setDeadline(configDeadline)
