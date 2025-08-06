@@ -14,32 +14,37 @@ export default function ApplicationsFormDebug() {
       const supabase = createClient()
       
       try {
-        // 全ての期限設定を取得してデバッグ
-        const { data: allDeadlines, error: allError } = await supabase
-          .from('section_deadlines')
+        // 全ての設定を取得してデバッグ
+        const { data: allSettings, error: allError } = await supabase
+          .from('settings')
           .select('*')
+          .in('key', [
+            'basic_info_deadline',
+            'music_info_deadline',
+            'optional_request_deadline'
+          ])
         
-        console.log('All deadlines:', allDeadlines)
-        console.log('All deadlines error:', allError)
+        console.log('All settings:', allSettings)
+        console.log('All settings error:', allError)
         
-        // optional_requestの期限を取得
+        // optional_request_deadlineを取得
         const { data, error } = await supabase
-          .from('section_deadlines')
-          .select('deadline')
-          .eq('section_name', 'optional_request')
+          .from('settings')
+          .select('value')
+          .eq('key', 'optional_request_deadline')
           .single()
         
         console.log('Deadline query result:', { data, error })
         
         setDebugInfo({
-          allDeadlines,
+          allSettings,
           allError,
-          specificDeadline: data,
+          specificSetting: data,
           specificError: error
         })
         
-        if (data?.deadline) {
-          const date = new Date(data.deadline)
+        if (data?.value) {
+          const date = new Date(data.value)
           const formatted = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
           setDeadline(formatted)
         }

@@ -24,37 +24,25 @@ const deadlineLabels: Record<DeadlineKey, string> = {
 export async function getDeadline(key: DeadlineKey): Promise<string | null> {
   const supabase = createClient()
   
-  // DeadlineKeyからsection_nameへのマッピング
-  const sectionNameMap: Record<DeadlineKey, string> = {
-    basic_info_deadline: 'basic_info',
-    music_info_deadline: 'music_info',
-    consent_form_deadline: 'consent_form',
-    program_info_deadline: 'program_info',
-    semifinals_deadline: 'semifinals',
-    finals_deadline: 'finals',
-    sns_deadline: 'sns',
-    optional_request_deadline: 'optional_request'
-  }
+  console.log(`Querying deadline for key: ${key}`)
   
-  const sectionName = sectionNameMap[key]
-  console.log(`Querying deadline for section: ${sectionName}`)
-  
+  // settingsテーブルから期限を取得
   const { data, error } = await supabase
-    .from('section_deadlines')
-    .select('deadline')
-    .eq('section_name', sectionName)
+    .from('settings')
+    .select('value')
+    .eq('key', key)
     .single()
 
   console.log(`Query result:`, { data, error })
 
-  if (error || !data?.deadline) {
-    console.log(`No deadline found for section: ${sectionName}`)
+  if (error || !data?.value) {
+    console.log(`No deadline found for key: ${key}`)
     return null
   }
 
   // ISO 8601形式の日付を日本語形式に変換
   try {
-    const date = new Date(data.deadline)
+    const date = new Date(data.value)
     const year = date.getFullYear()
     const month = date.getMonth() + 1
     const day = date.getDate()
@@ -63,7 +51,7 @@ export async function getDeadline(key: DeadlineKey): Promise<string | null> {
     
     return `${year}年${month}月${day}日 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
   } catch {
-    return data.deadline // 変換できない場合はそのまま返す
+    return data.value // 変換できない場合はそのまま返す
   }
 }
 

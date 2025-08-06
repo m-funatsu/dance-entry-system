@@ -188,7 +188,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
       
-      {/* デバッグ用: テーブルの存在確認 */}
+      {/* TODO: デバッグ用コンポーネント - 問題解決後に削除 */}
       <TableDebug />
 
       {error && (

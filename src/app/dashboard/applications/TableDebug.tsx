@@ -12,37 +12,39 @@ export default function TableDebug() {
       const supabase = createClient()
       
       try {
-        // section_deadlinesテーブルから全データを取得
-        const { data: sectionData, error: sectionError } = await supabase
-          .from('section_deadlines')
+        // settingsテーブルから期限設定を取得
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('settings')
           .select('*')
+          .in('key', [
+            'basic_info_deadline',
+            'music_info_deadline',
+            'consent_form_deadline',
+            'program_info_deadline',
+            'semifinals_deadline',
+            'finals_deadline',
+            'sns_deadline',
+            'optional_request_deadline'
+          ])
         
-        // admin_settingsテーブルから全データを取得（存在する場合）
-        const { data: adminData, error: adminError } = await supabase
-          .from('admin_settings')
-          .select('*')
-        
-        // 特定のoptional_requestレコードを取得
+        // optional_request_deadlineの設定を特別に取得
         const { data: optionalData, error: optionalError } = await supabase
-          .from('section_deadlines')
+          .from('settings')
           .select('*')
-          .eq('section_name', 'optional_request')
+          .eq('key', 'optional_request_deadline')
           .single()
         
         setDebugInfo({
-          section_deadlines: {
-            data: sectionData,
-            error: sectionError,
-            count: sectionData?.length || 0
+          settings_table: {
+            data: settingsData,
+            error: settingsError,
+            exists: !settingsError || settingsError.code !== '42P01',
+            count: settingsData?.length || 0
           },
-          admin_settings: {
-            data: adminData,
-            error: adminError,
-            count: adminData?.length || 0
-          },
-          optional_request: {
+          optional_request_deadline: {
             data: optionalData,
-            error: optionalError
+            error: optionalError,
+            exists: !!optionalData
           }
         })
       } catch (err) {

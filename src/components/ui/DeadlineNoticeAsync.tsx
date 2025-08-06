@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { DeadlineNotice } from './DeadlineNotice'
 import { getDeadline, type DeadlineKey } from '@/lib/deadline-utils'
+import { getDeadlineFromConfig } from '@/lib/deadline-config'
 
 interface DeadlineNoticeAsyncProps {
   deadlineKey: DeadlineKey
@@ -19,10 +20,20 @@ export function DeadlineNoticeAsync({ deadlineKey, className = '' }: DeadlineNot
         console.log(`Fetching deadline for key: ${deadlineKey}`)
         const fetchedDeadline = await getDeadline(deadlineKey)
         console.log(`Fetched deadline: ${fetchedDeadline}`)
-        setDeadline(fetchedDeadline)
+        
+        if (fetchedDeadline) {
+          setDeadline(fetchedDeadline)
+        } else {
+          // データベースから取得できない場合はハードコードされた値を使用
+          console.log('Using config deadline as fallback')
+          const configDeadline = getDeadlineFromConfig(deadlineKey)
+          setDeadline(configDeadline)
+        }
       } catch (error) {
         console.error('Failed to fetch deadline:', error)
-        setDeadline(null)
+        // エラーの場合もハードコードされた値を使用
+        const configDeadline = getDeadlineFromConfig(deadlineKey)
+        setDeadline(configDeadline)
       } finally {
         setLoading(false)
       }
