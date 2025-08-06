@@ -63,11 +63,18 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // ファイルアップロードフック
   const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
     category: 'video',
-    onSuccess: (result: { url?: string; path?: string }) => {
-      if (result.url) {
-        setVideoUrl(result.url)
+    onSuccess: async (result: { url?: string; path?: string }) => {
+      if (result.path) {
         // ファイル情報をデータベースに保存
-        saveVideoFileInfo(result.path || '')
+        await saveVideoFileInfo(result.path)
+        
+        // 署名付きURLを取得してプレビューを更新
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(result.path, 3600)
+        if (data?.signedUrl) {
+          setVideoUrl(data.signedUrl)
+        }
       }
     },
     onError: (error: string) => showToast(error, 'error')
@@ -114,9 +121,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
       setVideoFile(fileData)
       showToast('予選動画をアップロードしました', 'success')
+      return fileData
     } catch (error) {
       console.error('Error saving file info:', error)
       showToast('ファイル情報の保存に失敗しました', 'error')
+      throw error
     }
   }
   
@@ -138,6 +147,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
 
     try {
+      // 即座にUIを更新（楽観的更新）
+      const tempVideoFile = videoFile
+      const tempVideoUrl = videoUrl
+      setVideoFile(null)
+      setVideoUrl(null)
+      
       // ストレージから削除
       const deleteSuccess = await deleteFile(videoFile.file_path)
       
@@ -148,12 +163,18 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           .delete()
           .eq('id', videoFile.id)
 
-        if (dbError) throw dbError
+        if (dbError) {
+          // エラーの場合は元に戻す
+          setVideoFile(tempVideoFile)
+          setVideoUrl(tempVideoUrl)
+          throw dbError
+        }
 
-        setVideoFile(null)
-        setVideoUrl(null)
         showToast('予選動画を削除しました', 'success')
       } else {
+        // エラーの場合は元に戻す
+        setVideoFile(tempVideoFile)
+        setVideoUrl(tempVideoUrl)
         throw new Error('ファイルの削除に失敗しました')
       }
     } catch (error) {
