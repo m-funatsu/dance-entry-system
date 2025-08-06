@@ -63,10 +63,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // ファイルアップロードフック
   const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
     category: 'video',
-    generatePath: (fileName: string) => {
-      if (!entryId || !userId) return fileName
-      return `${userId}/${entryId}/preliminary/${fileName}`
-    },
     onSuccess: (result: { url?: string; path?: string }) => {
       if (result.url) {
         setVideoUrl(result.url)
@@ -135,7 +131,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
-    await uploadVideo(file, { entryId, userId })
+    await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
   }
 
   const handleFileDelete = async () => {
@@ -266,18 +262,24 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           {videoFile ? (
             <div className="space-y-4">
               {/* 動画プレビュー */}
-              <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
-                <div className="aspect-video">
-                  <video
-                    controls
-                    className="w-full h-full object-contain bg-black"
-                    src={videoUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${videoFile.file_path}`}
-                    key={videoFile.id}
-                  >
-                    お使いのブラウザは動画タグをサポートしていません。
-                  </video>
+              {videoUrl ? (
+                <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
+                  <div className="aspect-video">
+                    <video
+                      controls
+                      className="w-full h-full object-contain bg-black"
+                      src={videoUrl}
+                      key={videoFile.id}
+                    >
+                      お使いのブラウザは動画タグをサポートしていません。
+                    </video>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
+                  <p className="text-gray-500">動画を読み込んでいます...</p>
+                </div>
+              )}
               
               {/* ファイル情報 */}
               <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -352,7 +354,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               required
               maxSizeMB={200}
               accept="video/*"
-              uploadPath={(fileName) => `${userId}/${entryId}/preliminary/${fileName}`}
               placeholder={{
                 title: "予選提出動画をドラッグ&ドロップ",
                 formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
