@@ -186,7 +186,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
       
       if (result.success && result.path) {
         // ファイル情報をデータベースに保存
-        const fileData = await saveVideoFileInfo(result.path, field)
+        await saveVideoFileInfo(result.path, field)
         
         // 署名付きURLを取得してプレビューを更新
         const { data } = await supabase.storage
