@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import type { Entry, ApplicationsInfo } from '@/lib/types'
+import TableDebug from '@/app/dashboard/applications/TableDebug'
 
 interface ApplicationsFormProps {
   entry: Entry
@@ -187,11 +188,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
       
-      {/* デバッグ用: 直接期限を取得 */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded p-4 text-sm">
-        <p className="font-medium">デバッグ: optional_request_deadline の確認</p>
-        <p className="text-xs">このメッセージはデバッグ用です。問題が解決したら削除されます。</p>
-      </div>
+      {/* デバッグ用: テーブルの存在確認 */}
+      <TableDebug />
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
