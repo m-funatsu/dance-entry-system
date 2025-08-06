@@ -14,32 +14,32 @@ export default function ApplicationsFormDebug() {
       const supabase = createClient()
       
       try {
-        // 全ての設定を取得してデバッグ
-        const { data: allSettings, error: allError } = await supabase
-          .from('admin_settings')
+        // 全ての期限設定を取得してデバッグ
+        const { data: allDeadlines, error: allError } = await supabase
+          .from('section_deadlines')
           .select('*')
         
-        console.log('All settings:', allSettings)
-        console.log('All settings error:', allError)
+        console.log('All deadlines:', allDeadlines)
+        console.log('All deadlines error:', allError)
         
-        // optional_request_deadlineを取得
+        // optional_requestの期限を取得
         const { data, error } = await supabase
-          .from('admin_settings')
-          .select('value')
-          .eq('key', 'optional_request_deadline')
+          .from('section_deadlines')
+          .select('deadline')
+          .eq('section_name', 'optional_request')
           .single()
         
         console.log('Deadline query result:', { data, error })
         
         setDebugInfo({
-          allSettings,
+          allDeadlines,
           allError,
-          specificSetting: data,
+          specificDeadline: data,
           specificError: error
         })
         
-        if (data?.value) {
-          const date = new Date(data.value)
+        if (data?.deadline) {
+          const date = new Date(data.deadline)
           const formatted = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
           setDeadline(formatted)
         }

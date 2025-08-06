@@ -5,13 +5,13 @@ export async function GET() {
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('admin_settings')
+    .from('section_deadlines')
     .select('*')
-    .order('key')
+    .order('section_name')
   
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
   
-  return NextResponse.json({ settings: data })
+  return NextResponse.json({ deadlines: data })
 }
