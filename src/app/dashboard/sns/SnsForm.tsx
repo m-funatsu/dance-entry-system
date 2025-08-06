@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, VideoUpload, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, FileUploadField, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
@@ -171,13 +171,18 @@ export default function SNSForm({ entry }: SNSFormProps) {
 
         {/* 練習風景動画 */}
         <div>
-          <VideoUpload
+          <FileUploadField
             label="練習風景（約30秒）横長動画"
             required
-            disabled={!entry}
+            disabled={!entry || uploading}
             value={formData.practice_video_path}
             onChange={(file) => handleFileUpload('practice_video', file)}
+            category="video"
             maxSizeMB={200}
+            placeholder={{
+              title: "練習風景動画をドラッグ&ドロップ",
+              formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
+            }}
           />
           {!formData.practice_video_path && (
             <p className="mt-1 text-sm text-red-600">練習風景動画をアップロードしてください</p>
@@ -186,13 +191,18 @@ export default function SNSForm({ entry }: SNSFormProps) {
 
         {/* 選手紹介・見所動画 */}
         <div>
-          <VideoUpload
+          <FileUploadField
             label="選手紹介・見所（30秒）"
             required
-            disabled={!entry}
+            disabled={!entry || uploading}
             value={formData.introduction_highlight_path}
             onChange={(file) => handleFileUpload('introduction_highlight', file)}
+            category="video"
             maxSizeMB={100}
+            placeholder={{
+              title: "選手紹介・見所動画をドラッグ&ドロップ",
+              formats: "対応形式: MP4, MOV, AVI など（最大100MB）"
+            }}
           />
           {!formData.introduction_highlight_path && (
             <p className="mt-1 text-sm text-red-600">選手紹介・見所動画をアップロードしてください</p>
