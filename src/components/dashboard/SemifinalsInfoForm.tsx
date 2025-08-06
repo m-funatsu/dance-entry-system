@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { DeadlineNotice } from '@/components/ui'
 import type { Entry, SemifinalsInfo } from '@/lib/types'
 
 interface SemifinalsInfoFormProps {
@@ -221,6 +222,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">準決勝情報</h3>
+
+      <DeadlineNotice deadline="2025年3月31日 23:59" />
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">

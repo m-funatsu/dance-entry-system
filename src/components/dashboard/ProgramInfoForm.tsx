@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FormField, TemporarySaveButton, SaveButton, Alert } from '@/components/ui'
+import { FormField, TemporarySaveButton, SaveButton, Alert, DeadlineNotice } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { Entry, ProgramInfo } from '@/lib/types'
@@ -241,6 +241,8 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">プログラム掲載用情報</h3>
+
+      <DeadlineNotice deadline="2025年3月31日 23:59" />
 
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}

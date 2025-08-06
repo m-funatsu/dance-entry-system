@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert } from '@/components/ui'
+import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert, DeadlineNotice } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
@@ -210,6 +210,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
+
+      <DeadlineNotice deadline="2025年3月31日 23:59" />
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">

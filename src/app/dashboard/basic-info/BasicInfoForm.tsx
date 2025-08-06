@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, Alert, Button } from '@/components/ui'
+import { FormField, Alert, Button, DeadlineNotice } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
@@ -284,6 +284,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
+
+      <DeadlineNotice deadline="2025年3月31日 23:59" />
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
