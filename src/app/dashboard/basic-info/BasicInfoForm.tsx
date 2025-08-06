@@ -292,7 +292,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           基本情報の登録
         </h3>
         <p className="text-sm text-gray-600 mb-6">
-          ダンスジャンルと参加者の基本情報を入力してください。
+          ダンスジャンルとエントリーの基本情報を入力してください。
         </p>
       </div>
 
@@ -314,11 +314,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         </FormField>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">参加者情報</h3>
+          <h3 className="text-lg font-medium text-gray-900">エントリー情報</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="代表者氏名"
+              label="エントリー名"
               name="representative_name"
               value={formData.representative_name}
               onChange={(e) => handleFieldChangeWithValidation('representative_name', e.target.value)}
@@ -326,7 +326,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.representative_name || errors.representative_name}
             />
             <FormField
-              label="代表者フリガナ"
+              label="エントリー名フリガナ"
               name="representative_furigana"
               value={formData.representative_furigana}
               onChange={(e) => handleFieldChangeWithValidation('representative_furigana', e.target.value)}
