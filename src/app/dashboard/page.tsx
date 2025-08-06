@@ -818,7 +818,7 @@ export default async function DashboardPage() {
                           申請可能
                       </dd>
                       {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.applications_deadline)
+                        const deadline = getDeadlineInfo(settingsMap.optional_request_deadline)
                         if (!deadline) return null
                         return (
                           <dd className={`text-xs mt-1 ${
@@ -839,7 +839,7 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('applications_deadline') ? (
+                  {isFormEditable('optional_request_deadline') ? (
                     <Link href="/dashboard/applications" className="font-medium text-indigo-600 hover:text-indigo-500">
                       申請 →
                     </Link>
