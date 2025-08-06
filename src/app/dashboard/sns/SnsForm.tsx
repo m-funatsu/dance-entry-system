@@ -67,28 +67,8 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
   // ファイルアップロードフック（新システム）
   const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
     category: 'video',
-    onSuccess: async (result: { url?: string; path?: string }) => {
-      if (result.path) {
-        // ファイル情報をデータベースに保存
-        await saveVideoFileInfo(result.path, currentUploadField as 'practice_video' | 'introduction_highlight')
-        
-        // 署名付きURLを取得してプレビューを更新
-        const { data } = await supabase.storage
-          .from('files')
-          .createSignedUrl(result.path, 3600)
-        if (data?.signedUrl) {
-          if (currentUploadField === 'practice_video') {
-            setPracticeVideoUrl(data.signedUrl)
-          } else if (currentUploadField === 'introduction_highlight') {
-            setIntroVideoUrl(data.signedUrl)
-          }
-        }
-      }
-    },
     onError: (error: string) => showToast(error, 'error')
   })
-  
-  const [currentUploadField, setCurrentUploadField] = useState<string | null>(null)
 
   // データを読み込む
   useEffect(() => {
@@ -201,8 +181,30 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
       return
     }
 
-    setCurrentUploadField(field)
-    await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
+    try {
+      const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
+      
+      if (result.success && result.path) {
+        // ファイル情報をデータベースに保存
+        const fileData = await saveVideoFileInfo(result.path, field)
+        
+        // 署名付きURLを取得してプレビューを更新
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(result.path, 3600)
+          
+        if (data?.signedUrl) {
+          if (field === 'practice_video') {
+            setPracticeVideoUrl(data.signedUrl)
+          } else if (field === 'introduction_highlight') {
+            setIntroVideoUrl(data.signedUrl)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      showToast('アップロードに失敗しました', 'error')
+    }
   }
 
   const handleFileDelete = async (field: 'practice_video' | 'introduction_highlight') => {
