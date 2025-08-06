@@ -23,7 +23,7 @@ const sectionLabels: Record<string, string> = {
   semifinals_deadline: '準決勝情報',
   finals_deadline: '決勝情報',
   sns_deadline: 'SNS情報',
-  optional_request_deadline: '任意申請'
+  optional_request_deadline: '各種申請'
 }
 
 const sectionDescriptions: Record<string, string> = {
@@ -34,7 +34,7 @@ const sectionDescriptions: Record<string, string> = {
   semifinals_deadline: '準決勝用の音響・照明指示書',
   finals_deadline: '決勝用楽曲情報、音響・照明指示書',
   sns_deadline: 'Instagram、Twitter、Facebook情報',
-  optional_request_deadline: 'その他の申請事項'
+  optional_request_deadline: '関係者チケット、同伴申請、楽曲使用許諾申請などの各種申請'
 }
 
 export default function DeadlineSettings({ initialSettings }: DeadlineSettingsProps) {

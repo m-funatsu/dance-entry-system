@@ -10,9 +10,9 @@ interface OptionalApplicationSectionProps {
 export const OptionalApplicationSection: React.FC<OptionalApplicationSectionProps> = () => {
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium text-gray-900">任意申請</h3>
+      <h3 className="text-lg font-medium text-gray-900">各種申請</h3>
       <p className="text-sm text-gray-600">
-        今後、任意の申請事項がある場合はこちらに表示されます。
+        関係者チケット、同伴申請、楽曲使用許諾申請などの各種申請はこちらから行えます。
       </p>
     </div>
   )

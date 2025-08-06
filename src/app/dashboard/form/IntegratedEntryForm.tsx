@@ -85,7 +85,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
     { id: 'basic', label: '基本情報', required: true },
     { id: 'music', label: '楽曲情報', required: true },
     { id: 'additional', label: '追加情報' },
-    { id: 'optional', label: '任意申請' },
+    { id: 'optional', label: '各種申請' },
   ]
 
   // アップロード済みファイル数を取得
@@ -408,7 +408,7 @@ export default function IntegratedEntryForm({ userId, existingEntry, userProfile
             />
           )}
 
-          {/* 任意申請セクション */}
+          {/* 各種申請セクション */}
           {activeSection === 'optional' && (
             <OptionalApplicationSection />
           )}
