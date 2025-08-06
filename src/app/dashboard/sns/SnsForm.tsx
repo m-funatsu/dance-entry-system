@@ -111,8 +111,8 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
           .from('entry_files')
           .select('*')
           .eq('entry_id', entry.id)
-          .eq('purpose', 'sns')
-          .in('file_type', ['video'])
+          .in('purpose', ['sns_practice_video', 'sns_introduction_highlight'])
+          .eq('file_type', 'video')
         
         if (snsData) {
           // formDataを更新
@@ -126,7 +126,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
         // 動画ファイルを設定
         if (files && files.length > 0) {
           for (const file of files) {
-            if (file.field === 'practice_video') {
+            if (file.purpose === 'sns_practice_video') {
               setPracticeVideoFile(file)
               // 署名付きURLを取得
               const { data } = await supabase.storage
@@ -135,7 +135,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               if (data?.signedUrl) {
                 setPracticeVideoUrl(data.signedUrl)
               }
-            } else if (file.field === 'introduction_highlight') {
+            } else if (file.purpose === 'sns_introduction_highlight') {
               setIntroVideoFile(file)
               // 署名付きURLを取得
               const { data } = await supabase.storage
@@ -166,8 +166,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
           file_type: 'video',
           file_name: filePath.split('/').pop() || '',
           file_path: filePath,
-          purpose: 'sns',
-          field: field
+          purpose: `sns_${field}`
         })
         .select()
         .single()
