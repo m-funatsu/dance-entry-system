@@ -8,18 +8,24 @@ import { FormField, FileUploadField, Alert, Button, DeadlineNoticeAsync } from '
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
-import type { Entry, SnsFormData } from '@/lib/types'
+import type { Entry, SnsFormData, EntryFile } from '@/lib/types'
 
 interface SNSFormProps {
   userId: string
   entry: Entry | null
 }
 
-export default function SNSForm({ entry }: SNSFormProps) {
+export default function SNSForm({ entry, userId }: SNSFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
+  
+  // 動画ファイル状態管理
+  const [practiceVideoFile, setPracticeVideoFile] = useState<EntryFile | null>(null)
+  const [practiceVideoUrl, setPracticeVideoUrl] = useState<string | null>(null)
+  const [introVideoFile, setIntroVideoFile] = useState<EntryFile | null>(null)
+  const [introVideoUrl, setIntroVideoUrl] = useState<string | null>(null)
 
   // フォームの初期データ
   const initialData: SnsFormData = {
@@ -61,17 +67,28 @@ export default function SNSForm({ entry }: SNSFormProps) {
   // ファイルアップロードフック（新システム）
   const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
     category: 'video',
-    generatePath: (fileName, fileInfo) => {
-      if (!fileInfo?.entryId || !fileInfo?.field) return fileName
-      return `${fileInfo.entryId}/sns/${fileInfo.field}/${fileName}`
-    },
-    onSuccess: (result) => {
-      if (result.field && result.url) {
-        handleFieldChange(`${result.field}_path` as keyof SnsFormData, result.url)
+    onSuccess: async (result: { url?: string; path?: string }) => {
+      if (result.path) {
+        // ファイル情報をデータベースに保存
+        await saveVideoFileInfo(result.path, currentUploadField as 'practice_video' | 'introduction_highlight')
+        
+        // 署名付きURLを取得してプレビューを更新
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(result.path, 3600)
+        if (data?.signedUrl) {
+          if (currentUploadField === 'practice_video') {
+            setPracticeVideoUrl(data.signedUrl)
+          } else if (currentUploadField === 'introduction_highlight') {
+            setIntroVideoUrl(data.signedUrl)
+          }
+        }
       }
     },
-    onError: (error) => setError(error)
+    onError: (error: string) => showToast(error, 'error')
   })
+  
+  const [currentUploadField, setCurrentUploadField] = useState<string | null>(null)
 
   // データを読み込む
   useEffect(() => {
@@ -82,11 +99,20 @@ export default function SNSForm({ entry }: SNSFormProps) {
     
     const loadData = async () => {
       try {
+        // SNS情報を取得
         const { data: snsData } = await supabase
           .from('sns_info')
           .select('*')
           .eq('entry_id', entry.id)
           .maybeSingle()
+        
+        // 動画ファイル情報を取得
+        const { data: files } = await supabase
+          .from('entry_files')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .eq('purpose', 'sns')
+          .in('file_type', ['video'])
         
         if (snsData) {
           // formDataを更新
@@ -95,6 +121,31 @@ export default function SNSForm({ entry }: SNSFormProps) {
               handleFieldChange(key as keyof SnsFormData, snsData[key])
             }
           })
+        }
+        
+        // 動画ファイルを設定
+        if (files && files.length > 0) {
+          for (const file of files) {
+            if (file.field === 'practice_video') {
+              setPracticeVideoFile(file)
+              // 署名付きURLを取得
+              const { data } = await supabase.storage
+                .from('files')
+                .createSignedUrl(file.file_path, 3600)
+              if (data?.signedUrl) {
+                setPracticeVideoUrl(data.signedUrl)
+              }
+            } else if (file.field === 'introduction_highlight') {
+              setIntroVideoFile(file)
+              // 署名付きURLを取得
+              const { data } = await supabase.storage
+                .from('files')
+                .createSignedUrl(file.file_path, 3600)
+              if (data?.signedUrl) {
+                setIntroVideoUrl(data.signedUrl)
+              }
+            }
+          }
         }
       } catch {
         setError('データの読み込みに失敗しました')
@@ -106,37 +157,123 @@ export default function SNSForm({ entry }: SNSFormProps) {
     loadData()
   }, [entry?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const saveVideoFileInfo = async (filePath: string, field: 'practice_video' | 'introduction_highlight') => {
+    try {
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert({
+          entry_id: entry?.id,
+          file_type: 'video',
+          file_name: filePath.split('/').pop() || '',
+          file_path: filePath,
+          purpose: 'sns',
+          field: field
+        })
+        .select()
+        .single()
+
+      if (dbError) throw dbError
+
+      if (field === 'practice_video') {
+        setPracticeVideoFile(fileData)
+      } else {
+        setIntroVideoFile(fileData)
+      }
+      
+      showToast(`${field === 'practice_video' ? '練習風景' : '選手紹介・見所'}動画をアップロードしました`, 'success')
+      return fileData
+    } catch (error) {
+      console.error('Error saving file info:', error)
+      showToast('ファイル情報の保存に失敗しました', 'error')
+      throw error
+    }
+  }
+  
   const handleFileUpload = async (field: 'practice_video' | 'introduction_highlight', file: File) => {
     if (!entry?.id) {
       showToast('基本情報を先に保存してください', 'error')
       return
     }
 
-    // ファイル名を保存
-    handleFieldChange(`${field}_filename` as keyof SnsFormData, file.name)
-
-    // 古いファイルを削除（存在する場合）
-    const pathField = `${field}_path` as keyof SnsFormData
-    const oldPath = formData[pathField]
-    if (oldPath && typeof oldPath === 'string') {
-      // URLからパスを抽出
-      const pathMatch = oldPath.match(/files\/(.+)$/)
-      if (pathMatch) {
-        await deleteFile(pathMatch[1])
-      }
+    // 既存の動画がある場合はエラー
+    if ((field === 'practice_video' && practiceVideoFile) || 
+        (field === 'introduction_highlight' && introVideoFile)) {
+      showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
+      return
     }
 
-    // 新しいファイルをアップロード
-    await uploadVideo(file, {
-      entryId: entry.id,
-      field
-    })
+    setCurrentUploadField(field)
+    await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
+  }
+
+  const handleFileDelete = async (field: 'practice_video' | 'introduction_highlight') => {
+    const videoFile = field === 'practice_video' ? practiceVideoFile : introVideoFile
+    if (!videoFile || !window.confirm(`${field === 'practice_video' ? '練習風景' : '選手紹介・見所'}動画を削除してもよろしいですか？`)) return
+
+    try {
+      // 即座にUIを更新（楽観的更新）
+      if (field === 'practice_video') {
+        setPracticeVideoFile(null)
+        setPracticeVideoUrl(null)
+      } else {
+        setIntroVideoFile(null)
+        setIntroVideoUrl(null)
+      }
+      
+      // ストレージから削除
+      const deleteSuccess = await deleteFile(videoFile.file_path)
+      
+      if (deleteSuccess) {
+        // データベースから削除
+        const { error: dbError } = await supabase
+          .from('entry_files')
+          .delete()
+          .eq('id', videoFile.id)
+
+        if (dbError) {
+          // エラーの場合は元に戻す
+          if (field === 'practice_video') {
+            setPracticeVideoFile(videoFile)
+            // URLを再取得
+            const { data } = await supabase.storage
+              .from('files')
+              .createSignedUrl(videoFile.file_path, 3600)
+            if (data?.signedUrl) {
+              setPracticeVideoUrl(data.signedUrl)
+            }
+          } else {
+            setIntroVideoFile(videoFile)
+            // URLを再取得
+            const { data } = await supabase.storage
+              .from('files')
+              .createSignedUrl(videoFile.file_path, 3600)
+            if (data?.signedUrl) {
+              setIntroVideoUrl(data.signedUrl)
+            }
+          }
+          throw dbError
+        }
+
+        showToast(`${field === 'practice_video' ? '練習風景' : '選手紹介・見所'}動画を削除しました`, 'success')
+      } else {
+        throw new Error('ファイルの削除に失敗しました')
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      showToast('削除に失敗しました', 'error')
+    }
   }
 
   const handleSave = async (isTemporary = false) => {
     if (!entry?.id) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
+      return
+    }
+
+    // 完了登録の場合は動画が必須
+    if (!isTemporary && (!practiceVideoFile || !introVideoFile)) {
+      showToast('すべての動画をアップロードしてください', 'error')
       return
     }
 
@@ -170,42 +307,182 @@ export default function SNSForm({ entry }: SNSFormProps) {
       <div className="space-y-6">
 
         {/* 練習風景動画 */}
-        <div>
-          <FileUploadField
-            label="練習風景（約30秒）横長動画"
-            required
-            disabled={!entry || uploading}
-            value={formData.practice_video_path}
-            onChange={(file) => handleFileUpload('practice_video', file)}
-            category="video"
-            maxSizeMB={200}
-            placeholder={{
-              title: "練習風景動画をドラッグ&ドロップ",
-              formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
-            }}
-          />
-          {!formData.practice_video_path && (
-            <p className="mt-1 text-sm text-red-600">練習風景動画をアップロードしてください</p>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h4 className="text-base font-medium text-gray-900 mb-4">
+            練習風景（約30秒）横長動画 <span className="text-red-500">*</span>
+          </h4>
+          
+          {!practiceVideoFile && (
+            <p className="text-sm text-red-600 mb-4">練習風景動画のアップロードは必須です</p>
+          )}
+          
+          {practiceVideoFile ? (
+            <div className="space-y-4">
+              {/* 動画プレビュー */}
+              {practiceVideoUrl ? (
+                <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
+                  <div className="aspect-video">
+                    <video
+                      controls
+                      className="w-full h-full object-contain bg-black"
+                      src={practiceVideoUrl}
+                      key={practiceVideoFile.id}
+                    >
+                      お使いのブラウザは動画タグをサポートしていません。
+                    </video>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
+                  <p className="text-gray-500">動画を読み込んでいます...</p>
+                </div>
+              )}
+              
+              {/* ファイル情報 */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {practiceVideoFile.file_name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ビデオファイル • {practiceVideoFile.file_size && `${(practiceVideoFile.file_size / 1024 / 1024).toFixed(2)} MB`}
+                      </p>
+                      <p className="text-xs text-green-600 mt-1 flex items-center">
+                        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        アップロード完了
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleFileDelete('practice_video')}
+                    disabled={uploading}
+                    className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                    削除
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <FileUploadField
+              label="練習風景動画"
+              value={null}
+              onChange={(file) => handleFileUpload('practice_video', file)}
+              category="video"
+              disabled={uploading || !!practiceVideoFile || !entry}
+              required
+              maxSizeMB={200}
+              accept="video/*"
+              placeholder={{
+                title: "練習風景動画をドラッグ&ドロップ",
+                formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
+              }}
+            />
           )}
         </div>
 
         {/* 選手紹介・見所動画 */}
-        <div>
-          <FileUploadField
-            label="選手紹介・見所（30秒）"
-            required
-            disabled={!entry || uploading}
-            value={formData.introduction_highlight_path}
-            onChange={(file) => handleFileUpload('introduction_highlight', file)}
-            category="video"
-            maxSizeMB={100}
-            placeholder={{
-              title: "選手紹介・見所動画をドラッグ&ドロップ",
-              formats: "対応形式: MP4, MOV, AVI など（最大100MB）"
-            }}
-          />
-          {!formData.introduction_highlight_path && (
-            <p className="mt-1 text-sm text-red-600">選手紹介・見所動画をアップロードしてください</p>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h4 className="text-base font-medium text-gray-900 mb-4">
+            選手紹介・見所（30秒） <span className="text-red-500">*</span>
+          </h4>
+          
+          {!introVideoFile && (
+            <p className="text-sm text-red-600 mb-4">選手紹介・見所動画のアップロードは必須です</p>
+          )}
+          
+          {introVideoFile ? (
+            <div className="space-y-4">
+              {/* 動画プレビュー */}
+              {introVideoUrl ? (
+                <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
+                  <div className="aspect-video">
+                    <video
+                      controls
+                      className="w-full h-full object-contain bg-black"
+                      src={introVideoUrl}
+                      key={introVideoFile.id}
+                    >
+                      お使いのブラウザは動画タグをサポートしていません。
+                    </video>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
+                  <p className="text-gray-500">動画を読み込んでいます...</p>
+                </div>
+              )}
+              
+              {/* ファイル情報 */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {introVideoFile.file_name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ビデオファイル • {introVideoFile.file_size && `${(introVideoFile.file_size / 1024 / 1024).toFixed(2)} MB`}
+                      </p>
+                      <p className="text-xs text-green-600 mt-1 flex items-center">
+                        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        アップロード完了
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleFileDelete('introduction_highlight')}
+                    disabled={uploading}
+                    className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                    削除
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <FileUploadField
+              label="選手紹介・見所動画"
+              value={null}
+              onChange={(file) => handleFileUpload('introduction_highlight', file)}
+              category="video"
+              disabled={uploading || !!introVideoFile || !entry}
+              required
+              maxSizeMB={100}
+              accept="video/*"
+              placeholder={{
+                title: "選手紹介・見所動画をドラッグ&ドロップ",
+                formats: "対応形式: MP4, MOV, AVI など（最大100MB）"
+              }}
+            />
           )}
         </div>
 
