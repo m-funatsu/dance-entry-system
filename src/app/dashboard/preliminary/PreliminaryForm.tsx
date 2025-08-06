@@ -80,22 +80,24 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     onError: (error: string) => showToast(error, 'error')
   })
 
-  // 動画ファイルの状態を監視とURL取得
+  // 初回のみ動画ファイルの状態をセット
   useEffect(() => {
-    setVideoFile(preliminaryVideo)
-    if (preliminaryVideo?.file_path) {
-      // 署名付きURLを取得
-      const getVideoUrl = async () => {
-        const { data } = await supabase.storage
-          .from('files')
-          .createSignedUrl(preliminaryVideo.file_path, 3600)
-        if (data?.signedUrl) {
-          setVideoUrl(data.signedUrl)
+    if (preliminaryVideo && !videoFile) {
+      setVideoFile(preliminaryVideo)
+      if (preliminaryVideo.file_path) {
+        // 署名付きURLを取得
+        const getVideoUrl = async () => {
+          const { data } = await supabase.storage
+            .from('files')
+            .createSignedUrl(preliminaryVideo.file_path, 3600)
+          if (data?.signedUrl) {
+            setVideoUrl(data.signedUrl)
+          }
         }
+        getVideoUrl()
       }
-      getVideoUrl()
     }
-  }, [preliminaryVideo, supabase.storage])
+  }, [preliminaryVideo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -369,9 +371,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           ) : (
             <FileUploadField
               label="予選提出動画"
-              value={videoUrl}
+              value={null}
               onChange={handleFileUpload}
-              onUploadComplete={(url) => setVideoUrl(url)}
               category="video"
               disabled={uploading || !!videoFile || !entryId}
               required
