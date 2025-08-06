@@ -7,7 +7,7 @@ import { DeadlineNotice } from '@/components/ui'
 export default function ApplicationsFormDebug() {
   const [deadline, setDeadline] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [debugInfo, setDebugInfo] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
     async function fetchDeadline() {
