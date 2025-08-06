@@ -186,6 +186,12 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       <h3 className="text-lg font-semibold">各種申請</h3>
 
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
+      
+      {/* デバッグ用: 直接期限を取得 */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded p-4 text-sm">
+        <p className="font-medium">デバッグ: optional_request_deadline の確認</p>
+        <p className="text-xs">このメッセージはデバッグ用です。問題が解決したら削除されます。</p>
+      </div>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">

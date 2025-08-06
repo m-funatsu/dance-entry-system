@@ -24,13 +24,18 @@ const deadlineLabels: Record<DeadlineKey, string> = {
 export async function getDeadline(key: DeadlineKey): Promise<string | null> {
   const supabase = createClient()
   
+  console.log(`Querying deadline for key: ${key}`)
+  
   const { data, error } = await supabase
     .from('admin_settings')
     .select('value')
     .eq('key', key)
     .single()
 
+  console.log(`Query result:`, { data, error })
+
   if (error || !data?.value) {
+    console.log(`No deadline found for key: ${key}`)
     return null
   }
 

@@ -16,7 +16,9 @@ export function DeadlineNoticeAsync({ deadlineKey, className = '' }: DeadlineNot
   useEffect(() => {
     async function fetchDeadline() {
       try {
+        console.log(`Fetching deadline for key: ${deadlineKey}`)
         const fetchedDeadline = await getDeadline(deadlineKey)
+        console.log(`Fetched deadline: ${fetchedDeadline}`)
         setDeadline(fetchedDeadline)
       } catch (error) {
         console.error('Failed to fetch deadline:', error)
