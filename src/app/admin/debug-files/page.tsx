@@ -15,8 +15,12 @@ interface DebugData {
   entriesError?: unknown
   musicFiles?: Array<Record<string, unknown>>
   musicError?: unknown
+  chaserFiles?: Array<Record<string, unknown>>
+  chaserError?: unknown
+  fileTypeStats?: Array<Record<string, unknown>>
   totalEntries?: number
   totalMusicFiles?: number
+  totalChaserFiles?: number
 }
 
 export default function DebugFilesPage() {
@@ -97,6 +101,30 @@ export default function DebugFilesPage() {
               </pre>
             </div>
           )}
+        </div>
+
+        {/* Chaser Song Files */}
+        <div className="bg-white p-6 rounded-lg shadow mb-6">
+          <h2 className="text-lg font-semibold mb-4">Chaser Song Files ({data?.totalChaserFiles || 0})</h2>
+          {data?.chaserError ? (
+            <p className="text-red-600">Error: {JSON.stringify(data.chaserError)}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <pre className="text-xs bg-gray-100 p-4 rounded overflow-x-auto">
+                {JSON.stringify(data?.chaserFiles || [], null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+
+        {/* File Type Statistics */}
+        <div className="bg-white p-6 rounded-lg shadow mb-6">
+          <h2 className="text-lg font-semibold mb-4">File Type & Purpose Statistics</h2>
+          <div className="overflow-x-auto">
+            <pre className="text-xs bg-gray-100 p-4 rounded overflow-x-auto">
+              {JSON.stringify(data?.fileTypeStats || [], null, 2)}
+            </pre>
+          </div>
         </div>
 
         {/* 全エントリー */}

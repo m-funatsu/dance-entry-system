@@ -28,6 +28,19 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(10)
     
+    // purposeがchaser_songのファイルを取得
+    const { data: chaserFiles, error: chaserError } = await adminSupabase
+      .from('entry_files')
+      .select('*')
+      .eq('purpose', 'chaser_song')
+      .order('created_at', { ascending: false })
+    
+    // すべてのファイルタイプの統計
+    const { data: fileTypeStats } = await adminSupabase
+      .from('entry_files')
+      .select('file_type, purpose')
+      .order('file_type')
+    
     return NextResponse.json({
       columns: columns || [],
       columnsError,
@@ -35,8 +48,12 @@ export async function GET() {
       entriesError,
       musicFiles: musicFiles || [],
       musicError,
+      chaserFiles: chaserFiles || [],
+      chaserError,
+      fileTypeStats: fileTypeStats || [],
       totalEntries: entries?.length || 0,
-      totalMusicFiles: musicFiles?.length || 0
+      totalMusicFiles: musicFiles?.length || 0,
+      totalChaserFiles: chaserFiles?.length || 0
     })
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 })
