@@ -89,22 +89,21 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         if (semiData) {
           setSemifinalsInfo(semiData)
           
-          // 楽曲ファイル情報を取得
+          // すべてのファイル情報を取得
           const { data: filesData } = await supabase
             .from('entry_files')
             .select('*')
             .eq('entry_id', entry.id)
-            .eq('file_type', 'music')
           
-          console.log('Loading music files:', filesData)
+          console.log('Loading all files:', filesData)
           
           if (filesData && filesData.length > 0) {
             const filesMap: Record<string, EntryFile> = {}
             const urlUpdates: Record<string, string> = {}
             
             for (const file of filesData) {
-              // purposeフィールドがある場合（例：'music_data_path'）
-              if (file.purpose) {
+              // purposeフィールドがあり、音楽関連のファイルの場合
+              if (file.purpose && (file.purpose === 'music_data_path' || file.purpose === 'chaser_song')) {
                 filesMap[file.purpose] = file
                 
                 // 署名付きURLを取得
@@ -306,6 +305,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // audioFilesにない場合は、データベースから取得
       if (!fileToDelete && entry?.id) {
         console.log('File not in audioFiles, fetching from database...')
+        console.log('Looking for purpose:', field)
         const { data: filesData } = await supabase
           .from('entry_files')
           .select('*')
@@ -316,6 +316,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         if (filesData) {
           fileToDelete = filesData
           console.log('Found file in database:', fileToDelete)
+        } else {
+          console.log('No file found in database for purpose:', field)
         }
       }
       
