@@ -30,6 +30,8 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
   const [saving, setSaving] = useState(false)
   const [existingFiles, setExistingFiles] = useState<EntryFile[]>([])
   const [user, setUser] = useState<{id: string} | null>(null)
+  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({})
+  const [videoUrls, setVideoUrls] = useState<Record<string, string>>({})
 
   const fetchUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -46,6 +48,31 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
 
       if (error) throw error
       setExistingFiles(data || [])
+      
+      // 音楽ファイルと動画ファイルの署名付きURLを取得
+      if (data && data.length > 0) {
+        const newAudioUrls: Record<string, string> = {}
+        const newVideoUrls: Record<string, string> = {}
+        
+        for (const file of data) {
+          if (file.file_path) {
+            const { data: urlData } = await supabase.storage
+              .from('files')
+              .createSignedUrl(file.file_path, 3600)
+            
+            if (urlData?.signedUrl) {
+              if (file.file_type === 'music') {
+                newAudioUrls[file.id] = urlData.signedUrl
+              } else if (file.file_type === 'video') {
+                newVideoUrls[file.id] = urlData.signedUrl
+              }
+            }
+          }
+        }
+        
+        setAudioUrls(newAudioUrls)
+        setVideoUrls(newVideoUrls)
+      }
     } catch (error) {
       console.error('Error fetching files:', error)
     }
@@ -58,13 +85,34 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
 
 
   const handleDeleteFile = async (fileId: string) => {
+    if (!confirm('このファイルを削除してもよろしいですか？')) return
+
     try {
-      const { error } = await supabase
+      // まず、削除するファイルの情報を取得
+      const fileToDelete = existingFiles.find(f => f.id === fileId)
+      if (!fileToDelete) {
+        throw new Error('ファイルが見つかりません')
+      }
+
+      // ストレージからファイルを削除
+      if (fileToDelete.file_path) {
+        const { error: storageError } = await supabase.storage
+          .from('files')
+          .remove([fileToDelete.file_path])
+
+        if (storageError) {
+          console.error('Storage delete error:', storageError)
+          // ストレージの削除に失敗してもデータベースからは削除する
+        }
+      }
+
+      // データベースからレコードを削除
+      const { error: dbError } = await supabase
         .from('entry_files')
         .delete()
         .eq('id', fileId)
 
-      if (error) throw error
+      if (dbError) throw dbError
 
       showToast('ファイルを削除しました', 'success')
       fetchExistingFiles()
@@ -231,17 +279,31 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
             />
           )}
           {existingFiles.filter(f => f.file_type === 'video').map((file) => (
-            <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">予選動画: {file.file_name}</span>
+            <div key={file.id} className="mt-4 p-4 border rounded-md bg-white">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">予選動画: {file.file_name}</span>
                 <button
                   type="button"
                   onClick={() => handleDeleteFile(file.id)}
-                  className="text-red-600 hover:text-red-800 text-sm"
+                  className="text-red-600 hover:text-red-800 text-sm font-medium"
                 >
                   削除
                 </button>
               </div>
+              {videoUrls[file.id] && (
+                <div className="mt-2 aspect-video max-w-2xl">
+                  <video 
+                    controls 
+                    className="w-full h-full rounded-lg"
+                    preload="metadata"
+                  >
+                    <source src={videoUrls[file.id]} type="video/mp4" />
+                    <source src={videoUrls[file.id]} type="video/quicktime" />
+                    <source src={videoUrls[file.id]} type="video/avi" />
+                    お使いのブラウザは動画タグをサポートしていません。
+                  </video>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -280,19 +342,31 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
               />
             )}
             {existingFiles.filter(f => f.file_type === 'music' && f.purpose !== '決勝').map((file) => (
-              <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
+              <div key={file.id} className="mt-4 p-4 border rounded-md bg-white">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">
                     {formData.use_different_songs ? '準決勝用' : '準決勝・決勝共通'}: {file.file_name}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleDeleteFile(file.id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    className="text-red-600 hover:text-red-800 text-sm font-medium"
                   >
                     削除
                   </button>
                 </div>
+                {audioUrls[file.id] && (
+                  <audio 
+                    controls 
+                    className="w-full mt-2"
+                    preload="metadata"
+                  >
+                    <source src={audioUrls[file.id]} type="audio/mpeg" />
+                    <source src={audioUrls[file.id]} type="audio/wav" />
+                    <source src={audioUrls[file.id]} type="audio/aac" />
+                    お使いのブラウザは音声タグをサポートしていません。
+                  </audio>
+                )}
               </div>
             ))}
           </div>
@@ -312,17 +386,29 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
                 />
               )}
               {existingFiles.filter(f => f.file_type === 'music' && f.purpose === '決勝').map((file) => (
-                <div key={file.id} className="mt-4 p-3 border rounded-md bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">決勝用: {file.file_name}</span>
+                <div key={file.id} className="mt-4 p-4 border rounded-md bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">決勝用: {file.file_name}</span>
                     <button
                       type="button"
                       onClick={() => handleDeleteFile(file.id)}
-                      className="text-red-600 hover:text-red-800 text-sm"
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
                     >
                       削除
                     </button>
                   </div>
+                  {audioUrls[file.id] && (
+                    <audio 
+                      controls 
+                      className="w-full mt-2"
+                      preload="metadata"
+                    >
+                      <source src={audioUrls[file.id]} type="audio/mpeg" />
+                      <source src={audioUrls[file.id]} type="audio/wav" />
+                      <source src={audioUrls[file.id]} type="audio/aac" />
+                      お使いのブラウザは音声タグをサポートしていません。
+                    </audio>
+                  )}
                 </div>
               ))}
             </div>
