@@ -95,24 +95,31 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             .select('*')
             .eq('entry_id', entry.id)
             .eq('file_type', 'music')
-            .in('purpose', ['music_data_path'])
+          
+          console.log('Loading music files:', filesData)
           
           if (filesData && filesData.length > 0) {
             const filesMap: Record<string, EntryFile> = {}
             const urlUpdates: Record<string, string> = {}
             
             for (const file of filesData) {
-              filesMap[file.purpose] = file
-              
-              // 署名付きURLを取得
-              const { data: urlData } = await supabase.storage
-                .from('files')
-                .createSignedUrl(file.file_path, 3600)
-              
-              if (urlData?.signedUrl) {
-                urlUpdates[file.purpose] = urlData.signedUrl
+              // purposeが'music_data_path'または他の音楽関連フィールドの場合
+              if (file.purpose && file.purpose.includes('music')) {
+                filesMap[file.purpose] = file
+                
+                // 署名付きURLを取得
+                const { data: urlData } = await supabase.storage
+                  .from('files')
+                  .createSignedUrl(file.file_path, 3600)
+                
+                if (urlData?.signedUrl) {
+                  urlUpdates[file.purpose] = urlData.signedUrl
+                }
               }
             }
+            
+            console.log('Files map:', filesMap)
+            console.log('URL updates:', urlUpdates)
             
             setAudioFiles(filesMap)
             setSemifinalsInfo(prev => ({ ...prev, ...urlUpdates }))
@@ -233,30 +240,62 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
 
   const handleFileDelete = async (field: string) => {
     try {
-      const fileToDelete = audioFiles[field]
-      if (!fileToDelete) return
+      console.log('Deleting file for field:', field)
+      console.log('Current audioFiles:', audioFiles)
+      
+      // ファイル情報を取得（audioFilesまたはデータベースから）
+      let fileToDelete = audioFiles[field]
+      
+      // audioFilesにない場合は、データベースから取得
+      if (!fileToDelete && entry?.id) {
+        console.log('File not in audioFiles, fetching from database...')
+        const { data: filesData } = await supabase
+          .from('entry_files')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .eq('purpose', field)
+          .single()
+        
+        if (filesData) {
+          fileToDelete = filesData
+          console.log('Found file in database:', fileToDelete)
+        }
+      }
+      
+      if (!fileToDelete) {
+        console.log('No file to delete')
+        showToast('削除するファイルが見つかりません', 'error')
+        return
+      }
 
       // ストレージからファイルを削除
       if (fileToDelete.file_path) {
+        console.log('Deleting from storage:', fileToDelete.file_path)
         const { error: storageError } = await supabase.storage
           .from('files')
           .remove([fileToDelete.file_path])
 
         if (storageError) {
           console.error('Storage delete error:', storageError)
+          // ストレージエラーがあってもデータベースからは削除を試みる
         }
       }
 
       // データベースからレコードを削除
       if (fileToDelete.id) {
+        console.log('Deleting from database, id:', fileToDelete.id)
         const { error: dbError } = await supabase
           .from('entry_files')
           .delete()
           .eq('id', fileToDelete.id)
 
-        if (dbError) throw dbError
+        if (dbError) {
+          console.error('Database delete error:', dbError)
+          throw dbError
+        }
       }
 
+      // UIの状態を更新
       setSemifinalsInfo(prev => ({
         ...prev,
         [field]: ''
@@ -269,6 +308,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       })
 
       showToast('ファイルを削除しました', 'success')
+      console.log('File deleted successfully')
     } catch (err) {
       console.error('ファイル削除エラー:', err)
       showToast('ファイルの削除に失敗しました', 'error')
