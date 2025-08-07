@@ -10,6 +10,7 @@ interface FinalsMusicSectionProps {
   onChange: (updates: Partial<FinalsInfo>) => void
   onMusicChangeOption: (option: 'changed' | 'unchanged') => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete?: (field: string) => void
 }
 
 export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
@@ -18,7 +19,8 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
   validationErrors,
   onChange,
   onMusicChangeOption,
-  onFileUpload
+  onFileUpload,
+  onFileDelete
 }) => {
   return (
     <div className="space-y-4">
@@ -198,6 +200,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           label=""
           value={finalsInfo.music_data_path}
           onChange={(file) => onFileUpload('music_data_path', file)}
+          onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
           disabled={musicChangeOption === 'unchanged'}
           required={musicChangeOption === 'changed'}
         />

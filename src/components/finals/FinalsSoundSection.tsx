@@ -10,6 +10,7 @@ interface FinalsSoundSectionProps {
   onChange: (updates: Partial<FinalsInfo>) => void
   onSoundChangeOption: (option: 'same' | 'different') => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete?: (field: string) => void
 }
 
 export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
@@ -18,7 +19,8 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   validationErrors,
   onChange,
   onSoundChangeOption,
-  onFileUpload
+  onFileUpload,
+  onFileDelete
 }) => {
   return (
     <div className="space-y-4">
@@ -95,6 +97,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             label="チェイサー（退場）曲 音源"
             value={finalsInfo.chaser_song}
             onChange={(file) => onFileUpload('chaser_song', file)}
+            onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
             disabled={soundChangeOption === 'same'}
             required={soundChangeOption === 'different'}
           />

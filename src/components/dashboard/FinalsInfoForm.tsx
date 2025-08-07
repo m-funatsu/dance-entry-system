@@ -320,6 +320,47 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     }
   }
 
+  const handleFileDelete = async (field: string) => {
+    try {
+      console.log('Deleting file for field:', field)
+      
+      // ファイルパスを取得
+      const filePath = finalsInfo[field as keyof FinalsInfo] as string
+      if (!filePath) {
+        console.log('No file to delete')
+        return
+      }
+
+      // URLからファイルパスを抽出
+      const urlParts = filePath.split('/files/')
+      if (urlParts.length < 2) {
+        console.log('Invalid file path')
+        return
+      }
+      const storagePath = urlParts[1].split('?')[0]
+
+      // ストレージからファイルを削除
+      const { error: storageError } = await supabase.storage
+        .from('files')
+        .remove([storagePath])
+
+      if (storageError) {
+        console.error('Storage delete error:', storageError)
+        // ストレージエラーがあってもUIは更新する
+      }
+
+      // UIの状態を更新
+      setFinalsInfo(prev => ({
+        ...prev,
+        [field]: ''
+      }))
+
+      console.log('File deleted successfully')
+    } catch (err) {
+      console.error('ファイル削除エラー:', err)
+    }
+  }
+
   const handleFieldChange = (updates: Partial<FinalsInfo>) => {
     setFinalsInfo(prev => ({ ...prev, ...updates }))
   }
@@ -399,6 +440,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           onChange={handleFieldChange}
           onMusicChangeOption={handleMusicChangeOption}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
         />
       )}
 
@@ -410,6 +452,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           onChange={handleFieldChange}
           onSoundChangeOption={handleSoundChangeOption}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
         />
       )}
 

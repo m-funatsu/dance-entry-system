@@ -246,9 +246,9 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         [field]: fileData
       }))
       
-      // semifinals_infoテーブルのmusic_data_pathも更新
-      if (field === 'music_data_path' && entry.id) {
-        console.log('Updating semifinals_info music_data_path...')
+      // semifinals_infoテーブルの音楽関連フィールドも更新
+      if ((field === 'music_data_path' || field === 'chaser_song') && entry.id) {
+        console.log(`Updating semifinals_info ${field}...`)
         
         // まず既存のレコードがあるか確認
         const { data: existingData } = await supabase
@@ -364,9 +364,9 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         return newFiles
       })
       
-      // semifinals_infoテーブルのmusic_data_pathもクリア
-      if (field === 'music_data_path' && entry?.id) {
-        console.log('Clearing semifinals_info music_data_path...')
+      // semifinals_infoテーブルのmusic_data_pathまたはchaser_songもクリア
+      if ((field === 'music_data_path' || field === 'chaser_song') && entry?.id) {
+        console.log(`Clearing semifinals_info ${field}...`)
         const { error: updateError } = await supabase
           .from('semifinals_info')
           .update({
@@ -474,6 +474,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           validationErrors={validationErrors.sound || []}
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
         />
       )}
 

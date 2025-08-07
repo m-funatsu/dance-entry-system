@@ -8,13 +8,15 @@ interface SoundSectionProps {
   validationErrors: string[]
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete?: (field: string) => void
 }
 
 export const SoundSection: React.FC<SoundSectionProps> = ({
   semifinalsInfo,
   validationErrors,
   onChange,
-  onFileUpload
+  onFileUpload,
+  onFileDelete
 }) => {
   return (
     <div className="space-y-4">
@@ -91,6 +93,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
             label="チェイサー（退場）曲音源"
             value={semifinalsInfo.chaser_song}
             onChange={(file) => onFileUpload('chaser_song', file)}
+            onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
             required
           />
         </div>
