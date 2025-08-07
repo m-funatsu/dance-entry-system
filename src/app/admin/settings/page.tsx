@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 interface Settings {
-  entry_deadline: string
-  upload_deadline: string
   max_file_size: string
   max_files_per_type: string
   email_notifications: string
@@ -16,9 +14,6 @@ interface Settings {
   competition_year: string
   competition_date: string
   competition_venue: string
-  application_start_date: string
-  application_end_date: string
-  announcement_date: string
   max_entries: string
   // 各フォームごとの期限
   basic_info_deadline: string
@@ -31,8 +26,6 @@ interface Settings {
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings>({
-    entry_deadline: '',
-    upload_deadline: '',
     max_file_size: '100',
     max_files_per_type: '5',
     email_notifications: 'true',
@@ -43,9 +36,6 @@ export default function AdminSettingsPage() {
     competition_year: '2025',
     competition_date: '',
     competition_venue: '',
-    application_start_date: '',
-    application_end_date: '',
-    announcement_date: '',
     max_entries: '100',
     basic_info_deadline: '',
     music_info_deadline: '',
@@ -305,62 +295,6 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
 
-                {/* エントリー期限設定 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">エントリー期限</h3>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        エントリー受付開始日時
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.application_start_date}
-                        onChange={(e) => handleChange('application_start_date', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        エントリー受付終了日時
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.entry_deadline}
-                        onChange={(e) => handleChange('entry_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        この日時以降、新規エントリーの受付を停止します
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        ファイルアップロード期限
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.upload_deadline}
-                        onChange={(e) => handleChange('upload_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        この日時以降、ファイルのアップロードを停止します
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        選考結果発表日
-                      </label>
-                      <input
-                        type="date"
-                        value={settings.announcement_date}
-                        onChange={(e) => handleChange('announcement_date', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
 
                 {/* 各フォームごとの期限設定 */}
                 <div className="border border-gray-200 rounded-lg p-6">
