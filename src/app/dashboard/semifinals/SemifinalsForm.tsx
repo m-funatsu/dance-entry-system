@@ -101,9 +101,13 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             const filesMap: Record<string, EntryFile> = {}
             const urlUpdates: Record<string, string> = {}
             
+            // デバッグ: すべてのファイルのpurposeをログ出力
+            console.log('File purposes:', filesData.map(f => ({ id: f.id, purpose: f.purpose, file_type: f.file_type, file_name: f.file_name })))
+            
             for (const file of filesData) {
               // purposeフィールドがあり、音楽関連のファイルの場合
-              if (file.purpose && (file.purpose === 'music_data_path' || file.purpose === 'chaser_song')) {
+              if (file.purpose && (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') && (file.file_type === 'music' || file.file_type === 'audio')) {
+                console.log(`Found ${file.purpose} file:`, file)
                 filesMap[file.purpose] = file
                 
                 // 署名付きURLを取得
@@ -215,6 +219,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         purpose: field
       }
       console.log('Inserting to database:', insertData)
+      console.log('Field value for purpose:', field)
       
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
