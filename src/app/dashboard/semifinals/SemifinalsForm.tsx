@@ -105,18 +105,50 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             console.log('File purposes:', filesData.map(f => ({ id: f.id, purpose: f.purpose, file_type: f.file_type, file_name: f.file_name })))
             
             for (const file of filesData) {
-              // purposeフィールドがあり、音楽関連のファイルの場合
-              if (file.purpose && (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') && (file.file_type === 'music' || file.file_type === 'audio')) {
-                console.log(`Found ${file.purpose} file:`, file)
-                filesMap[file.purpose] = file
-                
-                // 署名付きURLを取得
-                const { data: urlData } = await supabase.storage
-                  .from('files')
-                  .createSignedUrl(file.file_path, 3600)
-                
-                if (urlData?.signedUrl) {
-                  urlUpdates[file.purpose] = urlData.signedUrl
+              // 音楽関連のファイルを適切なフィールドにマッピング
+              if (file.file_type === 'music' || file.file_type === 'audio') {
+                // purposeが設定されている場合はそれを使用
+                if (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') {
+                  console.log(`Found ${file.purpose} file:`, file)
+                  filesMap[file.purpose] = file
+                  
+                  // 署名付きURLを取得
+                  const { data: urlData } = await supabase.storage
+                    .from('files')
+                    .createSignedUrl(file.file_path, 3600)
+                  
+                  if (urlData?.signedUrl) {
+                    urlUpdates[file.purpose] = urlData.signedUrl
+                  }
+                }
+                // purposeがnullまたは空の場合、ファイル名から推測
+                else if (!file.purpose || file.purpose === null) {
+                  // ファイルパスから目的を推測
+                  if (file.file_path.includes('chaser_song')) {
+                    console.log('Found chaser_song file (by path):', file)
+                    filesMap['chaser_song'] = file
+                    
+                    // 署名付きURLを取得
+                    const { data: urlData } = await supabase.storage
+                      .from('files')
+                      .createSignedUrl(file.file_path, 3600)
+                    
+                    if (urlData?.signedUrl) {
+                      urlUpdates['chaser_song'] = urlData.signedUrl
+                    }
+                  } else if (file.file_path.includes('music_data_path')) {
+                    console.log('Found music_data_path file (by path):', file)
+                    filesMap['music_data_path'] = file
+                    
+                    // 署名付きURLを取得
+                    const { data: urlData } = await supabase.storage
+                      .from('files')
+                      .createSignedUrl(file.file_path, 3600)
+                    
+                    if (urlData?.signedUrl) {
+                      urlUpdates['music_data_path'] = urlData.signedUrl
+                    }
+                  }
                 }
               }
             }
@@ -311,24 +343,41 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       if (!fileToDelete && entry?.id) {
         console.log('File not in audioFiles, fetching from database...')
         console.log('Looking for purpose:', field)
-        const { data: filesData } = await supabase
+        
+        // まずpurposeフィールドで検索
+        let { data: filesData } = await supabase
           .from('entry_files')
           .select('*')
           .eq('entry_id', entry.id)
           .eq('purpose', field)
           .maybeSingle()
         
+        // purposeで見つからない場合、ファイルパスで検索
+        if (!filesData) {
+          console.log('Not found by purpose, searching by file path...')
+          const { data: allFiles } = await supabase
+            .from('entry_files')
+            .select('*')
+            .eq('entry_id', entry.id)
+            .in('file_type', ['music', 'audio'])
+          
+          if (allFiles) {
+            // ファイルパスにフィールド名が含まれているものを探す
+            filesData = allFiles.find(f => f.file_path.includes(field))
+          }
+        }
+        
         if (filesData) {
           fileToDelete = filesData
           console.log('Found file in database:', fileToDelete)
         } else {
-          console.log('No file found in database for purpose:', field)
+          console.log('No file found in database for field:', field)
         }
       }
       
       if (!fileToDelete) {
         console.log('No file to delete')
-        showToast('削除するファイルが見つかりません', 'error')
+        // エラーメッセージを表示しない（ファイルがない場合は正常）
         return
       }
 

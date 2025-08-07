@@ -518,7 +518,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         <div className="space-x-4">
           <TemporarySaveButton
             onClick={() => handleSave(true)}
-            disabled={saving || uploading || !isAllRequiredFieldsValid(formData)}
+            disabled={saving || uploading}
             loading={saving}
           />
           <SaveButton
