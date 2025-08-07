@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 interface Settings {
-  max_file_size: string
-  max_files_per_type: string
   email_notifications: string
   admin_email: string
   site_title: string
@@ -14,15 +12,12 @@ interface Settings {
   competition_year: string
   competition_date: string
   competition_venue: string
-  max_entries: string
   // ファビコン設定
   favicon_url: string
 }
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings>({
-    max_file_size: '100',
-    max_files_per_type: '5',
     email_notifications: 'true',
     admin_email: '',
     site_title: '2025 バルカーカップ ダンスエントリーシステム',
@@ -31,7 +26,6 @@ export default function AdminSettingsPage() {
     competition_year: '2025',
     competition_date: '',
     competition_venue: '',
-    max_entries: '100',
     favicon_url: ''
   })
   const [isLoading, setIsLoading] = useState(true)
@@ -288,53 +282,6 @@ export default function AdminSettingsPage() {
 
 
 
-                {/* ファイル制限設定 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">ファイル制限</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        最大ファイルサイズ (MB)
-                      </label>
-                      <input
-                        type="number"
-                        value={settings.max_file_size}
-                        onChange={(e) => handleChange('max_file_size', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        ファイル数制限（種類ごと）
-                      </label>
-                      <input
-                        type="number"
-                        value={settings.max_files_per_type}
-                        onChange={(e) => handleChange('max_files_per_type', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* エントリー制限設定 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">エントリー制限</h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      最大エントリー数
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.max_entries}
-                      onChange={(e) => handleChange('max_entries', e.target.value)}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      この数に達するとエントリーを自動的に締め切ります（0で無制限）
-                    </p>
-                  </div>
-                </div>
 
                 {/* メール設定 */}
                 <div className="border border-gray-200 rounded-lg p-6">
