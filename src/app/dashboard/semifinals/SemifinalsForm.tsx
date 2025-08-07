@@ -249,16 +249,42 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // semifinals_infoテーブルのmusic_data_pathも更新
       if (field === 'music_data_path' && entry.id) {
         console.log('Updating semifinals_info music_data_path...')
-        const { error: updateError } = await supabase
-          .from('semifinals_info')
-          .upsert({
-            entry_id: entry.id,
-            [field]: fileName
-          })
-          .eq('entry_id', entry.id)
         
-        if (updateError) {
-          console.error('Error updating semifinals_info:', updateError)
+        // まず既存のレコードがあるか確認
+        const { data: existingData } = await supabase
+          .from('semifinals_info')
+          .select('id')
+          .eq('entry_id', entry.id)
+          .maybeSingle()
+        
+        if (existingData) {
+          // 既存レコードがある場合は更新
+          const { error: updateError } = await supabase
+            .from('semifinals_info')
+            .update({
+              [field]: fileName
+            })
+            .eq('entry_id', entry.id)
+          
+          if (updateError) {
+            console.error('Error updating semifinals_info:', updateError)
+          } else {
+            console.log('Updated semifinals_info successfully')
+          }
+        } else {
+          // 既存レコードがない場合は作成
+          const { error: insertError } = await supabase
+            .from('semifinals_info')
+            .insert({
+              entry_id: entry.id,
+              [field]: fileName
+            })
+          
+          if (insertError) {
+            console.error('Error inserting semifinals_info:', insertError)
+          } else {
+            console.log('Inserted semifinals_info successfully')
+          }
         }
       }
 
