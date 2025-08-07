@@ -13,14 +13,14 @@ import {
   isSemifinalsAllRequiredFieldsValid,
   semifinalsSections 
 } from '@/utils/semifinalsValidation'
-import type { Entry, SemifinalsInfo, BasicInfo, PreliminaryInfo } from '@/lib/types'
+import type { Entry, SemifinalsInfo, BasicInfo, PreliminaryInfo, EntryFile } from '@/lib/types'
 
 interface SemifinalsFormProps {
   userId: string
   entry: Entry | null
 }
 
-export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
+export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
@@ -30,6 +30,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
+  const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
@@ -87,6 +88,35 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
         
         if (semiData) {
           setSemifinalsInfo(semiData)
+          
+          // 楽曲ファイル情報を取得
+          const { data: filesData } = await supabase
+            .from('entry_files')
+            .select('*')
+            .eq('entry_id', entry.id)
+            .eq('file_type', 'music')
+            .in('purpose', ['music_data_path'])
+          
+          if (filesData && filesData.length > 0) {
+            const filesMap: Record<string, EntryFile> = {}
+            const urlUpdates: Record<string, string> = {}
+            
+            for (const file of filesData) {
+              filesMap[file.purpose] = file
+              
+              // 署名付きURLを取得
+              const { data: urlData } = await supabase.storage
+                .from('files')
+                .createSignedUrl(file.file_path, 3600)
+              
+              if (urlData?.signedUrl) {
+                urlUpdates[file.purpose] = urlData.signedUrl
+              }
+            }
+            
+            setAudioFiles(filesMap)
+            setSemifinalsInfo(prev => ({ ...prev, ...urlUpdates }))
+          }
         } else {
           // 新規作成時の初期設定
           const initialData: Partial<SemifinalsInfo> = {
@@ -145,8 +175,18 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
   const handleFileUpload = async (field: string, file: File) => {
     try {
+      if (!entry?.id) {
+        showToast('基本情報を先に保存してください', 'error')
+        return
+      }
+
+      // 既存のファイルがある場合は削除
+      if (audioFiles[field]) {
+        await handleFileDelete(field)
+      }
+
       const fileExt = file.name.split('.').pop()
-      const fileName = `${entry?.id}/semifinals/${field}_${Date.now()}.${fileExt}`
+      const fileName = `${userId}/${entry.id}/semifinals/${field}_${Date.now()}.${fileExt}`
       
       const { error: uploadError } = await supabase.storage
         .from('files')
@@ -154,17 +194,84 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
 
       if (uploadError) throw uploadError
 
-      const { data: { publicUrl } } = supabase.storage
+      // ファイル情報をデータベースに保存
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert({
+          entry_id: entry.id,
+          file_type: 'music',
+          file_name: file.name,
+          file_path: fileName,
+          purpose: field
+        })
+        .select()
+        .single()
+
+      if (dbError) throw dbError
+
+      // 署名付きURLを取得
+      const { data: urlData } = await supabase.storage
         .from('files')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 3600)
 
       setSemifinalsInfo(prev => ({
         ...prev,
-        [field]: publicUrl
+        [field]: urlData?.signedUrl || ''
       }))
+
+      setAudioFiles(prev => ({
+        ...prev,
+        [field]: fileData
+      }))
+
+      showToast('ファイルをアップロードしました', 'success')
     } catch (err) {
       console.error('ファイルアップロードエラー:', err)
       showToast('ファイルのアップロードに失敗しました', 'error')
+    }
+  }
+
+  const handleFileDelete = async (field: string) => {
+    try {
+      const fileToDelete = audioFiles[field]
+      if (!fileToDelete) return
+
+      // ストレージからファイルを削除
+      if (fileToDelete.file_path) {
+        const { error: storageError } = await supabase.storage
+          .from('files')
+          .remove([fileToDelete.file_path])
+
+        if (storageError) {
+          console.error('Storage delete error:', storageError)
+        }
+      }
+
+      // データベースからレコードを削除
+      if (fileToDelete.id) {
+        const { error: dbError } = await supabase
+          .from('entry_files')
+          .delete()
+          .eq('id', fileToDelete.id)
+
+        if (dbError) throw dbError
+      }
+
+      setSemifinalsInfo(prev => ({
+        ...prev,
+        [field]: ''
+      }))
+
+      setAudioFiles(prev => {
+        const newFiles = { ...prev }
+        delete newFiles[field]
+        return newFiles
+      })
+
+      showToast('ファイルを削除しました', 'success')
+    } catch (err) {
+      console.error('ファイル削除エラー:', err)
+      showToast('ファイルの削除に失敗しました', 'error')
     }
   }
 
@@ -245,6 +352,7 @@ export default function SemifinalsForm({ entry }: SemifinalsFormProps) {
           validationErrors={validationErrors.music || []}
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
         />
       )}
 

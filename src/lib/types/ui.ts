@@ -45,6 +45,7 @@ export interface FileUploadProps {
   label?: string
   value?: string | File | null
   onChange: (file: File) => void
+  onDelete?: () => void
   disabled?: boolean
   required?: boolean
   maxSizeMB?: number

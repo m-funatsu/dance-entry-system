@@ -9,6 +9,7 @@ interface MusicSectionProps {
   validationErrors: string[]
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete?: (field: string) => void
 }
 
 export const MusicSection: React.FC<MusicSectionProps> = ({
@@ -16,7 +17,8 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
   preliminaryInfo,
   validationErrors,
   onChange,
-  onFileUpload
+  onFileUpload,
+  onFileDelete
 }) => {
   const handleMusicChange = (useSameMusic: boolean) => {
     if (useSameMusic) {
@@ -233,6 +235,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           label="楽曲データ"
           value={semifinalsInfo.music_data_path}
           onChange={(file) => onFileUpload('music_data_path', file)}
+          onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
           required
         />
       </div>
