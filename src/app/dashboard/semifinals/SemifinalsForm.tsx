@@ -235,6 +235,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         .from('files')
         .createSignedUrl(fileName, 3600)
 
+      // UIの状態を更新
       setSemifinalsInfo(prev => ({
         ...prev,
         [field]: urlData?.signedUrl || ''
@@ -244,6 +245,22 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         ...prev,
         [field]: fileData
       }))
+      
+      // semifinals_infoテーブルのmusic_data_pathも更新
+      if (field === 'music_data_path' && entry.id) {
+        console.log('Updating semifinals_info music_data_path...')
+        const { error: updateError } = await supabase
+          .from('semifinals_info')
+          .upsert({
+            entry_id: entry.id,
+            [field]: fileName
+          })
+          .eq('entry_id', entry.id)
+        
+        if (updateError) {
+          console.error('Error updating semifinals_info:', updateError)
+        }
+      }
 
       showToast('ファイルをアップロードしました', 'success')
     } catch (err) {
@@ -320,6 +337,21 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         delete newFiles[field]
         return newFiles
       })
+      
+      // semifinals_infoテーブルのmusic_data_pathもクリア
+      if (field === 'music_data_path' && entry?.id) {
+        console.log('Clearing semifinals_info music_data_path...')
+        const { error: updateError } = await supabase
+          .from('semifinals_info')
+          .update({
+            [field]: null
+          })
+          .eq('entry_id', entry.id)
+        
+        if (updateError) {
+          console.error('Error updating semifinals_info:', updateError)
+        }
+      }
 
       showToast('ファイルを削除しました', 'success')
       console.log('File deleted successfully')
