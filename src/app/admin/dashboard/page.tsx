@@ -280,7 +280,7 @@ export default async function AdminDashboardPage() {
                         システム設定
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        期限・制限など
+                        大会情報・通知設定
                       </dd>
                     </dl>
                   </div>
