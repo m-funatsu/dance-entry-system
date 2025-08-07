@@ -103,8 +103,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             const urlUpdates: Record<string, string> = {}
             
             for (const file of filesData) {
-              // purposeが'music_data_path'または他の音楽関連フィールドの場合
-              if (file.purpose && file.purpose.includes('music')) {
+              // purposeフィールドがある場合（例：'music_data_path'）
+              if (file.purpose) {
                 filesMap[file.purpose] = file
                 
                 // 署名付きURLを取得
@@ -182,6 +182,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
 
   const handleFileUpload = async (field: string, file: File) => {
     try {
+      console.log('Uploading file for field:', field, 'File:', file.name)
+      
       if (!entry?.id) {
         showToast('基本情報を先に保存してください', 'error')
         return
@@ -195,26 +197,38 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       const fileExt = file.name.split('.').pop()
       const fileName = `${userId}/${entry.id}/semifinals/${field}_${Date.now()}.${fileExt}`
       
+      console.log('Uploading to storage path:', fileName)
       const { error: uploadError } = await supabase.storage
         .from('files')
         .upload(fileName, file)
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        throw uploadError
+      }
 
       // ファイル情報をデータベースに保存
+      const insertData = {
+        entry_id: entry.id,
+        file_type: 'music',
+        file_name: file.name,
+        file_path: fileName,
+        purpose: field
+      }
+      console.log('Inserting to database:', insertData)
+      
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
-        .insert({
-          entry_id: entry.id,
-          file_type: 'music',
-          file_name: file.name,
-          file_path: fileName,
-          purpose: field
-        })
+        .insert(insertData)
         .select()
         .single()
 
-      if (dbError) throw dbError
+      if (dbError) {
+        console.error('Database insert error:', dbError)
+        throw dbError
+      }
+      
+      console.log('File data saved:', fileData)
 
       // 署名付きURLを取得
       const { data: urlData } = await supabase.storage
@@ -254,7 +268,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           .select('*')
           .eq('entry_id', entry.id)
           .eq('purpose', field)
-          .single()
+          .maybeSingle()
         
         if (filesData) {
           fileToDelete = filesData
