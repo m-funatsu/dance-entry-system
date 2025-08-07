@@ -15,11 +15,6 @@ interface Settings {
   competition_date: string
   competition_venue: string
   max_entries: string
-  // 各フォームごとの期限
-  basic_info_deadline: string
-  music_info_deadline: string
-  additional_info_deadline: string
-  optional_request_deadline: string
   // ファビコン設定
   favicon_url: string
 }
@@ -37,10 +32,6 @@ export default function AdminSettingsPage() {
     competition_date: '',
     competition_venue: '',
     max_entries: '100',
-    basic_info_deadline: '',
-    music_info_deadline: '',
-    additional_info_deadline: '',
-    optional_request_deadline: '',
     favicon_url: ''
   })
   const [isLoading, setIsLoading] = useState(true)
@@ -296,68 +287,6 @@ export default function AdminSettingsPage() {
                 </div>
 
 
-                {/* 各フォームごとの期限設定 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">各フォームごとの期限設定</h3>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        基本情報フォーム期限
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.basic_info_deadline}
-                        onChange={(e) => handleChange('basic_info_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        基本情報（代表者名、パートナー名、ダンスジャンル等）の入力期限
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        楽曲情報フォーム期限
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.music_info_deadline}
-                        onChange={(e) => handleChange('music_info_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        楽曲情報（楽曲タイトル、アーティスト、作品テーマ等）の入力期限
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        追加情報フォーム期限
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.additional_info_deadline}
-                        onChange={(e) => handleChange('additional_info_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        追加情報（協賛企業、備考、ファイルアップロード）の入力期限
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        任意申請フォーム期限
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={settings.optional_request_deadline}
-                        onChange={(e) => handleChange('optional_request_deadline', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                      <p className="mt-1 text-sm text-gray-500">
-                        任意申請の入力期限
-                      </p>
-                    </div>
-                  </div>
-                </div>
 
                 {/* ファイル制限設定 */}
                 <div className="border border-gray-200 rounded-lg p-6">
