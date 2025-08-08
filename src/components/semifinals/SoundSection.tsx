@@ -92,8 +92,14 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
           <AudioUpload
             label="チェイサー（退場）曲音源"
             value={semifinalsInfo.chaser_song}
-            onChange={(file) => onFileUpload('chaser_song', file)}
-            onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
+            onChange={(file) => {
+              console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
+              onFileUpload('chaser_song', file)
+            }}
+            onDelete={onFileDelete ? () => {
+              console.log('[SOUND SECTION] Deleting chaser_song')
+              onFileDelete('chaser_song')
+            } : undefined}
             required
           />
         </div>
