@@ -80,24 +80,44 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     onError: (error: string) => showToast(error, 'error')
   })
 
-  // 初回のみ動画ファイルの状態をセット
+  // 動画ファイルの状態と署名付きURLを管理
   useEffect(() => {
-    if (preliminaryVideo && !videoFile) {
+    if (preliminaryVideo) {
+      console.log('[VIDEO] Setting video file from preliminaryVideo:', preliminaryVideo)
       setVideoFile(preliminaryVideo)
+      
       if (preliminaryVideo.file_path) {
+        console.log('[VIDEO] Fetching signed URL for:', preliminaryVideo.file_path)
         // 署名付きURLを取得
         const getVideoUrl = async () => {
-          const { data } = await supabase.storage
-            .from('files')
-            .createSignedUrl(preliminaryVideo.file_path, 3600)
-          if (data?.signedUrl) {
-            setVideoUrl(data.signedUrl)
+          try {
+            const { data, error } = await supabase.storage
+              .from('files')
+              .createSignedUrl(preliminaryVideo.file_path, 3600)
+            
+            if (error) {
+              console.error('[VIDEO] Error getting signed URL:', error)
+              return
+            }
+            
+            if (data?.signedUrl) {
+              console.log('[VIDEO] Got signed URL successfully')
+              setVideoUrl(data.signedUrl)
+            } else {
+              console.warn('[VIDEO] No signed URL returned')
+            }
+          } catch (err) {
+            console.error('[VIDEO] Exception getting signed URL:', err)
           }
         }
         getVideoUrl()
+      } else {
+        console.log('[VIDEO] No file_path in preliminaryVideo')
       }
+    } else {
+      console.log('[VIDEO] No preliminaryVideo provided')
     }
-  }, [preliminaryVideo]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [preliminaryVideo?.id, preliminaryVideo?.file_path]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -294,7 +314,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                       controls
                       className="w-full h-full object-contain bg-black"
                       src={videoUrl}
-                      key={videoFile.id}
+                      key={`${videoFile.id}_${videoUrl}`}
                     >
                       お使いのブラウザは動画タグをサポートしていません。
                     </video>
@@ -302,7 +322,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                 </div>
               ) : (
                 <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
-                  <p className="text-gray-500">動画を読み込んでいます...</p>
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <svg className="animate-spin h-8 w-8 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p className="text-gray-500">動画を読み込んでいます...</p>
+                  </div>
                 </div>
               )}
               
