@@ -342,6 +342,17 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       let fileToDelete = audioFiles[field]
       console.log('[DELETE DEBUG] File from audioFiles:', fileToDelete)
       
+      // URLからファイルパスを抽出する関数
+      const extractFilePathFromUrl = (url: string): string | null => {
+        if (!url) return null
+        // Supabase URLからファイルパスを抽出
+        const match = url.match(/files\/(.*?)(\?|$)/)
+        if (match && match[1]) {
+          return decodeURIComponent(match[1])
+        }
+        return null
+      }
+      
       // audioFilesにない場合は、データベースから取得
       if (!fileToDelete && entry?.id) {
         console.log('[DELETE DEBUG] File not in audioFiles, searching database...')
@@ -380,6 +391,29 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         
         if (fileToDeleteFromDb) {
           fileToDelete = fileToDeleteFromDb
+        }
+      }
+      
+      // それでも見つからない場合、URLから直接ファイルパスを取得
+      let filePathToDelete: string | null = null
+      if (!fileToDelete && semifinalsInfo[field as keyof SemifinalsInfo]) {
+        const fieldValue = semifinalsInfo[field as keyof SemifinalsInfo]
+        if (typeof fieldValue === 'string' && fieldValue.includes('supabase.co')) {
+          filePathToDelete = extractFilePathFromUrl(fieldValue)
+          console.log('[DELETE DEBUG] Extracted file path from URL:', filePathToDelete)
+          
+          if (filePathToDelete) {
+            // 仮のファイル情報を作成（ストレージから削除するため）
+            fileToDelete = {
+              id: null,
+              file_path: filePathToDelete,
+              file_name: filePathToDelete.split('/').pop() || '',
+              entry_id: entry?.id || '',
+              file_type: 'audio',
+              purpose: field
+            } as EntryFile
+            console.log('[DELETE DEBUG] Created pseudo file object from URL')
+          }
         }
       }
       
