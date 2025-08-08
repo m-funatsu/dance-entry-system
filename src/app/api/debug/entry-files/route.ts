@@ -41,6 +41,19 @@ export async function GET() {
       .select('file_type, purpose')
       .order('file_type')
     
+    // 特定のentry_idのファイルを取得（デバッグ用）
+    const testEntryId = '5337bafd-fc2b-4ae3-ac3c-4e8c31e12fab'
+    const { data: specificEntryFiles } = await adminSupabase
+      .from('entry_files')
+      .select('*')
+      .eq('entry_id', testEntryId)
+    
+    // file_pathにchaser_songを含むファイルを検索
+    const { data: chaserPathFiles } = await adminSupabase
+      .from('entry_files')
+      .select('*')
+      .like('file_path', '%chaser_song%')
+    
     return NextResponse.json({
       columns: columns || [],
       columnsError,
@@ -51,9 +64,13 @@ export async function GET() {
       chaserFiles: chaserFiles || [],
       chaserError,
       fileTypeStats: fileTypeStats || [],
+      specificEntryFiles: specificEntryFiles || [],
+      chaserPathFiles: chaserPathFiles || [],
       totalEntries: entries?.length || 0,
       totalMusicFiles: musicFiles?.length || 0,
-      totalChaserFiles: chaserFiles?.length || 0
+      totalChaserFiles: chaserFiles?.length || 0,
+      totalSpecificEntryFiles: specificEntryFiles?.length || 0,
+      totalChaserPathFiles: chaserPathFiles?.length || 0
     })
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 })
