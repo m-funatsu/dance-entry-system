@@ -33,8 +33,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
-    choreographer: initialData?.choreographer || '',
-    choreographer_furigana: initialData?.choreographer_furigana || '',
     agreement_checked: initialData?.agreement_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   }
@@ -81,20 +79,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           return true
         }
       },
-      choreographer: { required: false, maxLength: 50 },
-      choreographer_furigana: {
-        required: false,
-        custom: (value: unknown) => {
-          // 振付師が入力されている場合のみカタカナチェック
-          if (formData.choreographer && value) {
-            const pattern = /^[\u30A0-\u30FF\s]+$/
-            if (!pattern.test(String(value))) {
-              return '振付師フリガナはカタカナで入力してください'
-            }
-          }
-          return true
-        }
-      }
     } as Record<string, {
       required?: boolean
       pattern?: RegExp
@@ -374,25 +358,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             required
             placeholder="090-1234-5678"
             error={fieldErrors.phone_number || errors.phone_number}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            label="振付師氏名"
-            name="choreographer"
-            value={formData.choreographer || ''}
-            onChange={(e) => handleFieldChangeWithValidation('choreographer', e.target.value)}
-            placeholder="振付師の氏名"
-            error={fieldErrors.choreographer}
-          />
-          <FormField
-            label="振付師フリガナ"
-            name="choreographer_furigana"
-            value={formData.choreographer_furigana || ''}
-            onChange={(e) => handleFieldChangeWithValidation('choreographer_furigana', e.target.value)}
-            placeholder="カタカナで入力"
-            error={fieldErrors.choreographer_furigana}
           />
         </div>
 

@@ -28,8 +28,6 @@ export interface BasicInfoFormData extends BaseFormData {
   partner_name?: string
   partner_furigana?: string
   phone_number: string
-  choreographer?: string
-  choreographer_furigana?: string
   agreement_checked: boolean
   privacy_policy_checked: boolean
 }
