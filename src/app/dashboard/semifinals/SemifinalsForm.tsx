@@ -342,13 +342,37 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       let fileToDelete = audioFiles[field]
       console.log('[DELETE DEBUG] File from audioFiles:', fileToDelete)
       
-      // URLからファイルパスを抽出する関数
+      // URLからファイルパスを抽出する関数（セキュリティチェック付き）
       const extractFilePathFromUrl = (url: string): string | null => {
         if (!url) return null
+        
+        // URLが自分のSupabaseプロジェクトのものか確認
+        if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
+          console.error('[SECURITY] Invalid URL domain')
+          return null
+        }
+        
         // Supabase URLからファイルパスを抽出
         const match = url.match(/files\/(.*?)(\?|$)/)
         if (match && match[1]) {
-          return decodeURIComponent(match[1])
+          const filePath = decodeURIComponent(match[1])
+          
+          // パス走査攻撃を防ぐ
+          if (filePath.includes('../') || filePath.includes('..\\')) {
+            console.error('[SECURITY] Path traversal detected')
+            return null
+          }
+          
+          // ユーザーIDとエントリーIDが含まれているか確認
+          if (userId && entry?.id) {
+            const expectedPathPrefix = `${userId}/${entry.id}/`
+            if (!filePath.startsWith(expectedPathPrefix)) {
+              console.error('[SECURITY] File path does not match user/entry')
+              return null
+            }
+          }
+          
+          return filePath
         }
         return null
       }
@@ -425,11 +449,22 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       
       console.log('[DELETE DEBUG] File to delete:', fileToDelete)
 
-      // ストレージからファイルを削除
+      // ストレージからファイルを削除（追加の安全性チェック）
       if (fileToDelete.file_path) {
+        // 削除前の最終確認：パスが正しいユーザー/エントリーのものか
+        const pathToDelete = fileToDelete.file_path
+        const isValidPath = userId && entry?.id && 
+                           pathToDelete.startsWith(`${userId}/${entry.id}/`)
+        
+        if (!isValidPath) {
+          console.error('[SECURITY] Attempted to delete file outside user scope')
+          showToast('ファイルの削除に失敗しました（権限エラー）', 'error')
+          return
+        }
+        
         const { error: storageError } = await supabase.storage
           .from('files')
-          .remove([fileToDelete.file_path])
+          .remove([pathToDelete])
 
         if (storageError) {
           console.error('Storage delete error:', storageError)
