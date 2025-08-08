@@ -298,46 +298,135 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
 
   const handleFileUpload = async (field: string, file: File) => {
     try {
+      console.log('[UPLOAD] Starting upload for field:', field)
+      
+      // 既存のファイルがある場合は先に削除
+      if (finalsInfo[field as keyof FinalsInfo]) {
+        await handleFileDelete(field)
+      }
+      
       const fileExt = file.name.split('.').pop()
       const fileName = `${entry.id}/finals/${field}_${Date.now()}.${fileExt}`
+      
+      console.log('[UPLOAD] Uploading to:', fileName)
       
       const { error: uploadError } = await supabase.storage
         .from('files')
         .upload(fileName, file)
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        console.error('[UPLOAD] Storage upload error:', uploadError)
+        throw uploadError
+      }
 
+      // ファイル情報をデータベースに保存
+      const fileType = field === 'choreographer_photo_path' ? 'photo' : 
+                      field.includes('image') ? 'photo' : 'audio'
+      
+      const insertData = {
+        entry_id: entry.id,
+        file_type: fileType,
+        file_name: file.name,
+        file_path: fileName,
+        purpose: field,
+        uploaded_at: new Date().toISOString()
+      }
+      
+      console.log('[UPLOAD] Saving to database:', insertData)
+      
+      const { error: dbError } = await supabase
+        .from('entry_files')
+        .insert(insertData)
+      
+      if (dbError) {
+        console.log('[UPLOAD] Database insert error (may already exist):', dbError)
+      }
+
+      // URLを取得
       const { data: { publicUrl } } = supabase.storage
         .from('files')
         .getPublicUrl(fileName)
+
+      // finals_infoテーブルも更新
+      const { error: updateError } = await supabase
+        .from('finals_info')
+        .update({
+          [field]: fileName
+        })
+        .eq('entry_id', entry.id)
+      
+      if (updateError) {
+        console.log('[UPLOAD] Error updating finals_info:', updateError)
+      }
 
       setFinalsInfo(prev => ({
         ...prev,
         [field]: publicUrl
       }))
+      
+      console.log('[UPLOAD] File uploaded successfully')
     } catch (err) {
-      console.error('ファイルアップロードエラー:', err)
+      console.error('[UPLOAD] File upload error:', err)
     }
   }
 
   const handleFileDelete = async (field: string) => {
     try {
-      console.log('Deleting file for field:', field)
+      console.log('[DELETE] Starting delete for field:', field)
+      
+      // URLからファイルパスを抽出する関数（セキュリティチェック付き）
+      const extractFilePathFromUrl = (url: string): string | null => {
+        if (!url) return null
+        
+        // URLが自分のSupabaseプロジェクトのものか確認
+        if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
+          console.error('[SECURITY] Invalid URL domain')
+          return null
+        }
+        
+        // Supabase URLからファイルパスを抽出
+        const match = url.match(/files\/(.*?)(\?|$)/)
+        if (match && match[1]) {
+          const filePath = decodeURIComponent(match[1])
+          
+          // パス走査攻撃を防ぐ
+          if (filePath.includes('../') || filePath.includes('..\\')) {
+            console.error('[SECURITY] Path traversal detected')
+            return null
+          }
+          
+          // ファイルパスの形式を確認
+          // パスは「entryId/finals/」の形式
+          if (entry.id) {
+            const validPattern = `${entry.id}/finals/`
+            
+            if (!filePath.startsWith(validPattern)) {
+              console.error('[SECURITY] File path does not match expected pattern')
+              console.log('[DELETE] Expected pattern:', validPattern)
+              console.log('[DELETE] Actual path:', filePath)
+              return null
+            }
+          }
+          
+          return filePath
+        }
+        return null
+      }
       
       // ファイルパスを取得
-      const filePath = finalsInfo[field as keyof FinalsInfo] as string
-      if (!filePath) {
-        console.log('No file to delete')
+      const fileUrl = finalsInfo[field as keyof FinalsInfo] as string
+      if (!fileUrl) {
+        console.log('[DELETE] No file to delete')
         return
       }
 
-      // URLからファイルパスを抽出
-      const urlParts = filePath.split('/files/')
-      if (urlParts.length < 2) {
-        console.log('Invalid file path')
+      const storagePath = extractFilePathFromUrl(fileUrl)
+      if (!storagePath) {
+        console.error('[DELETE] Could not extract valid file path from URL')
         return
       }
-      const storagePath = urlParts[1].split('?')[0]
+
+      console.log('[DELETE] Deleting file:', storagePath)
 
       // ストレージからファイルを削除
       const { error: storageError } = await supabase.storage
@@ -345,8 +434,31 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         .remove([storagePath])
 
       if (storageError) {
-        console.error('Storage delete error:', storageError)
+        console.error('[DELETE] Storage delete error:', storageError)
         // ストレージエラーがあってもUIは更新する
+      }
+
+      // entry_filesテーブルからも削除を試みる
+      const { error: dbError } = await supabase
+        .from('entry_files')
+        .delete()
+        .eq('entry_id', entry.id)
+        .eq('file_path', storagePath)
+
+      if (dbError) {
+        console.log('[DELETE] Database delete error (may not exist):', dbError)
+      }
+
+      // finals_infoテーブルのフィールドもクリア
+      const { error: updateError } = await supabase
+        .from('finals_info')
+        .update({
+          [field]: null
+        })
+        .eq('entry_id', entry.id)
+      
+      if (updateError) {
+        console.error('[DELETE] Error updating finals_info:', updateError)
       }
 
       // UIの状態を更新
@@ -355,9 +467,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         [field]: ''
       }))
 
-      console.log('File deleted successfully')
+      console.log('[DELETE] File deleted successfully')
     } catch (err) {
-      console.error('ファイル削除エラー:', err)
+      console.error('[DELETE] File deletion error:', err)
     }
   }
 
