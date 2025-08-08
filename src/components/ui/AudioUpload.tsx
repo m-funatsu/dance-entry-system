@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { AudioUploadProps } from '@/lib/types'
 
 export const AudioUpload: React.FC<AudioUploadProps> = ({
@@ -16,6 +16,17 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // valueが空になったら（削除された場合）、uploadingFileもクリア
+  useEffect(() => {
+    if (!value) {
+      setUploadingFile(null)
+      // inputフィールドもリセット
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }, [value])
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()

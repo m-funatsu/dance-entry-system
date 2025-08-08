@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { ImageUploadProps } from '@/lib/types'
 
@@ -14,6 +14,11 @@ export default function ImageUpload({
   const [isDragging, setIsDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // valueが変更されたら（削除された場合を含む）、previewを更新
+  useEffect(() => {
+    setPreview(typeof value === 'string' ? value : null)
+  }, [value])
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
