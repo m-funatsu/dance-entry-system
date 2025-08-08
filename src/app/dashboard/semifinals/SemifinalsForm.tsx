@@ -429,12 +429,13 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           if (filePathToDelete) {
             // 仮のファイル情報を作成（ストレージから削除するため）
             fileToDelete = {
-              id: null,
+              id: '',  // 空文字列を使用（nullは型エラーになるため）
               file_path: filePathToDelete,
               file_name: filePathToDelete.split('/').pop() || '',
               entry_id: entry?.id || '',
               file_type: 'audio',
-              purpose: field
+              purpose: field,
+              uploaded_at: new Date().toISOString()  // 現在時刻を設定
             } as EntryFile
             console.log('[DELETE DEBUG] Created pseudo file object from URL')
           }
