@@ -232,9 +232,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       }
 
       // ファイル情報をデータベースに保存（purposeフィールドを確実に設定）
+      // チェイサー曲とmusic_data_pathは音声ファイルとして保存
       const insertData = {
         entry_id: entry.id,
-        file_type: 'music',
+        file_type: 'audio',  // 音声ファイルは'audio'タイプ
         file_name: file.name,
         file_path: fileName,
         purpose: field  // purposeフィールドを確実に設定

@@ -5,6 +5,12 @@ WHERE purpose = 'scene2_image_path'
 AND file_name LIKE '%.jpg'
 AND file_type = 'music';
 
+-- 画像ファイル拡張子を持つのに誤ってmusicタイプになっているファイルを修正
+UPDATE entry_files
+SET file_type = 'photo'
+WHERE file_type = 'music'
+AND (file_name LIKE '%.jpg' OR file_name LIKE '%.jpeg' OR file_name LIKE '%.png' OR file_name LIKE '%.gif');
+
 -- デバッグ：現在のentry_filesテーブルの内容を確認
 SELECT 
   id,
