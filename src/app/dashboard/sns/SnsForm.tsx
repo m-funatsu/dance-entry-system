@@ -391,7 +391,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               accept="video/*"
               placeholder={{
                 title: "練習風景動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大50MB）"
+                formats: "対応形式: MP4, MOV, AVI など"
               }}
             />
           )}
@@ -481,7 +481,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               accept="video/*"
               placeholder={{
                 title: "選手紹介・見所動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大50MB）"
+                formats: "対応形式: MP4, MOV, AVI など"
               }}
             />
           )}
