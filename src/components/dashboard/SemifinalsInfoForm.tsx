@@ -287,7 +287,20 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   value="true"
                   checked={semifinalsInfo.music_change_from_preliminary === true}
                   onChange={() => {
-                    setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: true }))
+                    // 変更ありの場合は楽曲情報をクリア
+                    setSemifinalsInfo(prev => ({ 
+                      ...prev, 
+                      music_change_from_preliminary: true,
+                      work_title: '',
+                      work_character_story: '',
+                      music_title: '',
+                      cd_title: '',
+                      artist: '',
+                      record_number: '',
+                      jasrac_code: '',
+                      music_type: '',
+                      copyright_permission: ''
+                    }))
                     setUserSelectedFields(prev => new Set(prev).add('music_change_from_preliminary'))
                   }}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
@@ -300,8 +313,36 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                   name="music_change_option"
                   value="false"
                   checked={semifinalsInfo.music_change_from_preliminary === false}
-                  onChange={() => {
-                    setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))
+                  onChange={async () => {
+                    // 予選情報から楽曲データをコピー
+                    try {
+                      const { data: prelimData } = await supabase
+                        .from('preliminary_info')
+                        .select('*')
+                        .eq('entry_id', entry.id)
+                        .maybeSingle()
+                      
+                      if (prelimData) {
+                        setSemifinalsInfo(prev => ({
+                          ...prev,
+                          music_change_from_preliminary: false,
+                          work_title: prelimData.work_title || '',
+                          work_character_story: prelimData.work_story || '',
+                          music_title: prelimData.music_title || '',
+                          cd_title: prelimData.cd_title || '',
+                          artist: prelimData.artist || '',
+                          record_number: prelimData.record_number || '',
+                          jasrac_code: prelimData.jasrac_code || '',
+                          music_type: prelimData.music_type || '',  // 楽曲種類も確実にコピー
+                          copyright_permission: prelimData.music_rights_cleared || ''
+                        }))
+                      } else {
+                        setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))
+                      }
+                    } catch (err) {
+                      console.error('予選情報の取得エラー:', err)
+                      setSemifinalsInfo(prev => ({ ...prev, music_change_from_preliminary: false }))
+                    }
                     setUserSelectedFields(prev => new Set(prev).add('music_change_from_preliminary'))
                   }}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
@@ -444,12 +485,16 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               楽曲種類
             </label>
-            <input
-              type="text"
+            <select
               value={semifinalsInfo.music_type || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_type: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+            >
+              <option value="">選択してください</option>
+              <option value="cd">CD楽曲</option>
+              <option value="download">データダウンロード楽曲</option>
+              <option value="other">その他（オリジナル曲）</option>
+            </select>
           </div>
 
           <div>
