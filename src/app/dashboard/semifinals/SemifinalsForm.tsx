@@ -346,6 +346,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       const extractFilePathFromUrl = (url: string): string | null => {
         if (!url) return null
         
+        console.log('[DELETE DEBUG] Extracting path from URL:', url)
+        
         // URLが自分のSupabaseプロジェクトのものか確認
         if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
           console.error('[SECURITY] Invalid URL domain')
@@ -356,6 +358,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         const match = url.match(/files\/(.*?)(\?|$)/)
         if (match && match[1]) {
           const filePath = decodeURIComponent(match[1])
+          console.log('[DELETE DEBUG] Extracted file path:', filePath)
           
           // パス走査攻撃を防ぐ
           if (filePath.includes('../') || filePath.includes('..\\')) {
@@ -363,11 +366,20 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             return null
           }
           
-          // ユーザーIDとエントリーIDが含まれているか確認
-          if (userId && entry?.id) {
-            const expectedPathPrefix = `${userId}/${entry.id}/`
-            if (!filePath.startsWith(expectedPathPrefix)) {
-              console.error('[SECURITY] File path does not match user/entry')
+          // ファイルパスの形式を確認
+          // パスは「entry_id/semifinals/」または「userId/entry_id/」の形式の可能性がある
+          if (entry?.id) {
+            const validPatterns = [
+              `${userId}/${entry.id}/`,  // 新形式: userId/entryId/
+              `${entry.id}/semifinals/`   // 旧形式: entryId/semifinals/
+            ]
+            
+            const isValidPath = validPatterns.some(pattern => filePath.startsWith(pattern))
+            
+            if (!isValidPath) {
+              console.error('[SECURITY] File path does not match expected patterns')
+              console.log('[DELETE DEBUG] Expected patterns:', validPatterns)
+              console.log('[DELETE DEBUG] Actual path:', filePath)
               return null
             }
           }
@@ -454,11 +466,19 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       if (fileToDelete.file_path) {
         // 削除前の最終確認：パスが正しいユーザー/エントリーのものか
         const pathToDelete = fileToDelete.file_path
-        const isValidPath = userId && entry?.id && 
-                           pathToDelete.startsWith(`${userId}/${entry.id}/`)
+        
+        // 新旧両方のパス形式をサポート
+        const validPrefixes = entry?.id ? [
+          `${userId}/${entry.id}/`,     // 新形式
+          `${entry.id}/semifinals/`      // 旧形式
+        ] : []
+        
+        const isValidPath = validPrefixes.some(prefix => pathToDelete.startsWith(prefix))
         
         if (!isValidPath) {
           console.error('[SECURITY] Attempted to delete file outside user scope')
+          console.log('[DELETE DEBUG] Valid prefixes:', validPrefixes)
+          console.log('[DELETE DEBUG] Path to delete:', pathToDelete)
           showToast('ファイルの削除に失敗しました（権限エラー）', 'error')
           return
         }
