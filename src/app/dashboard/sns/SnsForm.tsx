@@ -387,11 +387,11 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               category="video"
               disabled={uploading || !!practiceVideoFile || !entry}
               required
-              maxSizeMB={200}
+              maxSizeMB={50}
               accept="video/*"
               placeholder={{
                 title: "練習風景動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大200MB）"
+                formats: "対応形式: MP4, MOV, AVI など（最大50MB）"
               }}
             />
           )}
@@ -477,11 +477,11 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               category="video"
               disabled={uploading || !!introVideoFile || !entry}
               required
-              maxSizeMB={100}
+              maxSizeMB={50}
               accept="video/*"
               placeholder={{
                 title: "選手紹介・見所動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大100MB）"
+                formats: "対応形式: MP4, MOV, AVI など（最大50MB）"
               }}
             />
           )}
