@@ -166,10 +166,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .from('entry_files')
         .insert({
           entry_id: entry.id,
-          file_type: file.type.startsWith('image/') ? 'photo' : 'document',
+          file_type: 'photo',  // 払込用紙は画像またはPDFなので'photo'として扱う
           file_name: file.name,
           file_path: fileName,
-          file_size: file.size,
           purpose: 'payment_slip'
         })
         .select()
@@ -670,11 +669,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                         <p className="text-xs text-gray-900 truncate" title={file.file_name}>
                           {file.file_name}
                         </p>
-                        {file.file_size && (
-                          <p className="text-xs text-gray-500">
-                            {(file.file_size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        )}
                       </div>
                       
                       {/* 削除ボタン */}
