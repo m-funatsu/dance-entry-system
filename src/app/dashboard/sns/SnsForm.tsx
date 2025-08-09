@@ -255,6 +255,25 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
           throw dbError
         }
 
+        // 削除後の動画ファイルの状態を確認
+        // （UIは既に更新されているので、現在の状態を直接確認）
+        const remainingPracticeVideo = field === 'practice_video' ? null : practiceVideoFile
+        const remainingIntroVideo = field === 'introduction_highlight' ? null : introVideoFile
+        
+        // 両方の動画が削除された場合、sns_infoテーブルのエントリーを削除
+        if (!remainingPracticeVideo && !remainingIntroVideo && entry?.id) {
+          // sns_infoテーブルからエントリーを削除（存在する場合）
+          const { error: deleteError } = await supabase
+            .from('sns_info')
+            .delete()
+            .eq('entry_id', entry.id)
+          
+          if (deleteError) {
+            console.error('Error deleting sns_info entry:', deleteError)
+            // エラーがあってもユーザーへの通知は続行
+          }
+        }
+
         showToast(`${field === 'practice_video' ? '練習風景' : '選手紹介・見所'}動画を削除しました`, 'success')
       } else {
         throw new Error('ファイルの削除に失敗しました')

@@ -101,6 +101,7 @@ export default async function DashboardPage() {
 
   // SNS情報の取得
   let snsInfo = null
+  let snsVideoFiles = 0
   if (entry) {
     const { data } = await supabase
       .from('sns_info')
@@ -109,6 +110,16 @@ export default async function DashboardPage() {
       .maybeSingle()
     
     snsInfo = data
+    
+    // SNS動画ファイルの確認
+    const { data: snsFiles } = await supabase
+      .from('entry_files')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .in('purpose', ['sns_practice_video', 'sns_introduction_highlight'])
+      .eq('file_type', 'video')
+    
+    snsVideoFiles = snsFiles?.length || 0
   }
 
 
@@ -280,19 +291,13 @@ export default async function DashboardPage() {
     })
   }
 
-  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null) => {
+  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null, videoFileCount: number) => {
+    // SNS情報が登録されていて、かつ動画ファイルが2つ（練習風景と選手紹介）存在する場合のみ完了とする
     if (!snsInfo) return false
+    if (videoFileCount < 2) return false
     
-    // 必須項目のチェック
-    const requiredFields = [
-      'practice_video_path',
-      'introduction_highlight_path'
-    ]
-    
-    return requiredFields.every(field => {
-      const value = snsInfo[field]
-      return value && value.toString().trim() !== ''
-    })
+    // sns_infoテーブルにレコードがあり、動画ファイルが2つある場合は完了
+    return true
   }
 
 
@@ -762,7 +767,7 @@ export default async function DashboardPage() {
                         SNS情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkSnsInfoComplete(snsInfo) ? '登録済み' : '未登録'}
+                        {checkSnsInfoComplete(snsInfo, snsVideoFiles) ? '登録済み' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.sns_deadline)
