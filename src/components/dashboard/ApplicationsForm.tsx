@@ -29,6 +29,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     companion_total_amount: 0
   })
   const [paymentSlipFiles, setPaymentSlipFiles] = useState<EntryFile[]>([])  // 複数の払込用紙を管理
+  const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
 
   useEffect(() => {
@@ -58,10 +59,23 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .select('*')
         .eq('entry_id', entry.id)
         .eq('purpose', 'payment_slip')
-        .order('created_at', { ascending: false })
+        .order('uploaded_at', { ascending: false })
       
-      if (files) {
+      if (files && files.length > 0) {
         setPaymentSlipFiles(files)
+        
+        // 各ファイルの署名付きURLを取得
+        const urls: { [key: string]: string } = {}
+        for (const file of files) {
+          const { data } = await supabase.storage
+            .from('files')
+            .createSignedUrl(file.file_path, 3600)
+          
+          if (data?.signedUrl) {
+            urls[file.id] = data.signedUrl
+          }
+        }
+        setPaymentSlipUrls(urls)
       }
     } catch (err) {
       console.error('各種申請情報の読み込みエラー:', err)
@@ -179,6 +193,15 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       // ファイルリストを更新
       setPaymentSlipFiles(prev => [fileData, ...prev])
       
+      // 署名付きURLを取得して追加
+      const { data } = await supabase.storage
+        .from('files')
+        .createSignedUrl(fileName, 3600)
+      
+      if (data?.signedUrl) {
+        setPaymentSlipUrls(prev => ({ ...prev, [fileData.id]: data.signedUrl }))
+      }
+      
       // 最初のファイルのパスをapplications_infoに保存（後方互換性のため）
       if (paymentSlipFiles.length === 0) {
         const { data: { publicUrl } } = supabase.storage
@@ -226,6 +249,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       // ファイルリストを更新
       setPaymentSlipFiles(prev => prev.filter(f => f.id !== fileId))
+      
+      // URLマッピングからも削除
+      setPaymentSlipUrls(prev => {
+        const newUrls = { ...prev }
+        delete newUrls[fileId]
+        return newUrls
+      })
       
       // 最初のファイルが削除された場合、次のファイルのパスを設定
       if (paymentSlipFiles[0]?.id === fileId && paymentSlipFiles.length > 1) {
@@ -645,16 +675,31 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   {paymentSlipFiles.map((file) => (
                     <div key={file.id} className="relative border rounded-lg p-3 bg-white">
                       {/* プレビュー */}
-                      {file.file_type === 'photo' ? (
-                        <div className="relative h-40 mb-2 bg-gray-100 rounded">
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${file.file_path}`}
-                            alt={file.file_name}
-                            fill
-                            className="object-contain"
-                            unoptimized
-                          />
-                        </div>
+                      {file.file_type === 'photo' || file.file_name.toLowerCase().endsWith('.pdf') ? (
+                        file.file_name.toLowerCase().endsWith('.pdf') ? (
+                          <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
+                            <svg className="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span className="ml-2 text-sm text-gray-500">PDF</span>
+                          </div>
+                        ) : (
+                          <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                            {paymentSlipUrls[file.id] ? (
+                              <Image
+                                src={paymentSlipUrls[file.id]}
+                                alt={file.file_name}
+                                fill
+                                className="object-contain"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full">
+                                <span className="text-sm text-gray-500">読み込み中...</span>
+                              </div>
+                            )}
+                          </div>
+                        )
                       ) : (
                         <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
                           <svg className="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
