@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
-import type { Entry, ApplicationsInfo } from '@/lib/types'
+import Image from 'next/image'
+import type { Entry, ApplicationsInfo, EntryFile } from '@/lib/types'
 
 interface ApplicationsFormProps {
   entry: Entry
@@ -27,6 +28,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     related_ticket_total_amount: 0,
     companion_total_amount: 0
   })
+  const [paymentSlipFiles, setPaymentSlipFiles] = useState<EntryFile[]>([])  // 複数の払込用紙を管理
+  const [uploadingFile, setUploadingFile] = useState(false)
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -47,6 +50,18 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (data) {
         setApplicationsInfo(data)
+      }
+      
+      // 払込用紙ファイルを取得
+      const { data: files } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .eq('purpose', 'payment_slip')
+        .order('created_at', { ascending: false })
+      
+      if (files) {
+        setPaymentSlipFiles(files)
       }
     } catch (err) {
       console.error('各種申請情報の読み込みエラー:', err)
@@ -136,6 +151,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
   const handleFileUpload = async (file: File) => {
     try {
+      setUploadingFile(true)
       const fileExt = file.name.split('.').pop()
       const fileName = `${entry.id}/applications/payment_slip_${Date.now()}.${fileExt}`
       
@@ -145,18 +161,95 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (uploadError) throw uploadError
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('files')
-        .getPublicUrl(fileName)
+      // entry_filesテーブルに保存
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert({
+          entry_id: entry.id,
+          file_type: file.type.startsWith('image/') ? 'photo' : 'document',
+          file_name: file.name,
+          file_path: fileName,
+          file_size: file.size,
+          purpose: 'payment_slip'
+        })
+        .select()
+        .single()
 
-      setApplicationsInfo(prev => ({
-        ...prev,
-        payment_slip_path: publicUrl
-      }))
+      if (dbError) throw dbError
+
+      // ファイルリストを更新
+      setPaymentSlipFiles(prev => [fileData, ...prev])
+      
+      // 最初のファイルのパスをapplications_infoに保存（後方互換性のため）
+      if (paymentSlipFiles.length === 0) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('files')
+          .getPublicUrl(fileName)
+        
+        setApplicationsInfo(prev => ({
+          ...prev,
+          payment_slip_path: publicUrl
+        }))
+      }
+      
       setSuccess('払込用紙をアップロードしました')
     } catch (err) {
       console.error('ファイルアップロードエラー:', err)
       setError('払込用紙のアップロードに失敗しました')
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
+  const handleFileDelete = async (fileId: string) => {
+    if (!window.confirm('この払込用紙を削除してもよろしいですか？')) return
+
+    try {
+      const fileToDelete = paymentSlipFiles.find(f => f.id === fileId)
+      if (!fileToDelete) return
+
+      // ストレージから削除
+      const { error: storageError } = await supabase.storage
+        .from('files')
+        .remove([fileToDelete.file_path])
+
+      if (storageError) {
+        console.error('ストレージ削除エラー:', storageError)
+      }
+
+      // データベースから削除
+      const { error: dbError } = await supabase
+        .from('entry_files')
+        .delete()
+        .eq('id', fileId)
+
+      if (dbError) throw dbError
+
+      // ファイルリストを更新
+      setPaymentSlipFiles(prev => prev.filter(f => f.id !== fileId))
+      
+      // 最初のファイルが削除された場合、次のファイルのパスを設定
+      if (paymentSlipFiles[0]?.id === fileId && paymentSlipFiles.length > 1) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('files')
+          .getPublicUrl(paymentSlipFiles[1].file_path)
+        
+        setApplicationsInfo(prev => ({
+          ...prev,
+          payment_slip_path: publicUrl
+        }))
+      } else if (paymentSlipFiles.length === 1) {
+        // 最後のファイルの場合はパスをクリア
+        setApplicationsInfo(prev => ({
+          ...prev,
+          payment_slip_path: ''
+        }))
+      }
+
+      setSuccess('払込用紙を削除しました')
+    } catch (err) {
+      console.error('ファイル削除エラー:', err)
+      setError('払込用紙の削除に失敗しました')
     }
   }
 
@@ -518,22 +611,85 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              払込用紙のアップロード
-            </label>
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) handleFileUpload(file)
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            {applicationsInfo.payment_slip_path && (
-              <div className="mt-2 text-sm text-gray-600">
-                払込用紙がアップロード済みです
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                払込用紙のアップロード（複数枚可）
+              </label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      handleFileUpload(file)
+                      e.target.value = ''  // inputをリセット
+                    }
+                  }}
+                  disabled={uploadingFile}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+                {uploadingFile && (
+                  <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
+                )}
+              </div>
+            </div>
+
+            {/* アップロード済みファイルのプレビューと管理 */}
+            {paymentSlipFiles.length > 0 && (
+              <div className="space-y-3">
+                <h5 className="text-sm font-medium text-gray-700">
+                  アップロード済みの払込用紙 ({paymentSlipFiles.length}枚)
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {paymentSlipFiles.map((file) => (
+                    <div key={file.id} className="relative border rounded-lg p-3 bg-white">
+                      {/* プレビュー */}
+                      {file.file_type === 'photo' ? (
+                        <div className="relative h-40 mb-2 bg-gray-100 rounded">
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/files/${file.file_path}`}
+                            alt={file.file_name}
+                            fill
+                            className="object-contain"
+                            unoptimized
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
+                          <svg className="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span className="ml-2 text-sm text-gray-500">PDF</span>
+                        </div>
+                      )}
+                      
+                      {/* ファイル情報 */}
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-900 truncate" title={file.file_name}>
+                          {file.file_name}
+                        </p>
+                        {file.file_size && (
+                          <p className="text-xs text-gray-500">
+                            {(file.file_size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        )}
+                      </div>
+                      
+                      {/* 削除ボタン */}
+                      <button
+                        onClick={() => handleFileDelete(file.id)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                        title="削除"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
