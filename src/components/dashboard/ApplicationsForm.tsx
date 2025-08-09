@@ -165,13 +165,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   }
 
   const relationshipOptions = [
-    '家族',
-    '友人',
-    '恩師',
-    '先輩',
-    '後輩',
-    '関係者',
-    'その他'
+    '振付師',
+    '振付師の代理人',
+    'スポンサー'
   ]
 
   const purposeOptions = [
