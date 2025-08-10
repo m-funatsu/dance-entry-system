@@ -31,6 +31,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [paymentSlipFiles, setPaymentSlipFiles] = useState<EntryFile[]>([])  // 複数の払込用紙を管理
   const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)  // 拡大表示用PDF URL
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -677,12 +678,28 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       {/* プレビュー */}
                       {file.file_type === 'photo' || file.file_name.toLowerCase().endsWith('.pdf') ? (
                         file.file_name.toLowerCase().endsWith('.pdf') ? (
-                          <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
-                            <svg className="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span className="ml-2 text-sm text-gray-500">PDF</span>
-                          </div>
+                          paymentSlipUrls[file.id] ? (
+                            <div 
+                              className="h-40 mb-2 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => setSelectedPdfUrl(paymentSlipUrls[file.id])}
+                              title="クリックで拡大表示"
+                            >
+                              <iframe
+                                src={paymentSlipUrls[file.id]}
+                                className="w-full h-full pointer-events-none"
+                                title={file.file_name}
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
+                                <svg className="h-8 w-8 text-white opacity-0 hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                </svg>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
+                              <span className="text-sm text-gray-500">PDFを読み込み中...</span>
+                            </div>
+                          )
                         ) : (
                           <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
                             {paymentSlipUrls[file.id] ? (
@@ -744,6 +761,35 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="その他、申請に関する注意事項や要望があれば記入してください"
             />
+          </div>
+        </div>
+      )}
+
+      {/* PDFモーダル */}
+      {selectedPdfUrl && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedPdfUrl(null)}
+        >
+          <div 
+            className="bg-white rounded-lg w-full max-w-6xl h-5/6 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedPdfUrl(null)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="h-full rounded-lg overflow-hidden">
+              <iframe
+                src={selectedPdfUrl}
+                className="w-full h-full"
+                title="PDFプレビュー"
+              />
+            </div>
           </div>
         </div>
       )}
