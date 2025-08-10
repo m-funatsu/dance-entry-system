@@ -71,15 +71,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         value={finalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
         disabled={choreographerChangeOption === 'same'}
+        required={choreographerChangeOption === 'different'}
       />
 
-      <FormField
-        label="決勝 - 振付師（かな）"
-        name="choreographer_name_kana"
-        value={finalsInfo.choreographer_name_kana || ''}
-        onChange={(e) => onChange({ choreographer_name_kana: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-      />
 
       <FormField
         label="決勝 - 振付師2（決勝でダンサーが振付変更した場合）"
@@ -87,15 +81,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         value={finalsInfo.choreographer2_name || ''}
         onChange={(e) => onChange({ choreographer2_name: e.target.value })}
         disabled={choreographerChangeOption === 'same'}
+        required={choreographerChangeOption === 'different'}
       />
 
-      <FormField
-        label="決勝 - 振付師2（かな）"
-        name="choreographer2_name_kana"
-        value={finalsInfo.choreographer2_name_kana || ''}
-        onChange={(e) => onChange({ choreographer2_name_kana: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-      />
 
       <div className="border-t pt-4">
         <h4 className="font-medium mb-3">作品振付師出席情報</h4>

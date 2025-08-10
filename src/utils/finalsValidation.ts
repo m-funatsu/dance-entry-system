@@ -71,6 +71,11 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (!data.choreographer_change && data.choreographer_change !== false) {
         errors.push('振付師の変更を選択してください')
       }
+      if (data.choreographer_change === true) {
+        // 変更ありの場合、振付師名は必須
+        if (!data.choreographer_name) errors.push('決勝 - 振付師')
+        if (!data.choreographer2_name) errors.push('決勝 - 振付師2（決勝でダンサーが振付変更した場合）')
+      }
       if (!data.choreographer_attendance) errors.push('作品振付師出席予定')
       if (!data.choreographer_photo_permission) errors.push('作品振付師写真掲載')
       break
