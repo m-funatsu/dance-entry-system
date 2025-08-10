@@ -188,12 +188,29 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           const mappedDesignation = mapChaserSongDesignation(semifinalsData.chaser_song_designation || '')
           console.log('[SOUND COPY] マッピング後の値:', mappedDesignation)
           
+          // チェイサー曲のファイルパスがある場合は署名付きURLを生成
+          let chaserSongUrl = ''
+          if (semifinalsData.chaser_song && !semifinalsData.chaser_song.startsWith('http')) {
+            // ファイルパスの場合、署名付きURLを生成
+            const { data: urlData } = await supabase.storage
+              .from('files')
+              .createSignedUrl(semifinalsData.chaser_song, 3600)
+            
+            if (urlData?.signedUrl) {
+              chaserSongUrl = urlData.signedUrl
+              console.log('[SOUND COPY] チェイサー曲の署名付きURL生成:', chaserSongUrl)
+            }
+          } else if (semifinalsData.chaser_song) {
+            // 既にURLの場合はそのまま使用
+            chaserSongUrl = semifinalsData.chaser_song
+          }
+          
           setFinalsInfo(prev => ({
             ...prev,
             sound_change_from_semifinals: false,
             sound_start_timing: semifinalsData.sound_start_timing || '',
             chaser_song_designation: mappedDesignation,
-            chaser_song: semifinalsData.chaser_song || '',
+            chaser_song: chaserSongUrl,
             fade_out_start_time: semifinalsData.fade_out_start_time || '',
             fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
           }))
