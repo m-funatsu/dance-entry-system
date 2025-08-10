@@ -171,11 +171,28 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             fade_out_complete_time: semifinalsData.fade_out_complete_time
           })
           
+          // 準決勝の英語値を決勝の日本語値にマッピング
+          const mapChaserSongDesignation = (value: string): string => {
+            switch (value) {
+              case 'included':
+                return '自作曲に組み込み'
+              case 'required':
+                return '必要'
+              case 'not_required':
+                return '不要（無音）'
+              default:
+                return value // 既に日本語の場合はそのまま返す
+            }
+          }
+          
+          const mappedDesignation = mapChaserSongDesignation(semifinalsData.chaser_song_designation || '')
+          console.log('[SOUND COPY] マッピング後の値:', mappedDesignation)
+          
           setFinalsInfo(prev => ({
             ...prev,
             sound_change_from_semifinals: false,
             sound_start_timing: semifinalsData.sound_start_timing || '',
-            chaser_song_designation: semifinalsData.chaser_song_designation || '',
+            chaser_song_designation: mappedDesignation,
             chaser_song: semifinalsData.chaser_song || '',
             fade_out_start_time: semifinalsData.fade_out_start_time || '',
             fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
