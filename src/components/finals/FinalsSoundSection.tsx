@@ -99,7 +99,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             onChange={(file) => onFileUpload('chaser_song', file)}
             onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
             disabled={soundChangeOption === 'same'}
-            required={soundChangeOption === 'different'}
+            required={soundChangeOption === 'different' && finalsInfo.chaser_song_designation === '必要'}
           />
         </div>
       )}

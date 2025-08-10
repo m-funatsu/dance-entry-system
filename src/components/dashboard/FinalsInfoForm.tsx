@@ -163,14 +163,22 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           .maybeSingle()
 
         if (semifinalsData) {
-          setFinalsInfo(prev => ({
-            ...prev,
-            sound_change_from_semifinals: false,
+          console.log('[SOUND COPY] 準決勝データ:', {
             sound_start_timing: semifinalsData.sound_start_timing,
             chaser_song_designation: semifinalsData.chaser_song_designation,
             chaser_song: semifinalsData.chaser_song,
             fade_out_start_time: semifinalsData.fade_out_start_time,
             fade_out_complete_time: semifinalsData.fade_out_complete_time
+          })
+          
+          setFinalsInfo(prev => ({
+            ...prev,
+            sound_change_from_semifinals: false,
+            sound_start_timing: semifinalsData.sound_start_timing || '',
+            chaser_song_designation: semifinalsData.chaser_song_designation || '',
+            chaser_song: semifinalsData.chaser_song || '',
+            fade_out_start_time: semifinalsData.fade_out_start_time || '',
+            fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
           }))
         }
       } catch (err) {
