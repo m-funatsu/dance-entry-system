@@ -100,6 +100,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
             disabled={soundChangeOption === 'same'}
             required={soundChangeOption === 'different' && finalsInfo.chaser_song_designation === '必要'}
+            accept=".wav,.mp3,.m4a"
           />
         </div>
       )}

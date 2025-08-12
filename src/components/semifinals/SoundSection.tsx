@@ -101,6 +101,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               onFileDelete('chaser_song')
             } : undefined}
             required
+            accept=".wav,.mp3,.m4a"
           />
         </div>
       )}

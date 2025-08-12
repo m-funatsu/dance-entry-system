@@ -213,6 +213,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
           disabled={musicChangeOption === 'unchanged'}
           required={musicChangeOption === 'changed'}
+          accept=".wav,.mp3,.m4a"
         />
       </div>
     </div>
