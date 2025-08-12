@@ -108,6 +108,7 @@ export interface BasicInfo {
   choreographer?: string
   choreographer_furigana?: string
   agreement_checked: boolean
+  media_consent_checked: boolean
   privacy_policy_checked: boolean
   created_by?: string
   created_at: string

@@ -29,6 +29,7 @@ export interface BasicInfoFormData extends BaseFormData {
   partner_furigana?: string
   phone_number: string
   agreement_checked: boolean
+  media_consent_checked: boolean
   privacy_policy_checked: boolean
 }
 

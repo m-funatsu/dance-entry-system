@@ -20,6 +20,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const { showToast } = useToast()
   const [checkboxes, setCheckboxes] = useState({
     agreement_checked: initialData?.agreement_checked || false,
+    media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
 
@@ -34,6 +35,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
     agreement_checked: initialData?.agreement_checked || false,
+    media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   }
 
@@ -159,7 +161,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     return !hasErrors
   }
 
-  const handleCheckboxChange = (field: 'agreement_checked' | 'privacy_policy_checked', value: boolean) => {
+  const handleCheckboxChange = (field: 'agreement_checked' | 'media_consent_checked' | 'privacy_policy_checked', value: boolean) => {
     setCheckboxes(prev => ({ ...prev, [field]: value }))
     handleFieldChange(field, value)
   }
@@ -172,8 +174,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         return
       }
 
-      if (!checkboxes.agreement_checked || !checkboxes.privacy_policy_checked) {
-        showToast('同意事項にチェックしてください', 'error')
+      if (!checkboxes.agreement_checked || !checkboxes.media_consent_checked || !checkboxes.privacy_policy_checked) {
+        showToast('すべての同意事項にチェックしてください', 'error')
         return
       }
     }
@@ -260,7 +262,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   // 必須項目のチェック（同意事項を含む）
   const isFormValid = () => {
     const hasAllRequired = validateAllWithDynamicRules()
-    const result = hasAllRequired && checkboxes.agreement_checked && checkboxes.privacy_policy_checked
+    const result = hasAllRequired && checkboxes.agreement_checked && checkboxes.media_consent_checked && checkboxes.privacy_policy_checked
     return result
   }
 
@@ -384,6 +386,25 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               />
               <span className="ml-2 text-sm font-medium text-gray-700">
                 上記の参加資格・要件を確認し、同意します <span className="text-red-500">*</span>
+              </span>
+            </label>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-md">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">写真・映像使用許諾</h3>
+            <div className="text-sm text-gray-600 mb-3">
+              <p>バルカーカップで撮影された映像と写真・氏名等の、テレビ・新聞・雑誌・インターネット等への掲載権および肖像権は主催者に属します。</p>
+            </div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={checkboxes.media_consent_checked}
+                onChange={(e) => handleCheckboxChange('media_consent_checked', e.target.checked)}
+                required
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm font-medium text-gray-700">
+                写真・映像使用許諾を確認し、同意します <span className="text-red-500">*</span>
               </span>
             </label>
           </div>
