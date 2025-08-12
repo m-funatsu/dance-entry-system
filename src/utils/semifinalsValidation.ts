@@ -8,7 +8,7 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       if (data.music_change_from_preliminary === undefined) {
         errors.push('「予選との楽曲情報の変更」を選択してください')
       }
-      if (!data.work_title) errors.push('作品タイトルまたはテーマ')
+      if (!data.work_title) errors.push('作品タイトル')
       if (!data.work_character_story) errors.push('作品キャラクター・ストーリー等')
       if (!data.copyright_permission) errors.push('楽曲著作権許諾')
       if (!data.music_title) errors.push('使用楽曲タイトル')

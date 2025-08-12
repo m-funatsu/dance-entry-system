@@ -68,7 +68,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       </div>
 
       <FormField
-        label="作品タイトルまたはテーマ"
+        label="作品タイトル"
         name="work_title"
         value={finalsInfo.work_title || ''}
         onChange={(e) => onChange({ work_title: e.target.value })}

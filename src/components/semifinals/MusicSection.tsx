@@ -109,7 +109,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       </div>
 
       <FormField
-        label="作品タイトルまたはテーマ"
+        label="作品タイトル"
         name="work_title"
         value={semifinalsInfo.work_title || ''}
         onChange={(e) => onChange({ work_title: e.target.value })}

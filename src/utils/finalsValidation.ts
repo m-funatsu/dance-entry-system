@@ -11,7 +11,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       }
       if (data.music_change === true) {
         // 変更ありの場合のみチェック
-        if (!data.work_title) errors.push('作品タイトルまたはテーマ')
+        if (!data.work_title) errors.push('作品タイトル')
         if (!data.work_character_story) errors.push('作品キャラクター・ストーリー等')
         if (!data.copyright_permission) errors.push('楽曲著作権許諾')
         if (!data.music_title) errors.push('使用楽曲タイトル')

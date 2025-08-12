@@ -271,7 +271,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           <h4 className="text-base font-medium text-gray-900">作品情報</h4>
           
           <FormField
-            label="作品タイトルまたはテーマ"
+            label="作品タイトル"
             name="work_title"
             value={formData.work_title}
             onChange={(e) => handleFieldChange('work_title', e.target.value)}
