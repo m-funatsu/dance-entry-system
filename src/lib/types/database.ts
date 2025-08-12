@@ -99,6 +99,7 @@ export interface BasicInfo {
   id: string
   entry_id: string
   dance_style: string
+  category_division: string
   representative_name: string
   representative_furigana: string
   representative_email: string

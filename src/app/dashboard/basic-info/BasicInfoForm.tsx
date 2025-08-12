@@ -28,6 +28,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const formInitialData: BasicInfoFormData = {
     entry_id: entryId || '',
     dance_style: initialData?.dance_style || '',
+    category_division: initialData?.category_division || '',
     representative_name: initialData?.representative_name || '',
     representative_furigana: initialData?.representative_furigana || '',
     representative_email: initialData?.representative_email || '',
@@ -43,6 +44,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const getValidationRules = () => {
     const baseRules = {
       dance_style: { required: true },
+      category_division: { required: true },
       representative_name: { required: true, maxLength: 50 },
       representative_furigana: { 
         required: true, 
@@ -299,6 +301,25 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <option value="ストリートダンス全般">ストリートダンス全般</option>
         </FormField>
 
+        <div>
+          <FormField
+            label="アマプロ区分"
+            name="category_division"
+            type="select"
+            value={formData.category_division}
+            onChange={(e) => handleFieldChangeWithValidation('category_division', e.target.value)}
+            required
+            error={errors.category_division}
+          >
+            <option value="">選択してください</option>
+            <option value="プロ＆プロ">プロ＆プロ</option>
+            <option value="アマ＆アマ">アマ＆アマ</option>
+          </FormField>
+          <p className="mt-1 text-sm text-gray-500">
+            ※プロとアマチュアの混合での出場は不可能です。
+          </p>
+        </div>
+
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900">エントリー情報</h3>
           
@@ -365,7 +386,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
         <div className="space-y-4">
           <div className="bg-gray-50 p-4 rounded-md">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格・エントリー要件</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格</h3>
             <div className="text-sm text-gray-600 space-y-1 mb-3">
               <p className="font-medium mb-2">■ 参加資格</p>
               <ul className="space-y-1 ml-4">

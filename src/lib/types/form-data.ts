@@ -22,6 +22,7 @@ export interface EntryFormData extends BaseFormData {
 export interface BasicInfoFormData extends BaseFormData {
   entry_id?: string
   dance_style: string
+  category_division: string
   representative_name: string
   representative_furigana: string
   representative_email: string
