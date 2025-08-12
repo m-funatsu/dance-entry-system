@@ -292,6 +292,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                       ...prev, 
                       music_change_from_preliminary: true,
                       work_title: '',
+                      work_title_kana: '',
                       work_character_story: '',
                       music_title: '',
                       cd_title: '',
@@ -327,6 +328,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                           ...prev,
                           music_change_from_preliminary: false,
                           work_title: prelimData.work_title || '',
+                          work_title_kana: prelimData.work_title_kana || '',
                           work_character_story: prelimData.work_story || '',
                           music_title: prelimData.music_title || '',
                           cd_title: prelimData.cd_title || '',
@@ -354,13 +356,26 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              作品タイトルまたはテーマ
+              作品タイトル
             </label>
             <input
               type="text"
               value={semifinalsInfo.work_title || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              作品タイトル(ふりがな)
+            </label>
+            <input
+              type="text"
+              value={semifinalsInfo.work_title_kana || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_title_kana: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="ひらがなで入力"
             />
           </div>
 

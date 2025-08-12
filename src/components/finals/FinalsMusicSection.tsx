@@ -77,6 +77,16 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       />
 
       <FormField
+        label="作品タイトル(ふりがな)"
+        name="work_title_kana"
+        value={finalsInfo.work_title_kana || ''}
+        onChange={(e) => onChange({ work_title_kana: e.target.value })}
+        disabled={musicChangeOption === 'unchanged'}
+        required={musicChangeOption === 'changed'}
+        placeholder="ひらがなで入力"
+      />
+
+      <FormField
         label="作品キャラクター・ストーリー等（50字以内）"
         name="work_character_story"
         type="textarea"

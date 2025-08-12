@@ -49,6 +49,47 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
         onChange={(e) => onChange({ choreographer_name_kana: e.target.value })}
       />
       
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          小道具の有無 <span className="text-red-500">*</span>
+        </label>
+        <div className="space-y-2">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="props_usage"
+              value="あり"
+              checked={semifinalsInfo.props_usage === 'あり'}
+              onChange={() => onChange({ props_usage: 'あり' })}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            あり
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="props_usage"
+              value="なし"
+              checked={semifinalsInfo.props_usage === 'なし'}
+              onChange={() => onChange({ props_usage: 'なし', props_details: '' })}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            なし
+          </label>
+        </div>
+      </div>
+
+      {semifinalsInfo.props_usage === 'あり' && (
+        <FormField
+          label="利用する小道具"
+          name="props_details"
+          value={semifinalsInfo.props_details || ''}
+          onChange={(e) => onChange({ props_details: e.target.value })}
+          required
+          placeholder="例：扇子、スカーフ、傘など"
+        />
+      )}
+      
     </div>
   )
 }

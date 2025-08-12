@@ -23,6 +23,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',
+    work_title_kana: initialData?.work_title_kana || '',
     work_story: initialData?.work_story || '',
     music_rights_cleared: initialData?.music_rights_cleared || 'A',
     music_title: initialData?.music_title || '',
@@ -41,6 +42,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // バリデーションルール
   const validationRules = {
     work_title: { required: true },
+    work_title_kana: { required: true },
     work_story: { required: true, maxLength: 50 },
     music_title: { required: true },
     cd_title: { required: true },
@@ -281,6 +283,16 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             required
             placeholder="例：情熱のタンゴ"
             error={errors.work_title}
+          />
+
+          <FormField
+            label="作品タイトル(ふりがな)"
+            name="work_title_kana"
+            value={formData.work_title_kana}
+            onChange={(e) => handleFieldChange('work_title_kana', e.target.value)}
+            required
+            placeholder="例：じょうねつのたんご"
+            error={errors.work_title_kana}
           />
 
           <FormField

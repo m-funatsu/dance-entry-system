@@ -134,6 +134,7 @@ export interface PreliminaryInfo {
   id: string
   entry_id: string
   work_title: string
+  work_title_kana?: string
   work_story?: string
   video_submitted: boolean
   music_rights_cleared: string
@@ -182,6 +183,7 @@ export interface SemifinalsInfo {
   entry_id: string
   music_change_from_preliminary?: boolean
   work_title?: string
+  work_title_kana?: string
   work_character_story?: string
   copyright_permission?: string
   music_title?: string
@@ -260,6 +262,7 @@ export interface FinalsInfo {
   music_change?: boolean
   copy_preliminary_music?: boolean
   work_title?: string
+  work_title_kana?: string
   work_character_story?: string
   copyright_permission?: string
   music_title?: string
