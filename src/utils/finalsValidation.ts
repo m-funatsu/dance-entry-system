@@ -78,6 +78,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       }
       if (!data.choreographer_attendance) errors.push('作品振付師出席予定')
       if (!data.choreographer_photo_permission) errors.push('作品振付師写真掲載')
+      if (!data.choreographer_photo_path) errors.push('作品振付師写真')
       break
   }
 

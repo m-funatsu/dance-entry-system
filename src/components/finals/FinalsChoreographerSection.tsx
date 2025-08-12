@@ -138,11 +138,12 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            作品振付師写真
+            作品振付師写真 <span className="text-red-500">*</span>
           </label>
           <ImageUpload
             value={finalsInfo.choreographer_photo_path}
             onChange={(file) => onFileUpload('choreographer_photo_path', file)}
+            required
           />
         </div>
       </div>
