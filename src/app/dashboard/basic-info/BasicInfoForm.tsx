@@ -348,6 +348,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900">エントリー情報</h3>
+          <p className="text-sm text-gray-600">
+            プログラムや当日の選手紹介名として使われます。
+          </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
