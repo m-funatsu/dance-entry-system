@@ -71,6 +71,26 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   }
 
+  // useBaseFormフックを使用
+  const {
+    formData,
+    handleFieldChange,
+    save: saveForm,
+    saving,
+    errors,
+    error,
+    success
+  } = useBaseForm<BasicInfoFormData>({
+    initialData: formInitialData,
+    tableName: 'basic_info',
+    uniqueField: 'entry_id',
+    validationRules: {}, // 初期ルールは空にする
+    redirectPath: '/dashboard',
+    onSuccess: (message) => showToast(message, 'success'),
+    onError: (error) => showToast(error, 'error'),
+    validateBeforeSave: false // カスタムバリデーションを行うため
+  })
+
   // バリデーションルール（新しいヘルパーを使用）
   const getValidationRules = () => {
     const baseRules = {
@@ -223,26 +243,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     
     return baseRules
   }
-
-  // useBaseFormフックを使用
-  const {
-    formData,
-    handleFieldChange,
-    save: saveForm,
-    saving,
-    errors,
-    error,
-    success
-  } = useBaseForm<BasicInfoFormData>({
-    initialData: formInitialData,
-    tableName: 'basic_info',
-    uniqueField: 'entry_id',
-    validationRules: getValidationRules(), // 初期状態のルールを設定
-    redirectPath: '/dashboard',
-    onSuccess: (message) => showToast(message, 'success'),
-    onError: (error) => showToast(error, 'error'),
-    validateBeforeSave: false // カスタムバリデーションを行うため
-  })
 
   // カスタムバリデーション関数
   const validateAllWithDynamicRules = () => {
