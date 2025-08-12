@@ -227,7 +227,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         <option value="">選択してください</option>
         <option value="cd">CD楽曲</option>
         <option value="download">データダウンロード楽曲</option>
-        <option value="other">その他（オリジナル曲）</option>
+        <option value="original">その他（オリジナル曲）</option>
       </FormField>
 
       <div>

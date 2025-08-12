@@ -197,9 +197,9 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         required={musicChangeOption === 'changed'}
       >
         <option value="">選択してください</option>
-        <option value="cd">CD楽曲</option>
-        <option value="download">データダウンロード楽曲</option>
-        <option value="other">その他（オリジナル曲）</option>
+        <option value="CD楽曲">CD楽曲</option>
+        <option value="データダウンロード楽曲">データダウンロード楽曲</option>
+        <option value="その他（オリジナル曲）">その他（オリジナル曲）</option>
       </FormField>
 
       <div>
