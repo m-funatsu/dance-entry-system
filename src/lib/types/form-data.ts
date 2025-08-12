@@ -41,6 +41,12 @@ export interface BasicInfoFormData extends BaseFormData {
   emergency_contact_phone_1?: string
   emergency_contact_name_2?: string
   emergency_contact_phone_2?: string
+  guardian_name?: string
+  guardian_phone?: string
+  guardian_email?: string
+  partner_guardian_name?: string
+  partner_guardian_phone?: string
+  partner_guardian_email?: string
   agreement_checked: boolean
   media_consent_checked: boolean
   privacy_policy_checked: boolean
