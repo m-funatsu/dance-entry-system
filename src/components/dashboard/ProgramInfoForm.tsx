@@ -288,6 +288,17 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             {errors.player_photo_path && (
               <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
             )}
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm text-blue-800 font-medium mb-2">画像についての要件：</p>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• 必要枚数：1枚</li>
+                <li>• 服装：大会用衣装または競技衣装</li>
+                <li>• サイズ：原寸で解像度300～350dpi以上が好ましい</li>
+                <li>• 背景：正方形サイズに切り抜くので、背景の指定なし</li>
+                <li>• 向き：二人の顔が正面を向いていること（推奨）</li>
+                <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
+              </ul>
+            </div>
           </div>
 
           {/* あらすじ・ストーリー */}
@@ -371,6 +382,17 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               {errors.final_player_photo_path && (
                 <p className="mt-1 text-sm text-red-600">{errors.final_player_photo_path}</p>
               )}
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800 font-medium mb-2">画像についての要件：</p>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• 必要枚数：1枚</li>
+                  <li>• 服装：大会用衣装または競技衣装</li>
+                  <li>• サイズ：原寸で解像度300～350dpi以上が好ましい</li>
+                  <li>• 背景：正方形サイズに切り抜くので、背景の指定なし</li>
+                  <li>• 向き：二人の顔が正面を向いていること（推奨）</li>
+                  <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
+                </ul>
+              </div>
             </div>
 
             {/* あらすじ・ストーリー */}

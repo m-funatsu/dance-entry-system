@@ -13,7 +13,7 @@ import {
   isSemifinalsAllRequiredFieldsValid,
   semifinalsSections 
 } from '@/utils/semifinalsValidation'
-import type { Entry, SemifinalsInfo, BasicInfo, PreliminaryInfo, EntryFile } from '@/lib/types'
+import type { Entry, SemifinalsInfo, PreliminaryInfo, EntryFile } from '@/lib/types'
 
 interface SemifinalsFormProps {
   userId: string
@@ -25,7 +25,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const supabase = createClient()
   const { showToast } = useToast()
   
-  const [basicInfo, setBasicInfo] = useState<BasicInfo | null>(null)
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('music')
@@ -57,16 +56,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     
     const loadData = async () => {
       try {
-        // 基本情報を取得
-        const { data: basicData } = await supabase
-          .from('basic_info')
-          .select('*')
-          .eq('entry_id', entry.id)
-          .maybeSingle()
-        
-        if (basicData) {
-          setBasicInfo(basicData)
-        }
         
         // 予選情報を取得
         const { data: prelimData } = await supabase
@@ -175,11 +164,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             choreographer_change_from_preliminary: false
           }
           
-          if (basicData) {
-            // 基本情報から振付師情報をデフォルト設定
-            initialData.choreographer_name = basicData.choreographer || ''
-            initialData.choreographer_name_kana = basicData.choreographer_furigana || ''
-          }
           
           if (prelimData) {
             // 予選情報から楽曲情報をデフォルト設定
@@ -642,7 +626,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       {activeSection === 'choreographer' && (
         <ChoreographerSection
           semifinalsInfo={semifinalsInfo}
-          basicInfo={basicInfo}
           onChange={handleFieldChange}
         />
       )}
