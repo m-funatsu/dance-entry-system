@@ -24,6 +24,19 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
 
+  // 年齢計算関数（2025年11月23日時点）
+  const calculateAge = (birthdate: string): string => {
+    if (!birthdate) return ''
+    const birth = new Date(birthdate)
+    const targetDate = new Date('2025-11-23')
+    let age = targetDate.getFullYear() - birth.getFullYear()
+    const monthDiff = targetDate.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && targetDate.getDate() < birth.getDate())) {
+      age--
+    }
+    return age.toString()
+  }
+
   // フォームの初期データ
   const formInitialData: BasicInfoFormData = {
     entry_id: entryId || '',
@@ -31,14 +44,28 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     category_division: initialData?.category_division || '',
     representative_name: initialData?.representative_name || '',
     representative_furigana: initialData?.representative_furigana || '',
+    representative_romaji: initialData?.representative_romaji || '',
+    representative_birthdate: initialData?.representative_birthdate || '',
     representative_email: initialData?.representative_email || '',
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
+    partner_romaji: initialData?.partner_romaji || '',
+    partner_birthdate: initialData?.partner_birthdate || '',
     phone_number: initialData?.phone_number || '',
+    real_name: initialData?.real_name || '',
+    real_name_kana: initialData?.real_name_kana || '',
+    partner_real_name: initialData?.partner_real_name || '',
+    partner_real_name_kana: initialData?.partner_real_name_kana || '',
     emergency_contact_name_1: initialData?.emergency_contact_name_1 || '',
     emergency_contact_phone_1: initialData?.emergency_contact_phone_1 || '',
     emergency_contact_name_2: initialData?.emergency_contact_name_2 || '',
     emergency_contact_phone_2: initialData?.emergency_contact_phone_2 || '',
+    guardian_name: initialData?.guardian_name || '',
+    guardian_phone: initialData?.guardian_phone || '',
+    guardian_email: initialData?.guardian_email || '',
+    partner_guardian_name: initialData?.partner_guardian_name || '',
+    partner_guardian_phone: initialData?.partner_guardian_phone || '',
+    partner_guardian_email: initialData?.partner_guardian_email || '',
     agreement_checked: initialData?.agreement_checked || false,
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
@@ -133,6 +160,64 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           return '正しい電話番号を入力してください（例: 090-1234-5678）'
         }
         return true
+      }
+    }
+
+    // 18歳未満の場合、保護者情報を必須にする
+    const repAge = formData.representative_birthdate ? parseInt(calculateAge(formData.representative_birthdate)) : 999
+    const partnerAge = formData.partner_birthdate ? parseInt(calculateAge(formData.partner_birthdate)) : 999
+
+    if (repAge < 18) {
+      baseRules.guardian_name = { required: true }
+      baseRules.guardian_phone = { 
+        required: true,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) return '保護者の電話番号は必須です'
+          if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+            return '正しい電話番号を入力してください'
+          }
+          return true
+        }
+      }
+      baseRules.guardian_email = { 
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) return '保護者のメールアドレスは必須です'
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
+            return '正しいメールアドレスを入力してください'
+          }
+          return true
+        }
+      }
+    }
+
+    if (partnerAge < 18) {
+      baseRules.partner_guardian_name = { required: true }
+      baseRules.partner_guardian_phone = { 
+        required: true,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) return 'ペア保護者の電話番号は必須です'
+          if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+            return '正しい電話番号を入力してください'
+          }
+          return true
+        }
+      }
+      baseRules.partner_guardian_email = { 
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        custom: (value: unknown) => {
+          const strValue = String(value || '')
+          if (!strValue) return 'ペア保護者のメールアドレスは必須です'
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
+            return '正しいメールアドレスを入力してください'
+          }
+          return true
+        }
       }
     }
     
@@ -398,6 +483,20 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.representative_furigana || errors.representative_furigana}
             />
             <FormField
+              label="エントリー名ローマ字"
+              name="representative_romaji"
+              value={formData.representative_romaji || ''}
+              onChange={(e) => handleFieldChangeWithValidation('representative_romaji', e.target.value)}
+              placeholder="YAMADA Taro"
+            />
+            <FormField
+              label="代表者生年月日"
+              name="representative_birthdate"
+              value={formData.representative_birthdate || ''}
+              onChange={(e) => handleFieldChangeWithValidation('representative_birthdate', e.target.value)}
+              placeholder="YYYY-MM-DD"
+            />
+            <FormField
               label="ペア氏名"
               name="partner_name"
               value={formData.partner_name || ''}
@@ -414,7 +513,33 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               placeholder="カタカナで入力"
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
+            <FormField
+              label="ペア氏名ローマ字"
+              name="partner_romaji"
+              value={formData.partner_romaji || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
+              placeholder="TANAKA Hanako"
+            />
+            <FormField
+              label="ペア生年月日"
+              name="partner_birthdate"
+              value={formData.partner_birthdate || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
+              placeholder="YYYY-MM-DD"
+            />
           </div>
+          
+          {/* 年齢表示 */}
+          {(formData.representative_birthdate || formData.partner_birthdate) && (
+            <div className="text-sm text-gray-600 mt-2">
+              {formData.representative_birthdate && (
+                <p>代表者年齢（大会時点）: {calculateAge(formData.representative_birthdate)}歳</p>
+              )}
+              {formData.partner_birthdate && (
+                <p>ペア年齢（大会時点）: {calculateAge(formData.partner_birthdate)}歳</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,6 +564,133 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             error={fieldErrors.phone_number || errors.phone_number}
           />
         </div>
+
+        {/* 本名情報セクション */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">本名情報</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            ※エントリー名と本名が異なる場合のみ入力してください
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              label="代表者本名"
+              name="real_name"
+              value={formData.real_name || ''}
+              onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
+              placeholder="山田太郎"
+            />
+            
+            <FormField
+              label="代表者本名カナ"
+              name="real_name_kana"
+              value={formData.real_name_kana || ''}
+              onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
+              placeholder="ヤマダタロウ"
+            />
+            
+            <FormField
+              label="ペア本名"
+              name="partner_real_name"
+              value={formData.partner_real_name || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
+              placeholder="田中花子"
+            />
+            
+            <FormField
+              label="ペア本名カナ"
+              name="partner_real_name_kana"
+              value={formData.partner_real_name_kana || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
+              placeholder="タナカハナコ"
+            />
+          </div>
+        </div>
+
+        {/* 保護者情報セクション（18歳未満の場合） */}
+        {(formData.representative_birthdate && parseInt(calculateAge(formData.representative_birthdate)) < 18) && (
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              代表者保護者情報
+              <span className="text-sm text-red-500 ml-2">（18歳未満のため必須）</span>
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="保護者氏名"
+                name="guardian_name"
+                value={formData.guardian_name || ''}
+                onChange={(e) => handleFieldChangeWithValidation('guardian_name', e.target.value)}
+                required
+                error={fieldErrors.guardian_name || errors.guardian_name}
+              />
+              
+              <FormField
+                label="保護者電話番号"
+                name="guardian_phone"
+                type="tel"
+                value={formData.guardian_phone || ''}
+                onChange={(e) => handleFieldChangeWithValidation('guardian_phone', e.target.value)}
+                required
+                placeholder="090-1234-5678"
+                error={fieldErrors.guardian_phone || errors.guardian_phone}
+              />
+              
+              <FormField
+                label="保護者メールアドレス"
+                name="guardian_email"
+                type="email"
+                value={formData.guardian_email || ''}
+                onChange={(e) => handleFieldChangeWithValidation('guardian_email', e.target.value)}
+                required
+                placeholder="guardian@example.com"
+                error={fieldErrors.guardian_email || errors.guardian_email}
+              />
+            </div>
+          </div>
+        )}
+        
+        {(formData.partner_birthdate && parseInt(calculateAge(formData.partner_birthdate)) < 18) && (
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              ペア保護者情報
+              <span className="text-sm text-red-500 ml-2">（18歳未満のため必須）</span>
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="ペア保護者氏名"
+                name="partner_guardian_name"
+                value={formData.partner_guardian_name || ''}
+                onChange={(e) => handleFieldChangeWithValidation('partner_guardian_name', e.target.value)}
+                required
+                error={fieldErrors.partner_guardian_name || errors.partner_guardian_name}
+              />
+              
+              <FormField
+                label="ペア保護者電話番号"
+                name="partner_guardian_phone"
+                type="tel"
+                value={formData.partner_guardian_phone || ''}
+                onChange={(e) => handleFieldChangeWithValidation('partner_guardian_phone', e.target.value)}
+                required
+                placeholder="090-1234-5678"
+                error={fieldErrors.partner_guardian_phone || errors.partner_guardian_phone}
+              />
+              
+              <FormField
+                label="ペア保護者メールアドレス"
+                name="partner_guardian_email"
+                type="email"
+                value={formData.partner_guardian_email || ''}
+                onChange={(e) => handleFieldChangeWithValidation('partner_guardian_email', e.target.value)}
+                required
+                placeholder="guardian@example.com"
+                error={fieldErrors.partner_guardian_email || errors.partner_guardian_email}
+              />
+            </div>
+          </div>
+        )}
 
         {/* 緊急連絡先情報セクション */}
         <div className="border-t pt-6">
