@@ -418,20 +418,6 @@ export interface SnsInfo {
   updated_by?: string
 }
 
-export interface SeatRequest {
-  id: string
-  entry_id: string
-  premium_seats?: number
-  ss_seats?: number
-  s_seats?: number
-  a_seats?: number
-  b_seats?: number
-  created_at: string
-  created_by?: string
-  updated_at: string
-  updated_by?: string
-}
-
 // Supabase Database Types
 export interface Database {
   public: {
@@ -480,11 +466,6 @@ export interface Database {
         Row: SnsInfo
         Insert: Omit<SnsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
         Update: Partial<Omit<SnsInfo, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
-      }
-      seat_request: {
-        Row: SeatRequest
-        Insert: Omit<SeatRequest, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>
-        Update: Partial<Omit<SeatRequest, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>
       }
       entry_files: {
         Row: EntryFile
