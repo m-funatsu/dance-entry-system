@@ -18,7 +18,7 @@ export interface ButtonProps {
 export interface FormFieldProps {
   label: string
   name: string
-  type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select'
+  type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select' | 'date'
   value: string | number
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   required?: boolean

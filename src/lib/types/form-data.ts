@@ -25,10 +25,22 @@ export interface BasicInfoFormData extends BaseFormData {
   category_division: string
   representative_name: string
   representative_furigana: string
+  representative_romaji?: string
+  representative_birthdate?: string
   representative_email: string
   partner_name?: string
   partner_furigana?: string
+  partner_romaji?: string
+  partner_birthdate?: string
   phone_number: string
+  real_name?: string
+  real_name_kana?: string
+  partner_real_name?: string
+  partner_real_name_kana?: string
+  emergency_contact_name_1?: string
+  emergency_contact_phone_1?: string
+  emergency_contact_name_2?: string
+  emergency_contact_phone_2?: string
   agreement_checked: boolean
   media_consent_checked: boolean
   privacy_policy_checked: boolean

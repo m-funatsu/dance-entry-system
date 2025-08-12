@@ -23,6 +23,19 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
+  
+  // 2025/11/23時点での年齢を計算する関数
+  const calculateAge = (birthdate: string | undefined) => {
+    if (!birthdate) return ''
+    const birth = new Date(birthdate)
+    const targetDate = new Date('2025-11-23')
+    let age = targetDate.getFullYear() - birth.getFullYear()
+    const monthDiff = targetDate.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && targetDate.getDate() < birth.getDate())) {
+      age--
+    }
+    return age.toString()
+  }
 
   // フォームの初期データ
   const formInitialData: BasicInfoFormData = {
@@ -31,10 +44,22 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     category_division: initialData?.category_division || '',
     representative_name: initialData?.representative_name || '',
     representative_furigana: initialData?.representative_furigana || '',
+    representative_romaji: initialData?.representative_romaji || '',
+    representative_birthdate: initialData?.representative_birthdate || '',
     representative_email: initialData?.representative_email || '',
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
+    partner_romaji: initialData?.partner_romaji || '',
+    partner_birthdate: initialData?.partner_birthdate || '',
     phone_number: initialData?.phone_number || '',
+    real_name: initialData?.real_name || '',
+    real_name_kana: initialData?.real_name_kana || '',
+    partner_real_name: initialData?.partner_real_name || '',
+    partner_real_name_kana: initialData?.partner_real_name_kana || '',
+    emergency_contact_name_1: initialData?.emergency_contact_name_1 || '',
+    emergency_contact_phone_1: initialData?.emergency_contact_phone_1 || '',
+    emergency_contact_name_2: initialData?.emergency_contact_name_2 || '',
+    emergency_contact_phone_2: initialData?.emergency_contact_phone_2 || '',
     agreement_checked: initialData?.agreement_checked || false,
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
@@ -104,6 +129,67 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         const strValue = String(value)
         if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
           return 'カタカナで入力してください'
+        }
+        return true
+      }
+    }
+    
+    // 新規追加フィールド
+    baseRules.representative_romaji = { required: true, maxLength: 100 }
+    baseRules.representative_birthdate = { required: true }
+    baseRules.partner_romaji = { required: true, maxLength: 100 }
+    baseRules.partner_birthdate = { required: true }
+    baseRules.real_name = { required: true, maxLength: 50 }
+    baseRules.real_name_kana = { 
+      required: true, 
+      maxLength: 50,
+      pattern: /^[\u30A0-\u30FF\s]+$/,
+      custom: (value: unknown) => {
+        if (!value) return 'ご本名カナは必須です'
+        const strValue = String(value)
+        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+          return 'カタカナで入力してください'
+        }
+        return true
+      }
+    }
+    baseRules.partner_real_name = { required: true, maxLength: 50 }
+    baseRules.partner_real_name_kana = { 
+      required: true, 
+      maxLength: 50,
+      pattern: /^[\u30A0-\u30FF\s]+$/,
+      custom: (value: unknown) => {
+        if (!value) return 'ペアご本名カナは必須です'
+        const strValue = String(value)
+        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+          return 'カタカナで入力してください'
+        }
+        return true
+      }
+    }
+    baseRules.emergency_contact_name_1 = { required: true, maxLength: 50 }
+    baseRules.emergency_contact_phone_1 = { 
+      required: true,
+      pattern: /^0\d{1,4}-?\d{1,4}-?\d{4}$/,
+      custom: (value: unknown) => {
+        if (!value) return '緊急連絡先電話番号①は必須です'
+        const strValue = String(value)
+        if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+          return '正しい電話番号を入力してください（例: 090-1234-5678）'
+        }
+        return true
+      }
+    }
+    // 任意項目
+    baseRules.emergency_contact_name_2 = { required: false, maxLength: 50 }
+    baseRules.emergency_contact_phone_2 = { 
+      required: false,
+      pattern: /^0\d{1,4}-?\d{1,4}-?\d{4}$/,
+      custom: (value: unknown) => {
+        if (!value) return true // 任意項目なので空でもOK
+        const strValue = String(value)
+        if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+          return '正しい電話番号を入力してください（例: 090-1234-5678）'
         }
         return true
       }
@@ -371,6 +457,38 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.representative_furigana || errors.representative_furigana}
             />
             <FormField
+              label="エントリー名ローマ字"
+              name="representative_romaji"
+              value={formData.representative_romaji || ''}
+              onChange={(e) => handleFieldChangeWithValidation('representative_romaji', e.target.value)}
+              required
+              placeholder="例: YAMADA TARO"
+              error={fieldErrors.representative_romaji || errors.representative_romaji}
+            />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <FormField
+                  label="エントリー者誕生日"
+                  name="representative_birthdate"
+                  type="date"
+                  value={formData.representative_birthdate || ''}
+                  onChange={(e) => handleFieldChangeWithValidation('representative_birthdate', e.target.value)}
+                  required
+                  error={fieldErrors.representative_birthdate || errors.representative_birthdate}
+                />
+              </div>
+              <div className="w-24">
+                <label className="block text-sm font-medium text-gray-700 mb-1">年齢</label>
+                <input
+                  type="text"
+                  value={calculateAge(formData.representative_birthdate)}
+                  readOnly
+                  className="w-full rounded-md border-gray-300 bg-gray-100 px-3 py-2 text-sm"
+                  placeholder="自動"
+                />
+              </div>
+            </div>
+            <FormField
               label="ペア氏名"
               name="partner_name"
               value={formData.partner_name || ''}
@@ -387,6 +505,38 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               placeholder="カタカナで入力"
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
+            <FormField
+              label="ペア名ローマ字"
+              name="partner_romaji"
+              value={formData.partner_romaji || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
+              required
+              placeholder="例: SUZUKI HANAKO"
+              error={fieldErrors.partner_romaji || errors.partner_romaji}
+            />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <FormField
+                  label="ペア誕生日"
+                  name="partner_birthdate"
+                  type="date"
+                  value={formData.partner_birthdate || ''}
+                  onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
+                  required
+                  error={fieldErrors.partner_birthdate || errors.partner_birthdate}
+                />
+              </div>
+              <div className="w-24">
+                <label className="block text-sm font-medium text-gray-700 mb-1">年齢</label>
+                <input
+                  type="text"
+                  value={calculateAge(formData.partner_birthdate)}
+                  readOnly
+                  className="w-full rounded-md border-gray-300 bg-gray-100 px-3 py-2 text-sm"
+                  placeholder="自動"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -411,6 +561,86 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             placeholder="090-1234-5678"
             error={fieldErrors.phone_number || errors.phone_number}
           />
+        </div>
+
+        {/* 緊急連絡先情報セクション */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">緊急連絡先情報</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              label="ご本名"
+              name="real_name"
+              value={formData.real_name || ''}
+              onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
+              required
+              error={fieldErrors.real_name || errors.real_name}
+            />
+            <FormField
+              label="ご本名カナ"
+              name="real_name_kana"
+              value={formData.real_name_kana || ''}
+              onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
+              required
+              placeholder="カタカナで入力"
+              error={fieldErrors.real_name_kana || errors.real_name_kana}
+            />
+            <FormField
+              label="ペアご本名"
+              name="partner_real_name"
+              value={formData.partner_real_name || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
+              required
+              error={fieldErrors.partner_real_name || errors.partner_real_name}
+            />
+            <FormField
+              label="ペアご本名カナ"
+              name="partner_real_name_kana"
+              value={formData.partner_real_name_kana || ''}
+              onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
+              required
+              placeholder="カタカナで入力"
+              error={fieldErrors.partner_real_name_kana || errors.partner_real_name_kana}
+            />
+            <FormField
+              label="緊急連絡先氏名①"
+              name="emergency_contact_name_1"
+              value={formData.emergency_contact_name_1 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_1', e.target.value)}
+              required
+              error={fieldErrors.emergency_contact_name_1 || errors.emergency_contact_name_1}
+            />
+            <FormField
+              label="緊急連絡先電話番号①"
+              name="emergency_contact_phone_1"
+              type="tel"
+              value={formData.emergency_contact_phone_1 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_1', e.target.value)}
+              required
+              placeholder="090-1234-5678"
+              error={fieldErrors.emergency_contact_phone_1 || errors.emergency_contact_phone_1}
+            />
+            <FormField
+              label="緊急連絡先氏名②"
+              name="emergency_contact_name_2"
+              value={formData.emergency_contact_name_2 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_2', e.target.value)}
+              error={fieldErrors.emergency_contact_name_2 || errors.emergency_contact_name_2}
+            />
+            <FormField
+              label="緊急連絡先電話番号②"
+              name="emergency_contact_phone_2"
+              type="tel"
+              value={formData.emergency_contact_phone_2 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_2', e.target.value)}
+              placeholder="090-1234-5678"
+              error={fieldErrors.emergency_contact_phone_2 || errors.emergency_contact_phone_2}
+            />
+          </div>
+          
+          <p className="text-sm text-gray-600">
+            ※ペアで緊急連絡先が異なる場合は②にも記入してください
+          </p>
         </div>
 
         <div className="space-y-4">
