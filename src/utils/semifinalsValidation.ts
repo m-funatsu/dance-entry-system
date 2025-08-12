@@ -47,7 +47,12 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       break
 
     case 'choreographer':
-      // 振付情報は必須項目なし
+      // 小道具の有無は必須
+      if (!data.props_usage) errors.push('小道具の有無')
+      // 小道具ありの場合は詳細が必須
+      if (data.props_usage === 'あり' && !data.props_details) {
+        errors.push('利用する小道具')
+      }
       break
 
     case 'bank':

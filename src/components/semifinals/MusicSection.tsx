@@ -237,6 +237,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           onChange={(file) => onFileUpload('music_data_path', file)}
           onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
           required
+          accept=".wav,.mp3,.m4a"
         />
       </div>
     </div>

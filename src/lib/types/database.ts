@@ -245,6 +245,8 @@ export interface SemifinalsInfo {
   choreographer_change_from_preliminary?: boolean
   choreographer_name?: string
   choreographer_name_kana?: string
+  props_usage?: string
+  props_details?: string
   bank_name?: string
   branch_name?: string
   account_type?: string
@@ -328,6 +330,8 @@ export interface FinalsInfo {
   choreographer_name_kana?: string
   choreographer2_name?: string
   choreographer2_name_kana?: string
+  props_usage?: string
+  props_details?: string
   choreographer_attendance?: string
   choreographer_photo_permission?: string
   choreographer_photo_path?: string

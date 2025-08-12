@@ -11,7 +11,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   disabled = false,
   required = false,
   maxSizeMB = 100,
-  accept = 'audio/*'
+  accept = '.wav,.mp3,.m4a'
 }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
@@ -53,8 +53,13 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   }
 
   const handleFile = (file: File) => {
-    if (!file.type.startsWith('audio/')) {
-      alert('音声ファイルを選択してください')
+    // ファイル拡張子をチェック
+    const fileName = file.name.toLowerCase()
+    const validExtensions = ['.wav', '.mp3', '.m4a']
+    const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext))
+    
+    if (!hasValidExtension) {
+      alert('WAV、MP3、M4A形式の音声ファイルを選択してください')
       return
     }
 
@@ -132,9 +137,9 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
                   preload="metadata"
                   src={value}
                 >
-                  <source src={value} type="audio/mpeg" />
                   <source src={value} type="audio/wav" />
-                  <source src={value} type="audio/aac" />
+                  <source src={value} type="audio/mpeg" />
+                  <source src={value} type="audio/mp4" />
                   お使いのブラウザは音声タグをサポートしていません。
                 </audio>
               </div>
@@ -175,7 +180,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
               または<span className="text-indigo-600">クリックして選択</span>
             </p>
             <p className="text-xs text-gray-400">
-              対応形式: MP3, WAV, AAC など（最大{maxSizeMB}MB）
+              対応形式: WAV, MP3, M4A（最大{maxSizeMB}MB）
             </p>
           </div>
         )}
