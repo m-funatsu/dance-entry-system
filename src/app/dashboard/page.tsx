@@ -129,7 +129,6 @@ export default async function DashboardPage() {
     
     // 必須フィールドのチェック
     const requiredFields = [
-      'player_photo_type',
       'player_photo_path',
       'semifinal_story',
       'semifinal_highlight',

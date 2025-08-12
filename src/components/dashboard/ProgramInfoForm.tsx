@@ -19,13 +19,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const [loading, setLoading] = useState(false)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
-    song_count: '1曲',
-    player_photo_type: ''
+    song_count: '1曲'
   })
 
   // バリデーションルール（静的に定義）
   const validationRules = {
-    player_photo_type: { required: true },
     player_photo_path: { required: true },
     semifinal_story: { 
       required: true,
@@ -188,8 +186,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         }
         
         setProgramInfo({
-          ...updatedData,
-          player_photo_type: updatedData.player_photo_type || ''
+          ...updatedData
         })
       }
     } catch (err) {
@@ -260,20 +257,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
         </FormField>
 
-        {/* 選手紹介用写真の種類 */}
-        <FormField
-          label="選手紹介用写真の種類"
-          name="player_photo_type"
-          type="select"
-          value={programInfo.player_photo_type || ''}
-          onChange={(e) => handleFieldChange('player_photo_type', e.target.value)}
-          required
-          error={errors.player_photo_type}
-        >
-          <option value="">選択してください</option>
-          <option value="Freedom's CUP撮影会での写真">Freedom&apos;s CUP撮影会での写真</option>
-          <option value="お持ちのデータを使用">お持ちのデータを使用</option>
-        </FormField>
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">
