@@ -26,6 +26,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       onChange({
         music_change_from_preliminary: false,
         work_title: preliminaryInfo?.work_title || '',
+        work_title_kana: preliminaryInfo?.work_title_kana || '',
         work_character_story: preliminaryInfo?.work_story || '',
         music_title: preliminaryInfo?.music_title || '',
         cd_title: preliminaryInfo?.cd_title || '',
@@ -39,6 +40,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       onChange({
         music_change_from_preliminary: true,
         work_title: '',
+        work_title_kana: '',
         work_character_story: '',
         music_title: '',
         cd_title: '',
@@ -115,6 +117,16 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         onChange={(e) => onChange({ work_title: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
         required
+      />
+
+      <FormField
+        label="作品タイトル(ふりがな)"
+        name="work_title_kana"
+        value={semifinalsInfo.work_title_kana || ''}
+        onChange={(e) => onChange({ work_title_kana: e.target.value })}
+        disabled={!semifinalsInfo.music_change_from_preliminary}
+        required
+        placeholder="ひらがなで入力"
       />
 
       <FormField

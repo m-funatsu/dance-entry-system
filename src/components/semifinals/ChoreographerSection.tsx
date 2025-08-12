@@ -35,7 +35,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       </div>
 
       <FormField
-        label="準決勝 - 振付師1"
+        label="振付師氏名"
         name="choreographer_name"
         value={semifinalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
@@ -43,10 +43,12 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       />
 
       <FormField
-        label="準決勝 - 振付師2"
-        name="choreographer_name_kana"
-        value={semifinalsInfo.choreographer_name_kana || ''}
-        onChange={(e) => onChange({ choreographer_name_kana: e.target.value })}
+        label="振付師氏名(ふりがな)"
+        name="choreographer_furigana"
+        value={semifinalsInfo.choreographer_furigana || ''}
+        onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
+        required
+        placeholder="ひらがなで入力"
       />
       
       <div className="mt-4">

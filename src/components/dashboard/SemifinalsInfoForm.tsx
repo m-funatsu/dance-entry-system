@@ -941,8 +941,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             </label>
             <input
               type="text"
-              value={semifinalsInfo.choreographer_name_kana || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
+              value={semifinalsInfo.choreographer_furigana || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_furigana: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>

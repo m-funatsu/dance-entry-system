@@ -163,7 +163,9 @@ export interface PreliminaryInfo {
   jasrac_code?: string
   music_type?: string
   choreographer1_name?: string
+  choreographer1_furigana?: string
   choreographer2_name?: string
+  choreographer2_furigana?: string
   created_by?: string
   created_at: string
   updated_by?: string
@@ -262,7 +264,7 @@ export interface SemifinalsInfo {
   chaser_exit_notes?: string
   choreographer_change_from_preliminary?: boolean
   choreographer_name?: string
-  choreographer_name_kana?: string
+  choreographer_furigana?: string
   props_usage?: string
   props_details?: string
   bank_name?: string
@@ -345,9 +347,9 @@ export interface FinalsInfo {
   chaser_exit_notes?: string
   choreographer_change?: boolean
   choreographer_name?: string
-  choreographer_name_kana?: string
+  choreographer_furigana?: string
   choreographer2_name?: string
-  choreographer2_name_kana?: string
+  choreographer2_furigana?: string
   props_usage?: string
   props_details?: string
   choreographer_attendance?: string

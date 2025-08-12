@@ -66,7 +66,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
       </div>
 
       <FormField
-        label="決勝 - 振付師"
+        label="振付師氏名"
         name="choreographer_name"
         value={finalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
@@ -74,14 +74,31 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         required={choreographerChangeOption === 'different'}
       />
 
+      <FormField
+        label="振付師氏名(ふりがな)"
+        name="choreographer_furigana"
+        value={finalsInfo.choreographer_furigana || ''}
+        onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
+        disabled={choreographerChangeOption === 'same'}
+        required={choreographerChangeOption === 'different'}
+        placeholder="ひらがなで入力"
+      />
 
       <FormField
-        label="決勝 - 振付師2（決勝でダンサーが振付変更した場合）"
+        label="振付師2氏名（決勝で変更した場合）"
         name="choreographer2_name"
         value={finalsInfo.choreographer2_name || ''}
         onChange={(e) => onChange({ choreographer2_name: e.target.value })}
         disabled={choreographerChangeOption === 'same'}
-        required={choreographerChangeOption === 'different'}
+      />
+
+      <FormField
+        label="振付師2氏名(ふりがな)（決勝で変更した場合）"
+        name="choreographer2_furigana"
+        value={finalsInfo.choreographer2_furigana || ''}
+        onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
+        disabled={choreographerChangeOption === 'same'}
+        placeholder="ひらがなで入力"
       />
 
       <div className="mt-4">
