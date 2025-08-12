@@ -143,6 +143,8 @@ export interface PreliminaryInfo {
   record_number?: string
   jasrac_code?: string
   music_type?: string
+  choreographer1_name?: string
+  choreographer2_name?: string
   created_by?: string
   created_at: string
   updated_by?: string

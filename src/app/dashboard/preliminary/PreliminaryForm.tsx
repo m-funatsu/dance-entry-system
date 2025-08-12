@@ -30,7 +30,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     artist: initialData?.artist || '',
     record_number: initialData?.record_number || '',
     jasrac_code: initialData?.jasrac_code || '',
-    music_type: initialData?.music_type || 'cd'
+    music_type: initialData?.music_type || 'cd',
+    choreographer1_name: initialData?.choreographer1_name || '',
+    choreographer2_name: initialData?.choreographer2_name || ''
   })
   
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
@@ -46,7 +48,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     record_number: { required: true },
     jasrac_code: { required: true },
     music_type: { required: true },
-    music_rights_cleared: { required: true }
+    music_rights_cleared: { required: true },
+    choreographer1_name: { required: true }
   }
 
   const { errors, validateAll, isAllRequiredFieldsValid, validateSingleField } = useFormValidation(formData, validationRules)
@@ -536,6 +539,30 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               <option value="other">その他（オリジナル曲）</option>
             </FormField>
           </div>
+        </div>
+
+        {/* 振付師情報セクション */}
+        <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+          <h4 className="text-base font-medium text-gray-900">振付師情報</h4>
+          
+          <FormField
+            label="予選 - 振付師1"
+            name="choreographer1_name"
+            value={formData.choreographer1_name}
+            onChange={(e) => handleFieldChange('choreographer1_name', e.target.value)}
+            required
+            placeholder="例：山田太郎"
+            error={errors.choreographer1_name}
+          />
+
+          <FormField
+            label="予選 - 振付師2"
+            name="choreographer2_name"
+            value={formData.choreographer2_name}
+            onChange={(e) => handleFieldChange('choreographer2_name', e.target.value)}
+            placeholder="例：佐藤花子"
+            error={errors.choreographer2_name}
+          />
         </div>
       </div>
 
