@@ -275,6 +275,32 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
       <DeadlineNoticeAsync deadlineKey="basic_info_deadline" />
 
+      {/* 2025年大会概要 */}
+      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-indigo-900 mb-4">2025年大会概要</h3>
+        <div className="space-y-3 text-sm text-gray-700">
+          <div className="flex">
+            <span className="font-semibold w-20">日　時</span>
+            <span>2025年11月23日（日・祝）</span>
+          </div>
+          <div className="flex">
+            <span className="font-semibold w-20">会　場</span>
+            <div>
+              <div>グランドプリンスホテル新高輪「飛天」</div>
+              <div className="text-xs text-gray-600 mt-1">JR・京浜急行 品川駅高輪口</div>
+            </div>
+          </div>
+          <div className="flex">
+            <span className="font-semibold w-20">主　催</span>
+            <span>株式会社バルカー　株式会社テレビ東京</span>
+          </div>
+          <div className="flex">
+            <span className="font-semibold w-20">特別協賛</span>
+            <span>バルカーグループ</span>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           基本情報の登録
