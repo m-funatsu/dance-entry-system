@@ -490,7 +490,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               placeholder="YAMADA Taro"
             />
             <FormField
-              label="代表者生年月日"
+              label={`代表者生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
               name="representative_birthdate"
               value={formData.representative_birthdate || ''}
               onChange={(e) => handleFieldChangeWithValidation('representative_birthdate', e.target.value)}
@@ -521,25 +521,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               placeholder="TANAKA Hanako"
             />
             <FormField
-              label="ペア生年月日"
+              label={`ペア生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
               name="partner_birthdate"
               value={formData.partner_birthdate || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
               placeholder="YYYY-MM-DD"
             />
           </div>
-          
-          {/* 年齢表示 */}
-          {(formData.representative_birthdate || formData.partner_birthdate) && (
-            <div className="text-sm text-gray-600 mt-2">
-              {formData.representative_birthdate && (
-                <p>代表者年齢（大会時点）: {calculateAge(formData.representative_birthdate)}歳</p>
-              )}
-              {formData.partner_birthdate && (
-                <p>ペア年齢（大会時点）: {calculateAge(formData.partner_birthdate)}歳</p>
-              )}
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
