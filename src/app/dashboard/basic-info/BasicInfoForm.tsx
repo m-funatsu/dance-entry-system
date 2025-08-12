@@ -35,6 +35,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     partner_name: initialData?.partner_name || '',
     partner_furigana: initialData?.partner_furigana || '',
     phone_number: initialData?.phone_number || '',
+    emergency_contact_name_1: initialData?.emergency_contact_name_1 || '',
+    emergency_contact_phone_1: initialData?.emergency_contact_phone_1 || '',
+    emergency_contact_name_2: initialData?.emergency_contact_name_2 || '',
+    emergency_contact_phone_2: initialData?.emergency_contact_phone_2 || '',
     agreement_checked: initialData?.agreement_checked || false,
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
@@ -104,6 +108,29 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         const strValue = String(value)
         if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
           return 'カタカナで入力してください'
+        }
+        return true
+      }
+    }
+
+    // 緊急連絡先電話番号のバリデーション（任意項目だが、入力時は形式チェック）
+    baseRules.emergency_contact_phone_1 = {
+      custom: (value: unknown) => {
+        if (!value) return true // 任意項目
+        const strValue = String(value)
+        if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+          return '正しい電話番号を入力してください（例: 090-1234-5678）'
+        }
+        return true
+      }
+    }
+
+    baseRules.emergency_contact_phone_2 = {
+      custom: (value: unknown) => {
+        if (!value) return true // 任意項目
+        const strValue = String(value)
+        if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
+          return '正しい電話番号を入力してください（例: 090-1234-5678）'
         }
         return true
       }
@@ -411,6 +438,53 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             placeholder="090-1234-5678"
             error={fieldErrors.phone_number || errors.phone_number}
           />
+        </div>
+
+        {/* 緊急連絡先情報セクション */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">緊急連絡先情報</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              label="緊急連絡先①氏名"
+              name="emergency_contact_name_1"
+              value={formData.emergency_contact_name_1 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_1', e.target.value)}
+              placeholder="山田太郎"
+            />
+            
+            <FormField
+              label="緊急連絡先①電話番号"
+              name="emergency_contact_phone_1"
+              type="tel"
+              value={formData.emergency_contact_phone_1 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_1', e.target.value)}
+              placeholder="090-1234-5678"
+              error={fieldErrors.emergency_contact_phone_1 || errors.emergency_contact_phone_1}
+            />
+            
+            <FormField
+              label="緊急連絡先②氏名"
+              name="emergency_contact_name_2"
+              value={formData.emergency_contact_name_2 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_2', e.target.value)}
+              placeholder="山田花子"
+            />
+            
+            <FormField
+              label="緊急連絡先②電話番号"
+              name="emergency_contact_phone_2"
+              type="tel"
+              value={formData.emergency_contact_phone_2 || ''}
+              onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_2', e.target.value)}
+              placeholder="090-5678-1234"
+              error={fieldErrors.emergency_contact_phone_2 || errors.emergency_contact_phone_2}
+            />
+          </div>
+          
+          <p className="text-sm text-gray-600 mt-2">
+            ※ペアで緊急連絡先が異なる場合は②にも記入してください
+          </p>
         </div>
 
         <div className="space-y-4">
