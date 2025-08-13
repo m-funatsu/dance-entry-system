@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, Alert, Button, DeadlineNoticeAsync, FileUploadField } from '@/components/ui'
+import { FormField, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
@@ -23,40 +23,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
-  const [paymentSlip, setPaymentSlip] = useState<File | null>(null)
-  const [paymentSlipUrl, setPaymentSlipUrl] = useState<string>('')
 
-  // 既存の振込確認用紙を読み込む
-  useEffect(() => {
-    const loadPaymentSlip = async () => {
-      if (!entryId) return
-
-      try {
-        // entry_filesテーブルから振込確認用紙を取得
-        const { data: fileData } = await supabase
-          .from('entry_files')
-          .select('*')
-          .eq('entry_id', entryId)
-          .eq('purpose', 'payment_slip')
-          .single()
-
-        if (fileData) {
-          // 署名付きURLを生成
-          const { data: urlData } = await supabase.storage
-            .from('files')
-            .createSignedUrl(fileData.file_path, 3600)
-
-          if (urlData?.signedUrl) {
-            setPaymentSlipUrl(urlData.signedUrl)
-          }
-        }
-      } catch (error) {
-        console.error('振込確認用紙の読み込みエラー:', error)
-      }
-    }
-
-    loadPaymentSlip()
-  }, [entryId, supabase])
 
   // 年齢計算関数（2025年11月23日時点）
   const calculateAge = (birthdate: string): string => {
@@ -372,42 +339,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         if (updateError) throw updateError
       }
 
-      // 振込確認用紙をアップロード
-      if (paymentSlip && currentEntryId) {
-        try {
-          // ファイル名を生成
-          const fileExt = paymentSlip.name.split('.').pop()?.toLowerCase()
-          const fileName = `${currentEntryId}_payment_slip_${Date.now()}.${fileExt}`
-          const filePath = `${currentEntryId}/${fileName}`
-
-          // Supabaseストレージにアップロード
-          const { error: uploadError } = await supabase.storage
-            .from('files')
-            .upload(filePath, paymentSlip, {
-              cacheControl: '3600',
-              upsert: true
-            })
-
-          if (uploadError) throw uploadError
-
-          // entry_filesテーブルに記録（PDFも画像として扱う）
-          const { error: dbError } = await supabase
-            .from('entry_files')
-            .insert({
-              entry_id: currentEntryId,
-              file_type: 'photo',  // PDFも画像カテゴリとして保存
-              file_name: fileName,
-              file_path: filePath,
-              purpose: 'payment_slip',
-              mime_type: paymentSlip.type
-            })
-
-          if (dbError) throw dbError
-        } catch (error) {
-          console.error('振込確認用紙のアップロードエラー:', error)
-          showToast('振込確認用紙のアップロードに失敗しました', 'error')
-        }
-      }
 
       // フォームデータを保存
       await saveForm(isTemporary)
@@ -646,55 +577,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.phone_number || errors.phone_number}
             />
           </div>
-        </div>
-
-        {/* 振込確認用紙アップロードセクション */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">振込確認用紙アップロード</h3>
-          
-          <div className="bg-gray-50 p-4 rounded-md mb-4">
-            <div className="text-sm text-gray-700 space-y-2">
-              <p className="font-semibold">■オンライン予選エントリー料</p>
-              <p className="ml-4">8,000円</p>
-              
-              <p className="font-semibold mt-3">■お振込先</p>
-              <div className="ml-4 space-y-1">
-                <p>三井住友銀行</p>
-                <p>新宿西口支店</p>
-                <p>普通　２２４１７６９</p>
-                <p>カ）バルカー</p>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <FileUploadField
-              label="振込確認用紙"
-              value={paymentSlipUrl}
-              onChange={(file: File) => setPaymentSlip(file)}
-              accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
-              maxSizeMB={10}
-              category="document"
-              required
-            />
-            
-            {paymentSlipUrl && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPaymentSlip(null)
-                  setPaymentSlipUrl('')
-                }}
-                className="mt-2 text-sm text-red-600 hover:text-red-800"
-              >
-                ファイルを削除
-              </button>
-            )}
-          </div>
-          
-          <p className="text-sm text-gray-600 mt-2">
-            ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
-          </p>
         </div>
 
         {/* 本名情報セクション */}
