@@ -559,6 +559,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.representative_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('representative_romaji', e.target.value)}
               placeholder="Yamada Taro"
+              required
+              error={fieldErrors.representative_romaji || errors.representative_romaji}
             />
             <FormField
               label={`代表者生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
@@ -568,6 +570,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('representative_birthdate', e.target.value)}
               max="2025-11-23"
               min="1920-01-01"
+              required
+              error={fieldErrors.representative_birthdate || errors.representative_birthdate}
             />
             <FormField
               label="ペア氏名"
@@ -592,6 +596,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
               placeholder="Tanaka Hanako"
+              required={formData.category_division === 'ペア'}
+              error={fieldErrors.partner_romaji || errors.partner_romaji}
             />
             <FormField
               label={`ペア生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
@@ -601,6 +607,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
               max="2025-11-23"
               min="1920-01-01"
+              required={formData.category_division === 'ペア'}
+              error={fieldErrors.partner_birthdate || errors.partner_birthdate}
             />
           </div>
         </div>
@@ -632,6 +640,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
               maxSizeMB={10}
               category="document"
+              required
             />
             
             {paymentSlipUrl && (
@@ -653,27 +662,33 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            label="代表者メールアドレス"
-            name="representative_email"
-            type="email"
-            value={formData.representative_email}
-            onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
-            required
-            placeholder="example@email.com"
-            error={fieldErrors.representative_email || errors.representative_email}
-          />
-          <FormField
-            label="代表者電話番号"
-            name="phone_number"
-            type="tel"
-            value={formData.phone_number}
-            onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
-            required
-            placeholder="090-1234-5678"
-            error={fieldErrors.phone_number || errors.phone_number}
-          />
+        {/* 連絡先情報セクション */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">連絡先情報</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              label="代表者メールアドレス"
+              name="representative_email"
+              type="email"
+              value={formData.representative_email}
+              onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
+              required
+              placeholder="example@email.com"
+              error={fieldErrors.representative_email || errors.representative_email}
+            />
+            
+            <FormField
+              label="代表者電話番号"
+              name="phone_number"
+              type="tel"
+              value={formData.phone_number}
+              onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
+              required
+              placeholder="090-1234-5678"
+              error={fieldErrors.phone_number || errors.phone_number}
+            />
+          </div>
         </div>
 
         {/* 本名情報セクション */}
@@ -690,6 +705,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
               placeholder="山田太郎"
+              required
+              error={fieldErrors.real_name || errors.real_name}
             />
             
             <FormField
@@ -698,6 +715,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
               placeholder="ヤマダタロウ"
+              required
+              error={fieldErrors.real_name_kana || errors.real_name_kana}
             />
             
             <FormField
@@ -729,6 +748,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.emergency_contact_name_1 || ''}
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_1', e.target.value)}
               placeholder="山田太郎"
+              required
+              error={fieldErrors.emergency_contact_name_1 || errors.emergency_contact_name_1}
             />
             
             <FormField
@@ -738,6 +759,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.emergency_contact_phone_1 || ''}
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_1', e.target.value)}
               placeholder="090-1234-5678"
+              required
               error={fieldErrors.emergency_contact_phone_1 || errors.emergency_contact_phone_1}
             />
             
