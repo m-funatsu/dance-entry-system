@@ -141,20 +141,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       real_name_kana: { required: true },
       emergency_contact_name_1: { required: true },
       emergency_contact_phone_1: { required: true },
-    } as Record<string, {
-      required?: boolean
-      pattern?: RegExp
-      maxLength?: number
-      custom?: (value: unknown) => boolean | string
-    }>
-    
-    // ペア部門の場合、ペア情報を必須にする
-    if (formData.category_division === 'ペア') {
-      baseRules.partner_name = { 
+      partner_name: { 
         required: true,
         maxLength: 50
-      }
-      baseRules.partner_furigana = { 
+      },
+      partner_furigana: { 
         required: true,
         maxLength: 50,
         pattern: /^[\u30A0-\u30FF\s]+$/,
@@ -166,12 +157,17 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           }
           return true
         }
-      }
-      baseRules.partner_romaji = { required: true }
-      baseRules.partner_birthdate = { required: true }
-      baseRules.partner_real_name = { required: true }
-      baseRules.partner_real_name_kana = { required: true }
-    }
+      },
+      partner_romaji: { required: true },
+      partner_birthdate: { required: true },
+      partner_real_name: { required: true },
+      partner_real_name_kana: { required: true },
+    } as Record<string, {
+      required?: boolean
+      pattern?: RegExp
+      maxLength?: number
+      custom?: (value: unknown) => boolean | string
+    }>
 
     // 緊急連絡先電話番号のバリデーション（必須項目として上書き）
     baseRules.emergency_contact_phone_1 = {
@@ -540,7 +536,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
               placeholder="Tanaka Hanako"
-              required={formData.category_division === 'ペア'}
+              required
               error={fieldErrors.partner_romaji || errors.partner_romaji}
             />
             <FormField
@@ -551,7 +547,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
               max="2025-11-23"
               min="1920-01-01"
-              required={formData.category_division === 'ペア'}
+              required
               error={fieldErrors.partner_birthdate || errors.partner_birthdate}
             />
             
