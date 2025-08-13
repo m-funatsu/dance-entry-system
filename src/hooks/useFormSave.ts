@@ -55,9 +55,13 @@ export const useFormSave = ({
           .eq(uniqueField, data[uniqueField])
 
         if (updateError) {
-          console.error('UPDATE エラー詳細 (useFormSave):', updateError)
+          console.error('UPDATE エラー詳細 (useFormSave):')
+          console.error('  code:', updateError.code)
+          console.error('  message:', updateError.message)
+          console.error('  details:', updateError.details)
+          console.error('  hint:', updateError.hint)
           console.error('テーブル名:', tableName)
-          console.error('送信データ:', updateData)
+          console.error('送信データ:', JSON.stringify(updateData, null, 2))
           throw updateError
         }
       } else {
@@ -70,9 +74,13 @@ export const useFormSave = ({
           .insert(insertData)
 
         if (insertError) {
-          console.error('INSERT エラー詳細 (useFormSave):', insertError)
+          console.error('INSERT エラー詳細 (useFormSave):')
+          console.error('  code:', insertError.code)
+          console.error('  message:', insertError.message)
+          console.error('  details:', insertError.details)
+          console.error('  hint:', insertError.hint)
           console.error('テーブル名:', tableName)
-          console.error('送信データ:', insertData)
+          console.error('送信データ:', JSON.stringify(insertData, null, 2))
           throw insertError
         }
       }
