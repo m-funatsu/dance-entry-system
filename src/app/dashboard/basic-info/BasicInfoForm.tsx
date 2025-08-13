@@ -610,6 +610,28 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               required={formData.category_division === 'ペア'}
               error={fieldErrors.partner_birthdate || errors.partner_birthdate}
             />
+            
+            <FormField
+              label="代表者メールアドレス"
+              name="representative_email"
+              type="email"
+              value={formData.representative_email}
+              onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
+              required
+              placeholder="example@email.com"
+              error={fieldErrors.representative_email || errors.representative_email}
+            />
+            
+            <FormField
+              label="代表者電話番号"
+              name="phone_number"
+              type="tel"
+              value={formData.phone_number}
+              onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
+              required
+              placeholder="090-1234-5678"
+              error={fieldErrors.phone_number || errors.phone_number}
+            />
           </div>
         </div>
 
@@ -660,35 +682,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <p className="text-sm text-gray-600 mt-2">
             ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
           </p>
-        </div>
-
-        {/* 連絡先情報セクション */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">連絡先情報</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label="代表者メールアドレス"
-              name="representative_email"
-              type="email"
-              value={formData.representative_email}
-              onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
-              required
-              placeholder="example@email.com"
-              error={fieldErrors.representative_email || errors.representative_email}
-            />
-            
-            <FormField
-              label="代表者電話番号"
-              name="phone_number"
-              type="tel"
-              value={formData.phone_number}
-              onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
-              required
-              placeholder="090-1234-5678"
-              error={fieldErrors.phone_number || errors.phone_number}
-            />
-          </div>
         </div>
 
         {/* 本名情報セクション */}
