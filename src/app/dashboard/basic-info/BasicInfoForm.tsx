@@ -487,7 +487,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="representative_romaji"
               value={formData.representative_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('representative_romaji', e.target.value)}
-              placeholder="YAMADA Taro"
+              placeholder="Yamada Taro"
             />
             <FormField
               label={`代表者生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
@@ -520,7 +520,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               name="partner_romaji"
               value={formData.partner_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
-              placeholder="TANAKA Hanako"
+              placeholder="Tanaka Hanako"
             />
             <FormField
               label={`ペア生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
