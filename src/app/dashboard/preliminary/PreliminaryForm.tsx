@@ -33,7 +33,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     jasrac_code: initialData?.jasrac_code || '',
     music_type: initialData?.music_type || 'cd',
     choreographer1_name: initialData?.choreographer1_name || '',
-    choreographer2_name: initialData?.choreographer2_name || ''
+    choreographer1_furigana: initialData?.choreographer1_furigana || '',
+    choreographer2_name: initialData?.choreographer2_name || '',
+    choreographer2_furigana: initialData?.choreographer2_furigana || ''
   })
   
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
@@ -51,7 +53,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     jasrac_code: { required: true },
     music_type: { required: true },
     music_rights_cleared: { required: true },
-    choreographer1_name: { required: true }
+    choreographer1_name: { required: true },
+    choreographer1_furigana: { required: true }
   }
 
   const { errors, validateAll, isAllRequiredFieldsValid, validateSingleField } = useFormValidation(formData, validationRules)
@@ -568,12 +571,31 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           />
 
           <FormField
+            label="予選 - 振付師1 フリガナ"
+            name="choreographer1_furigana"
+            value={formData.choreographer1_furigana}
+            onChange={(e) => handleFieldChange('choreographer1_furigana', e.target.value)}
+            required
+            placeholder="例：ヤマダタロウ"
+            error={errors.choreographer1_furigana}
+          />
+
+          <FormField
             label="予選 - 振付師2"
             name="choreographer2_name"
             value={formData.choreographer2_name}
             onChange={(e) => handleFieldChange('choreographer2_name', e.target.value)}
             placeholder="例：佐藤花子"
             error={errors.choreographer2_name}
+          />
+
+          <FormField
+            label="予選 - 振付師2 フリガナ"
+            name="choreographer2_furigana"
+            value={formData.choreographer2_furigana}
+            onChange={(e) => handleFieldChange('choreographer2_furigana', e.target.value)}
+            placeholder="例：サトウハナコ"
+            error={errors.choreographer2_furigana}
           />
         </div>
       </div>
