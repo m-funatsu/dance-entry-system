@@ -718,6 +718,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
               placeholder="田中花子"
+              required={formData.category_division === 'ペア'}
+              error={fieldErrors.partner_real_name || errors.partner_real_name}
             />
             
             <FormField
@@ -726,6 +728,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
               placeholder="タナカハナコ"
+              required={formData.category_division === 'ペア'}
+              error={fieldErrors.partner_real_name_kana || errors.partner_real_name_kana}
             />
           </div>
         </div>
