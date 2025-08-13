@@ -338,7 +338,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       
       const { error: uploadError } = await supabase.storage
         .from('files')
-        .upload(fileName, file)
+        .upload(fileName, file, {
+          contentType: file.type,
+          cacheControl: '3600',
+          upsert: false
+        })
 
       if (uploadError) throw uploadError
 
@@ -472,7 +476,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       // 新しいファイルをアップロード
       const { error: uploadError } = await supabase.storage
         .from('files')
-        .upload(fileName, file)
+        .upload(fileName, file, {
+          contentType: file.type,
+          cacheControl: '3600',
+          upsert: false
+        })
 
       if (uploadError) throw uploadError
 
