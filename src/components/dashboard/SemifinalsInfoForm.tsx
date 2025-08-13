@@ -1022,6 +1022,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               if ('payment_slip_file' in updates) {
                 setPaymentSlipFile(updates.payment_slip_file as File)
                 // payment_slip_fileはsemifinalsInfoに含めない
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { payment_slip_file, ...rest } = updates
                 setSemifinalsInfo(prev => ({ ...prev, ...rest }))
               } else {

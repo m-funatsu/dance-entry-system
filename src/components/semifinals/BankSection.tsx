@@ -17,6 +17,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
   onChange
 }) => {
   const supabase = createClient()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [paymentSlip, setPaymentSlip] = useState<File | null>(null)
   const [paymentSlipUrl, setPaymentSlipUrl] = useState<string>('')
   
@@ -59,7 +60,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
     // 保存処理はSemifinalsInfoFormで行うため、ここではファイルを保持するのみ
     // 親コンポーネントに通知する場合は、onChangeを使用
     if (onChange) {
-      onChange({ payment_slip_file: file } as any)
+      onChange({ payment_slip_file: file } as Partial<SemifinalsInfo> & { payment_slip_file: File })
     }
   }
 
