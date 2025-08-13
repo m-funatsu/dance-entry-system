@@ -40,6 +40,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
   const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)  // 拡大表示用PDF URL
+  const [makeupStyle1File, setMakeupStyle1File] = useState<EntryFile | null>(null)  // 希望スタイル①画像
+  const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL
+  const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像
+  const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL
+  const [uploadingMakeupFile, setUploadingMakeupFile] = useState(false)
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -96,6 +101,42 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           }
         }
         setPaymentSlipUrls(urls)
+      }
+      
+      // 希望スタイル①画像を取得
+      const { data: style1File } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .eq('purpose', 'makeup_style1')
+        .maybeSingle()
+      
+      if (style1File) {
+        setMakeupStyle1File(style1File)
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(style1File.file_path, 3600)
+        if (data?.signedUrl) {
+          setMakeupStyle1Url(data.signedUrl)
+        }
+      }
+      
+      // 希望スタイル②画像を取得
+      const { data: style2File } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .eq('purpose', 'makeup_style2')
+        .maybeSingle()
+      
+      if (style2File) {
+        setMakeupStyle2File(style2File)
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(style2File.file_path, 3600)
+        if (data?.signedUrl) {
+          setMakeupStyle2Url(data.signedUrl)
+        }
       }
     } catch (err) {
       console.error('各種申請情報の読み込みエラー:', err)
@@ -329,6 +370,107 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     } catch (err) {
       console.error('ファイル削除エラー:', err)
       setError('払込用紙の削除に失敗しました')
+    }
+  }
+
+  // メイクスタイル画像のアップロード処理
+  const handleMakeupStyleUpload = async (file: File, styleNumber: 1 | 2) => {
+    try {
+      setUploadingMakeupFile(true)
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${entry.id}/makeup/style${styleNumber}_${Date.now()}.${fileExt}`
+      
+      // 既存のファイルがある場合は削除
+      const existingFile = styleNumber === 1 ? makeupStyle1File : makeupStyle2File
+      if (existingFile) {
+        await supabase.storage.from('files').remove([existingFile.file_path])
+        await supabase.from('entry_files').delete().eq('id', existingFile.id)
+      }
+      
+      // 新しいファイルをアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('files')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      // entry_filesテーブルに保存
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert({
+          entry_id: entry.id,
+          file_type: 'photo',
+          file_name: file.name,
+          file_path: fileName,
+          purpose: `makeup_style${styleNumber}`
+        })
+        .select()
+        .single()
+
+      if (dbError) throw dbError
+
+      // 署名付きURLを取得
+      const { data } = await supabase.storage
+        .from('files')
+        .createSignedUrl(fileName, 3600)
+      
+      if (data?.signedUrl) {
+        if (styleNumber === 1) {
+          setMakeupStyle1File(fileData)
+          setMakeupStyle1Url(data.signedUrl)
+        } else {
+          setMakeupStyle2File(fileData)
+          setMakeupStyle2Url(data.signedUrl)
+        }
+      }
+      
+      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像をアップロードしました`)
+    } catch (err) {
+      console.error('メイクスタイル画像アップロードエラー:', err)
+      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像アップロードに失敗しました`)
+    } finally {
+      setUploadingMakeupFile(false)
+    }
+  }
+
+  // メイクスタイル画像の削除処理
+  const handleMakeupStyleDelete = async (styleNumber: 1 | 2) => {
+    if (!window.confirm(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像を削除してもよろしいですか？`)) return
+
+    try {
+      const fileToDelete = styleNumber === 1 ? makeupStyle1File : makeupStyle2File
+      if (!fileToDelete) return
+
+      // ストレージから削除
+      const { error: storageError } = await supabase.storage
+        .from('files')
+        .remove([fileToDelete.file_path])
+
+      if (storageError) {
+        console.error('ストレージ削除エラー:', storageError)
+      }
+
+      // データベースから削除
+      const { error: dbError } = await supabase
+        .from('entry_files')
+        .delete()
+        .eq('id', fileToDelete.id)
+
+      if (dbError) throw dbError
+
+      // 状態を更新
+      if (styleNumber === 1) {
+        setMakeupStyle1File(null)
+        setMakeupStyle1Url('')
+      } else {
+        setMakeupStyle2File(null)
+        setMakeupStyle2Url('')
+      }
+
+      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像を削除しました`)
+    } catch (err) {
+      console.error('メイクスタイル画像削除エラー:', err)
+      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像削除に失敗しました`)
     }
   }
 
@@ -633,28 +775,98 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                希望スタイル①
+                希望スタイル① （画像アップロード）
               </label>
-              <input
-                type="text"
-                value={applicationsInfo.makeup_style1 || ''}
-                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_style1: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder="例: ナチュラルメイク"
-              />
+              {makeupStyle1Url ? (
+                <div className="relative border rounded-lg p-3 bg-white">
+                  <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                    <Image
+                      src={makeupStyle1Url}
+                      alt="希望スタイル①"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleMakeupStyleDelete(1)}
+                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                  >
+                    画像を削除
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        handleMakeupStyleUpload(file, 1)
+                        e.target.value = ''
+                      }
+                    }}
+                    disabled={uploadingMakeupFile}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  {uploadingMakeupFile && (
+                    <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
+                  </p>
+                </div>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                希望スタイル②
+                希望スタイル② （画像アップロード）
               </label>
-              <input
-                type="text"
-                value={applicationsInfo.makeup_style2 || ''}
-                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_style2: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder="例: アップスタイル"
-              />
+              {makeupStyle2Url ? (
+                <div className="relative border rounded-lg p-3 bg-white">
+                  <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                    <Image
+                      src={makeupStyle2Url}
+                      alt="希望スタイル②"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleMakeupStyleDelete(2)}
+                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                  >
+                    画像を削除
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        handleMakeupStyleUpload(file, 2)
+                        e.target.value = ''
+                      }
+                    }}
+                    disabled={uploadingMakeupFile}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  {uploadingMakeupFile && (
+                    <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
