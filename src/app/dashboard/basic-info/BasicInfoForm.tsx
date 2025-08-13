@@ -144,6 +144,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           return true
         }
       },
+      representative_romaji: { required: true },
+      representative_birthdate: { required: true },
       representative_email: { 
         required: true,
         pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -168,6 +170,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           return true
         }
       },
+      real_name: { required: true },
+      real_name_kana: { required: true },
+      emergency_contact_name_1: { required: true },
+      emergency_contact_phone_1: { required: true },
     } as Record<string, {
       required?: boolean
       pattern?: RegExp
@@ -175,29 +181,36 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       custom?: (value: unknown) => boolean | string
     }>
     
-    // ペア情報は常に必須
-    baseRules.partner_name = { 
-      required: true,
-      maxLength: 50
-    }
-    baseRules.partner_furigana = { 
-      required: true,
-      maxLength: 50,
-      pattern: /^[\u30A0-\u30FF\s]+$/,
-      custom: (value: unknown) => {
-        if (!value) return 'ペアフリガナは必須です'
-        const strValue = String(value)
-        if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
-          return 'カタカナで入力してください'
-        }
-        return true
+    // ペア部門の場合、ペア情報を必須にする
+    if (formData.category_division === 'ペア') {
+      baseRules.partner_name = { 
+        required: true,
+        maxLength: 50
       }
+      baseRules.partner_furigana = { 
+        required: true,
+        maxLength: 50,
+        pattern: /^[\u30A0-\u30FF\s]+$/,
+        custom: (value: unknown) => {
+          if (!value) return 'ペアフリガナは必須です'
+          const strValue = String(value)
+          if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
+            return 'カタカナで入力してください'
+          }
+          return true
+        }
+      }
+      baseRules.partner_romaji = { required: true }
+      baseRules.partner_birthdate = { required: true }
+      baseRules.partner_real_name = { required: true }
+      baseRules.partner_real_name_kana = { required: true }
     }
 
-    // 緊急連絡先電話番号のバリデーション（任意項目だが、入力時は形式チェック）
+    // 緊急連絡先電話番号のバリデーション（必須項目として上書き）
     baseRules.emergency_contact_phone_1 = {
+      required: true,
       custom: (value: unknown) => {
-        if (!value) return true // 任意項目
+        if (!value) return '緊急連絡先電話番号は必須です'
         const strValue = String(value)
         if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
           return '正しい電話番号を入力してください（例: 090-1234-5678）'
