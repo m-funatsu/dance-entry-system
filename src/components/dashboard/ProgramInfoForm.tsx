@@ -303,7 +303,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
           {/* あらすじ・ストーリー */}
           <FormField
-            label="作品目あらすじ・ストーリー（100文字以内）"
+            label="作品あらすじ・ストーリー（100文字以内）"
             name="semifinal_story"
             type="textarea"
             value={programInfo.semifinal_story || ''}
@@ -316,7 +316,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
           {/* 見所 */}
           <FormField
-            label="作品目見所（50文字以内）"
+            label="作品見所（50文字以内）"
             name="semifinal_highlight"
             type="textarea"
             value={programInfo.semifinal_highlight || ''}
@@ -334,7 +334,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               return (
                 <div key={fieldName}>
                   <FileUploadField
-                    label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                    label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
                     required
                     value={programInfo[fieldName] as string}
                     onChange={(file) => handleImageUpload(fieldName, file)}
@@ -428,7 +428,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 return (
                   <div key={fieldName}>
                     <FileUploadField
-                      label={`作品目作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
+                      label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
                       required
                       value={programInfo[fieldName] as string}
                       onChange={(file) => handleImageUpload(fieldName, file)}
