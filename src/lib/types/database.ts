@@ -402,6 +402,14 @@ export interface ApplicationsInfo {
   makeup_notes?: string
   makeup_style1?: string
   makeup_style2?: string
+  // 決勝用メイク・ヘアメイク
+  makeup_preferred_stylist_final?: string
+  makeup_name_final?: string
+  makeup_email_final?: string
+  makeup_phone_final?: string
+  makeup_notes_final?: string
+  makeup_style1_final?: string
+  makeup_style2_final?: string
   created_at: string
   created_by?: string
   updated_at: string

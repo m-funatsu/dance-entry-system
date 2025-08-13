@@ -40,13 +40,19 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
   const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)  // 拡大表示用PDF URL
-  const [makeupStyle1File, setMakeupStyle1File] = useState<EntryFile | null>(null)  // 希望スタイル①画像
-  const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL
-  const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像
-  const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL
+  const [makeupStyle1File, setMakeupStyle1File] = useState<EntryFile | null>(null)  // 希望スタイル①画像（準決勝）
+  const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL（準決勝）
+  const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像（準決勝）
+  const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL（準決勝）
   const [uploadingMakeupFile, setUploadingMakeupFile] = useState(false)
   const [basicInfo, setBasicInfo] = useState<Partial<BasicInfo> | null>(null)  // 基本情報
-  const [makeupApplicant, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')  // メイク申請者
+  const [makeupApplicant, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（準決勝）
+  // 決勝用の状態
+  const [makeupApplicantFinal, setMakeupApplicantFinal] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（決勝）
+  const [makeupStyle1FileFinal, setMakeupStyle1FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル①画像（決勝）
+  const [makeupStyle1UrlFinal, setMakeupStyle1UrlFinal] = useState<string>('')  // 希望スタイル①画像URL（決勝）
+  const [makeupStyle2FileFinal, setMakeupStyle2FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル②画像（決勝）
+  const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -134,7 +140,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         }
       }
       
-      // 希望スタイル②画像を取得
+      // 希望スタイル②画像を取得（準決勝）
       const { data: style2File } = await supabase
         .from('entry_files')
         .select('*')
@@ -149,6 +155,42 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           .createSignedUrl(style2File.file_path, 3600)
         if (data?.signedUrl) {
           setMakeupStyle2Url(data.signedUrl)
+        }
+      }
+      
+      // 決勝用の希望スタイル①画像を取得
+      const { data: style1FileFinal } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .eq('purpose', 'makeup_style1_final')
+        .maybeSingle()
+      
+      if (style1FileFinal) {
+        setMakeupStyle1FileFinal(style1FileFinal)
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(style1FileFinal.file_path, 3600)
+        if (data?.signedUrl) {
+          setMakeupStyle1UrlFinal(data.signedUrl)
+        }
+      }
+      
+      // 決勝用の希望スタイル②画像を取得
+      const { data: style2FileFinal } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .eq('purpose', 'makeup_style2_final')
+        .maybeSingle()
+      
+      if (style2FileFinal) {
+        setMakeupStyle2FileFinal(style2FileFinal)
+        const { data } = await supabase.storage
+          .from('files')
+          .createSignedUrl(style2FileFinal.file_path, 3600)
+        if (data?.signedUrl) {
+          setMakeupStyle2UrlFinal(data.signedUrl)
         }
       }
     } catch (err) {
@@ -387,14 +429,16 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   }
 
   // メイクスタイル画像のアップロード処理
-  const handleMakeupStyleUpload = async (file: File, styleNumber: 1 | 2) => {
+  const handleMakeupStyleUpload = async (file: File, styleNumber: 1 | 2, isFinal: boolean = false) => {
     try {
       setUploadingMakeupFile(true)
       const fileExt = file.name.split('.').pop()
-      const fileName = `${entry.id}/makeup/style${styleNumber}_${Date.now()}.${fileExt}`
+      const fileName = `${entry.id}/makeup/${isFinal ? 'final_' : ''}style${styleNumber}_${Date.now()}.${fileExt}`
       
       // 既存のファイルがある場合は削除
-      const existingFile = styleNumber === 1 ? makeupStyle1File : makeupStyle2File
+      const existingFile = isFinal 
+        ? (styleNumber === 1 ? makeupStyle1FileFinal : makeupStyle2FileFinal)
+        : (styleNumber === 1 ? makeupStyle1File : makeupStyle2File)
       if (existingFile) {
         await supabase.storage.from('files').remove([existingFile.file_path])
         await supabase.from('entry_files').delete().eq('id', existingFile.id)
@@ -415,7 +459,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           file_type: 'photo',
           file_name: file.name,
           file_path: fileName,
-          purpose: `makeup_style${styleNumber}`
+          purpose: `makeup_style${styleNumber}${isFinal ? '_final' : ''}`
         })
         .select()
         .single()
@@ -428,30 +472,45 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .createSignedUrl(fileName, 3600)
       
       if (data?.signedUrl) {
-        if (styleNumber === 1) {
-          setMakeupStyle1File(fileData)
-          setMakeupStyle1Url(data.signedUrl)
+        if (isFinal) {
+          if (styleNumber === 1) {
+            setMakeupStyle1FileFinal(fileData)
+            setMakeupStyle1UrlFinal(data.signedUrl)
+          } else {
+            setMakeupStyle2FileFinal(fileData)
+            setMakeupStyle2UrlFinal(data.signedUrl)
+          }
         } else {
-          setMakeupStyle2File(fileData)
-          setMakeupStyle2Url(data.signedUrl)
+          if (styleNumber === 1) {
+            setMakeupStyle1File(fileData)
+            setMakeupStyle1Url(data.signedUrl)
+          } else {
+            setMakeupStyle2File(fileData)
+            setMakeupStyle2Url(data.signedUrl)
+          }
         }
       }
       
-      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像をアップロードしました`)
+      const stage = isFinal ? '（決勝）' : '（準決勝）'
+      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像をアップロードしました`)
     } catch (err) {
       console.error('メイクスタイル画像アップロードエラー:', err)
-      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像アップロードに失敗しました`)
+      const stage = isFinal ? '（決勝）' : '（準決勝）'
+      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像アップロードに失敗しました`)
     } finally {
       setUploadingMakeupFile(false)
     }
   }
 
   // メイクスタイル画像の削除処理
-  const handleMakeupStyleDelete = async (styleNumber: 1 | 2) => {
-    if (!window.confirm(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像を削除してもよろしいですか？`)) return
+  const handleMakeupStyleDelete = async (styleNumber: 1 | 2, isFinal: boolean = false) => {
+    const stage = isFinal ? '（決勝）' : '（準決勝）'
+    if (!window.confirm(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像を削除してもよろしいですか？`)) return
 
     try {
-      const fileToDelete = styleNumber === 1 ? makeupStyle1File : makeupStyle2File
+      const fileToDelete = isFinal
+        ? (styleNumber === 1 ? makeupStyle1FileFinal : makeupStyle2FileFinal)
+        : (styleNumber === 1 ? makeupStyle1File : makeupStyle2File)
       if (!fileToDelete) return
 
       // ストレージから削除
@@ -472,18 +531,28 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       if (dbError) throw dbError
 
       // 状態を更新
-      if (styleNumber === 1) {
-        setMakeupStyle1File(null)
-        setMakeupStyle1Url('')
+      if (isFinal) {
+        if (styleNumber === 1) {
+          setMakeupStyle1FileFinal(null)
+          setMakeupStyle1UrlFinal('')
+        } else {
+          setMakeupStyle2FileFinal(null)
+          setMakeupStyle2UrlFinal('')
+        }
       } else {
-        setMakeupStyle2File(null)
-        setMakeupStyle2Url('')
+        if (styleNumber === 1) {
+          setMakeupStyle1File(null)
+          setMakeupStyle1Url('')
+        } else {
+          setMakeupStyle2File(null)
+          setMakeupStyle2Url('')
+        }
       }
 
-      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像を削除しました`)
+      setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像を削除しました`)
     } catch (err) {
       console.error('メイクスタイル画像削除エラー:', err)
-      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}の画像削除に失敗しました`)
+      setError(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像削除に失敗しました`)
     }
   }
 
@@ -727,21 +796,25 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       {/* メイク・ヘアメイク予約申請 */}
       {activeTab === 'makeup' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <h4 className="font-medium">メイク・ヘアメイク予約申請</h4>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              希望美容師
-            </label>
-            <input
-              type="text"
-              value={applicationsInfo.makeup_preferred_stylist || ''}
-              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="希望がある場合は美容師名を入力してください"
-            />
-          </div>
+          {/* 準決勝用 */}
+          <div className="border rounded-lg p-6 space-y-4">
+            <h5 className="font-medium text-lg border-b pb-2">準決勝用</h5>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                希望美容師
+              </label>
+              <input
+                type="text"
+                value={applicationsInfo.makeup_preferred_stylist || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="希望がある場合は美容師名を入力してください"
+              />
+            </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -854,7 +927,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleMakeupStyleDelete(1)}
+                    onClick={() => handleMakeupStyleDelete(1, false)}
                     className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
                   >
                     画像を削除
@@ -868,7 +941,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) {
-                        handleMakeupStyleUpload(file, 1)
+                        handleMakeupStyleUpload(file, 1, false)
                         e.target.value = ''
                       }
                     }}
@@ -902,7 +975,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleMakeupStyleDelete(2)}
+                    onClick={() => handleMakeupStyleDelete(2, false)}
                     className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
                   >
                     画像を削除
@@ -916,7 +989,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) {
-                        handleMakeupStyleUpload(file, 2)
+                        handleMakeupStyleUpload(file, 2, false)
                         e.target.value = ''
                       }
                     }}
@@ -934,17 +1007,237 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              備考欄
-            </label>
-            <textarea
-              value={applicationsInfo.makeup_notes || ''}
-              onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes: e.target.value }))}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="その他、ご要望や注意事項があればご記入ください"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                備考欄
+              </label>
+              <textarea
+                value={applicationsInfo.makeup_notes || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes: e.target.value }))}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="その他、ご要望や注意事項があればご記入ください"
+              />
+            </div>
+          </div>
+
+          {/* 決勝用 */}
+          <div className="border rounded-lg p-6 space-y-4">
+            <h5 className="font-medium text-lg border-b pb-2">決勝用</h5>
+            <p className="text-sm text-gray-600">※決勝でメイク・ヘアメイクを変更される場合はご記入ください。</p>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                希望美容師
+              </label>
+              <input
+                type="text"
+                value={applicationsInfo.makeup_preferred_stylist_final || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist_final: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="希望がある場合は美容師名を入力してください"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                申請者
+              </label>
+              <select
+                value={makeupApplicantFinal}
+                onChange={(e) => {
+                  const value = e.target.value as 'representative' | 'partner' | ''
+                  setMakeupApplicantFinal(value)
+                  
+                  // 選択に応じて氏名、メール、電話番号を自動設定
+                  if (value === 'representative' && basicInfo) {
+                    setApplicationsInfo(prev => ({
+                      ...prev,
+                      makeup_name_final: basicInfo.representative_name || '',
+                      makeup_email_final: basicInfo.representative_email || '',
+                      makeup_phone_final: basicInfo.phone_number || ''
+                    }))
+                  } else if (value === 'partner' && basicInfo && basicInfo.partner_name) {
+                    setApplicationsInfo(prev => ({
+                      ...prev,
+                      makeup_name_final: basicInfo.partner_name || '',
+                      makeup_email_final: '', // パートナーのメールアドレスは基本情報にないため空にする
+                      makeup_phone_final: basicInfo.phone_number || '' // 電話番号は共通
+                    }))
+                  } else {
+                    setApplicationsInfo(prev => ({
+                      ...prev,
+                      makeup_name_final: '',
+                      makeup_email_final: '',
+                      makeup_phone_final: ''
+                    }))
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="">選択してください</option>
+                <option value="representative">
+                  {basicInfo?.representative_name || 'エントリー者'}
+                </option>
+                {basicInfo?.partner_name && (
+                  <option value="partner">
+                    {basicInfo.partner_name} (ペア)
+                  </option>
+                )}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  氏名
+                </label>
+                <input
+                  type="text"
+                  value={applicationsInfo.makeup_name_final || ''}
+                  onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_name_final: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                  readOnly={makeupApplicantFinal !== ''}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  メールアドレス
+                </label>
+                <input
+                  type="email"
+                  value={applicationsInfo.makeup_email_final || ''}
+                  onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email_final: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder={makeupApplicantFinal === 'partner' ? 'パートナーのメールアドレスを入力してください' : ''}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                ご連絡先電話番号
+              </label>
+              <input
+                type="tel"
+                value={applicationsInfo.makeup_phone_final || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone_final: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="例: 090-1234-5678"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  希望スタイル① （画像アップロード）
+                </label>
+                {makeupStyle1UrlFinal ? (
+                  <div className="relative border rounded-lg p-3 bg-white">
+                    <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                      <Image
+                        src={makeupStyle1UrlFinal}
+                        alt="希望スタイル①（決勝）"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleMakeupStyleDelete(1, true)}
+                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                    >
+                      画像を削除
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handleMakeupStyleUpload(file, 1, true)
+                          e.target.value = ''
+                        }
+                      }}
+                      disabled={uploadingMakeupFile}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    {uploadingMakeupFile && (
+                      <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  希望スタイル② （画像アップロード）
+                </label>
+                {makeupStyle2UrlFinal ? (
+                  <div className="relative border rounded-lg p-3 bg-white">
+                    <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                      <Image
+                        src={makeupStyle2UrlFinal}
+                        alt="希望スタイル②（決勝）"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleMakeupStyleDelete(2, true)}
+                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                    >
+                      画像を削除
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handleMakeupStyleUpload(file, 2, true)
+                          e.target.value = ''
+                        }
+                      }}
+                      disabled={uploadingMakeupFile}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    {uploadingMakeupFile && (
+                      <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                備考欄
+              </label>
+              <textarea
+                value={applicationsInfo.makeup_notes_final || ''}
+                onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes_final: e.target.value }))}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="その他、ご要望や注意事項があればご記入ください"
+              />
+            </div>
           </div>
         </div>
       )}
