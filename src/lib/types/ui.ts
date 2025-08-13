@@ -18,7 +18,7 @@ export interface ButtonProps {
 export interface FormFieldProps {
   label: string
   name: string
-  type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select'
+  type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select' | 'date' | 'datetime-local'
   value: string | number
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   required?: boolean
@@ -30,6 +30,8 @@ export interface FormFieldProps {
   children?: ReactNode // for select options
   className?: string
   autoComplete?: string
+  min?: string // for date/number inputs
+  max?: string // for date/number inputs
 }
 
 // Alert component props

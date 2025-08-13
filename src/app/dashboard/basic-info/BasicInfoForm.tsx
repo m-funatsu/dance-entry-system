@@ -492,9 +492,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             <FormField
               label={`代表者生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
               name="representative_birthdate"
+              type="date"
               value={formData.representative_birthdate || ''}
               onChange={(e) => handleFieldChangeWithValidation('representative_birthdate', e.target.value)}
-              placeholder="YYYY-MM-DD"
+              max="2025-11-23"
+              min="1920-01-01"
             />
             <FormField
               label="ペア氏名"
@@ -523,9 +525,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             <FormField
               label={`ペア生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
               name="partner_birthdate"
+              type="date"
               value={formData.partner_birthdate || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_birthdate', e.target.value)}
-              placeholder="YYYY-MM-DD"
+              max="2025-11-23"
+              min="1920-01-01"
             />
           </div>
         </div>

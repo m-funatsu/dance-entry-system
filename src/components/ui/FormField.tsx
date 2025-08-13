@@ -17,7 +17,9 @@ export const FormField = memo<FormFieldProps>(({
   rows = 3,
   children,
   className = '',
-  autoComplete
+  autoComplete,
+  min,
+  max
 }) => {
   const baseInputClass = `w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
     disabled ? 'bg-gray-300 cursor-not-allowed' : ''
@@ -68,6 +70,8 @@ export const FormField = memo<FormFieldProps>(({
             maxLength={maxLength}
             className={baseInputClass}
             autoComplete={autoComplete}
+            min={min}
+            max={max}
           />
         )
     }
