@@ -338,14 +338,17 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
       // デバッグ: 保存するデータをログ出力
       console.log('=== 保存するデータ ===')
-      console.log('formData:', formData)
-      console.log('checkboxes:', checkboxes)
+      console.log('formData:', JSON.stringify(formData, null, 2))
+      console.log('checkboxes:', JSON.stringify(checkboxes, null, 2))
       const saveData = {
         ...formData,
         ...checkboxes,
         entry_id: currentEntryId
       }
-      console.log('最終的な保存データ:', saveData)
+      console.log('最終的な保存データ（全フィールド）:')
+      Object.keys(saveData).forEach(key => {
+        console.log(`  ${key}: ${saveData[key as keyof typeof saveData]}`)
+      })
       console.log('===================')
 
       // フォームデータを保存

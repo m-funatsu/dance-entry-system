@@ -143,7 +143,11 @@ export function useBaseForm<T extends Record<string, unknown>>({
           .update(dataToSave)
           .eq(uniqueField, formData[uniqueField] as string)
         
-        if (updateError) throw updateError
+        if (updateError) {
+          console.error('UPDATE エラー詳細:', updateError)
+          console.error('送信データ:', dataToSave)
+          throw updateError
+        }
       } else {
         // 新規作成
         ;(dataToSave as Record<string, unknown>).created_at = now
@@ -154,7 +158,11 @@ export function useBaseForm<T extends Record<string, unknown>>({
           .select()
           .single()
         
-        if (insertError) throw insertError
+        if (insertError) {
+          console.error('INSERT エラー詳細:', insertError)
+          console.error('送信データ:', dataToSave)
+          throw insertError
+        }
         
         // 新規作成時はIDを更新
         if (insertedData && 'id' in insertedData) {
