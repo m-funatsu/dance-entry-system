@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, Alert, Button, DeadlineNoticeAsync, ImageUpload } from '@/components/ui'
+import { FormField, Alert, Button, DeadlineNoticeAsync, FileUploadField } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
@@ -363,7 +363,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       if (paymentSlip && currentEntryId) {
         try {
           // ファイル名を生成
-          const fileExt = paymentSlip.name.split('.').pop()
+          const fileExt = paymentSlip.name.split('.').pop()?.toLowerCase()
           const fileName = `${currentEntryId}_payment_slip_${Date.now()}.${fileExt}`
           const filePath = `${currentEntryId}/${fileName}`
 
@@ -377,15 +377,16 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
           if (uploadError) throw uploadError
 
-          // entry_filesテーブルに記録
+          // entry_filesテーブルに記録（PDFも画像として扱う）
           const { error: dbError } = await supabase
             .from('entry_files')
             .insert({
               entry_id: currentEntryId,
-              file_type: 'photo',
+              file_type: 'photo',  // PDFも画像カテゴリとして保存
               file_name: fileName,
               file_path: filePath,
-              purpose: 'payment_slip'
+              purpose: 'payment_slip',
+              mime_type: paymentSlip.type
             })
 
           if (dbError) throw dbError
@@ -623,20 +624,32 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             </div>
           </div>
           
-          <ImageUpload
-            label="振込確認用紙"
-            value={paymentSlipUrl || paymentSlip}
-            onChange={(file) => setPaymentSlip(file as File)}
-            onDelete={() => {
-              setPaymentSlip(null)
-              setPaymentSlipUrl('')
-            }}
-            accept="image/jpeg,image/jpg,image/png,image/gif"
-            maxSizeMB={10}
-          />
+          <div>
+            <FileUploadField
+              label="振込確認用紙"
+              value={paymentSlipUrl}
+              onChange={(file: File) => setPaymentSlip(file)}
+              accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
+              maxSizeMB={10}
+              category="document"
+            />
+            
+            {paymentSlipUrl && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPaymentSlip(null)
+                  setPaymentSlipUrl('')
+                }}
+                className="mt-2 text-sm text-red-600 hover:text-red-800"
+              >
+                ファイルを削除
+              </button>
+            )}
+          </div>
           
           <p className="text-sm text-gray-600 mt-2">
-            ※振込明細書、振込確認画面のスクリーンショット等をアップロードしてください
+            ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
           </p>
         </div>
 
