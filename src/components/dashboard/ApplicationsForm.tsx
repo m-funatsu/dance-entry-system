@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import Image from 'next/image'
-import type { Entry, ApplicationsInfo, EntryFile, SeatRequest } from '@/lib/types'
+import type { Entry, ApplicationsInfo, EntryFile, SeatRequest, BasicInfo } from '@/lib/types'
 
 interface ApplicationsFormProps {
   entry: Entry
@@ -45,6 +45,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像
   const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL
   const [uploadingMakeupFile, setUploadingMakeupFile] = useState(false)
+  const [basicInfo, setBasicInfo] = useState<Partial<BasicInfo> | null>(null)  // 基本情報
+  const [makeupApplicant, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')  // メイク申請者
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -76,6 +78,17 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (seatData) {
         setSeatRequest(seatData)
+      }
+      
+      // 基本情報を取得
+      const { data: basicData } = await supabase
+        .from('basic_info')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .maybeSingle()
+      
+      if (basicData) {
+        setBasicInfo(basicData)
       }
       
       // 払込用紙ファイルを取得
@@ -730,6 +743,55 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              申請者 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={makeupApplicant}
+              onChange={(e) => {
+                const value = e.target.value as 'representative' | 'partner' | ''
+                setMakeupApplicant(value)
+                
+                // 選択に応じて氏名、メール、電話番号を自動設定
+                if (value === 'representative' && basicInfo) {
+                  setApplicationsInfo(prev => ({
+                    ...prev,
+                    makeup_name: basicInfo.representative_name || '',
+                    makeup_email: basicInfo.representative_email || '',
+                    makeup_phone: basicInfo.phone_number || ''
+                  }))
+                } else if (value === 'partner' && basicInfo && basicInfo.partner_name) {
+                  setApplicationsInfo(prev => ({
+                    ...prev,
+                    makeup_name: basicInfo.partner_name || '',
+                    makeup_email: '', // パートナーのメールアドレスは基本情報にないため空にする
+                    makeup_phone: basicInfo.phone_number || '' // 電話番号は共通
+                  }))
+                } else {
+                  setApplicationsInfo(prev => ({
+                    ...prev,
+                    makeup_name: '',
+                    makeup_email: '',
+                    makeup_phone: ''
+                  }))
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+            >
+              <option value="">選択してください</option>
+              <option value="representative">
+                {basicInfo?.representative_name || 'エントリー者'}
+              </option>
+              {basicInfo?.partner_name && (
+                <option value="partner">
+                  {basicInfo.partner_name} (ペア)
+                </option>
+              )}
+            </select>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -739,7 +801,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 type="text"
                 value={applicationsInfo.makeup_name || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_name: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                readOnly={makeupApplicant !== ''}
                 required
               />
             </div>
@@ -753,6 +816,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 value={applicationsInfo.makeup_email || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder={makeupApplicant === 'partner' ? 'パートナーのメールアドレスを入力してください' : ''}
                 required
               />
             </div>
