@@ -237,6 +237,16 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       video_submitted: !!videoFile
     }
 
+    // デバッグ: 保存するデータをログ出力
+    console.log('=== 予選情報 保存データ ===')
+    console.log('formData:', JSON.stringify(formData, null, 2))
+    console.log('dataToSave:', JSON.stringify(dataToSave, null, 2))
+    console.log('全フィールド:')
+    Object.keys(dataToSave).forEach(key => {
+      console.log(`  ${key}: ${dataToSave[key as keyof typeof dataToSave]}`)
+    })
+    console.log('========================')
+
     const savedData = await save(dataToSave, isTemporary)
     
     // 完了登録の場合は、ステータスを更新

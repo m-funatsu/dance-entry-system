@@ -54,7 +54,12 @@ export const useFormSave = ({
           })
           .eq(uniqueField, data[uniqueField])
 
-        if (updateError) throw updateError
+        if (updateError) {
+          console.error('UPDATE エラー詳細 (useFormSave):', updateError)
+          console.error('テーブル名:', tableName)
+          console.error('送信データ:', updateData)
+          throw updateError
+        }
       } else {
         // Insert new record
         const insertData = { ...data }
@@ -64,7 +69,12 @@ export const useFormSave = ({
           .from(tableName)
           .insert(insertData)
 
-        if (insertError) throw insertError
+        if (insertError) {
+          console.error('INSERT エラー詳細 (useFormSave):', insertError)
+          console.error('テーブル名:', tableName)
+          console.error('送信データ:', insertData)
+          throw insertError
+        }
       }
 
       const successMessage = isTemporary ? 'データを一時保存しました' : 'データを保存しました'
