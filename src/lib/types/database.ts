@@ -265,6 +265,8 @@ export interface SemifinalsInfo {
   choreographer_change_from_preliminary?: boolean
   choreographer_name?: string
   choreographer_furigana?: string
+  choreographer2_name?: string
+  choreographer2_furigana?: string
   props_usage?: string
   props_details?: string
   bank_name?: string

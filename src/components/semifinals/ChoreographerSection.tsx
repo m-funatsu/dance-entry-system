@@ -35,7 +35,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       </div>
 
       <FormField
-        label="振付師氏名"
+        label="振付師 氏名①"
         name="choreographer_name"
         value={semifinalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
@@ -43,13 +43,34 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       />
 
       <FormField
-        label="振付師氏名(ふりがな)"
+        label="振付師 氏名フリガナ①"
         name="choreographer_furigana"
         value={semifinalsInfo.choreographer_furigana || ''}
         onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
         required
         placeholder="ひらがなで入力"
       />
+
+      <div className="mt-4">
+        <p className="text-sm text-gray-600 mb-2">
+          ※振付師が2名いる場合のみ記入してください。
+        </p>
+        
+        <FormField
+          label="振付師 氏名②"
+          name="choreographer2_name"
+          value={semifinalsInfo.choreographer2_name || ''}
+          onChange={(e) => onChange({ choreographer2_name: e.target.value })}
+        />
+
+        <FormField
+          label="振付師 氏名フリガナ②"
+          name="choreographer2_furigana"
+          value={semifinalsInfo.choreographer2_furigana || ''}
+          onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
+          placeholder="ひらがなで入力"
+        />
+      </div>
       
       <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">

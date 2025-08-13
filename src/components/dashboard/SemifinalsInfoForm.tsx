@@ -49,8 +49,12 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         // 照明指示情報の必須項目
         return !!semifinalsInfo.dance_start_timing
       case 'choreographer':
-        // 振付情報の必須項目（ユーザーが選択したかチェック）
-        return userSelectedFields.has('choreographer_change_from_preliminary')
+        // 振付情報の必須項目（振付師①の氏名とフリガナが必須）
+        return userSelectedFields.has('choreographer_change_from_preliminary') &&
+               !!semifinalsInfo.choreographer_name &&
+               semifinalsInfo.choreographer_name.trim() !== '' &&
+               !!semifinalsInfo.choreographer_furigana &&
+               semifinalsInfo.choreographer_furigana.trim() !== ''
       case 'bank':
         // 賞金振込先情報の必須項目（全フィールドが必須）
         return !!(
@@ -287,7 +291,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             {!isTabValid('music') && <li>楽曲情報：予選との楽曲情報の変更</li>}
             {!isTabValid('sound') && <li>音響指示情報：音楽スタートのタイミング</li>}
             {!isTabValid('lighting') && <li>照明指示情報：踊り出しタイミング</li>}
-            {!isTabValid('choreographer') && <li>振付情報：予選との振付師の変更</li>}
+            {!isTabValid('choreographer') && <li>振付情報：予選との振付師の変更、振付師①の氏名・フリガナ</li>}
             {!isTabValid('bank') && <li>賞金振込先情報：全項目（銀行名、支店名、口座種類、口座番号、口座名義）</li>}
           </ul>
         </div>
@@ -968,26 +972,60 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              準決勝 - 振付師
+              振付師 氏名① <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={semifinalsInfo.choreographer_name || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              準決勝 - 振付師（かな）
+              振付師 氏名フリガナ① <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={semifinalsInfo.choreographer_furigana || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_furigana: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="ひらがなで入力"
+              required
             />
+          </div>
+
+          <div className="mt-4">
+            <p className="text-sm text-gray-600 mb-2">
+              ※振付師が2名いる場合のみ記入してください。
+            </p>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                振付師 氏名②
+              </label>
+              <input
+                type="text"
+                value={semifinalsInfo.choreographer2_name || ''}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer2_name: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+
+            <div className="mt-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                振付師 氏名フリガナ②
+              </label>
+              <input
+                type="text"
+                value={semifinalsInfo.choreographer2_furigana || ''}
+                onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer2_furigana: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="ひらがなで入力"
+              />
+            </div>
           </div>
           </div>
 
