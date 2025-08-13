@@ -312,7 +312,28 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const handleFileUpload = async (file: File) => {
     try {
       setUploadingFile(true)
-      const fileExt = file.name.split('.').pop()
+      
+      // ファイルタイプの検証
+      const allowedTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'application/pdf'
+      ]
+      
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error(`許可されていないファイル形式です。JPG、PNG、GIF、WEBP、PDFのみアップロード可能です。(現在のファイル: ${file.type || '不明'})`)
+      }
+      
+      // ファイルサイズの検証（10MB以下）
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        throw new Error('ファイルサイズが10MBを超えています')
+      }
+      
+      const fileExt = file.name.split('.').pop()?.toLowerCase()
       const fileName = `${entry.id}/applications/payment_slip_${Date.now()}.${fileExt}`
       
       const { error: uploadError } = await supabase.storage
@@ -363,7 +384,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       setSuccess('払込用紙をアップロードしました')
     } catch (err) {
       console.error('ファイルアップロードエラー:', err)
-      setError('払込用紙のアップロードに失敗しました')
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('払込用紙のアップロードに失敗しました')
+      }
     } finally {
       setUploadingFile(false)
     }
@@ -1240,7 +1265,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               <div className="mt-2">
                 <input
                   type="file"
-                  accept="image/*,application/pdf"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) {
@@ -1251,6 +1276,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   disabled={uploadingFile}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  対応形式: JPG、PNG、GIF、WEBP、PDF（最大10MB）
+                </p>
                 {uploadingFile && (
                   <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
                 )}
