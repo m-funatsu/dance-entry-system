@@ -1,6 +1,8 @@
 'use client'
 
-import { FormField } from '@/components/ui'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { FormField, FileUploadField } from '@/components/ui'
 import type { SemifinalsInfo } from '@/lib/types'
 
 interface BankSectionProps {
@@ -14,8 +16,103 @@ export const BankSection: React.FC<BankSectionProps> = ({
   validationErrors,
   onChange
 }) => {
+  const supabase = createClient()
+  const [paymentSlip, setPaymentSlip] = useState<File | null>(null)
+  const [paymentSlipUrl, setPaymentSlipUrl] = useState<string>('')
+  
+  // 既存の振込確認用紙を読み込む
+  useEffect(() => {
+    const loadPaymentSlip = async () => {
+      if (!semifinalsInfo.entry_id) return
+
+      try {
+        // entry_filesテーブルから振込確認用紙を取得
+        const { data: fileData } = await supabase
+          .from('entry_files')
+          .select('*')
+          .eq('entry_id', semifinalsInfo.entry_id)
+          .eq('purpose', 'semifinals_payment_slip')
+          .single()
+
+        if (fileData) {
+          // 署名付きURLを生成
+          const { data: urlData } = await supabase.storage
+            .from('files')
+            .createSignedUrl(fileData.file_path, 3600)
+
+          if (urlData?.signedUrl) {
+            setPaymentSlipUrl(urlData.signedUrl)
+          }
+        }
+      } catch (error) {
+        console.error('振込確認用紙の読み込みエラー:', error)
+      }
+    }
+
+    loadPaymentSlip()
+  }, [semifinalsInfo.entry_id, supabase])
+
+  // ファイルアップロード処理
+  const handleFileUpload = async (file: File) => {
+    setPaymentSlip(file)
+    
+    // 保存処理はSemifinalsInfoFormで行うため、ここではファイルを保持するのみ
+    // 親コンポーネントに通知する場合は、onChangeを使用
+    if (onChange) {
+      onChange({ payment_slip_file: file } as any)
+    }
+  }
+
   return (
     <div className="space-y-4">
+      {/* 振込確認用紙アップロードセクション */}
+      <div className="border-b pb-6 mb-6">
+        <h4 className="font-medium mb-4">振込確認用紙アップロード</h4>
+        
+        <div className="bg-gray-50 p-4 rounded-md mb-4">
+          <div className="text-sm text-gray-700 space-y-2">
+            <p className="font-semibold">■本大会エントリー料</p>
+            <p className="ml-4">12,000円</p>
+            
+            <p className="font-semibold mt-3">■お振込先</p>
+            <div className="ml-4 space-y-1">
+              <p>三井住友銀行</p>
+              <p>新宿西口支店</p>
+              <p>普通　２２４１７６９</p>
+              <p>カ）バルカー</p>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <FileUploadField
+            label="振込確認用紙"
+            value={paymentSlipUrl}
+            onChange={handleFileUpload}
+            accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
+            maxSizeMB={10}
+            category="document"
+          />
+          
+          {paymentSlipUrl && (
+            <button
+              type="button"
+              onClick={() => {
+                setPaymentSlip(null)
+                setPaymentSlipUrl('')
+              }}
+              className="mt-2 text-sm text-red-600 hover:text-red-800"
+            >
+              ファイルを削除
+            </button>
+          )}
+        </div>
+        
+        <p className="text-sm text-gray-600 mt-2">
+          ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
+        </p>
+      </div>
+
       <div className="flex items-center justify-between">
         <h4 className="font-medium">賞金振込先情報</h4>
         <p className="text-sm text-gray-500">

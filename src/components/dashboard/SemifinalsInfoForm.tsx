@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
+import { BankSection } from '@/components/semifinals/BankSection'
 import type { Entry, SemifinalsInfo } from '@/lib/types'
 
 interface SemifinalsInfoFormProps {
@@ -27,6 +28,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   })
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
+  const [paymentSlipFile, setPaymentSlipFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (!hasLoadedInitialData) {
@@ -160,6 +162,47 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         if (error) throw error
       }
 
+      // 振込確認用紙をアップロード
+      if (paymentSlipFile) {
+        try {
+          // ファイル名を生成
+          const fileExt = paymentSlipFile.name.split('.').pop()?.toLowerCase()
+          const fileName = `${entry.id}_semifinals_payment_slip_${Date.now()}.${fileExt}`
+          const filePath = `${entry.id}/${fileName}`
+
+          // Supabaseストレージにアップロード
+          const { error: uploadError } = await supabase.storage
+            .from('files')
+            .upload(filePath, paymentSlipFile, {
+              cacheControl: '3600',
+              upsert: true
+            })
+
+          if (uploadError) throw uploadError
+
+          // entry_filesテーブルに記録
+          const { error: dbError } = await supabase
+            .from('entry_files')
+            .insert({
+              entry_id: entry.id,
+              file_type: 'photo',  // PDFも画像カテゴリとして保存
+              file_name: fileName,
+              file_path: filePath,
+              purpose: 'semifinals_payment_slip',
+              mime_type: paymentSlipFile.type
+            })
+
+          if (dbError) throw dbError
+          
+          // ファイルをリセット
+          setPaymentSlipFile(null)
+        } catch (error) {
+          console.error('振込確認用紙のアップロードエラー:', error)
+          // エラーがあっても保存は成功扱いにし、エラーメッセージを追加
+          setError('振込確認用紙のアップロードに失敗しました。後で再度お試しください。')
+        }
+      }
+
       setSuccess(isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました')
       // データを保持するため、再読み込みはしない
     } catch (err) {
@@ -204,7 +247,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     { id: 'sound', label: '音響指示情報' },
     { id: 'lighting', label: '照明指示情報' },
     { id: 'choreographer', label: '振付情報' },
-    { id: 'bank', label: '賞金振込先情報' }
+    { id: 'bank', label: 'エントリー振込確認/賞金振込先情報' }
   ]
 
   const colorTypes = [
@@ -968,82 +1011,24 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         </>
       )}
 
-      {/* 賞金振込先情報セクション */}
+      {/* エントリー振込確認/賞金振込先情報セクション */}
       {activeSection === 'bank' && (
         <>
-          <div className="space-y-4">
-          <h4 className="font-medium">賞金振込先情報</h4>
-          
-          {!isTabValid('bank') && (
-            <div className="bg-yellow-50 text-yellow-800 p-4 rounded-md">
-              <p className="font-medium">全ての項目が必須です</p>
-              <p className="text-sm mt-1">銀行名、支店名、口座種類、口座番号、口座名義を全て入力してください。</p>
-            </div>
-          )}
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              銀行名 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={semifinalsInfo.bank_name || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, bank_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              支店名 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={semifinalsInfo.branch_name || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, branch_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座種類 <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={semifinalsInfo.account_type || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_type: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="">選択してください</option>
-              <option value="普通">普通</option>
-              <option value="当座">当座</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座番号 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={semifinalsInfo.account_number || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_number: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              口座名義 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={semifinalsInfo.account_holder || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, account_holder: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          </div>
+          <BankSection
+            semifinalsInfo={semifinalsInfo}
+            validationErrors={!isTabValid('bank') ? ['銀行名、支店名、口座種類、口座番号、口座名義を全て入力してください。'] : []}
+            onChange={(updates) => {
+              // payment_slip_fileの特別処理
+              if ('payment_slip_file' in updates) {
+                setPaymentSlipFile(updates.payment_slip_file as File)
+                // payment_slip_fileはsemifinalsInfoに含めない
+                const { payment_slip_file, ...rest } = updates
+                setSemifinalsInfo(prev => ({ ...prev, ...rest }))
+              } else {
+                setSemifinalsInfo(prev => ({ ...prev, ...updates }))
+              }
+            }}
+          />
 
           {/* 保存ボタン */}
           <div className="flex justify-end pt-6 space-x-4">
