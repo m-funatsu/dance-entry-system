@@ -336,10 +336,23 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       }
 
 
+      // デバッグ: 保存するデータをログ出力
+      console.log('=== 保存するデータ ===')
+      console.log('formData:', formData)
+      console.log('checkboxes:', checkboxes)
+      const saveData = {
+        ...formData,
+        ...checkboxes,
+        entry_id: currentEntryId
+      }
+      console.log('最終的な保存データ:', saveData)
+      console.log('===================')
+
       // フォームデータを保存
       await saveForm(isTemporary)
 
-    } catch {
+    } catch (error) {
+      console.error('保存エラーの詳細:', error)
       showToast('保存中にエラーが発生しました', 'error')
     }
   }
