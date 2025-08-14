@@ -623,12 +623,16 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               チェイサー（退場）曲の指定
             </label>
-            <input
-              type="text"
+            <select
               value={semifinalsInfo.chaser_song_designation || ''}
               onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song_designation: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+            >
+              <option value="">選択してください</option>
+              <option value="主催者一任">主催者一任</option>
+              <option value="指定あり">指定あり</option>
+              <option value="なし">なし</option>
+            </select>
           </div>
 
           <div>

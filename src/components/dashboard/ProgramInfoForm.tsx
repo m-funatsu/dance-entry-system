@@ -21,6 +21,9 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     entry_id: entry.id,
     song_count: '1曲'
   })
+  
+  // 表示用の署名付きURL（パスとは別に管理）
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({})
 
   // バリデーションルール（静的に定義）
   const validationRules = {
@@ -166,13 +169,14 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
       if (data) {
         // 画像フィールドの署名付きURLを取得
-        const updatedData = { ...data }
         const imageFields = [
           'player_photo_path',
           'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
           'final_player_photo_path',
           'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
         ]
+        
+        const urls: Record<string, string> = {}
         
         for (const field of imageFields) {
           const fieldValue = (data as Record<string, unknown>)[field] as string
@@ -181,7 +185,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             if (fieldValue.startsWith('https://') || fieldValue.startsWith('http://')) {
               logger.warn(`Field ${field} contains URL instead of path: ${fieldValue}`)
               // URLの場合は空にする（再アップロードが必要）
-              ;(updatedData as Record<string, unknown>)[field] = null
+              ;(data as Record<string, unknown>)[field] = null
             } else {
               // 相対パスの場合のみ署名付きURLを生成
               try {
@@ -192,21 +196,20 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 if (urlError) {
                   logger.error(`Error creating signed URL for ${field}`, urlError)
                   // エラーの場合はnullにする
-                  ;(updatedData as Record<string, unknown>)[field] = null
+                  ;(data as Record<string, unknown>)[field] = null
                 } else if (urlData?.signedUrl) {
-                  ;(updatedData as Record<string, unknown>)[field] = urlData.signedUrl
+                  urls[field] = urlData.signedUrl
                 }
               } catch (err) {
                 logger.error(`Exception creating signed URL for ${field}`, err)
-                ;(updatedData as Record<string, unknown>)[field] = null
+                ;(data as Record<string, unknown>)[field] = null
               }
             }
           }
         }
         
-        setProgramInfo({
-          ...updatedData
-        })
+        setProgramInfo(data)
+        setImageUrls(urls)
       }
     } catch (err) {
       logger.error('プログラム情報の読み込みエラー', err, {
@@ -232,6 +235,48 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     // pathを使用して保存（URLではなく相対パス）
     if (result.success && result.path) {
       setProgramInfo(prev => ({ ...prev, [field]: result.path }))
+      
+      // 表示用の署名付きURLを生成
+      const { data: urlData } = await supabase.storage
+        .from('files')
+        .createSignedUrl(result.path, 3600)
+      
+      if (urlData?.signedUrl) {
+        setImageUrls(prev => ({ ...prev, [field]: urlData.signedUrl }))
+      }
+    }
+  }
+  
+  const handleImageDelete = async (field: string) => {
+    if (!window.confirm('画像を削除してもよろしいですか？')) return
+    
+    const path = (programInfo as Record<string, unknown>)[field] as string
+    if (!path) return
+    
+    try {
+      // ストレージから削除
+      const { error } = await supabase.storage
+        .from('files')
+        .remove([path])
+      
+      if (error) {
+        logger.error(`Error deleting image ${field}`, error)
+        setError('画像の削除に失敗しました')
+        return
+      }
+      
+      // 状態を更新
+      setProgramInfo(prev => ({ ...prev, [field]: null }))
+      setImageUrls(prev => {
+        const newUrls = { ...prev }
+        delete newUrls[field]
+        return newUrls
+      })
+      
+      setSuccess('画像を削除しました')
+    } catch (err) {
+      logger.error(`Exception deleting image ${field}`, err)
+      setError('画像の削除に失敗しました')
     }
   }
 
@@ -316,7 +361,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             <FileUploadField
               label="選手紹介用画像"
               required
-              value={programInfo.player_photo_path}
+              value={imageUrls.player_photo_path || programInfo.player_photo_path}
               onChange={(file) => handleImageUpload('player_photo_path', file)}
               category="image"
               disabled={uploading}
@@ -374,7 +419,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                   <FileUploadField
                     label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
                     required
-                    value={programInfo[fieldName] as string}
+                    value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
                     onChange={(file) => handleImageUpload(fieldName, file)}
                     category="image"
                     disabled={uploading}
@@ -408,7 +453,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               <FileUploadField
                 label="選手紹介用画像"
                 required
-                value={programInfo.final_player_photo_path}
+                value={imageUrls.final_player_photo_path || programInfo.final_player_photo_path}
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
                 category="image"
                 disabled={uploading}
@@ -466,7 +511,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                     <FileUploadField
                       label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
                       required
-                      value={programInfo[fieldName] as string}
+                      value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
                       onChange={(file) => handleImageUpload(fieldName, file)}
                       category="image"
                       disabled={uploading}
