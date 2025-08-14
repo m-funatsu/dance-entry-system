@@ -348,6 +348,9 @@ export interface FinalsInfo {
   chaser_exit_image_path?: string
   chaser_exit_notes?: string
   choreographer_change?: boolean
+  choreography_change_timing?: string
+  choreography_before_change?: string
+  choreography_after_change?: string
   choreographer_name?: string
   choreographer_furigana?: string
   choreographer2_name?: string

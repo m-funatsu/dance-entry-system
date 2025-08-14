@@ -65,82 +65,130 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         </div>
       </div>
 
-      <FormField
-        label="振付師氏名"
-        name="choreographer_name"
-        value={finalsInfo.choreographer_name || ''}
-        onChange={(e) => onChange({ choreographer_name: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-        required={choreographerChangeOption === 'different'}
-      />
+      {/* 振付変更の詳細情報 */}
+      {choreographerChangeOption === 'different' && (
+        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+          <h5 className="font-medium text-gray-900">振付変更詳細</h5>
+          
+          <FormField
+            label="振付変更部分（曲が始まってから何分何秒の部分か）"
+            name="choreography_change_timing"
+            value={finalsInfo.choreography_change_timing || ''}
+            onChange={(e) => onChange({ choreography_change_timing: e.target.value })}
+            required
+            placeholder="例：1分30秒〜2分15秒"
+          />
 
-      <FormField
-        label="振付師氏名(ふりがな)"
-        name="choreographer_furigana"
-        value={finalsInfo.choreographer_furigana || ''}
-        onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-        required={choreographerChangeOption === 'different'}
-        placeholder="ひらがなで入力"
-      />
+          <FormField
+            label="変更前（準決勝振付）"
+            name="choreography_before_change"
+            type="textarea"
+            value={finalsInfo.choreography_before_change || ''}
+            onChange={(e) => onChange({ choreography_before_change: e.target.value })}
+            required
+            rows={3}
+            placeholder="準決勝での振付内容を記載"
+          />
 
-      <FormField
-        label="振付師2氏名（決勝で変更した場合）"
-        name="choreographer2_name"
-        value={finalsInfo.choreographer2_name || ''}
-        onChange={(e) => onChange({ choreographer2_name: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-      />
-
-      <FormField
-        label="振付師2氏名(ふりがな)（決勝で変更した場合）"
-        name="choreographer2_furigana"
-        value={finalsInfo.choreographer2_furigana || ''}
-        onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
-        disabled={choreographerChangeOption === 'same'}
-        placeholder="ひらがなで入力"
-      />
-
-      <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          小道具の有無 <span className="text-red-500">*</span>
-        </label>
-        <div className="space-y-2">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="props_usage"
-              value="あり"
-              checked={finalsInfo.props_usage === 'あり'}
-              onChange={() => onChange({ props_usage: 'あり' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            あり
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="props_usage"
-              value="なし"
-              checked={finalsInfo.props_usage === 'なし'}
-              onChange={() => onChange({ props_usage: 'なし', props_details: '' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            なし
-          </label>
+          <FormField
+            label="変更後（決勝振付）"
+            name="choreography_after_change"
+            type="textarea"
+            value={finalsInfo.choreography_after_change || ''}
+            onChange={(e) => onChange({ choreography_after_change: e.target.value })}
+            required
+            rows={3}
+            placeholder="決勝での振付内容を記載"
+          />
         </div>
+      )}
+
+      {/* 振付情報セクション */}
+      <div className="border-t pt-6">
+        <h4 className="font-medium mb-4">振付情報</h4>
+        
+        <FormField
+          label="振付師氏名"
+          name="choreographer_name"
+          value={finalsInfo.choreographer_name || ''}
+          onChange={(e) => onChange({ choreographer_name: e.target.value })}
+          disabled={choreographerChangeOption === 'same'}
+          required={choreographerChangeOption === 'different'}
+        />
+
+        <FormField
+          label="振付師氏名(ふりがな)"
+          name="choreographer_furigana"
+          value={finalsInfo.choreographer_furigana || ''}
+          onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
+          disabled={choreographerChangeOption === 'same'}
+          required={choreographerChangeOption === 'different'}
+          placeholder="ひらがなで入力"
+        />
+
+        <FormField
+          label="振付師2氏名（決勝で変更した場合）"
+          name="choreographer2_name"
+          value={finalsInfo.choreographer2_name || ''}
+          onChange={(e) => onChange({ choreographer2_name: e.target.value })}
+          disabled={choreographerChangeOption === 'same'}
+        />
+
+        <FormField
+          label="振付師2氏名(ふりがな)（決勝で変更した場合）"
+          name="choreographer2_furigana"
+          value={finalsInfo.choreographer2_furigana || ''}
+          onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
+          disabled={choreographerChangeOption === 'same'}
+          placeholder="ひらがなで入力"
+        />
       </div>
 
-      {finalsInfo.props_usage === 'あり' && (
-        <FormField
-          label="利用する小道具"
-          name="props_details"
-          value={finalsInfo.props_details || ''}
-          onChange={(e) => onChange({ props_details: e.target.value })}
-          required
-          placeholder="例：扇子、スカーフ、傘など"
-        />
-      )}
+      {/* 小道具セクション */}
+      <div className="border-t pt-6">
+        <h4 className="font-medium mb-4">小道具</h4>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            小道具の有無 <span className="text-red-500">*</span>
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="props_usage"
+                value="あり"
+                checked={finalsInfo.props_usage === 'あり'}
+                onChange={() => onChange({ props_usage: 'あり' })}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              />
+              あり
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="props_usage"
+                value="なし"
+                checked={finalsInfo.props_usage === 'なし'}
+                onChange={() => onChange({ props_usage: 'なし', props_details: '' })}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              />
+              なし
+            </label>
+          </div>
+        </div>
+
+        {finalsInfo.props_usage === 'あり' && (
+          <FormField
+            label="利用する小道具"
+            name="props_details"
+            value={finalsInfo.props_details || ''}
+            onChange={(e) => onChange({ props_details: e.target.value })}
+            required
+            placeholder="例：扇子、スカーフ、傘など"
+          />
+        )}
+      </div>
 
       <div className="border-t pt-4">
         <h4 className="font-medium mb-3">作品振付師出席情報</h4>
