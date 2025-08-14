@@ -136,10 +136,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const { uploadImage, uploading } = useFileUploadV2({
     category: 'image',
     onSuccess: (result: { field?: string; url?: string; path?: string }) => {
-      if (result.field && (result.url || result.path)) {
+      // pathのみを使用（URLではなく相対パス）
+      if (result.field && result.path) {
         setProgramInfo(prev => ({
           ...prev,
-          [result.field as string]: result.url || result.path
+          [result.field as string]: result.path
         }))
       }
     },
@@ -176,11 +177,29 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         for (const field of imageFields) {
           const fieldValue = (data as Record<string, unknown>)[field] as string
           if (fieldValue) {
-            const { data: urlData } = await supabase.storage
-              .from('files')
-              .createSignedUrl(fieldValue, 3600)
-            if (urlData?.signedUrl) {
-              (updatedData as Record<string, unknown>)[field] = urlData.signedUrl
+            // 既にURLの場合はスキップ（https://で始まる場合）
+            if (fieldValue.startsWith('https://') || fieldValue.startsWith('http://')) {
+              logger.warn(`Field ${field} contains URL instead of path: ${fieldValue}`)
+              // URLの場合は空にする（再アップロードが必要）
+              ;(updatedData as Record<string, unknown>)[field] = null
+            } else {
+              // 相対パスの場合のみ署名付きURLを生成
+              try {
+                const { data: urlData, error: urlError } = await supabase.storage
+                  .from('files')
+                  .createSignedUrl(fieldValue, 3600)
+                
+                if (urlError) {
+                  logger.error(`Error creating signed URL for ${field}`, urlError)
+                  // エラーの場合はnullにする
+                  ;(updatedData as Record<string, unknown>)[field] = null
+                } else if (urlData?.signedUrl) {
+                  ;(updatedData as Record<string, unknown>)[field] = urlData.signedUrl
+                }
+              } catch (err) {
+                logger.error(`Exception creating signed URL for ${field}`, err)
+                ;(updatedData as Record<string, unknown>)[field] = null
+              }
             }
           }
         }
@@ -228,10 +247,25 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
     }
 
-    await save({
-      ...programInfo,
-      entry_id: entry.id
-    }, isTemporary)
+    // 保存するデータを準備（URLではなくパスのみを保存）
+    const dataToSave = { ...programInfo, entry_id: entry.id }
+    const imageFields = [
+      'player_photo_path',
+      'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
+      'final_player_photo_path',
+      'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
+    ]
+    
+    // 画像フィールドがURLの場合はnullにする（相対パスのみ保存）
+    for (const field of imageFields) {
+      const value = (dataToSave as Record<string, unknown>)[field] as string
+      if (value && (value.startsWith('https://') || value.startsWith('http://') || value.includes('supabase'))) {
+        // 署名付きURLやpublicURLの場合はnullにする
+        ;(dataToSave as Record<string, unknown>)[field] = null
+      }
+    }
+
+    await save(dataToSave, isTemporary)
 
     router.refresh()
   }
