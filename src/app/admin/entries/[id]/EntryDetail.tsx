@@ -155,6 +155,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
   const finalsMusicFile = finalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('music'))
   const finalsChaserFile = finalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('chaser'))
 
+  // SNS関連ファイル
+  const snsFiles = getPurposeFiles('sns')
+  const practiceVideoFile = snsFiles.find(f => f.file_type === 'video' && (f.file_name?.includes('practice') || f.file_name?.includes('練習')))
+  const highlightVideoFile = snsFiles.find(f => f.file_type === 'video' && (f.file_name?.includes('highlight') || f.file_name?.includes('紹介')))
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'basic':
@@ -232,12 +237,24 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.representative_furigana || '-'}</dd>
                     </div>
                     <div>
+                      <dt className="text-sm font-medium text-gray-500">代表者ローマ字</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{basicInfo.representative_romaji || '-'}</dd>
+                    </div>
+                    <div>
                       <dt className="text-sm font-medium text-gray-500">代表者メール</dt>
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.representative_email || '-'}</dd>
                     </div>
                     <div>
                       <dt className="text-sm font-medium text-gray-500">代表者生年月日</dt>
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.representative_birthdate || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">本名</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{basicInfo.real_name || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">本名カナ</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{basicInfo.real_name_kana || '-'}</dd>
                     </div>
                     {basicInfo.partner_name && (
                       <>
@@ -249,6 +266,22 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">パートナーフリガナ</dt>
                           <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_furigana || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナーローマ字</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_romaji || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー生年月日</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_birthdate || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー本名</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_real_name || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー本名カナ</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_real_name_kana || '-'}</dd>
+                        </div>
                       </>
                     )}
                     <div>
@@ -259,6 +292,22 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       <dt className="text-sm font-medium text-gray-500">カテゴリー</dt>
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.category_division || '-'}</dd>
                     </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">ダンススタイル</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{basicInfo.dance_style || '-'}</dd>
+                    </div>
+                    {basicInfo.choreographer && (
+                      <>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.choreographer}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師フリガナ</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.choreographer_furigana || '-'}</dd>
+                        </div>
+                      </>
+                    )}
                     {basicInfo.emergency_contact_name_1 && (
                       <>
                         <div>
@@ -271,6 +320,67 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                       </>
                     )}
+                    {basicInfo.emergency_contact_name_2 && (
+                      <>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">緊急連絡先2</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.emergency_contact_name_2}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">緊急連絡先2電話</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.emergency_contact_phone_2}</dd>
+                        </div>
+                      </>
+                    )}
+                    {basicInfo.guardian_name && (
+                      <>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">保護者名</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.guardian_name}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">保護者電話</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.guardian_phone || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">保護者メール</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.guardian_email || '-'}</dd>
+                        </div>
+                      </>
+                    )}
+                    {basicInfo.partner_guardian_name && (
+                      <>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー保護者名</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_guardian_name}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー保護者電話</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_guardian_phone || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">パートナー保護者メール</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{basicInfo.partner_guardian_email || '-'}</dd>
+                        </div>
+                      </>
+                    )}
+                    <div className="md:col-span-2">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">同意事項</h4>
+                      <div className="space-y-1">
+                        <div>
+                          <span className="text-sm text-gray-500">利用規約:</span>
+                          <span className="ml-2 text-sm text-gray-900">{basicInfo.agreement_checked ? '同意済み' : '未同意'}</span>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-500">メディア掲載:</span>
+                          <span className="ml-2 text-sm text-gray-900">{basicInfo.media_consent_checked ? '同意済み' : '未同意'}</span>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-500">プライバシーポリシー:</span>
+                          <span className="ml-2 text-sm text-gray-900">{basicInfo.privacy_policy_checked ? '同意済み' : '未同意'}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -618,6 +728,10 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         <div>
                           <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
                           <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_title_kana || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
@@ -1505,20 +1619,20 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                 {snsInfo ? (
                   <div className="space-y-6">
                     {/* 練習動画 */}
-                    {mediaUrls.practice_video_path && (
+                    {(mediaUrls.practice_video_path || practiceVideoFile?.signed_url) && (
                       <div>
                         <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">練習風景動画</h3>
                         <div className="bg-gray-50 rounded-lg p-4">
                           <video
                             controls
                             className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
-                            src={mediaUrls.practice_video_path}
+                            src={mediaUrls.practice_video_path || practiceVideoFile?.signed_url}
                           >
                             お使いのブラウザは動画タグをサポートしていません。
                           </video>
                           <div className="mt-3 text-center">
                             <p className="text-sm text-gray-600">
-                              ファイル名: {snsInfo.practice_video_filename || '-'}
+                              ファイル名: {snsInfo.practice_video_filename || practiceVideoFile?.file_name || '-'}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
                               SNSでの事前告知に使用される練習風景動画
@@ -1529,20 +1643,20 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                     )}
 
                     {/* 紹介ハイライト動画 */}
-                    {mediaUrls.introduction_highlight_path && (
+                    {(mediaUrls.introduction_highlight_path || highlightVideoFile?.signed_url) && (
                       <div>
                         <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">紹介用ハイライト動画</h3>
                         <div className="bg-gray-50 rounded-lg p-4">
                           <video
                             controls
                             className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
-                            src={mediaUrls.introduction_highlight_path}
+                            src={mediaUrls.introduction_highlight_path || highlightVideoFile?.signed_url}
                           >
                             お使いのブラウザは動画タグをサポートしていません。
                           </video>
                           <div className="mt-3 text-center">
                             <p className="text-sm text-gray-600">
-                              ファイル名: {snsInfo.introduction_highlight_filename || '-'}
+                              ファイル名: {snsInfo.introduction_highlight_filename || highlightVideoFile?.file_name || '-'}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
                               大会当日の選手紹介で使用されるハイライト動画
@@ -1562,7 +1676,45 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       </div>
                     )}
 
-                    {!mediaUrls.practice_video_path && !mediaUrls.introduction_highlight_path && !snsInfo.sns_notes && (
+                    {/* 動画がない場合のentry_filesからのフォールバック */}
+                    {!mediaUrls.practice_video_path && !practiceVideoFile && !mediaUrls.introduction_highlight_path && !highlightVideoFile && snsFiles.length > 0 && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">SNS用メディアファイル</h3>
+                        <div className="space-y-4">
+                          {snsFiles.map((file) => (
+                            <div key={file.id} className="bg-gray-50 rounded-lg p-4">
+                              {file.file_type === 'video' && file.signed_url && (
+                                <>
+                                  <video
+                                    controls
+                                    className="w-full max-w-3xl mx-auto rounded-lg shadow-lg mb-2"
+                                    src={file.signed_url}
+                                  >
+                                    お使いのブラウザは動画タグをサポートしていません。
+                                  </video>
+                                  <p className="text-sm text-gray-600 text-center">ファイル名: {file.file_name}</p>
+                                </>
+                              )}
+                              {file.file_type === 'photo' && file.signed_url && (
+                                <>
+                                  <Image
+                                    src={file.signed_url}
+                                    alt={file.file_name}
+                                    width={800}
+                                    height={600}
+                                    className="rounded-lg shadow-lg w-full"
+                                    style={{ objectFit: 'contain' }}
+                                  />
+                                  <p className="text-sm text-gray-600 text-center mt-2">ファイル名: {file.file_name}</p>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {!mediaUrls.practice_video_path && !practiceVideoFile && !mediaUrls.introduction_highlight_path && !highlightVideoFile && snsFiles.length === 0 && !snsInfo.sns_notes && (
                       <p className="text-gray-500">SNS・広報用の情報は登録されていません</p>
                     )}
                   </div>
