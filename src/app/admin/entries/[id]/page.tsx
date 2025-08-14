@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import EntryDetail from './EntryDetail'
+import type { EntryFile } from '@/lib/types'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -11,6 +12,7 @@ interface PageProps {
 
 export default async function EntryDetailPage({ params }: PageProps) {
   const resolvedParams = await params
+  console.log('[DEBUG] EntryDetailPage - Entry ID:', resolvedParams.id)
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -31,7 +33,7 @@ export default async function EntryDetailPage({ params }: PageProps) {
 
   // 管理者クライアントでエントリーデータを取得
   const adminSupabase = createAdminClient()
-  const { data: entry } = await adminSupabase
+  const { data: entry, error: entryError } = await adminSupabase
     .from('entries')
     .select(`
       *,
@@ -48,6 +50,35 @@ export default async function EntryDetailPage({ params }: PageProps) {
     `)
     .eq('id', resolvedParams.id)
     .single()
+
+  console.log('[DEBUG] Entry fetch error:', entryError)
+  console.log('[DEBUG] Entry data:', {
+    id: entry?.id,
+    hasUsers: !!entry?.users,
+    entryFilesCount: entry?.entry_files?.length || 0,
+    hasBasicInfo: !!entry?.basic_info,
+    hasPreliminaryInfo: !!entry?.preliminary_info,
+    hasProgramInfo: !!entry?.program_info,
+    hasSemifinalsInfo: !!entry?.semifinals_info,
+    hasFinalsInfo: !!entry?.finals_info,
+    hasApplicationsInfo: !!entry?.applications_info,
+    hasSnsInfo: !!entry?.sns_info
+  })
+  
+  if (entry?.sns_info) {
+    console.log('[DEBUG] SNS Info details:', entry.sns_info)
+  }
+  if (entry?.semifinals_info) {
+    console.log('[DEBUG] Semifinals Info details:', entry.semifinals_info)
+  }
+  if (entry?.entry_files && entry.entry_files.length > 0) {
+    console.log('[DEBUG] Entry files:', entry.entry_files.map((f: EntryFile) => ({
+      name: f.file_name,
+      type: f.file_type,
+      purpose: f.purpose,
+      path: f.file_path
+    })))
+  }
 
   if (!entry) {
     notFound()
@@ -149,23 +180,50 @@ export default async function EntryDetailPage({ params }: PageProps) {
   }
 
   // SNS情報のファイル
+  console.log('[DEBUG] Processing SNS info...')
   if (entry.sns_info?.[0] || entry.sns_info) {
     const snsInfo = Array.isArray(entry.sns_info) ? entry.sns_info[0] : entry.sns_info
+    console.log('[DEBUG] SNS Info object:', snsInfo)
     if (snsInfo) {
+      console.log('[DEBUG] practice_video_path:', snsInfo.practice_video_path)
+      console.log('[DEBUG] introduction_highlight_path:', snsInfo.introduction_highlight_path)
+      
       mediaUrls.practice_video_path = await generateSignedUrl(snsInfo.practice_video_path)
       mediaUrls.introduction_highlight_path = await generateSignedUrl(snsInfo.introduction_highlight_path)
+      
+      console.log('[DEBUG] Generated practice_video URL:', mediaUrls.practice_video_path)
+      console.log('[DEBUG] Generated introduction_highlight URL:', mediaUrls.introduction_highlight_path)
     }
+  } else {
+    console.log('[DEBUG] No SNS info found')
   }
 
   // entry_filesの署名付きURLも生成
+  console.log('[DEBUG] Processing entry_files...')
   if (entry.entry_files && entry.entry_files.length > 0) {
+    console.log('[DEBUG] Found', entry.entry_files.length, 'entry files')
     for (const file of entry.entry_files) {
+      console.log('[DEBUG] Processing file:', {
+        name: file.file_name,
+        path: file.file_path,
+        type: file.file_type,
+        purpose: file.purpose
+      })
       const signedUrl = await generateSignedUrl(file.file_path)
       if (signedUrl) {
         file.signed_url = signedUrl
+        console.log('[DEBUG] Generated signed URL for', file.file_name)
+      } else {
+        console.log('[DEBUG] Failed to generate signed URL for', file.file_name)
       }
     }
+  } else {
+    console.log('[DEBUG] No entry files found')
   }
+
+  console.log('[DEBUG] Final mediaUrls:', Object.keys(mediaUrls).filter(key => mediaUrls[key]))
+
+  console.log('[DEBUG] Rendering with entry:', entry?.id, 'and mediaUrls count:', Object.keys(mediaUrls).filter(key => mediaUrls[key]).length)
 
   return (
     <div className="min-h-screen bg-gray-50">
