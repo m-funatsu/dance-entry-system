@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDateLocale } from '@/lib/utils'
-import FileList from '@/components/FileList'
+import Image from 'next/image'
 import type { 
   Entry, 
   BasicInfo, 
@@ -17,6 +17,10 @@ import type {
   Selection 
 } from '@/lib/types'
 
+interface ExtendedEntryFile extends EntryFile {
+  signed_url?: string
+}
+
 interface ExtendedEntry extends Entry {
   team_name?: string
   emergency_contact?: string
@@ -24,7 +28,7 @@ interface ExtendedEntry extends Entry {
     name: string
     email: string
   }
-  entry_files: EntryFile[]
+  entry_files: ExtendedEntryFile[]
   selections?: (Selection & {
     users?: {
       name: string
@@ -41,9 +45,10 @@ interface ExtendedEntry extends Entry {
 
 interface EntryDetailProps {
   entry: ExtendedEntry
+  mediaUrls?: Record<string, string | null>
 }
 
-export default function EntryDetail({ entry }: EntryDetailProps) {
+export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps) {
   const [comments, setComments] = useState(entry.selections?.[0]?.comments || '')
   const [status, setStatus] = useState<'pending' | 'selected' | 'rejected'>(
     (entry.selections?.[0]?.status as 'pending' | 'selected' | 'rejected') || 'pending'
@@ -60,6 +65,7 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
   const semifinalsInfo = Array.isArray(entry.semifinals_info) ? entry.semifinals_info[0] : entry.semifinals_info
   const finalsInfo = Array.isArray(entry.finals_info) ? entry.finals_info[0] : entry.finals_info
   const applicationsInfo = Array.isArray(entry.applications_info) ? entry.applications_info[0] : entry.applications_info
+  const snsInfo = Array.isArray(entry.sns_info) ? entry.sns_info[0] : entry.sns_info
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -129,6 +135,9 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
       setLoading(false)
     }
   }
+
+  // 予選動画を取得
+  const preliminaryVideo = entry.entry_files?.find(f => f.purpose === 'preliminary' && f.file_type === 'video')
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -261,61 +270,82 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                 予選情報
               </h2>
               {preliminaryInfo ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title || '-'}</dd>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title_kana || '-'}</dd>
+                    </div>
+                    <div className="md:col-span-2">
+                      <dt className="text-sm font-medium text-gray-500">作品ストーリー</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_story || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_title || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.cd_title || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.artist || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.record_number || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.jasrac_code || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_type || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_rights_cleared || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">振付師1</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer1_name || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">振付師2</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer2_name || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">動画提出</dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        {preliminaryInfo.video_submitted ? '提出済み' : '未提出'}
+                      </dd>
+                    </div>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title_kana || '-'}</dd>
-                  </div>
-                  <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">作品ストーリー</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_story || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_title || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.cd_title || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.artist || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.record_number || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.jasrac_code || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_type || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_rights_cleared || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">振付師1</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer1_name || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">振付師2</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer2_name || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">動画提出</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {preliminaryInfo.video_submitted ? '提出済み' : '未提出'}
-                    </dd>
-                  </div>
+
+                  {/* 予選動画の表示 */}
+                  {preliminaryVideo && preliminaryVideo.signed_url && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">予選提出動画</h3>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <video
+                          controls
+                          className="w-full max-w-2xl mx-auto rounded-lg"
+                          src={preliminaryVideo.signed_url}
+                        >
+                          お使いのブラウザは動画タグをサポートしていません。
+                        </video>
+                        <p className="mt-2 text-sm text-gray-600 text-center">
+                          ファイル名: {preliminaryVideo.file_name}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-gray-500">予選情報はまだ登録されていません</p>
@@ -332,39 +362,121 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                 プログラム情報
               </h2>
               {programInfo ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">楽曲数</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{programInfo.song_count || '-'}</dd>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">楽曲数</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{programInfo.song_count || '-'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">所属</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{programInfo.affiliation || '-'}</dd>
+                    </div>
+                    <div className="md:col-span-2">
+                      <dt className="text-sm font-medium text-gray-500">準決勝ストーリー</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_story || '-'}</dd>
+                    </div>
+                    <div className="md:col-span-2">
+                      <dt className="text-sm font-medium text-gray-500">準決勝見所</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_highlight || '-'}</dd>
+                    </div>
+                    {programInfo.final_story && (
+                      <>
+                        <div className="md:col-span-2">
+                          <dt className="text-sm font-medium text-gray-500">決勝ストーリー</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{programInfo.final_story}</dd>
+                        </div>
+                        <div className="md:col-span-2">
+                          <dt className="text-sm font-medium text-gray-500">決勝見所</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{programInfo.final_highlight || '-'}</dd>
+                        </div>
+                      </>
+                    )}
+                    <div className="md:col-span-2">
+                      <dt className="text-sm font-medium text-gray-500">備考</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{programInfo.notes || '-'}</dd>
+                    </div>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">所属</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{programInfo.affiliation || '-'}</dd>
-                  </div>
-                  <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">準決勝ストーリー</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_story || '-'}</dd>
-                  </div>
-                  <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">準決勝見所</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_highlight || '-'}</dd>
-                  </div>
-                  {programInfo.final_story && (
-                    <>
-                      <div className="md:col-span-2">
-                        <dt className="text-sm font-medium text-gray-500">決勝ストーリー</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{programInfo.final_story}</dd>
+
+                  {/* 選手紹介用画像 */}
+                  {mediaUrls.player_photo_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">選手紹介用画像（準決勝）</h3>
+                      <div className="relative w-full max-w-md mx-auto">
+                        <Image
+                          src={mediaUrls.player_photo_path}
+                          alt="選手紹介用画像"
+                          width={400}
+                          height={400}
+                          className="rounded-lg shadow-lg"
+                          style={{ objectFit: 'cover' }}
+                        />
                       </div>
-                      <div className="md:col-span-2">
-                        <dt className="text-sm font-medium text-gray-500">決勝見所</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{programInfo.final_highlight || '-'}</dd>
-                      </div>
-                    </>
+                    </div>
                   )}
-                  <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">備考</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{programInfo.notes || '-'}</dd>
+
+                  {/* 準決勝作品イメージ */}
+                  <div>
+                    <h3 className="text-base font-medium text-gray-900 mb-2">準決勝作品イメージ</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {['semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path'].map((key, index) => (
+                        mediaUrls[key] && (
+                          <div key={key} className="relative">
+                            <Image
+                              src={mediaUrls[key]}
+                              alt={`準決勝作品イメージ${index + 1}`}
+                              width={300}
+                              height={300}
+                              className="rounded-lg shadow-md"
+                              style={{ objectFit: 'cover' }}
+                            />
+                            <p className="mt-1 text-sm text-gray-600 text-center">イメージ{index + 1}</p>
+                          </div>
+                        )
+                      ))}
+                    </div>
                   </div>
+
+                  {/* 決勝選手紹介用画像 */}
+                  {mediaUrls.final_player_photo_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">選手紹介用画像（決勝）</h3>
+                      <div className="relative w-full max-w-md mx-auto">
+                        <Image
+                          src={mediaUrls.final_player_photo_path}
+                          alt="決勝選手紹介用画像"
+                          width={400}
+                          height={400}
+                          className="rounded-lg shadow-lg"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 決勝作品イメージ */}
+                  {(mediaUrls.final_image1_path || mediaUrls.final_image2_path || mediaUrls.final_image3_path || mediaUrls.final_image4_path) && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">決勝作品イメージ</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {['final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'].map((key, index) => (
+                          mediaUrls[key] && (
+                            <div key={key} className="relative">
+                              <Image
+                                src={mediaUrls[key]}
+                                alt={`決勝作品イメージ${index + 1}`}
+                                width={300}
+                                height={300}
+                                className="rounded-lg shadow-md"
+                                style={{ objectFit: 'cover' }}
+                              />
+                              <p className="mt-1 text-sm text-gray-600 text-center">イメージ{index + 1}</p>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-gray-500">プログラム情報はまだ登録されていません</p>
@@ -417,6 +529,28 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                     </div>
                   </div>
                   
+                  {/* 楽曲ファイル */}
+                  {mediaUrls.semifinals_music_data_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">楽曲ファイル</h3>
+                      <audio controls className="w-full">
+                        <source src={mediaUrls.semifinals_music_data_path} />
+                        お使いのブラウザは音声タグをサポートしていません。
+                      </audio>
+                    </div>
+                  )}
+
+                  {/* チェイサー曲 */}
+                  {mediaUrls.semifinals_chaser_song && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">チェイサー曲</h3>
+                      <audio controls className="w-full">
+                        <source src={mediaUrls.semifinals_chaser_song} />
+                        お使いのブラウザは音声タグをサポートしていません。
+                      </audio>
+                    </div>
+                  )}
+
                   <div>
                     <h3 className="text-base font-medium text-gray-900 mb-2">音響情報</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -436,6 +570,30 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                         <dt className="text-sm font-medium text-gray-500">フェードアウト完了</dt>
                         <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_complete_time || '-'}</dd>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* 照明シーン画像 */}
+                  <div>
+                    <h3 className="text-base font-medium text-gray-900 mb-2">照明シーン画像</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {['scene1_image_path', 'scene2_image_path', 'scene3_image_path', 'scene4_image_path', 'scene5_image_path', 'chaser_exit_image_path'].map((key, index) => (
+                        mediaUrls[key] && (
+                          <div key={key} className="relative">
+                            <Image
+                              src={mediaUrls[key]}
+                              alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
+                              width={200}
+                              height={200}
+                              className="rounded-lg shadow-md"
+                              style={{ objectFit: 'cover' }}
+                            />
+                            <p className="mt-1 text-sm text-gray-600 text-center">
+                              {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
+                            </p>
+                          </div>
+                        )
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -499,6 +657,45 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                       <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_attendance || '-'}</dd>
                     </div>
                   </div>
+
+                  {/* 楽曲ファイル */}
+                  {mediaUrls.finals_music_data_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">楽曲ファイル</h3>
+                      <audio controls className="w-full">
+                        <source src={mediaUrls.finals_music_data_path} />
+                        お使いのブラウザは音声タグをサポートしていません。
+                      </audio>
+                    </div>
+                  )}
+
+                  {/* チェイサー曲 */}
+                  {mediaUrls.finals_chaser_song && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">チェイサー曲</h3>
+                      <audio controls className="w-full">
+                        <source src={mediaUrls.finals_chaser_song} />
+                        お使いのブラウザは音声タグをサポートしていません。
+                      </audio>
+                    </div>
+                  )}
+
+                  {/* 振付師写真 */}
+                  {mediaUrls.choreographer_photo_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">振付師写真</h3>
+                      <div className="relative w-full max-w-md mx-auto">
+                        <Image
+                          src={mediaUrls.choreographer_photo_path}
+                          alt="振付師写真"
+                          width={400}
+                          height={400}
+                          className="rounded-lg shadow-lg"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <h3 className="text-base font-medium text-gray-900 mb-2">音響情報</h3>
@@ -523,6 +720,30 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                           {finalsInfo.lighting_change_from_semifinals ? '変更あり' : '変更なし'}
                         </dd>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* 照明シーン画像 */}
+                  <div>
+                    <h3 className="text-base font-medium text-gray-900 mb-2">照明シーン画像</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {['finals_scene1_image_path', 'finals_scene2_image_path', 'finals_scene3_image_path', 'finals_scene4_image_path', 'finals_scene5_image_path', 'finals_chaser_exit_image_path'].map((key, index) => (
+                        mediaUrls[key] && (
+                          <div key={key} className="relative">
+                            <Image
+                              src={mediaUrls[key]}
+                              alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
+                              width={200}
+                              height={200}
+                              className="rounded-lg shadow-md"
+                              style={{ objectFit: 'cover' }}
+                            />
+                            <p className="mt-1 text-sm text-gray-600 text-center">
+                              {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
+                            </p>
+                          </div>
+                        )
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -577,6 +798,23 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                     })}
                   </div>
 
+                  {/* 振込明細画像 */}
+                  {mediaUrls.payment_slip_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">振込明細</h3>
+                      <div className="relative w-full max-w-2xl mx-auto">
+                        <Image
+                          src={mediaUrls.payment_slip_path}
+                          alt="振込明細"
+                          width={800}
+                          height={600}
+                          className="rounded-lg shadow-lg"
+                          style={{ objectFit: 'contain' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <h3 className="text-base font-medium text-gray-900 mb-2">メイク・ヘアメイク</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -606,6 +844,68 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
           </div>
         )
 
+      case 'sns':
+        return (
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                SNS情報
+              </h2>
+              {snsInfo ? (
+                <div className="space-y-6">
+                  {/* 練習動画 */}
+                  {mediaUrls.practice_video_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">練習動画</h3>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <video
+                          controls
+                          className="w-full max-w-2xl mx-auto rounded-lg"
+                          src={mediaUrls.practice_video_path}
+                        >
+                          お使いのブラウザは動画タグをサポートしていません。
+                        </video>
+                        <p className="mt-2 text-sm text-gray-600 text-center">
+                          ファイル名: {snsInfo.practice_video_filename || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 紹介ハイライト動画 */}
+                  {mediaUrls.introduction_highlight_path && (
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">紹介ハイライト動画</h3>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <video
+                          controls
+                          className="w-full max-w-2xl mx-auto rounded-lg"
+                          src={mediaUrls.introduction_highlight_path}
+                        >
+                          お使いのブラウザは動画タグをサポートしていません。
+                        </video>
+                        <p className="mt-2 text-sm text-gray-600 text-center">
+                          ファイル名: {snsInfo.introduction_highlight_filename || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 備考 */}
+                  {snsInfo.sns_notes && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">備考</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{snsInfo.sns_notes}</dd>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-500">SNS情報はまだ登録されていません</p>
+              )}
+            </div>
+          </div>
+        )
+
       case 'files':
         return (
           <div className="bg-white shadow rounded-lg">
@@ -614,7 +914,47 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                 アップロードファイル
               </h2>
               {entry.entry_files && entry.entry_files.length > 0 ? (
-                <FileList entryId={entry.id} editable={false} />
+                <div className="space-y-4">
+                  {entry.entry_files.map((file) => (
+                    <div key={file.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{file.file_name}</p>
+                          <p className="text-sm text-gray-500">
+                            タイプ: {file.file_type} | 目的: {file.purpose || '-'}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            アップロード日時: {formatDateLocale(file.uploaded_at)}
+                          </p>
+                        </div>
+                        {file.signed_url && (
+                          <div className="ml-4">
+                            {file.file_type === 'video' && (
+                              <video controls className="w-64 rounded">
+                                <source src={file.signed_url} />
+                              </video>
+                            )}
+                            {file.file_type === 'audio' && (
+                              <audio controls className="w-64">
+                                <source src={file.signed_url} />
+                              </audio>
+                            )}
+                            {file.file_type === 'photo' && (
+                              <Image
+                                src={file.signed_url}
+                                alt={file.file_name}
+                                width={256}
+                                height={256}
+                                className="rounded"
+                                style={{ objectFit: 'cover' }}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-gray-500">アップロードされたファイルはありません</p>
               )}
@@ -713,7 +1053,7 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
       {/* タブナビゲーション */}
       <div className="bg-white shadow rounded-lg">
         <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+          <nav className="-mb-px flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
             <button
               onClick={() => setActiveTab('basic')}
               className={`${
@@ -732,7 +1072,7 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              予選情報
+              予選
             </button>
             <button
               onClick={() => setActiveTab('program')}
@@ -773,6 +1113,16 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
               申込み
+            </button>
+            <button
+              onClick={() => setActiveTab('sns')}
+              className={`${
+                activeTab === 'sns'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              SNS
             </button>
             <button
               onClick={() => setActiveTab('files')}

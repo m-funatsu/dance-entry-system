@@ -75,6 +75,98 @@ export default async function EntryDetailPage({ params }: PageProps) {
     }
   }
 
+  // 署名付きURLを生成する関数
+  const generateSignedUrl = async (path: string | null | undefined) => {
+    if (!path) return null
+    try {
+      const { data } = await adminSupabase.storage
+        .from('files')
+        .createSignedUrl(path, 3600) // 1時間有効
+      return data?.signedUrl || null
+    } catch (error) {
+      console.error('Error generating signed URL:', error)
+      return null
+    }
+  }
+
+  // メディアファイルの署名付きURLを生成
+  const mediaUrls: Record<string, string | null> = {}
+
+  // プログラム情報の画像
+  if (entry.program_info?.[0] || entry.program_info) {
+    const programInfo = Array.isArray(entry.program_info) ? entry.program_info[0] : entry.program_info
+    if (programInfo) {
+      mediaUrls.player_photo_path = await generateSignedUrl(programInfo.player_photo_path)
+      mediaUrls.semifinal_image1_path = await generateSignedUrl(programInfo.semifinal_image1_path)
+      mediaUrls.semifinal_image2_path = await generateSignedUrl(programInfo.semifinal_image2_path)
+      mediaUrls.semifinal_image3_path = await generateSignedUrl(programInfo.semifinal_image3_path)
+      mediaUrls.semifinal_image4_path = await generateSignedUrl(programInfo.semifinal_image4_path)
+      mediaUrls.final_player_photo_path = await generateSignedUrl(programInfo.final_player_photo_path)
+      mediaUrls.final_image1_path = await generateSignedUrl(programInfo.final_image1_path)
+      mediaUrls.final_image2_path = await generateSignedUrl(programInfo.final_image2_path)
+      mediaUrls.final_image3_path = await generateSignedUrl(programInfo.final_image3_path)
+      mediaUrls.final_image4_path = await generateSignedUrl(programInfo.final_image4_path)
+    }
+  }
+
+  // 準決勝情報のファイル
+  if (entry.semifinals_info?.[0] || entry.semifinals_info) {
+    const semifinalsInfo = Array.isArray(entry.semifinals_info) ? entry.semifinals_info[0] : entry.semifinals_info
+    if (semifinalsInfo) {
+      mediaUrls.semifinals_music_data_path = await generateSignedUrl(semifinalsInfo.music_data_path)
+      mediaUrls.semifinals_chaser_song = await generateSignedUrl(semifinalsInfo.chaser_song)
+      mediaUrls.scene1_image_path = await generateSignedUrl(semifinalsInfo.scene1_image_path)
+      mediaUrls.scene2_image_path = await generateSignedUrl(semifinalsInfo.scene2_image_path)
+      mediaUrls.scene3_image_path = await generateSignedUrl(semifinalsInfo.scene3_image_path)
+      mediaUrls.scene4_image_path = await generateSignedUrl(semifinalsInfo.scene4_image_path)
+      mediaUrls.scene5_image_path = await generateSignedUrl(semifinalsInfo.scene5_image_path)
+      mediaUrls.chaser_exit_image_path = await generateSignedUrl(semifinalsInfo.chaser_exit_image_path)
+    }
+  }
+
+  // 決勝情報のファイル
+  if (entry.finals_info?.[0] || entry.finals_info) {
+    const finalsInfo = Array.isArray(entry.finals_info) ? entry.finals_info[0] : entry.finals_info
+    if (finalsInfo) {
+      mediaUrls.finals_music_data_path = await generateSignedUrl(finalsInfo.music_data_path)
+      mediaUrls.finals_chaser_song = await generateSignedUrl(finalsInfo.chaser_song)
+      mediaUrls.finals_scene1_image_path = await generateSignedUrl(finalsInfo.scene1_image_path)
+      mediaUrls.finals_scene2_image_path = await generateSignedUrl(finalsInfo.scene2_image_path)
+      mediaUrls.finals_scene3_image_path = await generateSignedUrl(finalsInfo.scene3_image_path)
+      mediaUrls.finals_scene4_image_path = await generateSignedUrl(finalsInfo.scene4_image_path)
+      mediaUrls.finals_scene5_image_path = await generateSignedUrl(finalsInfo.scene5_image_path)
+      mediaUrls.finals_chaser_exit_image_path = await generateSignedUrl(finalsInfo.chaser_exit_image_path)
+      mediaUrls.choreographer_photo_path = await generateSignedUrl(finalsInfo.choreographer_photo_path)
+    }
+  }
+
+  // 申込み情報のファイル
+  if (entry.applications_info?.[0] || entry.applications_info) {
+    const applicationsInfo = Array.isArray(entry.applications_info) ? entry.applications_info[0] : entry.applications_info
+    if (applicationsInfo) {
+      mediaUrls.payment_slip_path = await generateSignedUrl(applicationsInfo.payment_slip_path)
+    }
+  }
+
+  // SNS情報のファイル
+  if (entry.sns_info?.[0] || entry.sns_info) {
+    const snsInfo = Array.isArray(entry.sns_info) ? entry.sns_info[0] : entry.sns_info
+    if (snsInfo) {
+      mediaUrls.practice_video_path = await generateSignedUrl(snsInfo.practice_video_path)
+      mediaUrls.introduction_highlight_path = await generateSignedUrl(snsInfo.introduction_highlight_path)
+    }
+  }
+
+  // entry_filesの署名付きURLも生成
+  if (entry.entry_files && entry.entry_files.length > 0) {
+    for (const file of entry.entry_files) {
+      const signedUrl = await generateSignedUrl(file.file_path)
+      if (signedUrl) {
+        file.signed_url = signedUrl
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -107,7 +199,7 @@ export default async function EntryDetailPage({ params }: PageProps) {
 
       <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <EntryDetail entry={entry} />
+          <EntryDetail entry={entry} mediaUrls={mediaUrls} />
         </div>
       </main>
     </div>
