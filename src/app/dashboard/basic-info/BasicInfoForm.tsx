@@ -780,7 +780,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-sm font-medium text-gray-900 mb-2">参加資格</h3>
             <div className="text-sm text-gray-600 space-y-1 mb-3">
-              <p className="font-medium mb-2">■ 参加資格</p>
               <ul className="space-y-1 ml-4">
                 <li>・ペアであれば、プロ、アマを問わず全ての選手がエントリー可能</li>
                 <li>・ダンスによる教師、デモンストレーション等で収入を少額でも得ている場合はプロとみなす</li>
