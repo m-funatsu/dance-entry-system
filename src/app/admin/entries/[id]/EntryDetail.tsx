@@ -136,8 +136,24 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
     }
   }
 
-  // 予選動画を取得
-  const preliminaryVideo = entry.entry_files?.find(f => f.purpose === 'preliminary' && f.file_type === 'video')
+  // 各purpose別にファイルを分類
+  const getPurposeFiles = (purpose: string) => {
+    return entry.entry_files?.filter(f => f.purpose === purpose) || []
+  }
+
+  // 予選関連ファイル
+  const preliminaryFiles = getPurposeFiles('preliminary')
+  const preliminaryVideo = preliminaryFiles.find(f => f.file_type === 'video')
+
+  // 準決勝関連ファイル
+  const semifinalsFiles = getPurposeFiles('semifinals')
+  const semifinalsMusicFile = semifinalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('music'))
+  const semifinalsChaserFile = semifinalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('chaser'))
+
+  // 決勝関連ファイル  
+  const finalsFiles = getPurposeFiles('finals')
+  const finalsMusicFile = finalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('music'))
+  const finalsChaserFile = finalsFiles.find(f => f.file_type === 'audio' && f.file_name?.includes('chaser'))
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -204,7 +220,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    基本情報
+                    基本情報詳細
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -264,700 +280,909 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
 
       case 'preliminary':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                予選情報
-              </h2>
-              {preliminaryInfo ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  予選情報
+                </h2>
+                {preliminaryInfo ? (
+                  <div className="space-y-6">
+                    {/* 作品情報セクション */}
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title_kana || '-'}</dd>
-                    </div>
-                    <div className="md:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">作品ストーリー</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_story || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_title || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.cd_title || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.artist || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.record_number || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.jasrac_code || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_type || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_rights_cleared || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師1</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer1_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師2</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer2_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">動画提出</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {preliminaryInfo.video_submitted ? '提出済み' : '未提出'}
-                      </dd>
-                    </div>
-                  </div>
-
-                  {/* 予選動画の表示 */}
-                  {preliminaryVideo && preliminaryVideo.signed_url && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">予選提出動画</h3>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <video
-                          controls
-                          className="w-full max-w-2xl mx-auto rounded-lg"
-                          src={preliminaryVideo.signed_url}
-                        >
-                          お使いのブラウザは動画タグをサポートしていません。
-                        </video>
-                        <p className="mt-2 text-sm text-gray-600 text-center">
-                          ファイル名: {preliminaryVideo.file_name}
-                        </p>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">作品情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_title_kana || '-'}</dd>
+                        </div>
+                        <div className="md:col-span-2">
+                          <dt className="text-sm font-medium text-gray-500">作品キャラクター・ストーリー</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.work_story || '-'}</dd>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-gray-500">予選情報はまだ登録されていません</p>
-              )}
+
+                    {/* 楽曲情報セクション */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">楽曲著作権情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.cd_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.artist || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.record_number || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.jasrac_code || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.music_type || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {preliminaryInfo.music_rights_cleared === 'A' && '市販の楽曲を使用する'}
+                            {preliminaryInfo.music_rights_cleared === 'B' && '自身で著作権に対し許諾を取った楽曲を使用する'}
+                            {preliminaryInfo.music_rights_cleared === 'C' && '独自に製作されたオリジナル楽曲を使用する'}
+                            {!preliminaryInfo.music_rights_cleared && '-'}
+                          </dd>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 振付師情報セクション */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">振付師情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer1_name || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1 フリガナ</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer1_furigana || '-'}</dd>
+                        </div>
+                        {preliminaryInfo.choreographer2_name && (
+                          <>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer2_name}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2 フリガナ</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{preliminaryInfo.choreographer2_furigana || '-'}</dd>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 予選動画セクション */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">
+                        予選提出動画
+                        <span className="ml-2 text-sm font-normal text-gray-600">
+                          （動画提出: {preliminaryInfo.video_submitted ? '済み' : '未提出'}）
+                        </span>
+                      </h3>
+                      {preliminaryVideo && preliminaryVideo.signed_url ? (
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <video
+                            controls
+                            className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
+                            src={preliminaryVideo.signed_url}
+                          >
+                            お使いのブラウザは動画タグをサポートしていません。
+                          </video>
+                          <div className="mt-3 text-center">
+                            <p className="text-sm text-gray-600">ファイル名: {preliminaryVideo.file_name}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              アップロード日時: {formatDateLocale(preliminaryVideo.uploaded_at)}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+                          動画が未提出です
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">予選情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
 
       case 'program':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                プログラム情報
-              </h2>
-              {programInfo ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  プログラム掲載用情報
+                </h2>
+                {programInfo ? (
+                  <div className="space-y-6">
+                    {/* 基本設定 */}
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲数</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{programInfo.song_count || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">所属</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{programInfo.affiliation || '-'}</dd>
-                    </div>
-                    <div className="md:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">準決勝ストーリー</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_story || '-'}</dd>
-                    </div>
-                    <div className="md:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">準決勝見所</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{programInfo.semifinal_highlight || '-'}</dd>
-                    </div>
-                    {programInfo.final_story && (
-                      <>
-                        <div className="md:col-span-2">
-                          <dt className="text-sm font-medium text-gray-500">決勝ストーリー</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{programInfo.final_story}</dd>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">基本設定</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲数設定</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{programInfo.song_count || '-'}</dd>
                         </div>
-                        <div className="md:col-span-2">
-                          <dt className="text-sm font-medium text-gray-500">決勝見所</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{programInfo.final_highlight || '-'}</dd>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">所属教室または所属</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{programInfo.affiliation || '登録なし'}</dd>
                         </div>
-                      </>
-                    )}
-                    <div className="md:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">備考</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{programInfo.notes || '-'}</dd>
-                    </div>
-                  </div>
-
-                  {/* 選手紹介用画像 */}
-                  {mediaUrls.player_photo_path && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">選手紹介用画像（準決勝）</h3>
-                      <div className="relative w-full max-w-md mx-auto">
-                        <Image
-                          src={mediaUrls.player_photo_path}
-                          alt="選手紹介用画像"
-                          width={400}
-                          height={400}
-                          className="rounded-lg shadow-lg"
-                          style={{ objectFit: 'cover' }}
-                        />
                       </div>
                     </div>
-                  )}
 
-                  {/* 準決勝作品イメージ */}
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">準決勝作品イメージ</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {['semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path'].map((key, index) => (
-                        mediaUrls[key] && (
-                          <div key={key} className="relative">
-                            <Image
-                              src={mediaUrls[key]}
-                              alt={`準決勝作品イメージ${index + 1}`}
-                              width={300}
-                              height={300}
-                              className="rounded-lg shadow-md"
-                              style={{ objectFit: 'cover' }}
-                            />
-                            <p className="mt-1 text-sm text-gray-600 text-center">イメージ{index + 1}</p>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 決勝選手紹介用画像 */}
-                  {mediaUrls.final_player_photo_path && (
+                    {/* 準決勝用情報 */}
                     <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">選手紹介用画像（決勝）</h3>
-                      <div className="relative w-full max-w-md mx-auto">
-                        <Image
-                          src={mediaUrls.final_player_photo_path}
-                          alt="決勝選手紹介用画像"
-                          width={400}
-                          height={400}
-                          className="rounded-lg shadow-lg"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 決勝作品イメージ */}
-                  {(mediaUrls.final_image1_path || mediaUrls.final_image2_path || mediaUrls.final_image3_path || mediaUrls.final_image4_path) && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">決勝作品イメージ</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        {['final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'].map((key, index) => (
-                          mediaUrls[key] && (
-                            <div key={key} className="relative">
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">
+                        {programInfo.song_count === '1曲' ? '決勝・準決勝用情報' : '準決勝用情報'}
+                      </h3>
+                      
+                      {/* 選手紹介用画像 */}
+                      {mediaUrls.player_photo_path && (
+                        <div className="mb-6">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">選手紹介用画像</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="relative w-full max-w-md mx-auto">
                               <Image
-                                src={mediaUrls[key]}
-                                alt={`決勝作品イメージ${index + 1}`}
-                                width={300}
-                                height={300}
-                                className="rounded-lg shadow-md"
+                                src={mediaUrls.player_photo_path}
+                                alt="選手紹介用画像"
+                                width={400}
+                                height={400}
+                                className="rounded-lg shadow-lg"
                                 style={{ objectFit: 'cover' }}
                               />
-                              <p className="mt-1 text-sm text-gray-600 text-center">イメージ{index + 1}</p>
                             </div>
-                          )
-                        ))}
+                            <p className="text-xs text-gray-500 text-center mt-2">
+                              プログラムや当日の選手紹介に使用されます
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品あらすじ・ストーリー（100文字以内）</dt>
+                          <dd className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                            {programInfo.semifinal_story || '-'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品見所（50文字以内）</dt>
+                          <dd className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                            {programInfo.semifinal_highlight || '-'}
+                          </dd>
+                        </div>
                       </div>
+
+                      {/* 準決勝作品イメージ */}
+                      {(mediaUrls.semifinal_image1_path || mediaUrls.semifinal_image2_path || 
+                        mediaUrls.semifinal_image3_path || mediaUrls.semifinal_image4_path) && (
+                        <div className="mt-6">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">作品イメージ画像</h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            {['semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path'].map((key, index) => (
+                              mediaUrls[key] && (
+                                <div key={key} className="bg-gray-50 rounded-lg p-2">
+                                  <Image
+                                    src={mediaUrls[key]}
+                                    alt={`準決勝作品イメージ${index + 1}`}
+                                    width={300}
+                                    height={300}
+                                    className="rounded-lg shadow-md w-full"
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                  <p className="mt-1 text-xs text-gray-600 text-center">イメージ画像 {index + 1}</p>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-gray-500">プログラム情報はまだ登録されていません</p>
-              )}
+
+                    {/* 決勝用情報（2曲の場合） */}
+                    {programInfo.song_count === '2曲' && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">決勝用情報</h3>
+                        
+                        {/* 決勝選手紹介用画像 */}
+                        {mediaUrls.final_player_photo_path && (
+                          <div className="mb-6">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">決勝用選手紹介画像</h4>
+                            <div className="bg-gray-50 rounded-lg p-4">
+                              <div className="relative w-full max-w-md mx-auto">
+                                <Image
+                                  src={mediaUrls.final_player_photo_path}
+                                  alt="決勝選手紹介用画像"
+                                  width={400}
+                                  height={400}
+                                  className="rounded-lg shadow-lg"
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 gap-4">
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">決勝所属</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{programInfo.final_affiliation || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">決勝作品あらすじ・ストーリー</dt>
+                            <dd className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                              {programInfo.final_story || '-'}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">決勝作品見所</dt>
+                            <dd className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                              {programInfo.final_highlight || '-'}
+                            </dd>
+                          </div>
+                        </div>
+
+                        {/* 決勝作品イメージ */}
+                        {(mediaUrls.final_image1_path || mediaUrls.final_image2_path || 
+                          mediaUrls.final_image3_path || mediaUrls.final_image4_path) && (
+                          <div className="mt-6">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">決勝作品イメージ画像</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              {['final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'].map((key, index) => (
+                                mediaUrls[key] && (
+                                  <div key={key} className="bg-gray-50 rounded-lg p-2">
+                                    <Image
+                                      src={mediaUrls[key]}
+                                      alt={`決勝作品イメージ${index + 1}`}
+                                      width={300}
+                                      height={300}
+                                      className="rounded-lg shadow-md w-full"
+                                      style={{ objectFit: 'cover' }}
+                                    />
+                                    <p className="mt-1 text-xs text-gray-600 text-center">イメージ画像 {index + 1}</p>
+                                  </div>
+                                )
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 備考 */}
+                    {programInfo.notes && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">備考</h3>
+                        <div className="bg-gray-50 p-4 rounded">
+                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{programInfo.notes}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">プログラム情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
 
       case 'semifinals':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                準決勝情報
-              </h2>
-              {semifinalsInfo ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  準決勝情報
+                </h2>
+                {semifinalsInfo ? (
+                  <div className="space-y-6">
+                    {/* 作品・楽曲情報 */}
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_title || '-'}</dd>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">作品・楽曲情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">予選から楽曲変更</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {semifinalsInfo.music_change_from_preliminary ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.music_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.artist || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {semifinalsInfo.music_type === 'cd' && 'CD楽曲'}
+                            {semifinalsInfo.music_type === 'download' && 'ダウンロード楽曲'}
+                            {semifinalsInfo.music_type === 'other' && 'その他（オリジナル曲）'}
+                            {!semifinalsInfo.music_type && '-'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.cd_title || '-'}</dd>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.music_title || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.artist || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.music_type || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師2</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer2_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">小道具</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.props_usage || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">小道具詳細</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.props_details || '-'}</dd>
-                    </div>
-                  </div>
-                  
-                  {/* 楽曲ファイル */}
-                  {mediaUrls.semifinals_music_data_path && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">楽曲ファイル</h3>
-                      <audio controls className="w-full">
-                        <source src={mediaUrls.semifinals_music_data_path} />
-                        お使いのブラウザは音声タグをサポートしていません。
-                      </audio>
-                    </div>
-                  )}
 
-                  {/* チェイサー曲 */}
-                  {mediaUrls.semifinals_chaser_song && (
+                    {/* 振付師情報 */}
                     <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">チェイサー曲</h3>
-                      <audio controls className="w-full">
-                        <source src={mediaUrls.semifinals_chaser_song} />
-                        お使いのブラウザは音声タグをサポートしていません。
-                      </audio>
-                    </div>
-                  )}
-
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">音響情報</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">音楽開始タイミング</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.sound_start_timing || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">チェイサー曲指定</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.chaser_song_designation || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">フェードアウト開始</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_start_time || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">フェードアウト完了</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_complete_time || '-'}</dd>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 照明シーン画像 */}
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">照明シーン画像</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {['scene1_image_path', 'scene2_image_path', 'scene3_image_path', 'scene4_image_path', 'scene5_image_path', 'chaser_exit_image_path'].map((key, index) => (
-                        mediaUrls[key] && (
-                          <div key={key} className="relative">
-                            <Image
-                              src={mediaUrls[key]}
-                              alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
-                              width={200}
-                              height={200}
-                              className="rounded-lg shadow-md"
-                              style={{ objectFit: 'cover' }}
-                            />
-                            <p className="mt-1 text-sm text-gray-600 text-center">
-                              {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
-                            </p>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">振付師情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">予選から振付師変更</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {semifinalsInfo.choreographer_change_from_preliminary ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_name || '-'}</dd>
+                        </div>
+                        {semifinalsInfo.choreographer2_name && (
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">振付師2</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer2_name}</dd>
                           </div>
-                        )
-                      ))}
+                        )}
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">小道具の使用</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.props_usage || '-'}</dd>
+                        </div>
+                        {semifinalsInfo.props_details && (
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">使用する小道具</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.props_details}</dd>
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    {/* 音楽ファイル */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">音楽データ</h3>
+                      
+                      {/* メイン楽曲 */}
+                      {(mediaUrls.semifinals_music_data_path || semifinalsMusicFile?.signed_url) && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">本番用楽曲データ</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <audio controls className="w-full">
+                              <source src={mediaUrls.semifinals_music_data_path || semifinalsMusicFile?.signed_url} />
+                              お使いのブラウザは音声タグをサポートしていません。
+                            </audio>
+                            {semifinalsMusicFile && (
+                              <p className="text-xs text-gray-600 mt-2">ファイル: {semifinalsMusicFile.file_name}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* チェイサー曲 */}
+                      {(mediaUrls.semifinals_chaser_song || semifinalsChaserFile?.signed_url) && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">チェイサー曲</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <audio controls className="w-full">
+                              <source src={mediaUrls.semifinals_chaser_song || semifinalsChaserFile?.signed_url} />
+                              お使いのブラウザは音声タグをサポートしていません。
+                            </audio>
+                            {semifinalsChaserFile && (
+                              <p className="text-xs text-gray-600 mt-2">ファイル: {semifinalsChaserFile.file_name}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {!mediaUrls.semifinals_music_data_path && !semifinalsMusicFile && (
+                        <p className="text-sm text-gray-500">音楽データは未アップロードです</p>
+                      )}
+                    </div>
+
+                    {/* 音響指示 */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">音響指示書</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">音楽スタートのタイミング</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.sound_start_timing || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">チェイサー曲の指定</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.chaser_song_designation || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">フェードアウト開始時間</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_start_time || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">フェードアウト完了時間</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_complete_time || '-'}</dd>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 照明シーン画像 */}
+                    {(mediaUrls.scene1_image_path || mediaUrls.scene2_image_path || 
+                      mediaUrls.scene3_image_path || mediaUrls.scene4_image_path || 
+                      mediaUrls.scene5_image_path || mediaUrls.chaser_exit_image_path) && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">照明シーン資料画像</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {['scene1_image_path', 'scene2_image_path', 'scene3_image_path', 
+                            'scene4_image_path', 'scene5_image_path', 'chaser_exit_image_path'].map((key, index) => (
+                            mediaUrls[key] && (
+                              <div key={key} className="bg-gray-50 rounded-lg p-2">
+                                <Image
+                                  src={mediaUrls[key]}
+                                  alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
+                                  width={200}
+                                  height={200}
+                                  className="rounded-lg shadow-md w-full"
+                                  style={{ objectFit: 'cover' }}
+                                />
+                                <p className="mt-1 text-xs text-gray-600 text-center">
+                                  {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
+                                </p>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">準決勝情報はまだ登録されていません</p>
-              )}
+                ) : (
+                  <p className="text-gray-500">準決勝情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
 
       case 'finals':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                決勝情報
-              </h2>
-              {finalsInfo ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  決勝情報
+                </h2>
+                {finalsInfo ? (
+                  <div className="space-y-6">
+                    {/* 作品・楽曲情報 */}
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_title || '-'}</dd>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">作品・楽曲情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">準決勝から楽曲変更</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.music_change ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.music_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.artist || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.music_type === 'cd' && 'CD楽曲'}
+                            {finalsInfo.music_type === 'download' && 'ダウンロード楽曲'}
+                            {finalsInfo.music_type === 'other' && 'その他（オリジナル曲）'}
+                            {!finalsInfo.music_type && '-'}
+                          </dd>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.music_title || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">アーティスト</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.artist || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.music_type || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">楽曲変更</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {finalsInfo.music_change ? '変更あり' : '変更なし'}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師2</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer2_name || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">小道具</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.props_usage || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">小道具詳細</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.props_details || '-'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">振付師来場</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_attendance || '-'}</dd>
-                    </div>
-                  </div>
 
-                  {/* 楽曲ファイル */}
-                  {mediaUrls.finals_music_data_path && (
+                    {/* 振付師情報 */}
                     <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">楽曲ファイル</h3>
-                      <audio controls className="w-full">
-                        <source src={mediaUrls.finals_music_data_path} />
-                        お使いのブラウザは音声タグをサポートしていません。
-                      </audio>
-                    </div>
-                  )}
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">振付師情報</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付変更</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.choreographer_change ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_name || '-'}</dd>
+                        </div>
+                        {finalsInfo.choreographer2_name && (
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">振付師2（決勝で変更の場合）</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer2_name}</dd>
+                          </div>
+                        )}
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">小道具の使用</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.props_usage || '-'}</dd>
+                        </div>
+                        {finalsInfo.props_details && (
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">使用する小道具</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{finalsInfo.props_details}</dd>
+                          </div>
+                        )}
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師の来場</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_attendance || '-'}</dd>
+                        </div>
+                      </div>
 
-                  {/* チェイサー曲 */}
-                  {mediaUrls.finals_chaser_song && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">チェイサー曲</h3>
-                      <audio controls className="w-full">
-                        <source src={mediaUrls.finals_chaser_song} />
-                        お使いのブラウザは音声タグをサポートしていません。
-                      </audio>
-                    </div>
-                  )}
-
-                  {/* 振付師写真 */}
-                  {mediaUrls.choreographer_photo_path && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">振付師写真</h3>
-                      <div className="relative w-full max-w-md mx-auto">
-                        <Image
-                          src={mediaUrls.choreographer_photo_path}
-                          alt="振付師写真"
-                          width={400}
-                          height={400}
-                          className="rounded-lg shadow-lg"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">音響情報</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">音響変更</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          {finalsInfo.sound_change_from_semifinals ? '変更あり' : '変更なし'}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">音楽開始タイミング</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{finalsInfo.sound_start_timing || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">チェイサー曲指定</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{finalsInfo.chaser_song_designation || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">照明変更</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          {finalsInfo.lighting_change_from_semifinals ? '変更あり' : '変更なし'}
-                        </dd>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 照明シーン画像 */}
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">照明シーン画像</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {['finals_scene1_image_path', 'finals_scene2_image_path', 'finals_scene3_image_path', 'finals_scene4_image_path', 'finals_scene5_image_path', 'finals_chaser_exit_image_path'].map((key, index) => (
-                        mediaUrls[key] && (
-                          <div key={key} className="relative">
-                            <Image
-                              src={mediaUrls[key]}
-                              alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
-                              width={200}
-                              height={200}
-                              className="rounded-lg shadow-md"
-                              style={{ objectFit: 'cover' }}
-                            />
-                            <p className="mt-1 text-sm text-gray-600 text-center">
-                              {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
+                      {/* 振付師写真 */}
+                      {mediaUrls.choreographer_photo_path && (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">振付師写真</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="relative w-full max-w-sm mx-auto">
+                              <Image
+                                src={mediaUrls.choreographer_photo_path}
+                                alt="振付師写真"
+                                width={300}
+                                height={300}
+                                className="rounded-lg shadow-lg"
+                                style={{ objectFit: 'cover' }}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 text-center mt-2">
+                              プログラム掲載用振付師写真
                             </p>
                           </div>
-                        )
-                      ))}
+                        </div>
+                      )}
                     </div>
+
+                    {/* 音楽ファイル */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">音楽データ</h3>
+                      
+                      {/* メイン楽曲 */}
+                      {(mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url) && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">決勝用楽曲データ</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <audio controls className="w-full">
+                              <source src={mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url} />
+                              お使いのブラウザは音声タグをサポートしていません。
+                            </audio>
+                            {finalsMusicFile && (
+                              <p className="text-xs text-gray-600 mt-2">ファイル: {finalsMusicFile.file_name}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* チェイサー曲 */}
+                      {(mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url) && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">チェイサー曲</h4>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <audio controls className="w-full">
+                              <source src={mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url} />
+                              お使いのブラウザは音声タグをサポートしていません。
+                            </audio>
+                            {finalsChaserFile && (
+                              <p className="text-xs text-gray-600 mt-2">ファイル: {finalsChaserFile.file_name}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 音響・照明変更 */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">音響・照明指示</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">音響変更（準決勝から）</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.sound_change_from_semifinals ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">照明変更（準決勝から）</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.lighting_change_from_semifinals ? '変更あり' : '変更なし'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">音楽スタートのタイミング</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.sound_start_timing || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">チェイサー曲の指定</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.chaser_song_designation || '-'}</dd>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 照明シーン画像 */}
+                    {(mediaUrls.finals_scene1_image_path || mediaUrls.finals_scene2_image_path || 
+                      mediaUrls.finals_scene3_image_path || mediaUrls.finals_scene4_image_path || 
+                      mediaUrls.finals_scene5_image_path || mediaUrls.finals_chaser_exit_image_path) && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">照明シーン資料画像（決勝用）</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {['finals_scene1_image_path', 'finals_scene2_image_path', 'finals_scene3_image_path', 
+                            'finals_scene4_image_path', 'finals_scene5_image_path', 'finals_chaser_exit_image_path'].map((key, index) => (
+                            mediaUrls[key] && (
+                              <div key={key} className="bg-gray-50 rounded-lg p-2">
+                                <Image
+                                  src={mediaUrls[key]}
+                                  alt={`シーン${index === 5 ? 'チェイサー退場' : index + 1}`}
+                                  width={200}
+                                  height={200}
+                                  className="rounded-lg shadow-md w-full"
+                                  style={{ objectFit: 'cover' }}
+                                />
+                                <p className="mt-1 text-xs text-gray-600 text-center">
+                                  {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
+                                </p>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">決勝情報はまだ登録されていません</p>
-              )}
+                ) : (
+                  <p className="text-gray-500">決勝情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
 
       case 'applications':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                申込み情報
-              </h2>
-              {applicationsInfo ? (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">関係者チケット</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">関係者チケット枚数</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.related_ticket_count || 0}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">合計金額</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          {applicationsInfo.related_ticket_total_amount ? `¥${applicationsInfo.related_ticket_total_amount.toLocaleString()}` : '-'}
-                        </dd>
-                      </div>
-                    </div>
-                    {[1, 2, 3, 4, 5].map((num) => {
-                      const nameKey = `related${num}_name` as keyof ApplicationsInfo
-                      const relationKey = `related${num}_relationship` as keyof ApplicationsInfo
-                      if (applicationsInfo[nameKey]) {
-                        return (
-                          <div key={num} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                            <div>
-                              <dt className="text-sm font-medium text-gray-500">関係者{num} 名前</dt>
-                              <dd className="mt-1 text-sm text-gray-900">{applicationsInfo[nameKey] as string}</dd>
-                            </div>
-                            <div>
-                              <dt className="text-sm font-medium text-gray-500">関係者{num} 関係</dt>
-                              <dd className="mt-1 text-sm text-gray-900">{applicationsInfo[relationKey] as string || '-'}</dd>
-                            </div>
-                          </div>
-                        )
-                      }
-                      return null
-                    })}
-                  </div>
-
-                  {/* 振込明細画像 */}
-                  {mediaUrls.payment_slip_path && (
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  申込み情報
+                </h2>
+                {applicationsInfo ? (
+                  <div className="space-y-6">
+                    {/* 関係者チケット */}
                     <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">振込明細</h3>
-                      <div className="relative w-full max-w-2xl mx-auto">
-                        <Image
-                          src={mediaUrls.payment_slip_path}
-                          alt="振込明細"
-                          width={800}
-                          height={600}
-                          className="rounded-lg shadow-lg"
-                          style={{ objectFit: 'contain' }}
-                        />
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">関係者チケット申込み</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">申込み枚数</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.related_ticket_count || 0}枚</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">合計金額</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {applicationsInfo.related_ticket_total_amount ? 
+                              `¥${applicationsInfo.related_ticket_total_amount.toLocaleString()}` : '¥0'}
+                          </dd>
+                        </div>
                       </div>
-                    </div>
-                  )}
 
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900 mb-2">メイク・ヘアメイク</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* 関係者詳細 */}
+                      {[1, 2, 3, 4, 5].map((num) => {
+                        const nameKey = `related${num}_name` as keyof ApplicationsInfo
+                        const relationKey = `related${num}_relationship` as keyof ApplicationsInfo
+                        const furiganaKey = `related${num}_furigana` as keyof ApplicationsInfo
+                        if (applicationsInfo[nameKey]) {
+                          return (
+                            <div key={num} className="bg-gray-50 rounded-lg p-3 mb-2">
+                              <h4 className="text-sm font-medium text-gray-700 mb-2">関係者{num}</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                  <dt className="text-xs text-gray-500">氏名</dt>
+                                  <dd className="text-sm text-gray-900">{applicationsInfo[nameKey] as string}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-xs text-gray-500">フリガナ</dt>
+                                  <dd className="text-sm text-gray-900">{(applicationsInfo[furiganaKey] as string) || '-'}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-xs text-gray-500">関係</dt>
+                                  <dd className="text-sm text-gray-900">{(applicationsInfo[relationKey] as string) || '-'}</dd>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
+                      })}
+                    </div>
+
+                    {/* 振込明細 */}
+                    {mediaUrls.payment_slip_path && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">希望スタイリスト</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_preferred_stylist || '-'}</dd>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">振込明細書</h3>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="relative w-full max-w-3xl mx-auto">
+                            <Image
+                              src={mediaUrls.payment_slip_path}
+                              alt="振込明細"
+                              width={800}
+                              height={600}
+                              className="rounded-lg shadow-lg w-full"
+                              style={{ objectFit: 'contain' }}
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 text-center mt-2">
+                            関係者チケット代金の振込明細
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">メイク担当者名</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_name || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">メイク担当者メール</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_email || '-'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">メイク担当者電話</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone || '-'}</dd>
+                    )}
+
+                    {/* メイク・ヘアメイク */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">メイク・ヘアメイク申込み</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">希望スタイリスト</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_preferred_stylist || '指定なし'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">メイク担当者名</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_name || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">メイク担当者メール</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_email || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">メイク担当者電話</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone || '-'}</dd>
+                        </div>
+                        {applicationsInfo.makeup_notes && (
+                          <div className="md:col-span-2">
+                            <dt className="text-sm font-medium text-gray-500">備考</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_notes}</dd>
+                          </div>
+                        )}
                       </div>
                     </div>
+
+                    {/* 申込み備考 */}
+                    {applicationsInfo.applications_notes && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">申込み備考</h3>
+                        <div className="bg-gray-50 p-4 rounded">
+                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{applicationsInfo.applications_notes}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">申込み情報はまだ登録されていません</p>
-              )}
+                ) : (
+                  <p className="text-gray-500">申込み情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
 
       case 'sns':
         return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                SNS情報
-              </h2>
-              {snsInfo ? (
-                <div className="space-y-6">
-                  {/* 練習動画 */}
-                  {mediaUrls.practice_video_path && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">練習動画</h3>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <video
-                          controls
-                          className="w-full max-w-2xl mx-auto rounded-lg"
-                          src={mediaUrls.practice_video_path}
-                        >
-                          お使いのブラウザは動画タグをサポートしていません。
-                        </video>
-                        <p className="mt-2 text-sm text-gray-600 text-center">
-                          ファイル名: {snsInfo.practice_video_filename || '-'}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 紹介ハイライト動画 */}
-                  {mediaUrls.introduction_highlight_path && (
-                    <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">紹介ハイライト動画</h3>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <video
-                          controls
-                          className="w-full max-w-2xl mx-auto rounded-lg"
-                          src={mediaUrls.introduction_highlight_path}
-                        >
-                          お使いのブラウザは動画タグをサポートしていません。
-                        </video>
-                        <p className="mt-2 text-sm text-gray-600 text-center">
-                          ファイル名: {snsInfo.introduction_highlight_filename || '-'}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 備考 */}
-                  {snsInfo.sns_notes && (
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">備考</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{snsInfo.sns_notes}</dd>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-gray-500">SNS情報はまだ登録されていません</p>
-              )}
-            </div>
-          </div>
-        )
-
-      case 'files':
-        return (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                アップロードファイル
-              </h2>
-              {entry.entry_files && entry.entry_files.length > 0 ? (
-                <div className="space-y-4">
-                  {entry.entry_files.map((file) => (
-                    <div key={file.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{file.file_name}</p>
-                          <p className="text-sm text-gray-500">
-                            タイプ: {file.file_type} | 目的: {file.purpose || '-'}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            アップロード日時: {formatDateLocale(file.uploaded_at)}
-                          </p>
-                        </div>
-                        {file.signed_url && (
-                          <div className="ml-4">
-                            {file.file_type === 'video' && (
-                              <video controls className="w-64 rounded">
-                                <source src={file.signed_url} />
-                              </video>
-                            )}
-                            {file.file_type === 'audio' && (
-                              <audio controls className="w-64">
-                                <source src={file.signed_url} />
-                              </audio>
-                            )}
-                            {file.file_type === 'photo' && (
-                              <Image
-                                src={file.signed_url}
-                                alt={file.file_name}
-                                width={256}
-                                height={256}
-                                className="rounded"
-                                style={{ objectFit: 'cover' }}
-                              />
-                            )}
+          <div className="space-y-6">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  SNS・広報用情報
+                </h2>
+                {snsInfo ? (
+                  <div className="space-y-6">
+                    {/* 練習動画 */}
+                    {mediaUrls.practice_video_path && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">練習風景動画</h3>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <video
+                            controls
+                            className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
+                            src={mediaUrls.practice_video_path}
+                          >
+                            お使いのブラウザは動画タグをサポートしていません。
+                          </video>
+                          <div className="mt-3 text-center">
+                            <p className="text-sm text-gray-600">
+                              ファイル名: {snsInfo.practice_video_filename || '-'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              SNSでの事前告知に使用される練習風景動画
+                            </p>
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">アップロードされたファイルはありません</p>
-              )}
+                    )}
+
+                    {/* 紹介ハイライト動画 */}
+                    {mediaUrls.introduction_highlight_path && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">紹介用ハイライト動画</h3>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <video
+                            controls
+                            className="w-full max-w-3xl mx-auto rounded-lg shadow-lg"
+                            src={mediaUrls.introduction_highlight_path}
+                          >
+                            お使いのブラウザは動画タグをサポートしていません。
+                          </video>
+                          <div className="mt-3 text-center">
+                            <p className="text-sm text-gray-600">
+                              ファイル名: {snsInfo.introduction_highlight_filename || '-'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              大会当日の選手紹介で使用されるハイライト動画
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SNS備考 */}
+                    {snsInfo.sns_notes && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">SNS使用に関する備考</h3>
+                        <div className="bg-gray-50 p-4 rounded">
+                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{snsInfo.sns_notes}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {!mediaUrls.practice_video_path && !mediaUrls.introduction_highlight_path && !snsInfo.sns_notes && (
+                      <p className="text-gray-500">SNS・広報用の情報は登録されていません</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">SNS情報はまだ登録されていません</p>
+                )}
+              </div>
             </div>
           </div>
         )
@@ -1036,6 +1261,12 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                   <div className="text-sm text-gray-500">
                     <p>評価者: {entry.selections[0].users?.name}</p>
                     <p>評価日時: {formatDateLocale(entry.selections[0].created_at)}</p>
+                    {entry.selections[0].comments && (
+                      <div className="mt-2">
+                        <p className="font-medium">前回のコメント:</p>
+                        <p className="mt-1">{entry.selections[0].comments}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1123,16 +1354,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
               SNS
-            </button>
-            <button
-              onClick={() => setActiveTab('files')}
-              className={`${
-                activeTab === 'files'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-            >
-              ファイル
             </button>
             <button
               onClick={() => setActiveTab('selection')}
