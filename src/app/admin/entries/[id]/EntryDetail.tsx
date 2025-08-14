@@ -640,6 +640,22 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
                           <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.cd_title || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.record_number || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.jasrac_code || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.copyright_permission || '-'}</dd>
+                        </div>
+                        <div className="md:col-span-2">
+                          <dt className="text-sm font-medium text-gray-500">作品キャラクター・ストーリー</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_character_story || '-'}</dd>
+                        </div>
                       </div>
                     </div>
 
@@ -657,11 +673,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">振付師1</dt>
                           <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_name || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1 フリガナ</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_furigana || '-'}</dd>
+                        </div>
                         {semifinalsInfo.choreographer2_name && (
-                          <div>
-                            <dt className="text-sm font-medium text-gray-500">振付師2</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer2_name}</dd>
-                          </div>
+                          <>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer2_name}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2 フリガナ</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer2_furigana || '-'}</dd>
+                            </div>
+                          </>
                         )}
                         <div>
                           <dt className="text-sm font-medium text-gray-500">小道具の使用</dt>
@@ -737,7 +763,94 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">フェードアウト完了時間</dt>
                           <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_complete_time || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">音楽使用方法</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.music_usage_method || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">ダンススタートタイミング</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.dance_start_timing || '-'}</dd>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* 照明指示（シーンごとの詳細） */}
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">照明指示書</h3>
+                      {[1, 2, 3, 4, 5].map((num) => {
+                        const timeKey = `scene${num}_time` as keyof SemifinalsInfo
+                        const triggerKey = `scene${num}_trigger` as keyof SemifinalsInfo
+                        const colorKey = `scene${num}_color_type` as keyof SemifinalsInfo
+                        const notesKey = `scene${num}_notes` as keyof SemifinalsInfo
+                        
+                        if (semifinalsInfo[timeKey] || semifinalsInfo[triggerKey]) {
+                          return (
+                            <div key={num} className="mb-4 p-3 bg-gray-50 rounded-lg">
+                              <h4 className="font-medium text-sm text-gray-700 mb-2">シーン{num}</h4>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                {semifinalsInfo[timeKey] && (
+                                  <div>
+                                    <span className="text-gray-500">時間:</span>
+                                    <span className="ml-2 text-gray-900">{semifinalsInfo[timeKey] as string}</span>
+                                  </div>
+                                )}
+                                {semifinalsInfo[triggerKey] && (
+                                  <div>
+                                    <span className="text-gray-500">タイミング:</span>
+                                    <span className="ml-2 text-gray-900">{semifinalsInfo[triggerKey] as string}</span>
+                                  </div>
+                                )}
+                                {semifinalsInfo[colorKey] && (
+                                  <div>
+                                    <span className="text-gray-500">カラー:</span>
+                                    <span className="ml-2 text-gray-900">{semifinalsInfo[colorKey] as string}</span>
+                                  </div>
+                                )}
+                                {semifinalsInfo[notesKey] && (
+                                  <div className="col-span-2">
+                                    <span className="text-gray-500">備考:</span>
+                                    <span className="ml-2 text-gray-900">{semifinalsInfo[notesKey] as string}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
+                      })}
+                      
+                      {/* チェイサー退場シーン */}
+                      {(semifinalsInfo.chaser_exit_time || semifinalsInfo.chaser_exit_trigger) && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <h4 className="font-medium text-sm text-gray-700 mb-2">チェイサー退場</h4>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            {semifinalsInfo.chaser_exit_time && (
+                              <div>
+                                <span className="text-gray-500">時間:</span>
+                                <span className="ml-2 text-gray-900">{semifinalsInfo.chaser_exit_time}</span>
+                              </div>
+                            )}
+                            {semifinalsInfo.chaser_exit_trigger && (
+                              <div>
+                                <span className="text-gray-500">タイミング:</span>
+                                <span className="ml-2 text-gray-900">{semifinalsInfo.chaser_exit_trigger}</span>
+                              </div>
+                            )}
+                            {semifinalsInfo.chaser_exit_color_type && (
+                              <div>
+                                <span className="text-gray-500">カラー:</span>
+                                <span className="ml-2 text-gray-900">{semifinalsInfo.chaser_exit_color_type}</span>
+                              </div>
+                            )}
+                            {semifinalsInfo.chaser_exit_notes && (
+                              <div className="col-span-2">
+                                <span className="text-gray-500">備考:</span>
+                                <span className="ml-2 text-gray-900">{semifinalsInfo.chaser_exit_notes}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* 照明シーン画像 */}
@@ -765,6 +878,35 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               </div>
                             )
                           ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 銀行口座情報 */}
+                    {(semifinalsInfo.bank_name || semifinalsInfo.branch_name || semifinalsInfo.account_number) && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">賞金振込先口座</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">銀行名</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.bank_name || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">支店名</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.branch_name || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">口座種別</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.account_type || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">口座番号</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.account_number || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">口座名義</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.account_holder || '-'}</dd>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -798,8 +940,18 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           </dd>
                         </div>
                         <div>
+                          <dt className="text-sm font-medium text-gray-500">予選楽曲コピー</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {finalsInfo.copy_preliminary_music ? 'コピーする' : 'コピーしない'}
+                          </dd>
+                        </div>
+                        <div>
                           <dt className="text-sm font-medium text-gray-500">作品タイトル</dt>
                           <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">作品タイトル（かな）</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_title_kana || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">楽曲タイトル</dt>
@@ -810,6 +962,18 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dd className="mt-1 text-sm text-gray-900">{finalsInfo.artist || '-'}</dd>
                         </div>
                         <div>
+                          <dt className="text-sm font-medium text-gray-500">CDタイトル</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.cd_title || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">レコード番号</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.record_number || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">JASRAC作品コード</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.jasrac_code || '-'}</dd>
+                        </div>
+                        <div>
                           <dt className="text-sm font-medium text-gray-500">楽曲種類</dt>
                           <dd className="mt-1 text-sm text-gray-900">
                             {finalsInfo.music_type === 'cd' && 'CD楽曲'}
@@ -817,6 +981,14 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                             {finalsInfo.music_type === 'other' && 'その他（オリジナル曲）'}
                             {!finalsInfo.music_type && '-'}
                           </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">著作権許諾</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.copyright_permission || '-'}</dd>
+                        </div>
+                        <div className="md:col-span-2">
+                          <dt className="text-sm font-medium text-gray-500">作品キャラクター・ストーリー</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_character_story || '-'}</dd>
                         </div>
                       </div>
                     </div>
@@ -835,11 +1007,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">振付師1</dt>
                           <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_name || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師1 フリガナ</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_furigana || '-'}</dd>
+                        </div>
                         {finalsInfo.choreographer2_name && (
-                          <div>
-                            <dt className="text-sm font-medium text-gray-500">振付師2（決勝で変更の場合）</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer2_name}</dd>
-                          </div>
+                          <>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer2_name}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付師2 フリガナ</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer2_furigana || '-'}</dd>
+                            </div>
+                          </>
                         )}
                         <div>
                           <dt className="text-sm font-medium text-gray-500">小道具の使用</dt>
@@ -855,6 +1037,26 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">振付師の来場</dt>
                           <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_attendance || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">振付師写真許諾</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_photo_permission || '-'}</dd>
+                        </div>
+                        {finalsInfo.choreography_change_timing && (
+                          <>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">振付変更タイミング</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreography_change_timing}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">変更前振付</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreography_before_change || '-'}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-sm font-medium text-gray-500">変更後振付</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreography_after_change || '-'}</dd>
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       {/* 振付師写真 */}
@@ -941,8 +1143,105 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">チェイサー曲の指定</dt>
                           <dd className="mt-1 text-sm text-gray-900">{finalsInfo.chaser_song_designation || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">フェードアウト開始時間</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.fade_out_start_time || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">フェードアウト完了時間</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.fade_out_complete_time || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">音楽使用方法</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.music_usage_method || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">ダンススタートタイミング</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.dance_start_timing || '-'}</dd>
+                        </div>
                       </div>
                     </div>
+
+                    {/* 照明指示詳細 */}
+                    {finalsInfo.lighting_change_from_semifinals && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">照明指示詳細</h3>
+                        {[1, 2, 3, 4, 5].map((num) => {
+                          const timeKey = `scene${num}_time` as keyof FinalsInfo
+                          const triggerKey = `scene${num}_trigger` as keyof FinalsInfo
+                          const colorKey = `scene${num}_color_type` as keyof FinalsInfo
+                          const notesKey = `scene${num}_notes` as keyof FinalsInfo
+                          
+                          if (finalsInfo[timeKey] || finalsInfo[triggerKey]) {
+                            return (
+                              <div key={num} className="mb-4 p-3 bg-gray-50 rounded-lg">
+                                <h4 className="font-medium text-sm text-gray-700 mb-2">シーン{num}</h4>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                  {finalsInfo[timeKey] && (
+                                    <div>
+                                      <span className="text-gray-500">時間:</span>
+                                      <span className="ml-2 text-gray-900">{finalsInfo[timeKey] as string}</span>
+                                    </div>
+                                  )}
+                                  {finalsInfo[triggerKey] && (
+                                    <div>
+                                      <span className="text-gray-500">タイミング:</span>
+                                      <span className="ml-2 text-gray-900">{finalsInfo[triggerKey] as string}</span>
+                                    </div>
+                                  )}
+                                  {finalsInfo[colorKey] && (
+                                    <div>
+                                      <span className="text-gray-500">カラー:</span>
+                                      <span className="ml-2 text-gray-900">{finalsInfo[colorKey] as string}</span>
+                                    </div>
+                                  )}
+                                  {finalsInfo[notesKey] && (
+                                    <div className="col-span-2">
+                                      <span className="text-gray-500">備考:</span>
+                                      <span className="ml-2 text-gray-900">{finalsInfo[notesKey] as string}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          }
+                          return null
+                        })}
+                        
+                        {/* チェイサー退場シーン */}
+                        {(finalsInfo.chaser_exit_time || finalsInfo.chaser_exit_trigger) && (
+                          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                            <h4 className="font-medium text-sm text-gray-700 mb-2">チェイサー退場</h4>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              {finalsInfo.chaser_exit_time && (
+                                <div>
+                                  <span className="text-gray-500">時間:</span>
+                                  <span className="ml-2 text-gray-900">{finalsInfo.chaser_exit_time}</span>
+                                </div>
+                              )}
+                              {finalsInfo.chaser_exit_trigger && (
+                                <div>
+                                  <span className="text-gray-500">タイミング:</span>
+                                  <span className="ml-2 text-gray-900">{finalsInfo.chaser_exit_trigger}</span>
+                                </div>
+                              )}
+                              {finalsInfo.chaser_exit_color_type && (
+                                <div>
+                                  <span className="text-gray-500">カラー:</span>
+                                  <span className="ml-2 text-gray-900">{finalsInfo.chaser_exit_color_type}</span>
+                                </div>
+                              )}
+                              {finalsInfo.chaser_exit_notes && (
+                                <div className="col-span-2">
+                                  <span className="text-gray-500">備考:</span>
+                                  <span className="ml-2 text-gray-900">{finalsInfo.chaser_exit_notes}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* 照明シーン画像 */}
                     {(mediaUrls.finals_scene1_image_path || mediaUrls.finals_scene2_image_path || 
@@ -1038,6 +1337,47 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       })}
                     </div>
 
+                    {/* 同伴者情報 */}
+                    {(applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name) && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">同伴者申込み</h3>
+                        <div className="mb-4">
+                          <dt className="text-sm font-medium text-gray-500">同伴者合計金額</dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            {applicationsInfo.companion_total_amount ? 
+                              `¥${applicationsInfo.companion_total_amount.toLocaleString()}` : '¥0'}
+                          </dd>
+                        </div>
+                        {[1, 2, 3].map((num) => {
+                          const nameKey = `companion${num}_name` as keyof ApplicationsInfo
+                          const furiganaKey = `companion${num}_furigana` as keyof ApplicationsInfo
+                          const purposeKey = `companion${num}_purpose` as keyof ApplicationsInfo
+                          if (applicationsInfo[nameKey]) {
+                            return (
+                              <div key={num} className="bg-gray-50 rounded-lg p-3 mb-2">
+                                <h4 className="text-sm font-medium text-gray-700 mb-2">同伴者{num}</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div>
+                                    <dt className="text-xs text-gray-500">氏名</dt>
+                                    <dd className="text-sm text-gray-900">{applicationsInfo[nameKey] as string}</dd>
+                                  </div>
+                                  <div>
+                                    <dt className="text-xs text-gray-500">フリガナ</dt>
+                                    <dd className="text-sm text-gray-900">{(applicationsInfo[furiganaKey] as string) || '-'}</dd>
+                                  </div>
+                                  <div>
+                                    <dt className="text-xs text-gray-500">目的</dt>
+                                    <dd className="text-sm text-gray-900">{(applicationsInfo[purposeKey] as string) || '-'}</dd>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          }
+                          return null
+                        })}
+                      </div>
+                    )}
+
                     {/* 振込明細 */}
                     {mediaUrls.payment_slip_path && (
                       <div>
@@ -1060,9 +1400,9 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       </div>
                     )}
 
-                    {/* メイク・ヘアメイク */}
+                    {/* メイク・ヘアメイク（準決勝） */}
                     <div>
-                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">メイク・ヘアメイク申込み</h3>
+                      <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">メイク・ヘアメイク申込み（準決勝）</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <dt className="text-sm font-medium text-gray-500">希望スタイリスト</dt>
@@ -1080,6 +1420,14 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dt className="text-sm font-medium text-gray-500">メイク担当者電話</dt>
                           <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone || '-'}</dd>
                         </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">メイクスタイル1</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style1 || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm font-medium text-gray-500">メイクスタイル2</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style2 || '-'}</dd>
+                        </div>
                         {applicationsInfo.makeup_notes && (
                           <div className="md:col-span-2">
                             <dt className="text-sm font-medium text-gray-500">備考</dt>
@@ -1088,6 +1436,45 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         )}
                       </div>
                     </div>
+
+                    {/* メイク・ヘアメイク（決勝） */}
+                    {(applicationsInfo.makeup_preferred_stylist_final || applicationsInfo.makeup_name_final) && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">メイク・ヘアメイク申込み（決勝）</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">希望スタイリスト</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_preferred_stylist_final || '指定なし'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">メイク担当者名</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_name_final || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">メイク担当者メール</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_email_final || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">メイク担当者電話</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone_final || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">メイクスタイル1</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style1_final || '-'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-sm font-medium text-gray-500">メイクスタイル2</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style2_final || '-'}</dd>
+                          </div>
+                          {applicationsInfo.makeup_notes_final && (
+                            <div className="md:col-span-2">
+                              <dt className="text-sm font-medium text-gray-500">備考</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_notes_final}</dd>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* 申込み備考 */}
                     {applicationsInfo.applications_notes && (
