@@ -157,8 +157,18 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
 
   // SNS関連ファイル
   const snsFiles = getPurposeFiles('sns')
-  const practiceVideoFile = snsFiles.find(f => f.file_type === 'video' && (f.file_name?.includes('practice') || f.file_name?.includes('練習')))
-  const highlightVideoFile = snsFiles.find(f => f.file_type === 'video' && (f.file_name?.includes('highlight') || f.file_name?.includes('紹介')))
+  // ファイル名によるマッチングをより柔軟に
+  const practiceVideoFile = snsFiles.find(f => f.file_type === 'video' && 
+    (f.file_name?.toLowerCase().includes('practice') || 
+     f.file_name?.includes('練習') ||
+     f.purpose === 'practice_video'))
+  const highlightVideoFile = snsFiles.find(f => f.file_type === 'video' && 
+    (f.file_name?.toLowerCase().includes('highlight') || 
+     f.file_name?.toLowerCase().includes('introduction') ||
+     f.file_name?.includes('紹介') ||
+     f.purpose === 'introduction_highlight'))
+  // どちらも見つからない場合は、すべての動画を取得
+  const allSnsVideos = snsFiles.filter(f => f.file_type === 'video')
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -713,8 +723,10 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                 <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                   準決勝情報
                 </h2>
-                {semifinalsInfo ? (
+                {
                   <div className="space-y-6">
+                    {semifinalsInfo ? (
+                      <>
                     {/* 作品・楽曲情報 */}
                     <div>
                       <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">作品・楽曲情報</h3>
@@ -1024,10 +1036,51 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                       </div>
                     )}
+                      </>
+                    ) : (
+                      <p className="text-gray-500">準決勝情報はまだ登録されていません</p>
+                    )}
+                    
+                    {/* entry_filesから準決勝関連ファイルを表示 */}
+                    {!semifinalsInfo && semifinalsFiles.length > 0 && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">準決勝関連ファイル</h3>
+                        <div className="space-y-4">
+                          {semifinalsFiles.map((file) => (
+                            <div key={file.id} className="bg-gray-50 rounded-lg p-4">
+                              {file.file_type === 'audio' && file.signed_url && (
+                                <>
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                    {file.file_name?.includes('chaser') ? 'チェイサー曲' : '楽曲データ'}
+                                  </h4>
+                                  <audio controls className="w-full">
+                                    <source src={file.signed_url} />
+                                    お使いのブラウザは音声タグをサポートしていません。
+                                  </audio>
+                                  <p className="text-xs text-gray-600 mt-2">ファイル: {file.file_name}</p>
+                                </>
+                              )}
+                              {file.file_type === 'photo' && file.signed_url && (
+                                <>
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">照明シーン画像</h4>
+                                  <Image
+                                    src={file.signed_url}
+                                    alt={file.file_name}
+                                    width={300}
+                                    height={300}
+                                    className="rounded-lg shadow-md"
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                  <p className="text-xs text-gray-600 mt-2">ファイル: {file.file_name}</p>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-gray-500">準決勝情報はまだ登録されていません</p>
-                )}
+                }
               </div>
             </div>
           </div>
@@ -1616,7 +1669,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                 <h2 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                   SNS・広報用情報
                 </h2>
-                {snsInfo ? (
+                {
                   <div className="space-y-6">
                     {/* 練習動画 */}
                     {(mediaUrls.practice_video_path || practiceVideoFile?.signed_url) && (
@@ -1632,7 +1685,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           </video>
                           <div className="mt-3 text-center">
                             <p className="text-sm text-gray-600">
-                              ファイル名: {snsInfo.practice_video_filename || practiceVideoFile?.file_name || '-'}
+                              ファイル名: {snsInfo?.practice_video_filename || practiceVideoFile?.file_name || '-'}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
                               SNSでの事前告知に使用される練習風景動画
@@ -1656,7 +1709,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           </video>
                           <div className="mt-3 text-center">
                             <p className="text-sm text-gray-600">
-                              ファイル名: {snsInfo.introduction_highlight_filename || highlightVideoFile?.file_name || '-'}
+                              ファイル名: {snsInfo?.introduction_highlight_filename || highlightVideoFile?.file_name || '-'}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
                               大会当日の選手紹介で使用されるハイライト動画
@@ -1667,11 +1720,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                     )}
 
                     {/* SNS備考 */}
-                    {snsInfo.sns_notes && (
+                    {snsInfo?.sns_notes && (
                       <div>
                         <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">SNS使用に関する備考</h3>
                         <div className="bg-gray-50 p-4 rounded">
-                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{snsInfo.sns_notes}</p>
+                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{snsInfo?.sns_notes}</p>
                         </div>
                       </div>
                     )}
@@ -1714,13 +1767,43 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       </div>
                     )}
 
-                    {!mediaUrls.practice_video_path && !practiceVideoFile && !mediaUrls.introduction_highlight_path && !highlightVideoFile && snsFiles.length === 0 && !snsInfo.sns_notes && (
+                    {/* すべてのSNS動画を表示（上記でマッチしなかった場合） */}
+                    {!mediaUrls.practice_video_path && !practiceVideoFile && 
+                     !mediaUrls.introduction_highlight_path && !highlightVideoFile && 
+                     allSnsVideos.length > 0 && (
+                      <div>
+                        <h3 className="text-base font-medium text-gray-900 mb-3 border-b pb-2">SNS用動画</h3>
+                        <div className="space-y-4">
+                          {allSnsVideos.map((file) => (
+                            <div key={file.id} className="bg-gray-50 rounded-lg p-4">
+                              {file.signed_url && (
+                                <>
+                                  <video
+                                    controls
+                                    className="w-full max-w-3xl mx-auto rounded-lg shadow-lg mb-2"
+                                    src={file.signed_url}
+                                  >
+                                    お使いのブラウザは動画タグをサポートしていません。
+                                  </video>
+                                  <p className="text-sm text-gray-600 text-center">
+                                    ファイル名: {file.file_name}
+                                    {file.purpose && ` (用途: ${file.purpose})`}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {!mediaUrls.practice_video_path && !practiceVideoFile && 
+                     !mediaUrls.introduction_highlight_path && !highlightVideoFile && 
+                     allSnsVideos.length === 0 && !snsInfo?.sns_notes && (
                       <p className="text-gray-500">SNS・広報用の情報は登録されていません</p>
                     )}
                   </div>
-                ) : (
-                  <p className="text-gray-500">SNS情報はまだ登録されていません</p>
-                )}
+                }
               </div>
             </div>
           </div>
