@@ -43,7 +43,6 @@ interface EntryDetailProps {
 }
 
 export default function EntryDetail({ entry }: EntryDetailProps) {
-  const [score, setScore] = useState(entry.selections?.[0]?.score || '')
   const [comments, setComments] = useState(entry.selections?.[0]?.comments || '')
   const [status, setStatus] = useState(entry.selections?.[0]?.status || 'pending')
   const [loading, setLoading] = useState(false)
@@ -97,7 +96,6 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          score: score ? parseInt(String(score)) : null,
           comments,
           status,
         }),
@@ -208,39 +206,21 @@ export default function EntryDetail({ entry }: EntryDetailProps) {
           )}
 
           <form onSubmit={handleSaveSelection} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  選考結果 *
-                </label>
-                <select
-                  id="status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="pending">審査待ち</option>
-                  <option value="selected">選考通過</option>
-                  <option value="rejected">不選考</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="score" className="block text-sm font-medium text-gray-700">
-                  スコア（1-10）
-                </label>
-                <input
-                  type="number"
-                  id="score"
-                  min="1"
-                  max="10"
-                  value={score}
-                  onChange={(e) => setScore(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="1-10の数値"
-                />
-              </div>
+            <div>
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                選考結果 *
+              </label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                <option value="pending">審査待ち</option>
+                <option value="selected">選考通過</option>
+                <option value="rejected">不選考</option>
+              </select>
             </div>
 
             <div>

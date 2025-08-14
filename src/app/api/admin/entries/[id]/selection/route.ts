@@ -35,7 +35,7 @@ export async function PUT(
     const resolvedParams = await params
     const entryId = resolvedParams.id
     const body = await request.json()
-    const { score, comments, status } = body
+    const { comments, status } = body
 
     // 入力値検証
     if (!status || !['pending', 'submitted', 'selected', 'rejected'].includes(status)) {
@@ -45,12 +45,6 @@ export async function PUT(
       )
     }
 
-    if (score !== null && score !== undefined && (score < 1 || score > 10)) {
-      return NextResponse.json(
-        { error: 'Score must be between 1 and 10' },
-        { status: 400 }
-      )
-    }
 
     const adminSupabase = createAdminClient()
 
@@ -66,7 +60,6 @@ export async function PUT(
       const { error: selectionError } = await adminSupabase
         .from('selections')
         .update({
-          score: score ? parseInt(String(score)) : null,
           comments,
           status,
           updated_at: new Date().toISOString()
@@ -88,7 +81,6 @@ export async function PUT(
           {
             entry_id: entryId,
             admin_id: user.id,
-            score: score ? parseInt(String(score)) : null,
             comments,
             status,
           }
