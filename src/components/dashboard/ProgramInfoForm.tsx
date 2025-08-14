@@ -363,6 +363,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               required
               value={imageUrls.player_photo_path || programInfo.player_photo_path}
               onChange={(file) => handleImageUpload('player_photo_path', file)}
+              onDelete={() => handleImageDelete('player_photo_path')}
               category="image"
               disabled={uploading}
               maxSizeMB={100}
@@ -421,6 +422,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                     required
                     value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
                     onChange={(file) => handleImageUpload(fieldName, file)}
+                    onDelete={() => handleImageDelete(fieldName)}
                     category="image"
                     disabled={uploading}
                     maxSizeMB={100}
@@ -455,6 +457,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 required
                 value={imageUrls.final_player_photo_path || programInfo.final_player_photo_path}
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
+                onDelete={() => handleImageDelete('final_player_photo_path')}
                 category="image"
                 disabled={uploading}
                 maxSizeMB={100}
@@ -513,6 +516,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                       required
                       value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
                       onChange={(file) => handleImageUpload(fieldName, file)}
+                      onDelete={() => handleImageDelete(fieldName)}
                       category="image"
                       disabled={uploading}
                       maxSizeMB={100}
