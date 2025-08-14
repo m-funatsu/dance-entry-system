@@ -37,7 +37,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          振付師の変更 <span className="text-red-500">*</span>
+          振付の変更 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
           <label className="flex items-center">
@@ -49,7 +49,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               onChange={() => onChoreographerChangeOption('same')}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
-            準決勝と同じ振付師
+            準決勝と同じ振付
           </label>
           <label className="flex items-center">
             <input
@@ -60,7 +60,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               onChange={() => onChoreographerChangeOption('different')}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
-            準決勝とは異なる振付師
+            準決勝とは異なる振付
           </label>
         </div>
       </div>
@@ -103,9 +103,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         </div>
       )}
 
-      {/* 振付情報セクション */}
+      {/* 振付師情報セクション */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">振付情報</h4>
+        <h4 className="font-medium mb-4">振付師情報</h4>
         
         <FormField
           label="振付師氏名"
