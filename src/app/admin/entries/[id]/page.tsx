@@ -37,7 +37,14 @@ export default async function EntryDetailPage({ params }: PageProps) {
       *,
       users(name, email),
       entry_files(*),
-      selections(*, users!selections_admin_id_fkey(name))
+      selections(*, users!selections_admin_id_fkey(name)),
+      basic_info(*),
+      preliminary_info(*),
+      program_info(*),
+      semifinals_info(*),
+      finals_info(*),
+      applications_info(*),
+      sns_info(*)
     `)
     .eq('id', resolvedParams.id)
     .single()
