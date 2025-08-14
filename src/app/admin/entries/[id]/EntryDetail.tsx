@@ -49,14 +49,6 @@ interface EntryDetailProps {
 }
 
 export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps) {
-  console.log('[EntryDetail] Received props:', {
-    entryId: entry?.id,
-    mediaUrlsKeys: Object.keys(mediaUrls),
-    mediaUrlsWithValues: Object.keys(mediaUrls).filter(k => mediaUrls[k]),
-    snsInfo: entry?.sns_info,
-    semifinalsInfo: entry?.semifinals_info,
-    entryFilesCount: entry?.entry_files?.length
-  })
 
   const [comments, setComments] = useState(entry.selections?.[0]?.comments || '')
   const [status, setStatus] = useState<'pending' | 'selected' | 'rejected'>(
@@ -76,12 +68,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
   const applicationsInfo = Array.isArray(entry.applications_info) ? entry.applications_info[0] : entry.applications_info
   const snsInfo = Array.isArray(entry.sns_info) ? entry.sns_info[0] : entry.sns_info
 
-  console.log('[EntryDetail] Extracted info:', {
-    hasSnsInfo: !!snsInfo,
-    snsInfoDetails: snsInfo,
-    hasSemifinalsInfo: !!semifinalsInfo,
-    semifinalsInfoDetails: semifinalsInfo
-  })
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -173,7 +159,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
 
   // SNS関連ファイル
   const snsFiles = getPurposeFiles('sns')
-  console.log('[EntryDetail] SNS Files from entry_files:', snsFiles)
   
   // ファイル名によるマッチングをより柔軟に
   const practiceVideoFile = snsFiles.find(f => f.file_type === 'video' && 
@@ -188,13 +173,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
   // どちらも見つからない場合は、すべての動画を取得
   const allSnsVideos = snsFiles.filter(f => f.file_type === 'video')
   
-  console.log('[EntryDetail] SNS video matching:', {
-    practiceVideo: practiceVideoFile?.file_name,
-    highlightVideo: highlightVideoFile?.file_name,
-    allVideosCount: allSnsVideos.length,
-    practiceVideoPath: mediaUrls.practice_video_path,
-    highlightVideoPath: mediaUrls.introduction_highlight_path
-  })
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -1688,13 +1666,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
         )
 
       case 'sns':
-        console.log('[EntryDetail] Rendering SNS tab with:', {
-          snsInfo,
-          mediaUrls,
-          snsFiles,
-          practiceVideoFile,
-          highlightVideoFile
-        })
         return (
           <div className="space-y-6">
             <div className="bg-white shadow rounded-lg">
