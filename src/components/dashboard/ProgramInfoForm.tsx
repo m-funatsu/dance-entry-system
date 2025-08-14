@@ -208,7 +208,12 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const handleImageUpload = async (field: string, file: File) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await uploadImage(file, { userId: user.id, entryId: entry.id, field, folder: 'program' })
+    const result = await uploadImage(file, { userId: user.id, entryId: entry.id, field, folder: 'program' })
+    
+    // pathを使用して保存（URLではなく相対パス）
+    if (result.success && result.path) {
+      setProgramInfo(prev => ({ ...prev, [field]: result.path }))
+    }
   }
 
   const handleSave = async (isTemporary = false) => {
@@ -279,7 +284,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               required
               value={programInfo.player_photo_path}
               onChange={(file) => handleImageUpload('player_photo_path', file)}
-              onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, player_photo_path: url }))}
               category="image"
               disabled={uploading}
               maxSizeMB={100}
@@ -338,7 +342,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                     required
                     value={programInfo[fieldName] as string}
                     onChange={(file) => handleImageUpload(fieldName, file)}
-                    onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, [fieldName]: url }))}
                     category="image"
                     disabled={uploading}
                     maxSizeMB={100}
@@ -373,7 +376,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                 required
                 value={programInfo.final_player_photo_path}
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
-                onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, final_player_photo_path: url }))}
                 category="image"
                 disabled={uploading}
                 maxSizeMB={100}
@@ -432,7 +434,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
                       required
                       value={programInfo[fieldName] as string}
                       onChange={(file) => handleImageUpload(fieldName, file)}
-                      onUploadComplete={(url) => setProgramInfo(prev => ({ ...prev, [fieldName]: url }))}
                       category="image"
                       disabled={uploading}
                       maxSizeMB={100}
