@@ -40,10 +40,9 @@ interface EntryWithDetails {
 
 interface EntryTableProps {
   entries: EntryWithDetails[]
-  getSubmissionStatus?: (entry: EntryWithDetails) => string
 }
 
-export default function EntryTable({ entries, getSubmissionStatus }: EntryTableProps) {
+export default function EntryTable({ entries }: EntryTableProps) {
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [showEmailComposer, setShowEmailComposer] = useState(false)
@@ -85,9 +84,6 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    if (!getSubmissionStatus) return null
-    
-    const status = getSubmissionStatus(entry)
     const hasBasicInfo = entry.basic_info && entry.basic_info.length > 0
     const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
     const hasProgramInfo = entry.program_info && entry.program_info.length > 0
@@ -96,68 +92,47 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
     const hasApplicationsInfo = entry.applications_info && entry.applications_info.length > 0
     const hasSnsInfo = entry.sns_info && entry.sns_info.length > 0
 
-    const completedCount = [
-      hasBasicInfo,
-      hasPreliminaryInfo,
-      hasProgramInfo,
-      hasSemifinalsInfo,
-      hasFinalsInfo,
-      hasApplicationsInfo,
-      hasSnsInfo
-    ].filter(Boolean).length
-
-    const statusLabels = {
-      basic: hasBasicInfo ? '基' : '',
-      preliminary: hasPreliminaryInfo ? '予' : '',
-      program: hasProgramInfo ? 'プ' : '',
-      semifinals: hasSemifinalsInfo ? '準' : '',
-      finals: hasFinalsInfo ? '決' : '',
-      applications: hasApplicationsInfo ? '申' : '',
-      sns: hasSnsInfo ? 'S' : ''
-    }
-
-    const statusText = Object.values(statusLabels).filter(Boolean).join('')
-
-    if (status === 'completed') {
-      return (
-        <div className="space-y-1">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            完了 (7/7)
-          </span>
-          <div className="text-xs text-gray-500">{statusText}</div>
-        </div>
-      )
-    } else if (status === 'in_progress') {
-      return (
-        <div className="space-y-1">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            途中 ({completedCount}/7)
-          </span>
-          <div className="text-xs text-gray-500">{statusText}</div>
-        </div>
-      )
-    } else {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-          未開始
+    return (
+      <div className="flex flex-wrap gap-1">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasBasicInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          基本
         </span>
-      )
-    }
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasPreliminaryInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          予選
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasProgramInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          プログラム
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasSemifinalsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          準決勝
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasFinalsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          決勝
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasApplicationsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          申請
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasSnsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          SNS
+        </span>
+      </div>
+    )
   }
 
-  const getFileTypeCounts = (files: { file_type: string }[]) => {
-    const counts = files.reduce((acc, file) => {
-      acc[file.file_type] = (acc[file.file_type] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
-
-    return {
-      music: counts.music || 0,
-      audio: counts.audio || 0,
-      photo: counts.photo || 0,
-      video: counts.video || 0,
-    }
-  }
 
   const handleSelectEntry = (entryId: string) => {
     setSelectedEntries(prev => {
@@ -400,9 +375,6 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
                 ダンス情報
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ファイル
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 提出状況
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -414,9 +386,7 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {entries.map((entry) => {
-              const fileCounts = getFileTypeCounts(entry.entry_files)
-              return (
+            {entries.map((entry) => (
                 <tr key={entry.id} className={selectedEntries.includes(entry.id) ? 'bg-indigo-50' : ''}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -446,23 +416,7 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex space-x-1">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                        🎵 {fileCounts.music}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                        🎵 {fileCounts.audio}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                        📷 {fileCounts.photo}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
-                        🎬 {fileCounts.video}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     {getSubmissionBadge(entry)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -501,8 +455,7 @@ export default function EntryTable({ entries, getSubmissionStatus }: EntryTableP
                     </div>
                   </td>
                 </tr>
-              )
-            })}
+            ))}
           </tbody>
         </table>
       </div>

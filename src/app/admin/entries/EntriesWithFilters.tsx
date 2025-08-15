@@ -152,7 +152,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
           </div>
         </div>
         
-        <EntryTable entries={filteredEntries} getSubmissionStatus={getSubmissionStatus} />
+        <EntryTable entries={filteredEntries} />
       </div>
     </div>
   )
