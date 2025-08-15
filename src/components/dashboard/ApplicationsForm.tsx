@@ -54,6 +54,36 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [makeupStyle2FileFinal, setMakeupStyle2FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル②画像（決勝）
   const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
 
+  // 関数定義（useEffectより前に配置）
+  const calculateTicketTotal = useCallback(() => {
+    let count = 0
+    for (let i = 1; i <= 5; i++) {
+      if (applicationsInfo[`related${i}_name` as keyof ApplicationsInfo]) {
+        count++
+      }
+    }
+    const total = count * TICKET_PRICE
+    setApplicationsInfo(prev => ({
+      ...prev,
+      related_ticket_count: count,
+      related_ticket_total_amount: total
+    }))
+  }, [applicationsInfo])
+
+  const calculateCompanionTotal = useCallback(() => {
+    let count = 0
+    for (let i = 1; i <= 3; i++) {
+      if (applicationsInfo[`companion${i}_name` as keyof ApplicationsInfo]) {
+        count++
+      }
+    }
+    const total = count * COMPANION_FEE
+    setApplicationsInfo(prev => ({
+      ...prev,
+      companion_total_amount: total
+    }))
+  }, [applicationsInfo])
+
   useEffect(() => {
     loadApplicationsInfo()
   }, [entry.id]) // eslint-disable-line
@@ -222,35 +252,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       setLoading(false)
     }
   }
-
-  const calculateTicketTotal = useCallback(() => {
-    let count = 0
-    for (let i = 1; i <= 5; i++) {
-      if (applicationsInfo[`related${i}_name` as keyof ApplicationsInfo]) {
-        count++
-      }
-    }
-    const total = count * TICKET_PRICE
-    setApplicationsInfo(prev => ({
-      ...prev,
-      related_ticket_count: count,
-      related_ticket_total_amount: total
-    }))
-  }, [applicationsInfo])
-
-  const calculateCompanionTotal = useCallback(() => {
-    let count = 0
-    for (let i = 1; i <= 3; i++) {
-      if (applicationsInfo[`companion${i}_name` as keyof ApplicationsInfo]) {
-        count++
-      }
-    }
-    const total = count * COMPANION_FEE
-    setApplicationsInfo(prev => ({
-      ...prev,
-      companion_total_amount: total
-    }))
-  }, [applicationsInfo])
 
   const handleSave = async (isTemporary = false) => {
     setError(null)
