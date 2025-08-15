@@ -599,12 +599,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     'スポンサー'
   ]
 
-  const purposeOptions = [
-    '付き添い',
-    '撮影',
-    '介助',
-    'その他'
-  ]
 
   return (
     <div className="space-y-6">
@@ -801,16 +795,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     目的
                   </label>
-                  <select
+                  <input
+                    type="text"
                     value={applicationsInfo[`companion${num}_purpose` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_purpose`]: e.target.value }))}
+                    placeholder="例：付き添い、撮影、介助など"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="">選択してください</option>
-                    {purposeOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </div>
             </div>
