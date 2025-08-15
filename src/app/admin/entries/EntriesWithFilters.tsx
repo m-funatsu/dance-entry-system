@@ -47,6 +47,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [genreFilter, setGenreFilter] = useState<string>('')
   const [submissionFilter, setSubmissionFilter] = useState<string>('')
+  const [formFilter, setFormFilter] = useState<string>('')
 
   // 各エントリーの提出状況を計算
   const getSubmissionStatus = (entry: EntryWithDetails) => {
@@ -76,15 +77,36 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
     return 'in_progress'
   }
 
+  // 特定のフォームが提出済みかチェック
+  const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
+    switch(formType) {
+      case 'basic': return entry.basic_info && entry.basic_info.length > 0
+      case 'preliminary': return entry.preliminary_info && entry.preliminary_info.length > 0
+      case 'program': return entry.program_info && entry.program_info.length > 0
+      case 'semifinals': return entry.semifinals_info && entry.semifinals_info.length > 0
+      case 'finals': return entry.finals_info && entry.finals_info.length > 0
+      case 'applications': return entry.applications_info && entry.applications_info.length > 0
+      case 'sns': return entry.sns_info && entry.sns_info.length > 0
+      default: return true
+    }
+  }
+
   // フィルタリングされたエントリーを計算
   const filteredEntries = useMemo(() => {
     return entries.filter(entry => {
       const statusMatch = !statusFilter || entry.status === statusFilter
       const genreMatch = !genreFilter || entry.dance_style === genreFilter
       const submissionMatch = !submissionFilter || getSubmissionStatus(entry) === submissionFilter
-      return statusMatch && genreMatch && submissionMatch
+      const formMatch = !formFilter || (
+        formFilter === 'has_' ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
+        formFilter === 'no_' ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
+        formFilter.startsWith('has_') ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
+        formFilter.startsWith('no_') ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
+        true
+      )
+      return statusMatch && genreMatch && submissionMatch && formMatch
     })
-  }, [entries, statusFilter, genreFilter, submissionFilter])
+  }, [entries, statusFilter, genreFilter, submissionFilter, formFilter])
 
   // 利用可能なダンスジャンルを取得
   const availableGenres = useMemo(() => {
@@ -136,12 +158,38 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               <option value="in_progress">途中</option>
               <option value="completed">完了</option>
             </select>
-            {(statusFilter || genreFilter || submissionFilter) && (
+            <select 
+              className="rounded-md border-gray-300 text-sm"
+              value={formFilter}
+              onChange={(e) => setFormFilter(e.target.value)}
+            >
+              <option value="">全フォーム</option>
+              <optgroup label="提出済み">
+                <option value="has_basic">基本情報あり</option>
+                <option value="has_preliminary">予選情報あり</option>
+                <option value="has_program">プログラム情報あり</option>
+                <option value="has_semifinals">準決勝情報あり</option>
+                <option value="has_finals">決勝情報あり</option>
+                <option value="has_applications">申請情報あり</option>
+                <option value="has_sns">SNS情報あり</option>
+              </optgroup>
+              <optgroup label="未提出">
+                <option value="no_basic">基本情報なし</option>
+                <option value="no_preliminary">予選情報なし</option>
+                <option value="no_program">プログラム情報なし</option>
+                <option value="no_semifinals">準決勝情報なし</option>
+                <option value="no_finals">決勝情報なし</option>
+                <option value="no_applications">申請情報なし</option>
+                <option value="no_sns">SNS情報なし</option>
+              </optgroup>
+            </select>
+            {(statusFilter || genreFilter || submissionFilter || formFilter) && (
               <button
                 onClick={() => {
                   setStatusFilter('')
                   setGenreFilter('')
                   setSubmissionFilter('')
+                  setFormFilter('')
                 }}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50"
               >
