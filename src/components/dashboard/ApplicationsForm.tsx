@@ -12,7 +12,7 @@ interface ApplicationsFormProps {
 }
 
 const TICKET_PRICE = 5000 // チケット単価（円）
-const COMPANION_FEE = 3000 // 同伴料（円）
+const COMPANION_FEE = 4000 // 同伴料（円）
 
 export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   // const router = useRouter()
