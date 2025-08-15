@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
@@ -56,7 +56,29 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
   useEffect(() => {
     loadApplicationsInfo()
-  }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [entry.id]) // eslint-disable-line
+
+  // 同伴者情報が変更されたときに合計金額を再計算
+  useEffect(() => {
+    calculateCompanionTotal()
+  }, [
+    applicationsInfo.companion1_name,
+    applicationsInfo.companion2_name,
+    applicationsInfo.companion3_name,
+    calculateCompanionTotal
+  ])
+
+  // 関係者チケット情報が変更されたときに合計金額を再計算
+  useEffect(() => {
+    calculateTicketTotal()
+  }, [
+    applicationsInfo.related1_name,
+    applicationsInfo.related2_name,
+    applicationsInfo.related3_name,
+    applicationsInfo.related4_name,
+    applicationsInfo.related5_name,
+    calculateTicketTotal
+  ])
 
   const loadApplicationsInfo = async () => {
     setLoading(true)
@@ -201,7 +223,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     }
   }
 
-  const calculateTicketTotal = () => {
+  const calculateTicketTotal = useCallback(() => {
     let count = 0
     for (let i = 1; i <= 5; i++) {
       if (applicationsInfo[`related${i}_name` as keyof ApplicationsInfo]) {
@@ -214,9 +236,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       related_ticket_count: count,
       related_ticket_total_amount: total
     }))
-  }
+  }, [applicationsInfo])
 
-  const calculateCompanionTotal = () => {
+  const calculateCompanionTotal = useCallback(() => {
     let count = 0
     for (let i = 1; i <= 3; i++) {
       if (applicationsInfo[`companion${i}_name` as keyof ApplicationsInfo]) {
@@ -228,7 +250,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       ...prev,
       companion_total_amount: total
     }))
-  }
+  }, [applicationsInfo])
 
   const handleSave = async (isTemporary = false) => {
     setError(null)
@@ -771,10 +793,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   <input
                     type="text"
                     value={applicationsInfo[`companion${num}_name` as keyof ApplicationsInfo] as string || ''}
-                    onChange={(e) => {
-                      setApplicationsInfo(prev => ({ ...prev, [`companion${num}_name`]: e.target.value }))
-                      setTimeout(calculateCompanionTotal, 0)
-                    }}
+                    onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_name`]: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
