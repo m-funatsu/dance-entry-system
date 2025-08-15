@@ -520,6 +520,16 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                             <p className="text-xs text-gray-500 mt-1">
                               アップロード日時: {formatDateLocale(preliminaryVideo.uploaded_at)}
                             </p>
+                            <a
+                              href={preliminaryVideo.signed_url}
+                              download={preliminaryVideo.file_name || '予選動画.mp4'}
+                              className="inline-flex items-center px-3 py-1.5 mt-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                              </svg>
+                              動画をダウンロード
+                            </a>
                           </div>
                         </div>
                       ) : (
@@ -845,9 +855,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               <source src={mediaUrls.semifinals_music_data_path || semifinalsMusicFile?.signed_url} />
                               お使いのブラウザは音声タグをサポートしていません。
                             </audio>
-                            {semifinalsMusicFile && (
-                              <p className="text-xs text-gray-600 mt-2">ファイル: {semifinalsMusicFile.file_name}</p>
-                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              {semifinalsMusicFile && (
+                                <p className="text-xs text-gray-600">ファイル: {semifinalsMusicFile.file_name}</p>
+                              )}
+                              <a
+                                href={mediaUrls.semifinals_music_data_path || semifinalsMusicFile?.signed_url}
+                                download={semifinalsMusicFile?.file_name || '準決勝_楽曲.mp3'}
+                                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                ダウンロード
+                              </a>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -861,9 +883,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               <source src={mediaUrls.semifinals_chaser_song || semifinalsChaserFile?.signed_url} />
                               お使いのブラウザは音声タグをサポートしていません。
                             </audio>
-                            {semifinalsChaserFile && (
-                              <p className="text-xs text-gray-600 mt-2">ファイル: {semifinalsChaserFile.file_name}</p>
-                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              {semifinalsChaserFile && (
+                                <p className="text-xs text-gray-600">ファイル: {semifinalsChaserFile.file_name}</p>
+                              )}
+                              <a
+                                href={mediaUrls.semifinals_chaser_song || semifinalsChaserFile?.signed_url}
+                                download={semifinalsChaserFile?.file_name || '準決勝_チェイサー.mp3'}
+                                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                ダウンロード
+                              </a>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1266,9 +1300,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               <source src={mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url} />
                               お使いのブラウザは音声タグをサポートしていません。
                             </audio>
-                            {finalsMusicFile && (
-                              <p className="text-xs text-gray-600 mt-2">ファイル: {finalsMusicFile.file_name}</p>
-                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              {finalsMusicFile && (
+                                <p className="text-xs text-gray-600">ファイル: {finalsMusicFile.file_name}</p>
+                              )}
+                              <a
+                                href={mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url}
+                                download={finalsMusicFile?.file_name || '決勝_楽曲.mp3'}
+                                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                ダウンロード
+                              </a>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1282,9 +1328,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               <source src={mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url} />
                               お使いのブラウザは音声タグをサポートしていません。
                             </audio>
-                            {finalsChaserFile && (
-                              <p className="text-xs text-gray-600 mt-2">ファイル: {finalsChaserFile.file_name}</p>
-                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              {finalsChaserFile && (
+                                <p className="text-xs text-gray-600">ファイル: {finalsChaserFile.file_name}</p>
+                              )}
+                              <a
+                                href={mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url}
+                                download={finalsChaserFile?.file_name || '決勝_チェイサー.mp3'}
+                                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                ダウンロード
+                              </a>
+                            </div>
                           </div>
                         </div>
                       )}
