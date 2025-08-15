@@ -29,7 +29,14 @@ export default async function AdminEntriesPage() {
       *,
       users(name, email),
       entry_files(id, file_type),
-      selections(id, status, score, created_at)
+      selections(id, status, score, created_at),
+      basic_info(id),
+      preliminary_info(id),
+      program_info(id),
+      semifinals_info(id),
+      finals_info(id),
+      applications_info(id),
+      sns_info(id)
     `)
     .order('created_at', { ascending: false })
 
@@ -86,7 +93,7 @@ export default async function AdminEntriesPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <EntriesWithFilters entries={entriesWithUsers} adminId={user.id} />
+          <EntriesWithFilters entries={entriesWithUsers} />
         </div>
       </main>
     </div>

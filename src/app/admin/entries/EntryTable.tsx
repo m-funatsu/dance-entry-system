@@ -12,7 +12,7 @@ interface EntryWithDetails {
   dance_style: string
   participant_names: string
   phone_number?: string
-  status: string
+  status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string
   users: {
@@ -29,14 +29,21 @@ interface EntryWithDetails {
     score?: number
     created_at: string
   }[]
+  basic_info?: { id: string }[]
+  preliminary_info?: { id: string }[]
+  program_info?: { id: string }[]
+  semifinals_info?: { id: string }[]
+  finals_info?: { id: string }[]
+  applications_info?: { id: string }[]
+  sns_info?: { id: string }[]
 }
 
 interface EntryTableProps {
   entries: EntryWithDetails[]
-  adminId: string
+  getSubmissionStatus?: (entry: EntryWithDetails) => string
 }
 
-export default function EntryTable({ entries }: EntryTableProps) {
+export default function EntryTable({ entries, getSubmissionStatus }: EntryTableProps) {
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [showEmailComposer, setShowEmailComposer] = useState(false)
@@ -74,6 +81,67 @@ export default function EntryTable({ entries }: EntryTableProps) {
             未設定
           </span>
         )
+    }
+  }
+
+  const getSubmissionBadge = (entry: EntryWithDetails) => {
+    if (!getSubmissionStatus) return null
+    
+    const status = getSubmissionStatus(entry)
+    const hasBasicInfo = entry.basic_info && entry.basic_info.length > 0
+    const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
+    const hasProgramInfo = entry.program_info && entry.program_info.length > 0
+    const hasSemifinalsInfo = entry.semifinals_info && entry.semifinals_info.length > 0
+    const hasFinalsInfo = entry.finals_info && entry.finals_info.length > 0
+    const hasApplicationsInfo = entry.applications_info && entry.applications_info.length > 0
+    const hasSnsInfo = entry.sns_info && entry.sns_info.length > 0
+
+    const completedCount = [
+      hasBasicInfo,
+      hasPreliminaryInfo,
+      hasProgramInfo,
+      hasSemifinalsInfo,
+      hasFinalsInfo,
+      hasApplicationsInfo,
+      hasSnsInfo
+    ].filter(Boolean).length
+
+    const statusLabels = {
+      basic: hasBasicInfo ? '基' : '',
+      preliminary: hasPreliminaryInfo ? '予' : '',
+      program: hasProgramInfo ? 'プ' : '',
+      semifinals: hasSemifinalsInfo ? '準' : '',
+      finals: hasFinalsInfo ? '決' : '',
+      applications: hasApplicationsInfo ? '申' : '',
+      sns: hasSnsInfo ? 'S' : ''
+    }
+
+    const statusText = Object.values(statusLabels).filter(Boolean).join('')
+
+    if (status === 'completed') {
+      return (
+        <div className="space-y-1">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            完了 (7/7)
+          </span>
+          <div className="text-xs text-gray-500">{statusText}</div>
+        </div>
+      )
+    } else if (status === 'in_progress') {
+      return (
+        <div className="space-y-1">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            途中 ({completedCount}/7)
+          </span>
+          <div className="text-xs text-gray-500">{statusText}</div>
+        </div>
+      )
+    } else {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          未開始
+        </span>
+      )
     }
   }
 
@@ -335,6 +403,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 ファイル
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                提出状況
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ステータス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -390,6 +461,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
                         🎬 {fileCounts.video}
                       </span>
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getSubmissionBadge(entry)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(entry.status)}

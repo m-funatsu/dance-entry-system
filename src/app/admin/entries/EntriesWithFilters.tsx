@@ -30,25 +30,61 @@ interface EntryWithDetails {
     score?: number
     created_at: string
   }[]
+  basic_info?: { id: string }[]
+  preliminary_info?: { id: string }[]
+  program_info?: { id: string }[]
+  semifinals_info?: { id: string }[]
+  finals_info?: { id: string }[]
+  applications_info?: { id: string }[]
+  sns_info?: { id: string }[]
 }
 
 interface EntriesWithFiltersProps {
   entries: EntryWithDetails[]
-  adminId: string
 }
 
-export default function EntriesWithFilters({ entries, adminId }: EntriesWithFiltersProps) {
+export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps) {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [genreFilter, setGenreFilter] = useState<string>('')
+  const [submissionFilter, setSubmissionFilter] = useState<string>('')
+
+  // 各エントリーの提出状況を計算
+  const getSubmissionStatus = (entry: EntryWithDetails) => {
+    const hasBasicInfo = entry.basic_info && entry.basic_info.length > 0
+    const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
+    const hasProgramInfo = entry.program_info && entry.program_info.length > 0
+    const hasSemifinalsInfo = entry.semifinals_info && entry.semifinals_info.length > 0
+    const hasFinalsInfo = entry.finals_info && entry.finals_info.length > 0
+    const hasApplicationsInfo = entry.applications_info && entry.applications_info.length > 0
+    const hasSnsInfo = entry.sns_info && entry.sns_info.length > 0
+
+    const statuses = {
+      basic: hasBasicInfo,
+      preliminary: hasPreliminaryInfo,
+      program: hasProgramInfo,
+      semifinals: hasSemifinalsInfo,
+      finals: hasFinalsInfo,
+      applications: hasApplicationsInfo,
+      sns: hasSnsInfo
+    }
+
+    const completedCount = Object.values(statuses).filter(Boolean).length
+    const totalCount = 7 // 全フォーム数
+
+    if (completedCount === 0) return 'not_started'
+    if (completedCount === totalCount) return 'completed'
+    return 'in_progress'
+  }
 
   // フィルタリングされたエントリーを計算
   const filteredEntries = useMemo(() => {
     return entries.filter(entry => {
       const statusMatch = !statusFilter || entry.status === statusFilter
       const genreMatch = !genreFilter || entry.dance_style === genreFilter
-      return statusMatch && genreMatch
+      const submissionMatch = !submissionFilter || getSubmissionStatus(entry) === submissionFilter
+      return statusMatch && genreMatch && submissionMatch
     })
-  }, [entries, statusFilter, genreFilter])
+  }, [entries, statusFilter, genreFilter, submissionFilter])
 
   // 利用可能なダンスジャンルを取得
   const availableGenres = useMemo(() => {
@@ -90,11 +126,22 @@ export default function EntriesWithFilters({ entries, adminId }: EntriesWithFilt
                 </option>
               ))}
             </select>
-            {(statusFilter || genreFilter) && (
+            <select 
+              className="rounded-md border-gray-300 text-sm"
+              value={submissionFilter}
+              onChange={(e) => setSubmissionFilter(e.target.value)}
+            >
+              <option value="">全提出状況</option>
+              <option value="not_started">未開始</option>
+              <option value="in_progress">途中</option>
+              <option value="completed">完了</option>
+            </select>
+            {(statusFilter || genreFilter || submissionFilter) && (
               <button
                 onClick={() => {
                   setStatusFilter('')
                   setGenreFilter('')
+                  setSubmissionFilter('')
                 }}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50"
               >
@@ -105,7 +152,7 @@ export default function EntriesWithFilters({ entries, adminId }: EntriesWithFilt
           </div>
         </div>
         
-        <EntryTable entries={filteredEntries} adminId={adminId} />
+        <EntryTable entries={filteredEntries} getSubmissionStatus={getSubmissionStatus} />
       </div>
     </div>
   )
