@@ -23,7 +23,7 @@ export default async function AdminEntriesPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries } = await supabase
+  const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select(`
       *,
@@ -39,6 +39,24 @@ export default async function AdminEntriesPage() {
       sns_info(id)
     `)
     .order('created_at', { ascending: false })
+
+  // デバッグ: 取得したデータを確認
+  if (entriesError) {
+    console.error('エントリー取得エラー:', entriesError)
+  }
+  console.log('=== エントリーデータ取得結果 ===')
+  console.log('エントリー数:', entries?.length || 0)
+  if (entries && entries.length > 0) {
+    console.log('最初のエントリーの構造:')
+    console.log('- ID:', entries[0].id)
+    console.log('- entries.dance_style:', entries[0].dance_style)
+    console.log('- basic_info:', entries[0].basic_info)
+    if (entries[0].basic_info && entries[0].basic_info.length > 0) {
+      console.log('- basic_info[0].dance_style:', entries[0].basic_info[0].dance_style)
+      console.log('- basic_info[0].category_division:', entries[0].basic_info[0].category_division)
+    }
+  }
+  console.log('================================')
 
   // 管理者クライアントで全ユーザーデータを取得
   const adminSupabase = createAdminClient()

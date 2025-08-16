@@ -412,7 +412,13 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
-                        {entry.basic_info?.[0]?.dance_style || entry.dance_style || 'ジャンル未設定'}
+                        {(() => {
+                          // デバッグ: ダンススタイルの取得を確認
+                          const basicInfoStyle = entry.basic_info?.[0]?.dance_style
+                          const entryStyle = entry.dance_style
+                          console.log(`Entry ${entry.id}: basic_info style = "${basicInfoStyle}", entry style = "${entryStyle}"`)
+                          return basicInfoStyle || entryStyle || 'ジャンル未設定'
+                        })()}
                       </div>
                       {entry.basic_info?.[0]?.category_division && (
                         <div className="text-xs text-gray-600">
