@@ -190,24 +190,65 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
         />
         
         {uploading ? (
-          <div className="space-y-2">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
-            <p className="text-sm font-medium text-indigo-700">アップロード中...</p>
-            {selectedFile && (
-              <p className="text-xs text-gray-600">
-                {selectedFile.name} ({formatFileSize(selectedFile.size)})
-              </p>
-            )}
-            {progress > 0 && (
-              <div className="mt-3">
-                <div className="bg-gray-200 rounded-full h-2 w-full">
-                  <div 
-                    className="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
-                    style={{width: `${progress}%`}}
-                  ></div>
-                </div>
-                <p className="text-xs text-gray-600 mt-1">{progress}%</p>
+          <div className="space-y-3">
+            {/* アップロード中のアニメーション */}
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 mx-auto"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent border-t-indigo-500"></div>
               </div>
+            </div>
+            
+            {/* ファイル情報 */}
+            <div className="text-center">
+              <p className="text-sm font-semibold text-indigo-700 animate-pulse">
+                {category === 'video' ? '動画をアップロード中...' : 
+                 category === 'audio' ? '音声をアップロード中...' : 
+                 category === 'image' ? '画像をアップロード中...' : 
+                 'ファイルをアップロード中...'}
+              </p>
+              {selectedFile && (
+                <p className="text-xs text-gray-600 mt-1">
+                  {selectedFile.name}
+                </p>
+              )}
+              {selectedFile && (
+                <p className="text-xs text-gray-500">
+                  サイズ: {formatFileSize(selectedFile.size)}
+                </p>
+              )}
+            </div>
+            
+            {/* プログレスバー */}
+            <div className="px-4">
+              <div className="relative">
+                <div className="overflow-hidden h-3 text-xs flex rounded-full bg-gray-200">
+                  <div 
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500 ease-out" 
+                    style={{width: `${progress || 0}%`}}
+                  >
+                    {/* プログレスバー内のアニメーション */}
+                    <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className="text-xs font-semibold text-indigo-600">
+                    {progress || 0}%
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {progress === 100 ? '処理中...' : 
+                     progress >= 50 ? 'もう少しです...' : 
+                     'アップロード中...'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 大きなファイルの場合の注意書き */}
+            {selectedFile && selectedFile.size > 50 * 1024 * 1024 && (
+              <p className="text-xs text-amber-600 text-center">
+                ⚠️ 大きなファイルのため、時間がかかる場合があります
+              </p>
             )}
           </div>
         ) : value ? (

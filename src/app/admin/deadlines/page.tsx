@@ -22,17 +22,10 @@ export default async function AdminDeadlinesPage() {
     redirect('/dashboard')
   }
 
-  // 期限設定を取得
+  // 期日設定を取得
   const { data: settings } = await supabase
     .from('settings')
     .select('*')
-    .in('key', [
-      'basic_info_deadline',
-      'music_info_deadline',
-      'finals_deadline',
-      'sns_deadline', 
-      'optional_request_deadline'
-    ])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,7 +33,7 @@ export default async function AdminDeadlinesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <h1 className="text-3xl font-bold text-gray-900">
-              期限設定
+              期日管理
             </h1>
             <div className="flex items-center space-x-4">
               <Link
@@ -67,10 +60,10 @@ export default async function AdminDeadlinesPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
-                各セクションの登録期限
+                各セクションの入力開始日と締切日
               </h2>
               <p className="text-sm text-gray-600 mb-6">
-                各セクションの登録期限を設定できます。期限が設定されていない場合は、期限なしとなります。
+                各セクションの入力開始日と締切日を設定できます。準決勝、決勝、参加同意書、SNS、各種申請は共通の入力開始日が設定されます。
               </p>
               <DeadlineSettings initialSettings={settings || []} />
             </div>

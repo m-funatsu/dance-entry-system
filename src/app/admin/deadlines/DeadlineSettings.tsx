@@ -23,7 +23,9 @@ const sectionLabels: Record<string, string> = {
   semifinals_deadline: '準決勝情報',
   finals_deadline: '決勝情報',
   sns_deadline: 'SNS情報',
-  optional_request_deadline: '各種申請'
+  optional_request_deadline: '各種申請',
+  // 入力開始日
+  advanced_start_date: '準決勝・決勝・SNS・各種申請の入力開始日'
 }
 
 const sectionDescriptions: Record<string, string> = {
@@ -34,7 +36,8 @@ const sectionDescriptions: Record<string, string> = {
   semifinals_deadline: '準決勝用の音響・照明指示書',
   finals_deadline: '決勝用楽曲情報、音響・照明指示書',
   sns_deadline: 'Instagram、Twitter、Facebook情報',
-  optional_request_deadline: '関係者チケット、同伴申請、楽曲使用許諾申請などの各種申請'
+  optional_request_deadline: '関係者チケット、同伴申請、楽曲使用許諾申請などの各種申請',
+  advanced_start_date: '準決勝、決勝、参加同意書、SNS、各種申請フォームの入力が可能になる日'
 }
 
 export default function DeadlineSettings({ initialSettings }: DeadlineSettingsProps) {
@@ -51,12 +54,13 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
 
-  // 設定キーの一覧
+  // 設定キーの一覧（順番を調整）
   const deadlineKeys = [
     'basic_info_deadline',
     'music_info_deadline',
-    'consent_form_deadline',
     'program_info_deadline',
+    'advanced_start_date', // 入力開始日
+    'consent_form_deadline',
     'semifinals_deadline',
     'finals_deadline',
     'sns_deadline',
@@ -75,7 +79,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
     setMessage('')
     
     try {
-      // 各期限設定を更新（upsertを使用）
+      // 各期日設定を更新（upsertを使用）
       for (const key of deadlineKeys) {
         const { error } = await supabase
           .from('settings')
@@ -93,11 +97,11 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
         }
       }
 
-      setMessage('期限設定を保存しました')
+      setMessage('期日設定を保存しました')
       router.refresh()
     } catch (error) {
       console.error('Error saving deadlines:', error)
-      setMessage('期限設定の保存に失敗しました')
+      setMessage('期日設定の保存に失敗しました')
     } finally {
       setSaving(false)
     }
@@ -113,54 +117,142 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
     return `${year}-${month}-${day}`
   }
 
-  const formatDateTimeForDatabase = (dateString: string) => {
+  const formatDateTimeForDatabase = (dateString: string, isStartDate: boolean = false) => {
     if (!dateString) return ''
-    // 日付を受け取って、その日の23:59:59に設定
     const date = new Date(dateString)
-    date.setHours(23, 59, 59, 999)
+    if (isStartDate) {
+      // 開始日の場合は00:00:00に設定
+      date.setHours(0, 0, 0, 0)
+    } else {
+      // 締切日の場合は23:59:59に設定
+      date.setHours(23, 59, 59, 999)
+    }
     return date.toISOString()
   }
 
   return (
     <div className="space-y-6">
-      {deadlineKeys.map((key) => (
-        <div key={key} className="border-b pb-4">
+      {/* 常に入力可能なセクション */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">常に入力可能なセクション</h3>
+        <div className="space-y-4">
+          {['basic_info_deadline', 'music_info_deadline', 'program_info_deadline'].map((key) => (
+            <div key={key} className="bg-white rounded p-4">
+              <div className="mb-2">
+                <h4 className="text-base font-medium text-gray-900">
+                  {sectionLabels[key]}
+                </h4>
+                <p className="text-sm text-gray-500 mt-1">
+                  {sectionDescriptions[key]}
+                </p>
+              </div>
+              <div>
+                <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
+                  締切日
+                </label>
+                <input
+                  type="date"
+                  id={`deadline-${key}`}
+                  value={formatDateForInput(deadlines[key])}
+                  onChange={(e) => handleDeadlineChange(key, formatDateTimeForDatabase(e.target.value))}
+                  className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+                {!deadlines[key] && (
+                  <p className="mt-1 text-sm text-gray-500">締切なし</p>
+                )}
+                {deadlines[key] && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    締切: {new Date(deadlines[key]).toLocaleDateString('ja-JP', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric'
+                    })} 23:59
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 入力開始日の設定 */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-yellow-900 mb-3">入力開始日が必要なセクション</h3>
+        <div className="bg-white rounded p-4 mb-4">
           <div className="mb-2">
-            <h3 className="text-base font-medium text-gray-900">
-              {sectionLabels[key]}
-            </h3>
+            <h4 className="text-base font-medium text-gray-900">
+              {sectionLabels['advanced_start_date']}
+            </h4>
             <p className="text-sm text-gray-500 mt-1">
-              {sectionDescriptions[key]}
+              {sectionDescriptions['advanced_start_date']}
             </p>
           </div>
           <div>
-            <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
-              登録期限
+            <label htmlFor="deadline-advanced_start_date" className="block text-sm font-medium text-gray-700">
+              入力開始日
             </label>
             <input
               type="date"
-              id={`deadline-${key}`}
-              value={formatDateForInput(deadlines[key])}
-              onChange={(e) => handleDeadlineChange(key, formatDateTimeForDatabase(e.target.value))}
+              id="deadline-advanced_start_date"
+              value={formatDateForInput(deadlines['advanced_start_date'])}
+              onChange={(e) => handleDeadlineChange('advanced_start_date', formatDateTimeForDatabase(e.target.value, true))}
               className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
-            {!deadlines[key] && (
-              <p className="mt-1 text-sm text-gray-500">期限なし</p>
+            {!deadlines['advanced_start_date'] && (
+              <p className="mt-1 text-sm text-gray-500">入力開始日未設定（常に入力可能）</p>
             )}
-            {deadlines[key] && (
+            {deadlines['advanced_start_date'] && (
               <p className="mt-1 text-sm text-gray-500">
-                期限: {new Date(deadlines[key]).toLocaleDateString('ja-JP', {
+                開始日: {new Date(deadlines['advanced_start_date']).toLocaleDateString('ja-JP', {
                   year: 'numeric',
                   month: 'numeric',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+                  day: 'numeric'
+                })} 00:00
               </p>
             )}
           </div>
         </div>
-      ))}
+
+        {/* 入力開始日が適用されるセクションの締切設定 */}
+        <div className="space-y-4">
+          {['consent_form_deadline', 'semifinals_deadline', 'finals_deadline', 'sns_deadline', 'optional_request_deadline'].map((key) => (
+            <div key={key} className="bg-white rounded p-4">
+              <div className="mb-2">
+                <h4 className="text-base font-medium text-gray-900">
+                  {sectionLabels[key]}
+                </h4>
+                <p className="text-sm text-gray-500 mt-1">
+                  {sectionDescriptions[key]}
+                </p>
+              </div>
+              <div>
+                <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
+                  締切日
+                </label>
+                <input
+                  type="date"
+                  id={`deadline-${key}`}
+                  value={formatDateForInput(deadlines[key])}
+                  onChange={(e) => handleDeadlineChange(key, formatDateTimeForDatabase(e.target.value))}
+                  className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+                {!deadlines[key] && (
+                  <p className="mt-1 text-sm text-gray-500">締切なし</p>
+                )}
+                {deadlines[key] && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    締切: {new Date(deadlines[key]).toLocaleDateString('ja-JP', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric'
+                    })} 23:59
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {message && (
         <div className={`p-4 rounded-md ${

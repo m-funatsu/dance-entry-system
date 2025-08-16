@@ -181,7 +181,7 @@ export async function uploadFile({
   path,
   config = {},
   bucketName = FILE_UPLOAD_DEFAULTS.bucket,
-  onProgress // eslint-disable-line @typescript-eslint/no-unused-vars
+  onProgress
 }: UploadFileOptions): Promise<UploadFileResult> {
   const supabase = createClient()
   
@@ -199,53 +199,103 @@ export async function uploadFile({
   const filePath = path || (config.generatePath ? config.generatePath(file.name) : file.name)
   
   try {
-    // アップロード実行
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
-    
-    if (error) {
-      // エラータイプの判定
-      let errorType = ErrorType.FILE_UPLOAD
-      let errorMessage = 'ファイルのアップロードに失敗しました'
+    // プログレスのシミュレーション（Supabaseは現在プログレスをサポートしていない）
+    if (onProgress) {
+      // 開始時
+      onProgress(10)
       
-      if (error.message?.includes('too large') || error.message?.includes('413')) {
-        errorType = ErrorType.FILE_SIZE
-        errorMessage = 'ファイルサイズが大きすぎます'
-      } else if (error.message?.includes('InvalidKey')) {
-        errorType = ErrorType.FILE_TYPE
-        errorMessage = 'ファイル名に使用できない文字が含まれています'
-      } else if (error.message?.includes('404')) {
-        errorType = ErrorType.DATABASE
-        errorMessage = 'ストレージの設定に問題があります'
+      // ファイルサイズに応じて段階的にプログレスを更新
+      const fileSize = file.size
+      const intervals = fileSize > 10 * 1024 * 1024 ? [30, 50, 70, 90] : [25, 50, 75, 95]
+      let currentIndex = 0
+      
+      const progressInterval = setInterval(() => {
+        if (currentIndex < intervals.length) {
+          onProgress(intervals[currentIndex])
+          currentIndex++
+        }
+      }, Math.min(fileSize / (1024 * 100), 500)) // ファイルサイズに応じて間隔を調整
+      
+      // アップロード実行
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      
+      clearInterval(progressInterval)
+      
+      if (!error) {
+        onProgress(100) // 完了
       }
       
-      return {
-        success: false,
-        error: `${errorMessage}: ${error.message}`,
-        errorType
+      // エラーの場合は元の処理を継続
+      if (error) {
+        throw error
+      }
+      
+      // 成功した場合は後続の処理へ
+      if (!error && data) {
+        // パブリックURLを取得
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(filePath)
+        
+        return {
+          success: true,
+          url: publicUrl,
+          path: data.path
+        }
+      } else {
+        throw error
+      }
+    } else {
+      // プログレスコールバックがない場合は通常のアップロード
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      
+      if (!error && data) {
+        // パブリックURLを取得
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(filePath)
+        
+        return {
+          success: true,
+          url: publicUrl,
+          path: data.path
+        }
+      } else {
+        throw error
       }
     }
+  } catch (uploadError: unknown) {
+    const error = uploadError as Error
     
-    // パブリックURLを取得
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(filePath)
+    // エラータイプの判定
+    let errorType = ErrorType.FILE_UPLOAD
+    let errorMessage = 'ファイルのアップロードに失敗しました'
     
-    return {
-      success: true,
-      url: publicUrl,
-      path: data.path
+    if (error?.message?.includes('too large') || error?.message?.includes('413')) {
+      errorType = ErrorType.FILE_SIZE
+      errorMessage = 'ファイルサイズが大きすぎます'
+    } else if (error?.message?.includes('InvalidKey')) {
+      errorType = ErrorType.FILE_TYPE
+      errorMessage = 'ファイル名に使用できない文字が含まれています'
+    } else if (error?.message?.includes('404')) {
+      errorType = ErrorType.DATABASE
+      errorMessage = 'ストレージの設定に問題があります'
     }
     
-  } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'アップロードに失敗しました',
-      errorType: ErrorType.FILE_UPLOAD
+      error: error?.message ? `${errorMessage}: ${error.message}` : errorMessage,
+      errorType
     }
   }
 }

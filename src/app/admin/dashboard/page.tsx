@@ -247,10 +247,10 @@ export default async function AdminDashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        期限設定
+                        期日管理
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        各セクションの期限管理
+                        各セクションの入力開始日と締切日
                       </dd>
                     </dl>
                   </div>
@@ -259,7 +259,7 @@ export default async function AdminDashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <Link href="/admin/deadlines" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    期限を設定 →
+                    期日を設定 →
                   </Link>
                 </div>
               </div>
