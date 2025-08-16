@@ -12,6 +12,116 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
   const [isExporting, setIsExporting] = useState(false)
   const [exportStatus, setExportStatus] = useState<string>('')
 
+  // カラム名のマッピング
+  const columnNameMap: Record<string, string> = {
+    // エントリー基本情報
+    'id': 'エントリーID',
+    'user_id': 'ユーザーID',
+    'user_name': 'ユーザー名',
+    'user_email': 'メールアドレス',
+    'dance_style': 'ダンススタイル',
+    'participant_names': '参加者名',
+    'status': 'ステータス',
+    'created_at': '作成日時',
+    'updated_at': '更新日時',
+    
+    // 基本情報
+    'basic_info_category_division': 'カテゴリー区分',
+    'basic_info_representative_name': '代表者氏名',
+    'basic_info_representative_furigana': '代表者ふりがな',
+    'basic_info_representative_romaji': '代表者ローマ字',
+    'basic_info_representative_birthdate': '代表者生年月日',
+    'basic_info_representative_email': '代表者メールアドレス',
+    'basic_info_partner_name': 'パートナー氏名',
+    'basic_info_partner_furigana': 'パートナーふりがな',
+    'basic_info_partner_romaji': 'パートナーローマ字',
+    'basic_info_partner_birthdate': 'パートナー生年月日',
+    'basic_info_phone_number': '電話番号',
+    'basic_info_real_name': '本名',
+    'basic_info_real_name_kana': '本名かな',
+    'basic_info_partner_real_name': 'パートナー本名',
+    'basic_info_partner_real_name_kana': 'パートナー本名かな',
+    'basic_info_choreographer': '振付師',
+    'basic_info_choreographer_furigana': '振付師ふりがな',
+    'basic_info_emergency_contact_name_1': '緊急連絡先1氏名',
+    'basic_info_emergency_contact_phone_1': '緊急連絡先1電話番号',
+    'basic_info_emergency_contact_name_2': '緊急連絡先2氏名',
+    'basic_info_emergency_contact_phone_2': '緊急連絡先2電話番号',
+    'basic_info_guardian_name': '保護者氏名',
+    'basic_info_guardian_phone': '保護者電話番号',
+    'basic_info_guardian_email': '保護者メールアドレス',
+    'basic_info_partner_guardian_name': 'パートナー保護者氏名',
+    'basic_info_partner_guardian_phone': 'パートナー保護者電話番号',
+    'basic_info_partner_guardian_email': 'パートナー保護者メールアドレス',
+    'basic_info_agreement_checked': '同意確認',
+    'basic_info_media_consent_checked': 'メディア同意',
+    'basic_info_privacy_policy_checked': 'プライバシーポリシー同意',
+    
+    // 予選情報
+    'preliminary_info_work_title': '予選作品タイトル',
+    'preliminary_info_work_title_kana': '予選作品タイトルかな',
+    'preliminary_info_work_story': '予選作品ストーリー',
+    'preliminary_info_video_submitted': '予選動画提出済み',
+    'preliminary_info_music_rights_cleared': '予選音楽権利クリア',
+    'preliminary_info_music_title': '予選楽曲タイトル',
+    'preliminary_info_cd_title': '予選CDタイトル',
+    'preliminary_info_artist': '予選アーティスト',
+    'preliminary_info_record_number': '予選レコード番号',
+    'preliminary_info_jasrac_code': '予選JASRACコード',
+    'preliminary_info_music_type': '予選音楽タイプ',
+    'preliminary_info_choreographer1_name': '予選振付師1氏名',
+    'preliminary_info_choreographer1_furigana': '予選振付師1ふりがな',
+    'preliminary_info_choreographer2_name': '予選振付師2氏名',
+    'preliminary_info_choreographer2_furigana': '予選振付師2ふりがな',
+    
+    // 準決勝情報
+    'semifinals_info_music_change_from_preliminary': '準決勝楽曲変更',
+    'semifinals_info_work_title': '準決勝作品タイトル',
+    'semifinals_info_work_title_kana': '準決勝作品タイトルかな',
+    'semifinals_info_work_character_story': '準決勝作品ストーリー',
+    'semifinals_info_copyright_permission': '準決勝著作権許可',
+    'semifinals_info_music_title': '準決勝楽曲タイトル',
+    'semifinals_info_cd_title': '準決勝CDタイトル',
+    'semifinals_info_artist': '準決勝アーティスト',
+    'semifinals_info_chaser_song_designation': '準決勝チェイサー曲指定',
+    'semifinals_info_choreographer_name': '準決勝振付師氏名',
+    'semifinals_info_choreographer_furigana': '準決勝振付師ふりがな',
+    'semifinals_info_choreographer2_name': '準決勝振付師2氏名',
+    'semifinals_info_choreographer2_furigana': '準決勝振付師2ふりがな',
+    'semifinals_info_props_usage': '準決勝小道具使用',
+    'semifinals_info_props_details': '準決勝小道具詳細',
+    
+    // 決勝情報
+    'finals_info_music_change': '決勝楽曲変更',
+    'finals_info_work_title': '決勝作品タイトル',
+    'finals_info_work_title_kana': '決勝作品タイトルかな',
+    'finals_info_choreographer_change': '決勝振付変更',
+    'finals_info_choreographer_name': '決勝振付師氏名',
+    'finals_info_choreographer_furigana': '決勝振付師ふりがな',
+    'finals_info_choreographer2_name': '決勝振付師2氏名',
+    'finals_info_choreographer2_furigana': '決勝振付師2ふりがな',
+    'finals_info_props_usage': '決勝小道具使用',
+    'finals_info_props_details': '決勝小道具詳細',
+    'finals_info_choreographer_attendance': '振付師出席予定',
+    'finals_info_choreographer_photo_permission': '振付師写真掲載許可',
+    
+    // 申請情報
+    'applications_info_related_ticket_count': '関連チケット数',
+    'applications_info_related_ticket_total_amount': '関連チケット総額',
+    'applications_info_companion_total_amount': '同伴者総額',
+    'applications_info_makeup_preferred_stylist': 'メイク希望スタイリスト',
+    'applications_info_makeup_name': 'メイク申請者名',
+    'applications_info_makeup_email': 'メイク申請者メール',
+    'applications_info_makeup_phone': 'メイク申請者電話',
+    
+    // 座席リクエスト
+    'seat_request_premium_seats': 'プレミアム席',
+    'seat_request_ss_seats': 'SS席',
+    'seat_request_s_seats': 'S席',
+    'seat_request_a_seats': 'A席',
+    'seat_request_b_seats': 'B席'
+  }
+
   // オブジェクトをフラット化する関数
   const flattenObject = (obj: Record<string, unknown>, prefix = ''): Record<string, string | number | boolean> => {
     const flattened: Record<string, string | number | boolean> = {}
@@ -41,14 +151,50 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     // フラットなオブジェクトに変換
     const flattenedData = data.map(item => flattenObject(item))
     
-    // CSVヘッダーを作成
+    // CSVヘッダーを作成（日本語名に変換）
     const headers = Object.keys(flattenedData[0])
-    const csvHeaders = headers.join(',')
+    const csvHeaders = headers.map(header => {
+      // IDフィールドは除外、ユーザー関連の特別処理
+      if (header === 'user_id' || header.includes('_id') && !header.includes('entry_id')) {
+        return null
+      }
+      return columnNameMap[header] || header
+    }).filter(h => h !== null).join(',')
     
     // CSVデータを作成
     const csvData = flattenedData.map(row => {
       return headers.map(header => {
-        const value = row[header]
+        // IDフィールドは除外
+        if (header === 'user_id' || header.includes('_id') && !header.includes('entry_id')) {
+          return null
+        }
+        let value = row[header]
+        
+        // 特別な値の変換
+        if (typeof value === 'boolean') {
+          value = value ? 'はい' : 'いいえ'
+        } else if (header === 'status') {
+          const statusMap: Record<string, string> = {
+            'pending': '保留中',
+            'submitted': '提出済み',
+            'selected': '選考通過',
+            'rejected': '不選考'
+          }
+          value = statusMap[String(value)] || value
+        } else if ((header === 'created_at' || header === 'updated_at') && value) {
+          // 日時のフォーマット
+          const date = new Date(String(value))
+          if (!isNaN(date.getTime())) {
+            value = date.toLocaleString('ja-JP', { 
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+        }
+        
         // 値にカンマ、改行、ダブルクォートが含まれる場合は適切にエスケープ
         if (value === null || value === undefined) return ''
         const stringValue = String(value)
@@ -56,7 +202,7 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
           return `"${stringValue.replace(/"/g, '""')}"`
         }
         return stringValue
-      }).join(',')
+      }).filter(v => v !== null).join(',')
     }).join('\n')
     
     const csv = `${csvHeaders}\n${csvData}`
@@ -127,8 +273,15 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
         const snsInfo = snsInfoResult.data?.find(s => s.entry_id === entry.id)
         const seatRequest = seatRequestResult.data?.find(s => s.entry_id === entry.id)
         
+        // ユーザー情報を展開
+        const userData = entry.users as { name?: string; email?: string } | undefined
+        
         return {
           ...entry,
+          // ユーザー情報を分かりやすく追加
+          user_name: userData?.name || '不明',
+          user_email: userData?.email || '',
+          // 関連データをマージ
           basic_info: basicInfo || {},
           preliminary_info: preliminaryInfo || {},
           semifinals_info: semifinalsInfo || {},
