@@ -271,6 +271,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (existingData) {
         // 更新
+        console.log('更新するapplications_infoデータ:', applicationsInfo)
         const { error } = await supabase
           .from('applications_info')
           .update({
@@ -279,9 +280,14 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           })
           .eq('entry_id', entry.id)
 
-        if (error) throw error
+        if (error) {
+          console.error('applications_info更新エラー:', error)
+          console.error('送信したデータ:', applicationsInfo)
+          throw error
+        }
       } else {
         // 新規作成
+        console.log('新規作成するapplications_infoデータ:', applicationsInfo)
         const { error } = await supabase
           .from('applications_info')
           .insert({
@@ -289,7 +295,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             entry_id: entry.id
           })
 
-        if (error) throw error
+        if (error) {
+          console.error('applications_info新規作成エラー:', error)
+          console.error('送信したデータ:', applicationsInfo)
+          throw error
+        }
       }
 
       // 観覧席希望申請データを保存
@@ -301,6 +311,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (existingSeatData) {
         // 更新
+        console.log('更新するseat_requestデータ:', seatRequest)
         const { error } = await supabase
           .from('seat_request')
           .update({
@@ -309,9 +320,14 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           })
           .eq('entry_id', entry.id)
 
-        if (error) throw error
+        if (error) {
+          console.error('seat_request更新エラー:', error)
+          console.error('送信したデータ:', seatRequest)
+          throw error
+        }
       } else {
         // 新規作成
+        console.log('新規作成するseat_requestデータ:', seatRequest)
         const { error } = await supabase
           .from('seat_request')
           .insert({
@@ -319,7 +335,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             entry_id: entry.id
           })
 
-        if (error) throw error
+        if (error) {
+          console.error('seat_request新規作成エラー:', error)
+          console.error('送信したデータ:', seatRequest)
+          throw error
+        }
       }
 
       setSuccess(isTemporary ? '各種申請情報を一時保存しました' : '各種申請情報を保存しました')
