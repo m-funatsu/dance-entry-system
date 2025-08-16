@@ -408,10 +408,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{entry.dance_style}</div>
-                      <div className="text-sm text-gray-500">
-                        個人参加
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
+                      <div className="text-xs text-gray-500 mt-1">
                         {entry.participant_names}
                       </div>
                     </div>
