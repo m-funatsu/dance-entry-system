@@ -281,8 +281,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           .eq('entry_id', entry.id)
 
         if (error) {
-          console.error('applications_info更新エラー:', error)
-          console.error('送信したデータ:', applicationsInfo)
+          console.error('applications_info更新エラー:')
+          console.error('エラーコード:', error.code)
+          console.error('エラーメッセージ:', error.message)
+          console.error('エラー詳細:', error.details)
+          console.error('エラーヒント:', error.hint)
+          console.error('送信したデータのキー:', Object.keys(applicationsInfo))
+          console.error('送信したデータ:', JSON.stringify(applicationsInfo, null, 2))
           throw error
         }
       } else {
@@ -296,8 +301,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           })
 
         if (error) {
-          console.error('applications_info新規作成エラー:', error)
-          console.error('送信したデータ:', applicationsInfo)
+          console.error('applications_info新規作成エラー:')
+          console.error('エラーコード:', error.code)
+          console.error('エラーメッセージ:', error.message)
+          console.error('エラー詳細:', error.details)
+          console.error('エラーヒント:', error.hint)
+          console.error('送信したデータのキー:', Object.keys(applicationsInfo))
+          console.error('送信したデータ:', JSON.stringify(applicationsInfo, null, 2))
           throw error
         }
       }
@@ -321,8 +331,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           .eq('entry_id', entry.id)
 
         if (error) {
-          console.error('seat_request更新エラー:', error)
-          console.error('送信したデータ:', seatRequest)
+          console.error('seat_request更新エラー:')
+          console.error('エラーコード:', error.code)
+          console.error('エラーメッセージ:', error.message)
+          console.error('エラー詳細:', error.details)
+          console.error('エラーヒント:', error.hint)
+          console.error('送信したデータのキー:', Object.keys(seatRequest))
+          console.error('送信したデータ:', JSON.stringify(seatRequest, null, 2))
           throw error
         }
       } else {
@@ -336,8 +351,13 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           })
 
         if (error) {
-          console.error('seat_request新規作成エラー:', error)
-          console.error('送信したデータ:', seatRequest)
+          console.error('seat_request新規作成エラー:')
+          console.error('エラーコード:', error.code)
+          console.error('エラーメッセージ:', error.message)
+          console.error('エラー詳細:', error.details)
+          console.error('エラーヒント:', error.hint)
+          console.error('送信したデータのキー:', Object.keys(seatRequest))
+          console.error('送信したデータ:', JSON.stringify(seatRequest, null, 2))
           throw error
         }
       }
