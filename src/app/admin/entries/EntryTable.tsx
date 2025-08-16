@@ -33,7 +33,11 @@ interface EntryWithDetails {
     id: string
     dance_style?: string
     category_division?: string
-  }[]
+  }[] | { 
+    id: string
+    dance_style?: string
+    category_division?: string
+  }
   preliminary_info?: { id: string }[]
   program_info?: { id: string }[]
   semifinals_info?: { id: string }[]
@@ -88,7 +92,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    const hasBasicInfo = entry.basic_info && entry.basic_info.length > 0
+    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : true)
     const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
     const hasProgramInfo = entry.program_info && entry.program_info.length > 0
     const hasSemifinalsInfo = entry.semifinals_info && entry.semifinals_info.length > 0
@@ -414,17 +418,36 @@ export default function EntryTable({ entries }: EntryTableProps) {
                       <div className="text-sm font-medium text-gray-900">
                         {(() => {
                           // デバッグ: ダンススタイルの取得を確認
-                          const basicInfoStyle = entry.basic_info?.[0]?.dance_style
+                          let basicInfoStyle: string | undefined
+                          
+                          if (entry.basic_info) {
+                            if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+                              basicInfoStyle = entry.basic_info[0]?.dance_style
+                            } else if (!Array.isArray(entry.basic_info)) {
+                              basicInfoStyle = entry.basic_info.dance_style
+                            }
+                          }
+                          
                           const entryStyle = entry.dance_style
                           console.log(`Entry ${entry.id}: basic_info style = "${basicInfoStyle}", entry style = "${entryStyle}"`)
                           return basicInfoStyle || entryStyle || 'ジャンル未設定'
                         })()}
                       </div>
-                      {entry.basic_info?.[0]?.category_division && (
-                        <div className="text-xs text-gray-600">
-                          {entry.basic_info[0].category_division}
-                        </div>
-                      )}
+                      {(() => {
+                        let categoryDivision: string | undefined
+                        if (entry.basic_info) {
+                          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+                            categoryDivision = entry.basic_info[0]?.category_division
+                          } else if (!Array.isArray(entry.basic_info)) {
+                            categoryDivision = entry.basic_info.category_division
+                          }
+                        }
+                        return categoryDivision ? (
+                          <div className="text-xs text-gray-600">
+                            {categoryDivision}
+                          </div>
+                        ) : null
+                      })()}
                       <div className="text-xs text-gray-500 mt-1">
                         {entry.participant_names}
                       </div>

@@ -30,7 +30,7 @@ export default async function AdminEntriesPage() {
       users(name, email),
       entry_files(id, file_type),
       selections(id, status, score, created_at),
-      basic_info(id, dance_style, category_division),
+      basic_info!left(id, dance_style, category_division),
       preliminary_info(id),
       program_info(id),
       semifinals_info(id),
@@ -50,10 +50,11 @@ export default async function AdminEntriesPage() {
     console.log('最初のエントリーの構造:')
     console.log('- ID:', entries[0].id)
     console.log('- entries.dance_style:', entries[0].dance_style)
-    console.log('- basic_info:', entries[0].basic_info)
-    if (entries[0].basic_info && entries[0].basic_info.length > 0) {
-      console.log('- basic_info[0].dance_style:', entries[0].basic_info[0].dance_style)
-      console.log('- basic_info[0].category_division:', entries[0].basic_info[0].category_division)
+    console.log('- basic_info:', JSON.stringify(entries[0].basic_info))
+    if (entries[0].basic_info && Array.isArray(entries[0].basic_info) && entries[0].basic_info.length > 0) {
+      console.log('- basic_info[0]:', JSON.stringify(entries[0].basic_info[0]))
+    } else if (entries[0].basic_info && !Array.isArray(entries[0].basic_info)) {
+      console.log('- basic_info (not array):', JSON.stringify(entries[0].basic_info))
     }
   }
   console.log('================================')

@@ -34,7 +34,11 @@ interface EntryWithDetails {
     id: string
     dance_style?: string
     category_division?: string
-  }[]
+  }[] | { 
+    id: string
+    dance_style?: string
+    category_division?: string
+  }
   preliminary_info?: { id: string }[]
   program_info?: { id: string }[]
   semifinals_info?: { id: string }[]
@@ -55,7 +59,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
 
   // 各エントリーの提出状況を計算
   const getSubmissionStatus = (entry: EntryWithDetails) => {
-    const hasBasicInfo = entry.basic_info && entry.basic_info.length > 0
+    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : true)
     const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
     const hasProgramInfo = entry.program_info && entry.program_info.length > 0
     const hasSemifinalsInfo = entry.semifinals_info && entry.semifinals_info.length > 0
@@ -84,7 +88,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   // 特定のフォームが提出済みかチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
     switch(formType) {
-      case 'basic': return entry.basic_info && entry.basic_info.length > 0
+      case 'basic': return entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : true)
       case 'preliminary': return entry.preliminary_info && entry.preliminary_info.length > 0
       case 'program': return entry.program_info && entry.program_info.length > 0
       case 'semifinals': return entry.semifinals_info && entry.semifinals_info.length > 0
@@ -99,7 +103,18 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const filteredEntries = useMemo(() => {
     return entries.filter(entry => {
       const statusMatch = !statusFilter || entry.status === statusFilter
-      const entryGenre = entry.basic_info?.[0]?.dance_style || entry.dance_style || ''
+      
+      let entryGenre = ''
+      if (entry.basic_info) {
+        if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+          entryGenre = entry.basic_info[0]?.dance_style || entry.dance_style || ''
+        } else if (!Array.isArray(entry.basic_info)) {
+          entryGenre = entry.basic_info.dance_style || entry.dance_style || ''
+        }
+      } else {
+        entryGenre = entry.dance_style || ''
+      }
+      
       const genreMatch = !genreFilter || entryGenre === genreFilter
       const submissionMatch = !submissionFilter || getSubmissionStatus(entry) === submissionFilter
       const formMatch = !formFilter || (
@@ -115,9 +130,16 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
 
   // 利用可能なダンスジャンルを取得
   const availableGenres = useMemo(() => {
-    const genres = [...new Set(entries.map(entry => 
-      entry.basic_info?.[0]?.dance_style || entry.dance_style || ''
-    ).filter(genre => genre))]
+    const genres = [...new Set(entries.map(entry => {
+      if (entry.basic_info) {
+        if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+          return entry.basic_info[0]?.dance_style || entry.dance_style || ''
+        } else if (!Array.isArray(entry.basic_info)) {
+          return entry.basic_info.dance_style || entry.dance_style || ''
+        }
+      }
+      return entry.dance_style || ''
+    }).filter(genre => genre))]
     return genres.sort()
   }, [entries])
 
