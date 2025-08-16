@@ -30,7 +30,11 @@ interface EntryWithDetails {
     score?: number
     created_at: string
   }[]
-  basic_info?: { id: string }[]
+  basic_info?: { 
+    id: string
+    dance_style?: string
+    category_division?: string
+  }[]
   preliminary_info?: { id: string }[]
   program_info?: { id: string }[]
   semifinals_info?: { id: string }[]
@@ -95,7 +99,8 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const filteredEntries = useMemo(() => {
     return entries.filter(entry => {
       const statusMatch = !statusFilter || entry.status === statusFilter
-      const genreMatch = !genreFilter || entry.dance_style === genreFilter
+      const entryGenre = entry.basic_info?.[0]?.dance_style || entry.dance_style || ''
+      const genreMatch = !genreFilter || entryGenre === genreFilter
       const submissionMatch = !submissionFilter || getSubmissionStatus(entry) === submissionFilter
       const formMatch = !formFilter || (
         formFilter === 'has_' ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
@@ -110,7 +115,9 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
 
   // 利用可能なダンスジャンルを取得
   const availableGenres = useMemo(() => {
-    const genres = [...new Set(entries.map(entry => entry.dance_style))]
+    const genres = [...new Set(entries.map(entry => 
+      entry.basic_info?.[0]?.dance_style || entry.dance_style || ''
+    ).filter(genre => genre))]
     return genres.sort()
   }, [entries])
 

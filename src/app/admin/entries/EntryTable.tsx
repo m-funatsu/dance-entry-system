@@ -29,7 +29,11 @@ interface EntryWithDetails {
     score?: number
     created_at: string
   }[]
-  basic_info?: { id: string }[]
+  basic_info?: { 
+    id: string
+    dance_style?: string
+    category_division?: string
+  }[]
   preliminary_info?: { id: string }[]
   program_info?: { id: string }[]
   semifinals_info?: { id: string }[]
@@ -407,7 +411,14 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{entry.dance_style}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {entry.basic_info?.[0]?.dance_style || entry.dance_style || 'ジャンル未設定'}
+                      </div>
+                      {entry.basic_info?.[0]?.category_division && (
+                        <div className="text-xs text-gray-600">
+                          {entry.basic_info[0].category_division}
+                        </div>
+                      )}
                       <div className="text-xs text-gray-500 mt-1">
                         {entry.participant_names}
                       </div>

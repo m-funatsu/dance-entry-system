@@ -30,7 +30,7 @@ export default async function AdminEntriesPage() {
       users(name, email),
       entry_files(id, file_type),
       selections(id, status, score, created_at),
-      basic_info(id),
+      basic_info(id, dance_style, category_division),
       preliminary_info(id),
       program_info(id),
       semifinals_info(id),
