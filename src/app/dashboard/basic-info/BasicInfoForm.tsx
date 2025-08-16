@@ -313,6 +313,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           .from('entries')
           .insert({
             user_id: userId,
+            dance_style: formData.dance_style || '',
             participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
             status: 'pending'
           })
@@ -323,10 +324,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         currentEntryId = newEntry.id
         handleFieldChange('entry_id', currentEntryId)
       } else {
-        // participant_namesを更新
+        // participant_namesとdance_styleを更新
         const { error: updateError } = await supabase
           .from('entries')
           .update({
+            dance_style: formData.dance_style || '',
             participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
             updated_at: new Date().toISOString()
           })
