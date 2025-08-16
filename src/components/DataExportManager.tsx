@@ -396,9 +396,6 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
             <li>SNS情報</li>
             <li>座席リクエスト情報</li>
           </ul>
-          <p className="mt-3">
-            💡 <strong>推奨:</strong> CSVファイルはExcelで開くことができ、データの分析や集計に便利です。
-          </p>
         </div>
       </div>
     </div>
