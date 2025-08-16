@@ -76,56 +76,74 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     URL.revokeObjectURL(url)
   }
 
-  // JSONエクスポート関数
-  const exportToJSON = (data: Record<string, unknown>[], filename: string) => {
-    const json = JSON.stringify(data, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
 
-  const handleExportData = async (format: 'json' | 'csv' = 'csv') => {
+  const handleExportData = async () => {
     setIsExporting(true)
     setExportStatus('データベースデータをエクスポート中...')
 
     try {
       const supabase = createClient()
       
-      // エントリーと関連データを取得
+      // エントリーと基本的な関連データを取得
       const { data: entries, error: entriesError } = await supabase
         .from('entries')
         .select(`
           *,
-          users(name, email),
-          basic_info(*),
-          preliminary_info(*),
-          semifinals_info(*),
-          finals_info(*),
-          applications_info(*),
-          program_info(*),
-          sns_info(*),
-          seat_request(*)
+          users(name, email)
         `)
         .order('created_at', { ascending: false })
       
       if (entriesError) throw entriesError
       
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
-      const filename = format === 'csv' 
-        ? `dance_entry_data_${timestamp}.csv`
-        : `dance_entry_data_${timestamp}.json`
+      // 各テーブルのデータを個別に取得
+      const [
+        basicInfoResult,
+        preliminaryInfoResult,
+        semifinalsInfoResult,
+        finalsInfoResult,
+        applicationsInfoResult,
+        programInfoResult,
+        snsInfoResult,
+        seatRequestResult
+      ] = await Promise.all([
+        supabase.from('basic_info').select('*'),
+        supabase.from('preliminary_info').select('*'),
+        supabase.from('semifinals_info').select('*'),
+        supabase.from('finals_info').select('*'),
+        supabase.from('applications_info').select('*'),
+        supabase.from('program_info').select('*'),
+        supabase.from('sns_info').select('*'),
+        supabase.from('seat_request').select('*')
+      ])
       
-      if (format === 'csv') {
-        exportToCSV(entries || [], filename)
-      } else {
-        exportToJSON(entries || [], filename)
-      }
+      // エントリーデータに関連データをマージ
+      const mergedData = (entries || []).map(entry => {
+        const basicInfo = basicInfoResult.data?.find(b => b.entry_id === entry.id)
+        const preliminaryInfo = preliminaryInfoResult.data?.find(p => p.entry_id === entry.id)
+        const semifinalsInfo = semifinalsInfoResult.data?.find(s => s.entry_id === entry.id)
+        const finalsInfo = finalsInfoResult.data?.find(f => f.entry_id === entry.id)
+        const applicationsInfo = applicationsInfoResult.data?.find(a => a.entry_id === entry.id)
+        const programInfo = programInfoResult.data?.find(p => p.entry_id === entry.id)
+        const snsInfo = snsInfoResult.data?.find(s => s.entry_id === entry.id)
+        const seatRequest = seatRequestResult.data?.find(s => s.entry_id === entry.id)
+        
+        return {
+          ...entry,
+          basic_info: basicInfo || {},
+          preliminary_info: preliminaryInfo || {},
+          semifinals_info: semifinalsInfo || {},
+          finals_info: finalsInfo || {},
+          applications_info: applicationsInfo || {},
+          program_info: programInfo || {},
+          sns_info: snsInfo || {},
+          seat_request: seatRequest || {}
+        }
+      })
+      
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
+      const filename = `dance_entry_data_${timestamp}.csv`
+      
+      exportToCSV(mergedData, filename)
       
       setExportStatus('データエクスポートが完了しました')
     } catch (error) {
@@ -202,30 +220,28 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
             <p className="text-sm text-gray-500 mb-3">
               参加者情報、エントリー詳細、選考結果などの全データをエクスポートします。
             </p>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleExportData('csv')}
-                disabled={isExporting}
-                className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                📄 CSVでダウンロード
-              </button>
-              <button
-                onClick={() => handleExportData('json')}
-                disabled={isExporting}
-                className="px-3 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                📋 JSON形式でダウンロード
-              </button>
-            </div>
+            <button
+              onClick={handleExportData}
+              disabled={isExporting}
+              className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              📄 CSVでダウンロード
+            </button>
           </div>
         </div>
 
         <div className="mt-6 text-xs text-gray-500">
           <p className="mb-2">📝 <strong>エクスポートされるデータ:</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li><strong>CSV形式</strong>: エントリー情報、基本情報、予選・準決勝・決勝情報、申請情報など全データを1つのCSVファイルに結合</li>
-            <li><strong>JSON形式</strong>: 構造化されたデータとして出力（プログラムでの処理に適しています）</li>
+            <li>エントリー基本情報（ユーザー名、メールアドレス、ステータス等）</li>
+            <li>基本情報（代表者名、パートナー名、連絡先等）</li>
+            <li>予選情報（作品タイトル、楽曲情報、振付師情報等）</li>
+            <li>準決勝情報（音響・照明指示、振付変更情報等）</li>
+            <li>決勝情報（振付変更、小道具使用情報等）</li>
+            <li>申請情報（チケット申請、メイク予約等）</li>
+            <li>プログラム掲載情報</li>
+            <li>SNS情報</li>
+            <li>座席リクエスト情報</li>
           </ul>
           <p className="mt-3">
             💡 <strong>推奨:</strong> CSVファイルはExcelで開くことができ、データの分析や集計に便利です。
