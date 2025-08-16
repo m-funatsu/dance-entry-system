@@ -317,13 +317,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
             </span>
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => bulkUpdateStatus('submitted')}
-                disabled={loading}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-              >
-                提出済みに変更
-              </button>
-              <button
                 onClick={() => bulkUpdateStatus('selected')}
                 disabled={loading}
                 className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
@@ -475,7 +468,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                           className="rounded border-gray-300 text-xs disabled:opacity-50"
                         >
                           <option value="pending">未処理</option>
-                          <option value="submitted">提出済み</option>
                           <option value="selected">選考通過</option>
                           <option value="rejected">不選考</option>
                         </select>

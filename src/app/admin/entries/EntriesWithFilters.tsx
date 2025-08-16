@@ -161,7 +161,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
             >
               <option value="">全ステータス</option>
               <option value="pending">未処理</option>
-              <option value="submitted">提出済み</option>
               <option value="selected">選考通過</option>
               <option value="rejected">不選考</option>
             </select>
