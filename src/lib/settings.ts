@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/logger'
 
 /**
- * 管理者通知メールアドレスを取得
+ * 管理者メールアドレスを取得（送信者アドレスとしても使用）
  */
 export async function getAdminEmail(): Promise<string | null> {
   try {
@@ -22,6 +22,14 @@ export async function getAdminEmail(): Promise<string | null> {
     })
     return null
   }
+}
+
+/**
+ * 管理者メールアドレスを送信者として使用する関数
+ */
+export async function getFromEmailAddress(): Promise<string> {
+  const adminEmail = await getAdminEmail()
+  return adminEmail || 'noreply@example.com' // フォールバック
 }
 
 /**
