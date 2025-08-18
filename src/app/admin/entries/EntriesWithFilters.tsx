@@ -79,12 +79,10 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
       let entryGenre = ''
       if (entry.basic_info) {
         if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-          entryGenre = entry.basic_info[0]?.dance_style || entry.dance_style || ''
+          entryGenre = entry.basic_info[0]?.dance_style || ''
         } else if (!Array.isArray(entry.basic_info)) {
-          entryGenre = entry.basic_info.dance_style || entry.dance_style || ''
+          entryGenre = entry.basic_info.dance_style || ''
         }
-      } else {
-        entryGenre = entry.dance_style || ''
       }
       
       const genreMatch = !genreFilter || entryGenre === genreFilter
@@ -104,12 +102,12 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
     const genres = [...new Set(entries.map(entry => {
       if (entry.basic_info) {
         if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-          return entry.basic_info[0]?.dance_style || entry.dance_style || ''
+          return entry.basic_info[0]?.dance_style || ''
         } else if (!Array.isArray(entry.basic_info)) {
-          return entry.basic_info.dance_style || entry.dance_style || ''
+          return entry.basic_info.dance_style || ''
         }
       }
-      return entry.dance_style || ''
+      return ''
     }).filter(genre => genre))]
     return genres.sort()
   }, [entries])

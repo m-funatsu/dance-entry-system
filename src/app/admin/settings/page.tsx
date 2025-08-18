@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 interface Settings {
-  email_notifications: string
   admin_email: string
   site_title: string
-  entry_message: string
   competition_name: string
   competition_year: string
   competition_date: string
@@ -18,10 +16,8 @@ interface Settings {
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings>({
-    email_notifications: 'true',
     admin_email: '',
     site_title: '2025 バルカーカップ ダンスエントリーシステム',
-    entry_message: '',
     competition_name: 'バルカーカップ',
     competition_year: '2025',
     competition_date: '',
@@ -287,18 +283,6 @@ export default function AdminSettingsPage() {
                 <div className="border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">通知設定</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center">
-                      <input
-                        id="email_notifications"
-                        type="checkbox"
-                        checked={settings.email_notifications === 'true'}
-                        onChange={(e) => handleChange('email_notifications', e.target.checked)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="email_notifications" className="ml-2 block text-sm text-gray-900">
-                        エントリー時にメール通知を送信
-                      </label>
-                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         管理者通知メールアドレス
@@ -310,6 +294,9 @@ export default function AdminSettingsPage() {
                         placeholder="admin@example.com"
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
+                      <p className="mt-1 text-sm text-gray-500">
+                        新しいエントリーやシステム通知を受け取るメールアドレスを設定してください
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -326,18 +313,6 @@ export default function AdminSettingsPage() {
                         type="text"
                         value={settings.site_title}
                         onChange={(e) => handleChange('site_title', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        エントリー受付メッセージ
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={settings.entry_message}
-                        onChange={(e) => handleChange('entry_message', e.target.value)}
-                        placeholder="エントリーページに表示するメッセージを入力してください"
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>

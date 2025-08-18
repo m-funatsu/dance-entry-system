@@ -59,18 +59,16 @@ export default async function AdminDashboardPage() {
     rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
   }
 
-  // ダンスジャンル別統計を計算（基本情報のdance_styleを優先）
+  // ダンスジャンル別統計を計算（基本情報のdance_styleのみ使用）
   const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
     let genre = '未分類'
     
     if (entry.basic_info) {
       if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-        genre = entry.basic_info[0]?.dance_style || entry.dance_style || '未分類'
+        genre = entry.basic_info[0]?.dance_style || '未分類'
       } else if (!Array.isArray(entry.basic_info)) {
-        genre = entry.basic_info.dance_style || entry.dance_style || '未分類'
+        genre = entry.basic_info.dance_style || '未分類'
       }
-    } else {
-      genre = entry.dance_style || '未分類'
     }
     
     acc[genre] = (acc[genre] || 0) + 1

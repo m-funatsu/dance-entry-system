@@ -470,12 +470,12 @@ export default function EntryTable({ entries }: EntryTableProps) {
                       {(() => {
                         if (entry.basic_info) {
                           if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-                            return entry.basic_info[0]?.dance_style || entry.dance_style || '未入力'
+                            return entry.basic_info[0]?.dance_style || '未入力'
                           } else if (!Array.isArray(entry.basic_info)) {
-                            return entry.basic_info.dance_style || entry.dance_style || '未入力'
+                            return entry.basic_info.dance_style || '未入力'
                           }
                         }
-                        return entry.dance_style || '未入力'
+                        return '未入力'
                       })()}
                     </div>
                   </td>
