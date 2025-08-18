@@ -18,10 +18,10 @@ export interface FileUploadConfig {
 export const FILE_UPLOAD_DEFAULTS = {
   bucket: 'files',
   maxSizes: {
-    image: 100 * 1024 * 1024, // 100MB
-    video: 250 * 1024 * 1024, // 250MB
-    audio: 100 * 1024 * 1024, // 100MB
-    document: 50 * 1024 * 1024, // 50MB
+    image: 200 * 1024 * 1024, // 200MB
+    video: 500 * 1024 * 1024, // 500MB
+    audio: 200 * 1024 * 1024, // 200MB
+    document: 100 * 1024 * 1024, // 100MB
   },
   allowedTypes: {
     image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
@@ -29,12 +29,12 @@ export const FILE_UPLOAD_DEFAULTS = {
     audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg'],
     document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
   },
-  // 現在のSupabase無料枠の制限
+  // 現在のSupabase課金後の制限
   currentLimits: {
-    image: 25 * 1024 * 1024, // 25MB
-    video: 250 * 1024 * 1024, // 250MB (予選動画用に増加)
-    audio: 25 * 1024 * 1024, // 25MB
-    document: 25 * 1024 * 1024, // 25MB
+    image: 200 * 1024 * 1024, // 200MB
+    video: 500 * 1024 * 1024, // 500MB (課金後の上限)
+    audio: 200 * 1024 * 1024, // 200MB
+    document: 100 * 1024 * 1024, // 100MB
   }
 } as const
 

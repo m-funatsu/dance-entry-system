@@ -10,7 +10,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   onDelete,
   disabled = false,
   required = false,
-  maxSizeMB = 100,
+  maxSizeMB = 200,
   accept = '.wav,.mp3,.m4a'
 }) => {
   const [isDragging, setIsDragging] = useState(false)
