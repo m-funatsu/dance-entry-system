@@ -31,12 +31,12 @@ export default async function AdminEntriesPage() {
       entry_files(id, file_type),
       selections(id, status, score, created_at),
       basic_info!left(id, dance_style, category_division),
-      preliminary_info(id),
-      program_info(id),
-      semifinals_info(id),
-      finals_info(id),
-      applications_info(id),
-      sns_info(id)
+      preliminary_info!left(id),
+      program_info!left(id),
+      semifinals_info!left(id),
+      finals_info!left(id),
+      applications_info!left(id),
+      sns_info!left(id)
     `)
     .order('created_at', { ascending: false })
 
@@ -51,6 +51,12 @@ export default async function AdminEntriesPage() {
     console.log('- ID:', entries[0].id)
     console.log('- entries.dance_style:', entries[0].dance_style)
     console.log('- basic_info:', JSON.stringify(entries[0].basic_info))
+    console.log('- preliminary_info:', JSON.stringify(entries[0].preliminary_info))
+    console.log('- program_info:', JSON.stringify(entries[0].program_info))
+    console.log('- semifinals_info:', JSON.stringify(entries[0].semifinals_info))
+    console.log('- finals_info:', JSON.stringify(entries[0].finals_info))
+    console.log('- applications_info:', JSON.stringify(entries[0].applications_info))
+    console.log('- sns_info:', JSON.stringify(entries[0].sns_info))
     if (entries[0].basic_info && Array.isArray(entries[0].basic_info) && entries[0].basic_info.length > 0) {
       console.log('- basic_info[0]:', JSON.stringify(entries[0].basic_info[0]))
     } else if (entries[0].basic_info && !Array.isArray(entries[0].basic_info)) {
