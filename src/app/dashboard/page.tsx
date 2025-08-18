@@ -122,6 +122,18 @@ export default async function DashboardPage() {
     snsVideoFiles = snsFiles?.length || 0
   }
 
+  // 各種申請情報の取得
+  let applicationsInfo = null
+  if (entry) {
+    const { data } = await supabase
+      .from('applications_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .maybeSingle()
+    
+    applicationsInfo = data
+  }
+
 
   // プログラム掲載用情報の完了判定関数
   const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
@@ -297,6 +309,12 @@ export default async function DashboardPage() {
     
     // sns_infoテーブルにレコードがあり、動画ファイルが2つある場合は完了
     return true
+  }
+
+  // 各種申請の完了判定関数
+  const checkApplicationsInfoComplete = (applicationsInfo: { [key: string]: unknown } | null) => {
+    // applications_infoテーブルにレコードが存在すれば申請済みとする
+    return !!applicationsInfo
   }
 
 
@@ -819,7 +837,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                          申請可能
+                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請済み' : '申請可能'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.optional_request_deadline)
@@ -845,7 +863,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   {isFormEditable('optional_request_deadline') ? (
                     <Link href="/dashboard/applications" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      申請 →
+                      {checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請'} →
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
