@@ -348,10 +348,11 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     return
                   }
                   
+                  const toAddress = 'entry_vqcup@valqua.com'
                   const subject = 'ダンスエントリーシステムへようこそ'
                   const body = `ダンスエントリーシステムにご登録いただき、ありがとうございます。\n\nシステムへのログインURLをお送りいたします。\n\n${window.location.origin}\n\nご不明点がございましたら、お気軽にお問い合わせください。\n\nダンスコンペティション運営事務局`
                   
-                  const mailtoLink = `mailto:${selectedEmails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+                  const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(selectedEmails)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
                   window.location.href = mailtoLink
                 }}
                 disabled={loading}

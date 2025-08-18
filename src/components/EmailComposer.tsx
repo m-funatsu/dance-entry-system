@@ -165,7 +165,7 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
 
-    // 全選択されたエントリーのメールアドレスを収集
+    // 全選択されたエントリーのメールアドレスを収集（BCC用）
     const emailAddresses = selectedEntriesData
       .filter(entry => entry?.users?.email)
       .map(entry => entry.users.email)
@@ -176,8 +176,9 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
     
-    // mailtoリンクを作成
-    const mailtoLink = `mailto:${emailAddresses}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    // mailtoリンクを作成（TO: 固定アドレス、BCC: 参加者アドレス）
+    const toAddress = 'entry_vqcup@valqua.com'
+    const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     
     // メーラーを開く
     window.location.href = mailtoLink
