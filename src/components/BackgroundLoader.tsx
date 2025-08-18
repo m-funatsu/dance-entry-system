@@ -22,7 +22,7 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
           .eq('key', settingKey)
           .maybeSingle()
         
-        if (data?.value) {
+        if (data?.value && typeof document !== 'undefined' && document.documentElement) {
           // CSS変数を設定
           logger.debug(`背景画像を設定: ${cssVar}`, {
             action: 'set_background_image',

@@ -26,13 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <head>
-        <FaviconLoader />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientProviders>
+          <FaviconLoader />
           {children}
         </ClientProviders>
       </body>
