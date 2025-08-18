@@ -120,6 +120,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               name={`scene${sceneNum}_color_other`}
               value={finalsInfo[`scene${sceneNum}_color_other` as keyof FinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_color_other`]: e.target.value })}
+              placeholder="具体的な色の指定など"
               disabled={lightingChangeOption === 'same'}
               required={sceneNum === 1 && lightingChangeOption === 'different'}
             />
@@ -203,6 +204,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             name="chaser_exit_color_other"
             value={finalsInfo.chaser_exit_color_other || ''}
             onChange={(e) => onChange({ chaser_exit_color_other: e.target.value })}
+            placeholder="具体的な色の指定など"
             disabled={lightingChangeOption === 'same'}
             required={lightingChangeOption === 'different'}
           />

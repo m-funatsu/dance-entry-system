@@ -607,9 +607,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('program_info_deadline') ? (
-                    <Link href="/dashboard/program-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/program-info">
                       {entry && entry.program_info_submitted ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -659,9 +659,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('consent_form_deadline') ? (
-                    <Link href="/dashboard/consent-form" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/consent-form">
                       {entry && entry.consent_form_submitted ? '確認' : '提出'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -891,9 +891,9 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">基本情報</h3>
                     {isFormEditable('basic_info_deadline') ? (
-                      <Link href="/dashboard/basic-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <EditButton href="/dashboard/basic-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
-                      </Link>
+                      </EditButton>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">
                         期限切れ
@@ -960,9 +960,9 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">予選情報</h3>
                     {isFormEditable('music_info_deadline') ? (
-                      <Link href="/dashboard/preliminary" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <EditButton href="/dashboard/preliminary" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
-                      </Link>
+                      </EditButton>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">
                         期限切れ
@@ -998,9 +998,9 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">準決勝情報</h3>
                     {isFormEditable('music_info_deadline') ? (
-                      <Link href="/dashboard/semifinals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <EditButton href="/dashboard/semifinals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
-                      </Link>
+                      </EditButton>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">
                         期限切れ
@@ -1087,9 +1087,9 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">決勝情報</h3>
                     {isFormEditable('finals_deadline') ? (
-                      <Link href="/dashboard/finals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <EditButton href="/dashboard/finals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
-                      </Link>
+                      </EditButton>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">
                         期限切れ
@@ -1139,9 +1139,9 @@ export default async function DashboardPage() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">SNS情報</h3>
                     {isFormEditable('sns_deadline') ? (
-                      <Link href="/dashboard/sns" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                      <EditButton href="/dashboard/sns" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
-                      </Link>
+                      </EditButton>
                     ) : (
                       <span className="text-sm font-medium text-gray-400">
                         期限切れ
