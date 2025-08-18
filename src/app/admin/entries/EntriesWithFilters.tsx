@@ -13,6 +13,7 @@ interface EntryWithDetails {
   participant_names: string
   emergency_contact?: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
+  basic_info_status?: string
   created_at: string
   updated_at: string
   users: {
@@ -59,7 +60,8 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   // 特定のフォームが提出済みかチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
     switch(formType) {
-      case 'basic': return entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
+      case 'basic': return entry.basic_info_status === '登録済み' || 
+        (entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info))
       case 'preliminary': return entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
       case 'program': return entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
       case 'semifinals': return entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0

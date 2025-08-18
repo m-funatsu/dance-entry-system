@@ -49,6 +49,7 @@ export default async function AdminEntriesPage() {
         user_id,
         participant_names,
         status,
+        basic_info_status,
         created_at,
         updated_at,
         entry_files(id, file_type),

@@ -11,6 +11,7 @@ interface EntryWithDetails {
   dance_style: string
   participant_names: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
+  basic_info_status?: string
   created_at: string
   updated_at: string
   users: {
@@ -90,8 +91,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // 基本情報の判定ロジック
-    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
+    // 基本情報の判定ロジック（basic_info_statusを優先）
+    const hasBasicInfo = entry.basic_info_status === '登録済み' || 
+      (entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info))
     const hasPreliminaryInfo = entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
     const hasProgramInfo = entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
     const hasSemifinalsInfo = entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
@@ -102,6 +104,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
     // デバッグログ（問題解決後は削除）
     console.log(`Entry ${entry.id} 提出状況:`, {
       basic: hasBasicInfo,
+      basicInfoStatus: entry.basic_info_status,
       preliminary: hasPreliminaryInfo,
       program: hasProgramInfo,
       semifinals: hasSemifinalsInfo,
@@ -110,6 +113,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
       sns: hasSnsInfo,
       rawData: {
         basic_info: entry.basic_info,
+        basic_info_status: entry.basic_info_status,
         preliminary_info: entry.preliminary_info,
         program_info: entry.program_info,
         semifinals_info: entry.semifinals_info,
