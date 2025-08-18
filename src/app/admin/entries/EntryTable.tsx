@@ -10,9 +10,7 @@ interface EntryWithDetails {
   user_id: string
   dance_style: string
   participant_names: string
-  phone_number?: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
-  basic_info_status?: string
   created_at: string
   updated_at: string
   users: {
@@ -92,9 +90,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // basic_info_statusフィールドがある場合はそれを優先、なければ従来の判定ロジック
-    const hasBasicInfo = entry.basic_info_status === '登録済み' || 
-      (entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info))
+    // 基本情報の判定ロジック
+    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
     const hasPreliminaryInfo = entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
     const hasProgramInfo = entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
     const hasSemifinalsInfo = entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
