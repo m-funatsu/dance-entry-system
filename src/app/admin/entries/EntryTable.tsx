@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { formatDateLocale } from '@/lib/utils'
 import EmailComposer from '@/components/EmailComposer'
 
 interface EntryWithDetails {
@@ -461,9 +460,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
                     <div className="text-sm text-gray-900 mt-1">
                       {entry.participant_names || 'エントリー名なし'}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {formatDateLocale(entry.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

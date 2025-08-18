@@ -194,10 +194,6 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                     <dd className="mt-1 text-sm text-gray-900">{entry.users?.email || 'メールアドレス不明'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">ダンスジャンル</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{entry.dance_style}</dd>
-                  </div>
-                  <div>
                     <dt className="text-sm font-medium text-gray-500">チーム名</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {entry.team_name || '個人参加'}
@@ -307,7 +303,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.category_division || '-'}</dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">ダンススタイル</dt>
+                      <dt className="text-sm font-medium text-gray-500">ダンスジャンル</dt>
                       <dd className="mt-1 text-sm text-gray-900">{basicInfo.dance_style || '-'}</dd>
                     </div>
                     {basicInfo.choreographer && (
