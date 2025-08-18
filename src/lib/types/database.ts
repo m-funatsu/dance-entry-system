@@ -58,6 +58,7 @@ export interface Entry {
   program_music_info?: string
   program_choreographer_info?: string
   program_special_notes?: string
+  basic_info_status?: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   created_at: string
   updated_at: string
