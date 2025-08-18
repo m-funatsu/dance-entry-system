@@ -28,7 +28,7 @@ export const useFormSave = ({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const save = async <T extends BaseFormData>(data: T, isTemporary = false) => {
+  const save = async <T extends BaseFormData>(data: T) => {
     setSaving(true)
     setError(null)
     setSuccess(null)
@@ -85,17 +85,18 @@ export const useFormSave = ({
         }
       }
 
-      const successMessage = isTemporary ? 'データを一時保存しました' : 'データを保存しました'
+      const successMessage = 'データを保存しました'
       setSuccess(successMessage)
       
       if (onSuccess) {
         onSuccess(successMessage)
       }
 
-      if (!isTemporary && redirectPath) {
-        router.push(redirectPath)
-      } else {
-        // router.refresh()を削除して再レンダリングを防ぐ
+      // 常にダッシュボードにリダイレクト
+      if (redirectPath) {
+        setTimeout(() => {
+          router.push(redirectPath)
+        }, 1500)
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'データの保存に失敗しました'

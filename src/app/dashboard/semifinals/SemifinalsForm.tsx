@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { Alert, TabNavigation, TemporarySaveButton, SaveButton, CancelButton } from '@/components/ui'
+import { Alert, TabNavigation, SaveButton, CancelButton } from '@/components/ui'
 import { useFormSave } from '@/hooks'
 import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection } from '@/components/semifinals'
 import { 
   validateSemifinalsSection, 
-  validateAllSemifinalsSection, 
-  isSemifinalsAllRequiredFieldsValid,
   semifinalsSections 
 } from '@/utils/semifinalsValidation'
 import type { Entry, SemifinalsInfo, PreliminaryInfo, EntryFile } from '@/lib/types'
@@ -523,26 +521,15 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     if (!entry?.id) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
       return
     }
 
-    // 必須項目チェック（一時保存時はスキップ）
-    if (!isTemporary) {
-      const allErrors = validateAllSemifinalsSection(semifinalsInfo)
-      if (Object.keys(allErrors).length > 0) {
-        setValidationErrors(allErrors)
-        const firstErrorSection = Object.keys(allErrors)[0]
-        setActiveSection(firstErrorSection)
-        showToast('必須項目を入力してください', 'error')
-        return
-      }
-    }
-
-    // 50文字制限のチェック
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
+    // 50文字制限のチェックのみ実施
     if (semifinalsInfo.work_character_story && semifinalsInfo.work_character_story.length > 50) {
       showToast('作品キャラクター・ストーリー等は50文字以内で入力してください', 'error')
       return
@@ -553,9 +540,14 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       entry_id: entry.id
     }
 
-    await save(dataToSave, isTemporary)
-    // save関数が例外をスローしなければ成功とみなす
-    // 保存成功時はエラーをクリア
+    await save(dataToSave) // 保存
+    
+    // 保存成功後にダッシュボードにリダイレクト
+    showToast('準決勝情報を保存しました', 'success')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
+    
     setValidationErrors({})
   }
 
@@ -647,14 +639,9 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       <div className="flex justify-between pt-6">
         <CancelButton onClick={() => router.push('/dashboard')} />
         <div className="space-x-4">
-          <TemporarySaveButton
-            onClick={() => handleSave(true)}
-            disabled={saving || !entry}
-            loading={saving}
-          />
           <SaveButton
-            onClick={() => handleSave(false)}
-            disabled={saving || !entry || !isSemifinalsAllRequiredFieldsValid(semifinalsInfo)}
+            onClick={handleSave}
+            disabled={saving || !entry}
             loading={saving}
           />
         </div>

@@ -554,7 +554,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       entry_id: entry.id
     }
 
-    await save(dataToSave, isTemporary)
+    await save(dataToSave)
     // save関数が例外をスローしなければ成功とみなす
     // 保存成功時はエラーをクリア
     setValidationErrors({})

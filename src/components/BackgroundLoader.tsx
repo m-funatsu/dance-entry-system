@@ -9,6 +9,8 @@ interface BackgroundLoaderProps {
 
 export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
   useEffect(() => {
+    let isMounted = true
+    
     const loadBackgroundImage = async () => {
       try {
         const settingKey = `${pageType}_background_image`
@@ -18,7 +20,17 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
         
         // APIエンドポイント経由で背景画像を取得（RLS制限を回避）
         const response = await fetch(`/api/admin/background/${pageType}`)
+        
+        if (!isMounted) return
+        
+        if (!response.ok) {
+          console.log(`背景画像API エラー: ${response.status} ${response.statusText}`)
+          return
+        }
+        
         const result = await response.json()
+        
+        if (!isMounted) return
         
         console.log(`背景画像API結果:`, { result, settingKey })
         
@@ -40,6 +52,8 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
           })
         }
       } catch (error) {
+        if (!isMounted) return
+        
         console.error(`${pageType}背景画像の読み込みエラー:`, error)
         
         logger.warn(`${pageType}背景画像の読み込みに失敗`, {
@@ -50,6 +64,10 @@ export default function BackgroundLoader({ pageType }: BackgroundLoaderProps) {
     }
 
     loadBackgroundImage()
+    
+    return () => {
+      isMounted = false
+    }
   }, [pageType])
 
   return null // このコンポーネントは何も描画しない

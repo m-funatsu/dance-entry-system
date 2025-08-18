@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, TemporarySaveButton, SaveButton, CancelButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
@@ -57,7 +57,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     choreographer1_furigana: { required: true }
   }
 
-  const { errors, validateAll, isAllRequiredFieldsValid, validateSingleField } = useFormValidation(formData, validationRules)
+  const { errors, validateSingleField } = useFormValidation(formData, validationRules)
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -213,23 +213,14 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     if (!entryId) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
       return
     }
 
-    // 完了登録の場合は動画が必須
-    if (!isTemporary && !videoFile) {
-      showToast('予選動画をアップロードしてください', 'error')
-      return
-    }
-
-    // バリデーション
-    if (!isTemporary && !validateAll(formData)) {
-      return
-    }
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
 
     const dataToSave = {
       entry_id: entryId,
@@ -247,24 +238,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     })
     console.log('========================')
 
-    const savedData = await save(dataToSave, isTemporary)
+    await save(dataToSave) // 保存
     
-    // 完了登録の場合は、ステータスを更新
-    if (!isTemporary && savedData) {
-      try {
-        const { error: entryError } = await supabase
-          .from('entries')
-          .update({ 
-            status: 'submitted',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', entryId)
-
-        if (entryError) throw entryError
-      } catch (error) {
-        console.error('Error updating entry status:', error)
-      }
-    }
+    // 保存成功後にダッシュボードにリダイレクト
+    showToast('予選情報を保存しました', 'success')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   return (
@@ -613,14 +593,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       <div className="flex justify-between pt-6">
         <CancelButton onClick={() => router.push('/dashboard')} />
         <div className="space-x-4">
-          <TemporarySaveButton
-            onClick={() => handleSave(true)}
-            disabled={saving || uploading}
-            loading={saving}
-          />
           <SaveButton
-            onClick={() => handleSave(false)}
-            disabled={saving || uploading || !isAllRequiredFieldsValid(formData) || !videoFile}
+            onClick={handleSave}
+            disabled={saving || uploading}
             loading={saving}
           />
         </div>

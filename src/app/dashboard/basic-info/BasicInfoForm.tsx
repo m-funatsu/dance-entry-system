@@ -254,8 +254,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     return baseRules
   }
 
-  // カスタムバリデーション関数
-  const validateAllWithDynamicRules = () => {
+  /*
+  // フォーム完成度チェック関数（ステータス表示用・将来使用予定）
+  const _checkFormCompletionStatus = () => {
     const currentRules = getValidationRules()
     let hasErrors = false
     const fieldErrors: Record<string, string> = {}
@@ -284,25 +285,15 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     
     return !hasErrors
   }
+  */
 
   const handleCheckboxChange = (field: 'agreement_checked' | 'media_consent_checked' | 'privacy_policy_checked', value: boolean) => {
     setCheckboxes(prev => ({ ...prev, [field]: value }))
     handleFieldChange(field, value)
   }
 
-  const handleSubmit = async (isTemporary = false) => {
-    // 完了保存の場合は全体バリデーション
-    if (!isTemporary) {
-      if (!validateAllWithDynamicRules()) {
-        showToast('入力内容に誤りがあります', 'error')
-        return
-      }
-
-      if (!checkboxes.agreement_checked || !checkboxes.media_consent_checked || !checkboxes.privacy_policy_checked) {
-        showToast('すべての同意事項にチェックしてください', 'error')
-        return
-      }
-    }
+  const handleSubmit = async () => {
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
 
     try {
       let currentEntryId = entryId
@@ -352,12 +343,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       console.log('===================')
 
       // フォームデータを保存
-      await saveForm(isTemporary)
+      await saveForm(true)
 
-      // 必須項目がすべて入力されている場合のログ出力
-      if (!isTemporary && validateAllWithDynamicRules() && checkboxes.agreement_checked && checkboxes.media_consent_checked && checkboxes.privacy_policy_checked) {
-        console.log('基本情報の必須項目がすべて入力されました')
-      }
+      // 保存成功後にダッシュボードにリダイレクト
+      showToast('基本情報を保存しました', 'success')
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
 
     } catch (error) {
       console.error('保存エラーの詳細:', error)
@@ -405,12 +397,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     }
   }
 
-  // 必須項目のチェック（同意事項を含む）
-  const isFormValid = () => {
-    const hasAllRequired = validateAllWithDynamicRules()
-    const result = hasAllRequired && checkboxes.agreement_checked && checkboxes.media_consent_checked && checkboxes.privacy_policy_checked
-    return result
-  }
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
@@ -867,16 +853,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           </Button>
           <Button
             type="button"
-            variant="secondary"
-            onClick={() => handleSubmit(true)}
+            onClick={handleSubmit}
             disabled={saving}
-          >
-            一時保存
-          </Button>
-          <Button
-            type="button"
-            onClick={() => handleSubmit(false)}
-            disabled={saving || !isFormValid()}
           >
             {saving ? '保存中...' : '保存'}
           </Button>
