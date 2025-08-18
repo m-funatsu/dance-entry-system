@@ -6,6 +6,9 @@ import MessageAlert from '@/components/MessageAlert'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
+// Dynamic renderingを強制（cookiesやauth使用のため）
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   try {
     const supabase = await createClient()
@@ -498,12 +501,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('basic_info_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/basic-info'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {basicInfo ? '編集' : '登録'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -553,12 +553,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/preliminary'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/preliminary" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {preliminaryInfo ? '編集' : '登録'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -712,12 +709,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/semifinals'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/semifinals" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {semifinalsInfo ? '編集' : '登録'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -767,12 +761,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('finals_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/finals'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {finalsInfo ? '編集' : '登録'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -822,12 +813,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('sns_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/sns'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/sns" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -878,12 +866,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('optional_request_deadline') ? (
-                    <button 
-                      onClick={() => window.location.href = '/dashboard/applications'}
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Link href="/dashboard/applications" className="font-medium text-indigo-600 hover:text-indigo-500">
                       {checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請'} →
-                    </button>
+                    </Link>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -1221,12 +1206,12 @@ export default async function DashboardPage() {
               {error instanceof Error ? error.message : 'Unknown error'}
             </p>
           </div>
-          <button 
-            onClick={() => window.location.href = '/auth/login'}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          <Link 
+            href="/auth/login"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 inline-block text-center"
           >
             ログインページに戻る
-          </button>
+          </Link>
         </div>
       </div>
     )
