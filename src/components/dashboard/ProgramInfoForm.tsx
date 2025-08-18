@@ -304,8 +304,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
     await save(dataToSave)
 
-    // 保存成功メッセージを表示
+    // 保存成功後にダッシュボードにリダイレクト
     setSuccess('プログラム情報を保存しました')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   if (loading) {

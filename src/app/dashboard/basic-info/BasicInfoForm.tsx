@@ -345,8 +345,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       // フォームデータを保存
       await saveForm(true)
 
-      // 保存成功メッセージを表示
+      // 保存成功後にダッシュボードにリダイレクト
       showToast('基本情報を保存しました', 'success')
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
 
     } catch (error) {
       console.error('保存エラーの詳細:', error)

@@ -248,8 +248,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
     await save(dataToSave) // 保存
     
-    // 保存成功メッセージを表示
+    // 保存成功後にダッシュボードにリダイレクト
     showToast('予選情報を保存しました', 'success')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   return (
