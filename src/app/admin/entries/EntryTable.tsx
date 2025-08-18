@@ -420,6 +420,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 エントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ダンスジャンル
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 代表者メールアドレス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -460,6 +463,20 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
                     <div className="text-sm text-gray-900 mt-1">
                       {entry.participant_names || 'エントリー名なし'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {(() => {
+                        if (entry.basic_info) {
+                          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+                            return entry.basic_info[0]?.dance_style || entry.dance_style || '未入力'
+                          } else if (!Array.isArray(entry.basic_info)) {
+                            return entry.basic_info.dance_style || entry.dance_style || '未入力'
+                          }
+                        }
+                        return entry.dance_style || '未入力'
+                      })()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
