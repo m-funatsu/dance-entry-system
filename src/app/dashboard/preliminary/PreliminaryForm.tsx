@@ -170,6 +170,14 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
+    // ファイルアップロード前に現在の入力データを一時保存
+    try {
+      await save({ ...formData, entry_id: entryId })
+      console.log('[PRELIMINARY UPLOAD] 一時保存完了')
+    } catch (tempSaveError) {
+      console.log('[PRELIMINARY UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
+    }
+
     await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
   }
 

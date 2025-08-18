@@ -50,41 +50,25 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           チェイサー（退場）曲の指定 <span className="text-red-500">*</span>
         </label>
-        <div className="space-y-2">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="chaser_designation"
-              value="included"
-              checked={semifinalsInfo.chaser_song_designation === 'included'}
-              onChange={() => onChange({ chaser_song_designation: 'included', chaser_song: '' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            自作曲に組み込み
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="chaser_designation"
-              value="required"
-              checked={semifinalsInfo.chaser_song_designation === 'required'}
-              onChange={() => onChange({ chaser_song_designation: 'required' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            必要
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="chaser_designation"
-              value="not_required"
-              checked={semifinalsInfo.chaser_song_designation === 'not_required'}
-              onChange={() => onChange({ chaser_song_designation: 'not_required', chaser_song: '' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            不要（無音）
-          </label>
-        </div>
+        <select
+          value={semifinalsInfo.chaser_song_designation || ''}
+          onChange={(e) => {
+            if (e.target.value === 'included') {
+              onChange({ chaser_song_designation: 'included', chaser_song: '' })
+            } else if (e.target.value === 'required') {
+              onChange({ chaser_song_designation: 'required' })
+            } else if (e.target.value === 'not_required') {
+              onChange({ chaser_song_designation: 'not_required', chaser_song: '' })
+            }
+          }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          required
+        >
+          <option value="">選択してください</option>
+          <option value="included">自作曲に組み込み</option>
+          <option value="required">必要</option>
+          <option value="not_required">不要（無音）</option>
+        </select>
       </div>
 
       {semifinalsInfo.chaser_song_designation === 'required' && (

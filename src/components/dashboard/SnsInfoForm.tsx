@@ -55,6 +55,27 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     setSuccess(null)
 
     try {
+      // ファイルアップロード前に現在の入力データを一時保存
+      try {
+        const tempSaveData = { ...snsInfo, entry_id: entry.id }
+        
+        // 既存データがあるかチェック
+        const { data: existingData } = await supabase
+          .from('sns_info')
+          .select('id')
+          .eq('entry_id', entry.id)
+          .maybeSingle()
+
+        if (existingData) {
+          await supabase.from('sns_info').update(tempSaveData).eq('entry_id', entry.id)
+        } else {
+          await supabase.from('sns_info').insert(tempSaveData)
+        }
+        console.log('[SNS UPLOAD] 一時保存完了')
+      } catch (tempSaveError) {
+        console.log('[SNS UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
+      }
+
       // ファイルサイズチェック（50MBまで）
       const maxSize = 50 * 1024 * 1024
       if (file.size > maxSize) {
@@ -100,6 +121,27 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     setSuccess(null)
 
     try {
+      // ファイルアップロード前に現在の入力データを一時保存
+      try {
+        const tempSaveData = { ...snsInfo, entry_id: entry.id }
+        
+        // 既存データがあるかチェック
+        const { data: existingData } = await supabase
+          .from('sns_info')
+          .select('id')
+          .eq('entry_id', entry.id)
+          .maybeSingle()
+
+        if (existingData) {
+          await supabase.from('sns_info').update(tempSaveData).eq('entry_id', entry.id)
+        } else {
+          await supabase.from('sns_info').insert(tempSaveData)
+        }
+        console.log('[SNS UPLOAD] 一時保存完了')
+      } catch (tempSaveError) {
+        console.log('[SNS UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
+      }
+
       // ファイルサイズチェック（50MBまで）
       const maxSize = 50 * 1024 * 1024
       if (file.size > maxSize) {

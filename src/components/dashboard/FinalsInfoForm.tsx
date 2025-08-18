@@ -342,6 +342,15 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     try {
       console.log('[UPLOAD] Starting upload for field:', field)
       
+      // ファイルアップロード前に現在の入力データを一時保存
+      try {
+        const tempSaveData = { ...finalsInfo, entry_id: entry.id }
+        await save(tempSaveData)
+        console.log('[FINALS UPLOAD] 一時保存完了')
+      } catch (tempSaveError) {
+        console.log('[FINALS UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
+      }
+      
       // 既存のファイルがある場合は先に削除
       if (finalsInfo[field as keyof FinalsInfo]) {
         await handleFileDelete(field)
