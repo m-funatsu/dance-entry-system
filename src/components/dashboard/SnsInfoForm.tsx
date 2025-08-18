@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, SnsInfo } from '@/lib/types'
 
@@ -10,7 +9,6 @@ interface SnsInfoFormProps {
 }
 
 export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -22,13 +20,6 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     entry_id: entry.id,
     sns_notes: ''
   })
-
-  // 必須項目が全て入力されているかチェック
-  const isAllRequiredFieldsValid = () => {
-    if (!snsInfo.practice_video_path) return false
-    if (!snsInfo.introduction_highlight_path) return false
-    return true
-  }
 
   useEffect(() => {
     loadSnsInfo()

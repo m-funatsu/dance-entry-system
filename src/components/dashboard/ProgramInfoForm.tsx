@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FormField, TemporarySaveButton, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { Entry, ProgramInfo } from '@/lib/types'
@@ -14,7 +13,6 @@ interface ProgramInfoFormProps {
 }
 
 export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
@@ -124,7 +122,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     }
   }
 
-  const { errors, validateAll, validateSingleField, isAllRequiredFieldsValid } = useFormValidation(programInfo, validationRules)
+  const { errors, validateSingleField } = useFormValidation(programInfo, validationRules)
 
   // フォーム保存フック
   const { save, saving, error, success, setError, setSuccess } = useFormSave({

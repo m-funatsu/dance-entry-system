@@ -3,13 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Alert, TabNavigation, TemporarySaveButton, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
+import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { useFormSave } from '@/hooks'
 import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
 import { 
   validateFinalsSection, 
-  validateAllFinalsSection, 
-  isFinalsAllRequiredFieldsValid,
   finalsSections 
 } from '@/utils/finalsValidation'
 import type { Entry, FinalsInfo } from '@/lib/types'
