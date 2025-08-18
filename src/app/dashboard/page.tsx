@@ -10,28 +10,29 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!userProfile) {
+    redirect('/auth/login')
+  }
+
+  if (userProfile.role === 'admin') {
+    redirect('/admin/dashboard')
+  }
+
   try {
-    const supabase = await createClient()
-    
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      redirect('/auth/login')
-    }
-
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    if (!userProfile) {
-      redirect('/auth/login')
-    }
-
-    if (userProfile.role === 'admin') {
-      redirect('/admin/dashboard')
-    }
 
   // エントリー情報の取得（最新のエントリー）
   const { data: entries } = await supabase
