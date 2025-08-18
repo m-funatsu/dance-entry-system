@@ -64,47 +64,21 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
           <h3 className="text-lg font-medium text-gray-900 mb-4">参加同意書</h3>
           
           <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
-            <p className="font-medium">主催者への同意事項</p>
+            <div className="text-center mb-6">
+              <h4 className="font-bold text-lg">2025　バルカーカップジャパンオープンショーダンス選手権　参加同意書</h4>
+            </div>
             
-            <ol className="space-y-3 ml-6 list-decimal">
+            <ol className="space-y-4 ml-6 list-decimal">
               <li>
-                <strong>参加資格の確認</strong>
-                <p className="mt-1">私は、本大会の参加資格を満たしていることを確認し、虚偽の申告がないことを誓約します。</p>
+                私は、「2025 バルカーカップジャパンオープンショーダンス選手権」（以降、選手権）期間中に主催者が設けたすべての規約、規則、指示に従うことを同意します。
               </li>
               
               <li>
-                <strong>撮影・配信への同意</strong>
-                <p className="mt-1">大会中の演技の撮影、録画、配信、および主催者による広報活動での使用について同意します。</p>
+                選手権当日に、参加者自身の健康状態に無理がない状態で臨むことを約束します。
               </li>
               
               <li>
-                <strong>著作権・肖像権</strong>
-                <p className="mt-1">大会での演技に関する著作権および肖像権の一部を主催者に委譲することに同意します。</p>
-              </li>
-              
-              <li>
-                <strong>安全管理</strong>
-                <p className="mt-1">大会参加中の事故や怪我について、主催者の故意または重大な過失による場合を除き、主催者は責任を負わないことを了承します。</p>
-              </li>
-              
-              <li>
-                <strong>規約の遵守</strong>
-                <p className="mt-1">大会規約および主催者の指示に従うことを誓約します。違反した場合、失格となる可能性があることを了承します。</p>
-              </li>
-              
-              <li>
-                <strong>個人情報の取り扱い</strong>
-                <p className="mt-1">提供した個人情報が、大会運営および主催者の定めるプライバシーポリシーに基づいて適切に管理されることを了承します。</p>
-              </li>
-              
-              <li>
-                <strong>音楽使用許諾</strong>
-                <p className="mt-1">使用する楽曲について、必要な権利処理が完了していることを確認し、著作権侵害等の問題が発生した場合は自己責任で対処することを誓約します。</p>
-              </li>
-              
-              <li>
-                <strong>大会の変更・中止</strong>
-                <p className="mt-1">天災、感染症の流行、その他やむを得ない事情により、大会の内容変更または中止となる可能性があることを了承します。</p>
+                選手権期間中、事故・怪我・発病等が発生する可能性があることを認識しています。万が一発生した場合、その際発生した身体及び精神的な傷害ならびに医療費・その他の費用について、主催者・施設側に対し一切責任を問いません。また、他人に怪我を負わせた場合、その責任は参加者自身にあり、主催者、施設側いずれに対しても怪我等に関する費用や損害賠償等の請求をいたしません。
               </li>
             </ol>
 
