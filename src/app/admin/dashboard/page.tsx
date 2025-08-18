@@ -25,51 +25,106 @@ export default async function AdminDashboardPage() {
 
   // 管理者クライアントでデータを取得
   const adminSupabase = createAdminClient()
-  const [entriesResult, usersResult, filesResult] = await Promise.all([
-    adminSupabase.from('entries').select(`
-      *,
-      basic_info!left(id, dance_style, category_division)
-    `).order('created_at', { ascending: false }),
+  const [entriesResult, usersResult, filesResult, basicInfoResult, preliminaryInfoResult] = await Promise.all([
+    adminSupabase.from('entries').select('*').order('created_at', { ascending: false }),
     adminSupabase.from('users').select('id, name, email'),
-    adminSupabase.from('entry_files').select('id')
+    adminSupabase.from('entry_files').select('id, entry_id, file_type, purpose'),
+    adminSupabase.from('basic_info').select('*'),
+    adminSupabase.from('preliminary_info').select('*')
   ])
   
   const { data: entries } = entriesResult
-  
   const { data: allUsers } = usersResult
   const { data: allFiles } = filesResult
+  const { data: allBasicInfo } = basicInfoResult
+  const { data: allPreliminaryInfo } = preliminaryInfoResult
 
-  // 手動でユーザーデータをマッピング（安全な処理）
+  // 必須項目の判定関数
+  const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
+    if (!basicInfo) return false
+    const requiredFields = [
+      'dance_style',
+      'representative_name',
+      'representative_furigana',
+      'representative_email',
+      'partner_name',
+      'partner_furigana',
+      'phone_number',
+      'choreographer',
+      'choreographer_furigana',
+      'agreement_checked',
+      'privacy_policy_checked'
+    ]
+    return requiredFields.every(field => {
+      const value = basicInfo[field]
+      if (typeof value === 'boolean') return value === true
+      return value && value.toString().trim() !== ''
+    })
+  }
+
+  const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
+    if (!preliminaryInfo) return false
+    if (!hasVideo) return false
+    const requiredFields = [
+      'work_title',
+      'work_story',
+      'music_rights_cleared',
+      'music_title',
+      'cd_title',
+      'artist',
+      'record_number',
+      'jasrac_code',
+      'music_type'
+    ]
+    return requiredFields.every(field => {
+      const value = preliminaryInfo[field]
+      return value && value.toString().trim() !== ''
+    })
+  }
+
+  // 手動でユーザーデータと関連情報をマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
+    const basicInfo = allBasicInfo?.find(b => b.entry_id === entry.id)
+    const preliminaryInfo = allPreliminaryInfo?.find(p => p.entry_id === entry.id)
+    const entryFiles = allFiles?.filter(f => f.entry_id === entry.id) || []
+    const hasVideo = entryFiles.some(f => f.file_type === 'video' && f.purpose === 'preliminary')
+    
+    // 必須項目の完了状況を判定
+    const basicInfoComplete = checkBasicInfoComplete(basicInfo)
+    const preliminaryInfoComplete = checkPreliminaryInfoComplete(preliminaryInfo, hasVideo)
+    
+    // 提出ステータスを判定（両方の必須項目が完了していれば提出済み）
+    const isSubmitted = basicInfoComplete && preliminaryInfoComplete
+    
     return {
       ...entry,
       users: user ? { 
         name: user.name || '不明なユーザー' 
       } : { 
         name: '不明なユーザー' 
-      }
+      },
+      basic_info: basicInfo,
+      preliminary_info: preliminaryInfo,
+      entry_files: entryFiles,
+      isSubmitted
     }
   }) || []
 
   const stats = {
     total: entriesWithUsers.length,
-    pending: entriesWithUsers.filter(e => e.status === 'pending').length,
-    submitted: entriesWithUsers.filter(e => e.status === 'submitted').length,
+    pending: entriesWithUsers.filter(e => !e.isSubmitted).length,
+    submitted: entriesWithUsers.filter(e => e.isSubmitted).length,
     selected: entriesWithUsers.filter(e => e.status === 'selected').length,
     rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
   }
 
-  // ダンスジャンル別統計を計算（基本情報のdance_styleのみ使用）
+  // ダンスジャンル別統計を計算
   const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
     let genre = '未分類'
     
-    if (entry.basic_info) {
-      if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-        genre = entry.basic_info[0]?.dance_style || '未分類'
-      } else if (!Array.isArray(entry.basic_info)) {
-        genre = entry.basic_info.dance_style || '未分類'
-      }
+    if (entry.basic_info?.dance_style) {
+      genre = entry.basic_info.dance_style as string
     }
     
     acc[genre] = (acc[genre] || 0) + 1
