@@ -73,7 +73,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
       case 'selected':
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            選考通過
+            予選通過
           </span>
         )
       case 'rejected':
@@ -321,7 +321,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 disabled={loading}
                 className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
               >
-                選考通過に変更
+                予選通過に変更
               </button>
               <button
                 onClick={() => bulkUpdateStatus('rejected')}
@@ -400,9 +400,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 エントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ペアエントリー名
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 代表者メールアドレス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -435,19 +432,17 @@ export default function EntryTable({ entries }: EntryTableProps) {
                       className="rounded border-gray-300 text-xs disabled:opacity-50"
                     >
                       <option value="pending">未処理</option>
-                      <option value="selected">選考通過</option>
+                      <option value="selected">予選通過</option>
                       <option value="rejected">予選敗退</option>
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
+                    <div className="text-sm text-gray-900 mt-1">
+                      {entry.participant_names || 'エントリー名なし'}
+                    </div>
                     <div className="text-xs text-gray-400 mt-1">
                       {formatDateLocale(entry.created_at)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {entry.participant_names || 'エントリー名なし'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -460,25 +455,12 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     {getStatusBadge(entry.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="space-y-2">
-                      <Link
-                        href={`/admin/entries/${entry.id}`}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        詳細
-                      </Link>
-                      {entry.status === 'pending' && (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => sendWelcomeEmail(entry.users.email, entry.users.name)}
-                            disabled={loading}
-                            className="text-xs text-indigo-600 hover:text-indigo-900 disabled:opacity-50"
-                          >
-                            ウェルカムメール
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <Link
+                      href={`/admin/entries/${entry.id}`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      詳細
+                    </Link>
                   </td>
                 </tr>
             ))}

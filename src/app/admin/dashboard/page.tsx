@@ -59,6 +59,18 @@ export default async function AdminDashboardPage() {
     rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
   }
 
+  // ダンスジャンル別統計を計算
+  const danceStyleStats = entriesWithUsers.reduce((acc, entry) => {
+    const style = entry.dance_style || '未分類'
+    acc[style] = (acc[style] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  // ダンスジャンル統計を配列に変換してソート
+  const danceStyleArray = Object.entries(danceStyleStats)
+    .map(([style, count]) => ({ style, count: Number(count) }))
+    .sort((a, b) => b.count - a.count)
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -196,6 +208,44 @@ export default async function AdminDashboardPage() {
                     </dl>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ダンスジャンル別統計 */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">ダンスジャンル別エントリー数</h2>
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-6">
+                {danceStyleArray.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {danceStyleArray.map(({ style, count }) => (
+                      <div key={style} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900 truncate" title={style}>
+                            {style}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {count}件のエントリー
+                          </div>
+                        </div>
+                        <div className="ml-3 flex-shrink-0">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {count}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">エントリーがありません</h3>
+                    <p className="mt-1 text-sm text-gray-500">まだダンスエントリーが登録されていません。</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
