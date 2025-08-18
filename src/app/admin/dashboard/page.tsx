@@ -23,17 +23,18 @@ export default async function AdminDashboardPage() {
     redirect('/dashboard')
   }
 
-  const { data: entries } = await supabase
-    .from('entries')
-    .select('*, users(name)')
-    .order('created_at', { ascending: false })
-
-  // 管理者クライアントで全ユーザーデータとファイル数を取得
+  // 管理者クライアントでデータを取得
   const adminSupabase = createAdminClient()
-  const [usersResult, filesResult] = await Promise.all([
+  const [entriesResult, usersResult, filesResult] = await Promise.all([
+    adminSupabase.from('entries').select(`
+      *,
+      basic_info!left(id, dance_style, category_division)
+    `).order('created_at', { ascending: false }),
     adminSupabase.from('users').select('id, name, email'),
     adminSupabase.from('entry_files').select('id')
   ])
+  
+  const { data: entries } = entriesResult
   
   const { data: allUsers } = usersResult
   const { data: allFiles } = filesResult
