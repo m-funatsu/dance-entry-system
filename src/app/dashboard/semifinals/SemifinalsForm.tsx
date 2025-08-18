@@ -449,10 +449,11 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         // 削除前の最終確認：パスが正しいユーザー/エントリーのものか
         const pathToDelete = fileToDelete.file_path
         
-        // 新旧両方のパス形式をサポート
+        // 新旧両方のパス形式をサポート（finalsフォルダーも含む）
         const validPrefixes = entry?.id ? [
           `${userId}/${entry.id}/`,     // 新形式
-          `${entry.id}/semifinals/`      // 旧形式
+          `${entry.id}/semifinals/`,    // 旧形式（準決勝）
+          `${entry.id}/finals/`         // 決勝フォルダー（準決勝で削除可能）
         ] : []
         
         const isValidPath = validPrefixes.some(prefix => pathToDelete.startsWith(prefix))
