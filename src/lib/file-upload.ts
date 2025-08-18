@@ -206,7 +206,7 @@ export async function uploadFile({
       
       // ファイルサイズに応じて段階的にプログレスを更新
       const fileSize = file.size
-      const intervals = fileSize > 10 * 1024 * 1024 ? [30, 50, 70, 90] : [25, 50, 75, 95]
+      const intervals = fileSize > 50 * 1024 * 1024 ? [15, 30, 45, 60, 75, 90] : [25, 50, 75, 95]
       let currentIndex = 0
       
       const progressInterval = setInterval(() => {
@@ -214,7 +214,7 @@ export async function uploadFile({
           onProgress(intervals[currentIndex])
           currentIndex++
         }
-      }, Math.min(fileSize / (1024 * 100), 500)) // ファイルサイズに応じて間隔を調整
+      }, fileSize > 50 * 1024 * 1024 ? 1000 : 500) // 大きなファイルは1秒間隔で更新
       
       // アップロード実行
       const { data, error } = await supabase.storage
