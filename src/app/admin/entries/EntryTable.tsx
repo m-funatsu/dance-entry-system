@@ -107,7 +107,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
     const hasSnsInfo = entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
 
     // デバッグログ（問題解決後は削除）
-    console.log(`Entry ${entry.id} 提出状況詳細:`, {
+    const debugInfo = {
       judgments: {
         basic: hasBasicInfo,
         preliminary: hasPreliminaryInfo,
@@ -161,7 +161,10 @@ export default function EntryTable({ entries }: EntryTableProps) {
           data: entry.sns_info
         }
       }
-    })
+    }
+    
+    console.log(`Entry ${entry.id} 提出状況詳細:`)
+    console.log(JSON.stringify(debugInfo, null, 2))
 
     return (
       <div className="flex flex-wrap gap-1">
