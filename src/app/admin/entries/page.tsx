@@ -27,6 +27,22 @@ export default async function AdminEntriesPage() {
   const adminSupabase = createAdminClient()
   
   try {
+    console.log('管理者クライアント作成完了')
+    console.log('環境変数確認:', {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    })
+    
+    // まず簡単なクエリでテスト
+    console.log('簡単なテストクエリ開始...')
+    const testResult = await adminSupabase.from('entries').select('id').limit(1)
+    console.log('テストクエリ結果:', testResult)
+    
+    if (testResult.error) {
+      throw new Error(`テストクエリエラー: ${testResult.error.message}`)
+    }
+    
+    console.log('データベースクエリ開始...')
     const [entriesResult, allUsersResult] = await Promise.all([
       adminSupabase.from('entries').select(`
         id,
@@ -50,6 +66,7 @@ export default async function AdminEntriesPage() {
       `).order('created_at', { ascending: false }),
       adminSupabase.from('users').select('*')
     ])
+    console.log('データベースクエリ完了')
 
     const { data: entries, error: entriesError } = entriesResult
     const { data: allUsers, error: usersError } = allUsersResult
@@ -132,11 +149,24 @@ export default async function AdminEntriesPage() {
     )
   } catch (error) {
     console.error('データ取得で予期しないエラー:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace available'
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-2xl mx-auto p-6">
           <h1 className="text-2xl font-bold text-red-600 mb-4">エラーが発生しました</h1>
           <p className="text-gray-600 mb-4">データの取得に失敗しました。</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-left">
+            <h3 className="text-sm font-semibold text-red-800 mb-2">エラー詳細:</h3>
+            <p className="text-sm text-red-700 mb-2">{errorMessage}</p>
+            {process.env.NODE_ENV === 'development' && (
+              <details className="text-xs text-red-600">
+                <summary className="cursor-pointer">スタックトレース</summary>
+                <pre className="mt-2 whitespace-pre-wrap">{errorStack}</pre>
+              </details>
+            )}
+          </div>
           <Link href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
             ← 管理ダッシュボードに戻る
           </Link>
