@@ -13,25 +13,34 @@ export default function FaviconLoader() {
             // 既存のfaviconリンクを安全に削除
             const existingLinks = document.querySelectorAll('link[rel*="icon"]')
             existingLinks.forEach(link => {
-              if (link.parentNode) {
-                link.parentNode.removeChild(link)
+              try {
+                if (link && link.parentNode && document.head.contains(link)) {
+                  link.parentNode.removeChild(link)
+                }
+              } catch (e) {
+                // DOM操作エラーを無視
+                console.log('ファビコン削除をスキップ:', e)
               }
             })
 
             // 新しいfaviconリンクを追加
-            const link = document.createElement('link')
-            link.rel = 'icon'
-            link.href = data.favicon_url
-            if (document.head) {
-              document.head.appendChild(link)
-            }
+            try {
+              const link = document.createElement('link')
+              link.rel = 'icon'
+              link.href = data.favicon_url
+              if (document.head && !document.head.querySelector(`link[rel="icon"][href="${data.favicon_url}"]`)) {
+                document.head.appendChild(link)
+              }
 
-            // shortcut iconも追加
-            const shortcutLink = document.createElement('link')
-            shortcutLink.rel = 'shortcut icon'
-            shortcutLink.href = data.favicon_url
-            if (document.head) {
-              document.head.appendChild(shortcutLink)
+              // shortcut iconも追加
+              const shortcutLink = document.createElement('link')
+              shortcutLink.rel = 'shortcut icon'
+              shortcutLink.href = data.favicon_url
+              if (document.head && !document.head.querySelector(`link[rel="shortcut icon"][href="${data.favicon_url}"]`)) {
+                document.head.appendChild(shortcutLink)
+              }
+            } catch (e) {
+              console.log('ファビコン追加をスキップ:', e)
             }
           }
         }
