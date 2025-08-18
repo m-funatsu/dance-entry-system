@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { FormField, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
@@ -15,7 +14,6 @@ interface ProgramInfoFormProps {
 }
 
 export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({

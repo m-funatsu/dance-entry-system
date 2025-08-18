@@ -398,13 +398,20 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             <FileUploadField
               label="予選提出動画"
               value={null}
-              onChange={() => {}} // 空の関数（自動アップロードを使用）
-              onUploadComplete={(url) => {
+              onChange={(file) => {
+                console.log('[PRELIMINARY] File selected:', file.name)
+              }}
+              onUploadComplete={async (url) => {
                 console.log('[PRELIMINARY] Upload completed with URL:', url)
                 // ページをリロードしてファイル情報を更新
                 window.location.reload()
               }}
-              uploadPath={(fileName) => `${userId}/${entryId}/preliminary/${fileName}`}
+              uploadPath={(fileName) => {
+                // ファイル名をサニタイズ（日本語を英数字に変換）
+                const fileExt = fileName.split('.').pop()
+                const timestamp = Date.now()
+                return `${userId}/${entryId}/preliminary/video_${timestamp}.${fileExt}`
+              }}
               category="video"
               disabled={uploading || !!videoFile || !entryId}
               required
