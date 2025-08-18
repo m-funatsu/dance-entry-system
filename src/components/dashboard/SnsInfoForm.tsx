@@ -219,9 +219,6 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
       }
 
       setSuccess('SNS掲載情報を保存しました')
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 1500)
     } catch (err) {
       console.error('保存エラー:', err)
       setError(err instanceof Error ? err.message : 'SNS掲載情報の保存に失敗しました')
