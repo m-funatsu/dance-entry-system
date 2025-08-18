@@ -40,16 +40,52 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (existingUser) {
-      // 既存ユーザーの場合はパスワードリセットメールを送信
-      const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?welcome=true&name=${encodeURIComponent(name || '')}`
-        }
-      )
+      // 既存ユーザーの場合もサインアップ確認メールを送信するため、
+      // メール確認状態をリセットしてからresendを使用
+      try {
+        // ユーザーのメール確認状態をリセット
+        const { error: updateError } = await adminSupabase.auth.admin.updateUserById(
+          existingUser.id,
+          { email_confirm: false }
+        )
 
-      if (resetError) {
-        console.error('Welcome email error:', resetError)
+        if (updateError) {
+          console.error('User update error:', updateError)
+          // エラーが発生してもパスワードリセットメールにフォールバック
+          const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?welcome=true&name=${encodeURIComponent(name || '')}`
+            }
+          )
+
+          if (resetError) {
+            console.error('Welcome email error:', resetError)
+            return NextResponse.json(
+              { error: 'ウェルカムメールの送信に失敗しました' },
+              { status: 500 }
+            )
+          }
+        } else {
+          // メール確認状態をリセット後、サインアップ確認メールを送信
+          const { error: resendError } = await adminSupabase.auth.resend({
+            type: 'signup',
+            email: email,
+            options: {
+              emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?welcome=true&name=${encodeURIComponent(name || '')}`
+            }
+          })
+
+          if (resendError) {
+            console.error('Signup confirmation email error:', resendError)
+            return NextResponse.json(
+              { error: 'ウェルカム確認メールの送信に失敗しました' },
+              { status: 500 }
+            )
+          }
+        }
+      } catch (error) {
+        console.error('Error processing existing user:', error)
         return NextResponse.json(
           { error: 'ウェルカムメールの送信に失敗しました' },
           { status: 500 }
