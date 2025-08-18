@@ -15,7 +15,6 @@ export default function NotificationTemplateManager() {
     description: '',
     subject: '',
     body: '',
-    category: 'general' as 'entry' | 'selection' | 'reminder' | 'general',
     is_active: true,
   })
 
@@ -77,7 +76,6 @@ export default function NotificationTemplateManager() {
       description: template.description || '',
       subject: template.subject,
       body: template.body,
-      category: template.category,
       is_active: template.is_active,
     })
     setIsCreating(true)
@@ -107,7 +105,6 @@ export default function NotificationTemplateManager() {
       description: '',
       subject: '',
       body: '',
-      category: 'general',
       is_active: true,
     })
     setEditingTemplate(null)
@@ -122,15 +119,6 @@ export default function NotificationTemplateManager() {
     }))
   }
 
-  const getCategoryLabel = (category: string) => {
-    const labels = {
-      'entry': 'エントリー',
-      'selection': '選考結果',
-      'reminder': 'リマインダー',
-      'general': '一般'
-    }
-    return labels[category as keyof typeof labels] || category
-  }
 
   if (loading) {
     return (
@@ -167,41 +155,20 @@ export default function NotificationTemplateManager() {
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  テンプレート名 *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="選考結果通知（合格）"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                  カテゴリ *
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="general">一般</option>
-                  <option value="entry">エントリー</option>
-                  <option value="selection">選考結果</option>
-                  <option value="reminder">リマインダー</option>
-                </select>
-              </div>
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                テンプレート名 *
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                placeholder="選考結果通知（合格）"
+              />
             </div>
 
             <div>
@@ -231,20 +198,14 @@ export default function NotificationTemplateManager() {
                 value={formData.subject}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="【{competition_name}】選考結果のお知らせ"
+                placeholder="【バルカーカップ】選考結果のお知らせ"
               />
               <div className="mt-2 p-3 bg-gray-50 rounded-md">
                 <p className="text-sm font-medium text-gray-700 mb-2">利用可能な変数：</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{representative_name}'}</code> - 代表者名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{partner_name}'}</code> - パートナ名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{name}'}</code> - 参加者名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{email}'}</code> - メールアドレス</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{dance_style}'}</code> - ダンススタイル</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{participant_names}'}</code> - 参加者名一覧</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{status}'}</code> - ステータス</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{competition_name}'}</code> - コンペティション名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{organization_name}'}</code> - 主催者名</div>
+                <div className="grid grid-cols-1 gap-2 text-xs text-gray-600">
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{representative_name}}'}</code> - 代表者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{partner_name}}'}</code> - ペア名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{dance_style}}'}</code> - ダンススタイル</div>
                 </div>
               </div>
             </div>
@@ -261,20 +222,14 @@ export default function NotificationTemplateManager() {
                 value={formData.body}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="{representative_name}様..."
+                placeholder="{{representative_name}}様..."
               />
               <div className="mt-2 p-3 bg-gray-50 rounded-md">
                 <p className="text-sm font-medium text-gray-700 mb-2">利用可能な変数：</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-600">
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{representative_name}'}</code> - 代表者名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{partner_name}'}</code> - パートナ名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{name}'}</code> - 参加者名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{email}'}</code> - メールアドレス</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{dance_style}'}</code> - ダンススタイル</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{participant_names}'}</code> - 参加者名一覧</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{status}'}</code> - ステータス</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{competition_name}'}</code> - コンペティション名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{organization_name}'}</code> - 主催者名</div>
+                <div className="grid grid-cols-1 gap-2 text-xs text-gray-600">
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{representative_name}}'}</code> - 代表者名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{partner_name}}'}</code> - ペア名</div>
+                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{dance_style}}'}</code> - ダンススタイル</div>
                 </div>
               </div>
             </div>
@@ -321,9 +276,6 @@ export default function NotificationTemplateManager() {
                 テンプレート名
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                カテゴリ
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 件名
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -344,11 +296,6 @@ export default function NotificationTemplateManager() {
                       <div className="text-sm text-gray-500">{template.description}</div>
                     )}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {getCategoryLabel(template.category)}
-                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {template.subject}

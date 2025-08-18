@@ -264,7 +264,7 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
                   {/* データベースからのテンプレート */}
                   {templates.map(template => (
                     <option key={template.id} value={template.id}>
-                      {template.name} ({template.category})
+                      {template.name}
                     </option>
                   ))}
                   {/* デフォルトテンプレート */}

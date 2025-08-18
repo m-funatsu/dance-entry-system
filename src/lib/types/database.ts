@@ -142,7 +142,6 @@ export interface NotificationTemplate {
   description?: string
   subject: string
   body: string
-  category: 'entry' | 'selection' | 'reminder' | 'general'
   is_active: boolean
   created_by?: string
   created_at: string

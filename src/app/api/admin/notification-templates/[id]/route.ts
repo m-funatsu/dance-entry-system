@@ -36,9 +36,9 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     
-    const { name, description, subject, body: templateBody, category, is_active } = body
+    const { name, description, subject, body: templateBody, is_active } = body
     
-    if (!name || !subject || !templateBody || !category) {
+    if (!name || !subject || !templateBody) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
     
@@ -49,7 +49,6 @@ export async function PUT(
         description,
         subject,
         body: templateBody,
-        category,
         is_active,
       })
       .eq('id', id)

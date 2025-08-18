@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
     const body = await request.json()
     
-    const { name, description, subject, body: templateBody, category, is_active } = body
+    const { name, description, subject, body: templateBody, is_active } = body
     
-    if (!name || !subject || !templateBody || !category) {
+    if (!name || !subject || !templateBody) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
     
@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
           description,
           subject,
           body: templateBody,
-          category,
           is_active: is_active ?? true,
         }
       ])
