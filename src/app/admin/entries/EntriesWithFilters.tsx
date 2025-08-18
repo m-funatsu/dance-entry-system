@@ -63,24 +63,16 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const [formFilter, setFormFilter] = useState<string>('')
 
 
-  // 特定のフォームが提出済みかチェック（ステータスフィールドを優先、フォールバック付き）
+  // 特定のフォームが提出済みかチェック（従来の方式、将来的にステータスフィールド対応予定）
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
-    const entryWithStatus = entry as EntryWithDetails & Record<string, unknown>
     switch(formType) {
-      case 'basic': return entryWithStatus.basic_info_status === '登録済み' || 
-        (entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info))
-      case 'preliminary': return entryWithStatus.preliminary_info_status === '登録済み' || 
-        (entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0)
-      case 'program': return entryWithStatus.program_info_status === '登録済み' || 
-        (entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0)
-      case 'semifinals': return entryWithStatus.semifinals_info_status === '登録済み' || 
-        (entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0)
-      case 'finals': return entryWithStatus.finals_info_status === '登録済み' || 
-        (entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0)
-      case 'applications': return entryWithStatus.applications_info_status === '登録済み' || 
-        (entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0)
-      case 'sns': return entryWithStatus.sns_info_status === '登録済み' || 
-        (entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0)
+      case 'basic': return entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
+      case 'preliminary': return entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
+      case 'program': return entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
+      case 'semifinals': return entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
+      case 'finals': return entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0
+      case 'applications': return entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0
+      case 'sns': return entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
       default: return true
     }
   }
