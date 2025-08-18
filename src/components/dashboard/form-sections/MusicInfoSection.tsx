@@ -99,11 +99,11 @@ export const MusicInfoSection: React.FC<MusicInfoSectionProps> = ({
             onUploadComplete={onFileUploaded ? (url) => onFileUploaded('video', url) : undefined}
             category="video"
             disabled={!entryId || uploadedFiles.video >= 1}
-            maxSizeMB={500}
+            maxSizeMB={250}
             accept="video/*"
             uploadPath={entryId ? (fileName) => `${entryId}/video/${fileName}` : undefined}
             placeholder={{
-              formats: "※ 動画ファイルは500MBまでアップロード可能です（最大1ファイル）"
+              formats: "※ 動画ファイルは250MBまでアップロード可能です（最大1ファイル）"
             }}
           />
         )}

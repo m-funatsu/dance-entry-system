@@ -19,7 +19,7 @@ export const FILE_UPLOAD_DEFAULTS = {
   bucket: 'files',
   maxSizes: {
     image: 200 * 1024 * 1024, // 200MB
-    video: 500 * 1024 * 1024, // 500MB
+    video: 250 * 1024 * 1024, // 250MB
     audio: 200 * 1024 * 1024, // 200MB
     document: 100 * 1024 * 1024, // 100MB
   },
@@ -32,7 +32,7 @@ export const FILE_UPLOAD_DEFAULTS = {
   // 現在のSupabase課金後の制限
   currentLimits: {
     image: 200 * 1024 * 1024, // 200MB
-    video: 500 * 1024 * 1024, // 500MB (課金後の上限)
+    video: 250 * 1024 * 1024, // 250MB (課金後の上限)
     audio: 200 * 1024 * 1024, // 200MB
     document: 100 * 1024 * 1024, // 100MB
   }
