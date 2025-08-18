@@ -4,6 +4,9 @@ import Link from 'next/link'
 import BasicInfoForm from './BasicInfoForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
+// 動的レンダリングを強制（編集時の確実なデータ再取得のため）
+export const dynamic = 'force-dynamic'
+
 export default async function BasicInfoPage() {
   const supabase = await createClient()
   

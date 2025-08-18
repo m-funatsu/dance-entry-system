@@ -4,6 +4,9 @@ import Link from 'next/link'
 import ApplicationsForm from '@/components/dashboard/ApplicationsForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
+// 動的レンダリングを強制（編集時の確実なデータ再取得のため）
+export const dynamic = 'force-dynamic'
+
 export default async function ApplicationsPage() {
   const supabase = await createClient()
   
