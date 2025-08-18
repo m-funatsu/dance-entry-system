@@ -228,6 +228,75 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
   }
 
+  const updateEntryStatus = async (entryId: string, newStatus: string) => {
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/admin/entries/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryIds: [entryId],
+          status: newStatus,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(errorData.error || 'ステータスの更新に失敗しました')
+        return
+      }
+
+      router.refresh()
+    } catch (error) {
+      console.error('Status update error:', error)
+      alert('ステータスの更新に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const bulkUpdateStatus = async (newStatus: string) => {
+    if (selectedEntries.length === 0) {
+      alert('エントリーを選択してください')
+      return
+    }
+
+    if (!confirm(`選択したエントリーのステータスを「${newStatus}」に変更しますか？`)) {
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/admin/entries/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryIds: selectedEntries,
+          status: newStatus,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        alert(errorData.error || 'ステータスの更新に失敗しました')
+        return
+      }
+
+      setSelectedEntries([])
+      router.refresh()
+    } catch (error) {
+      console.error('Bulk status update error:', error)
+      alert('ステータスの更新に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
 
 
   const bulkDeleteEntries = async () => {
@@ -288,6 +357,20 @@ export default function EntryTable({ entries }: EntryTableProps) {
               {selectedEntries.length}件のエントリーが選択されています
             </span>
             <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => bulkUpdateStatus('selected')}
+                disabled={loading}
+                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
+              >
+                予選通過に変更
+              </button>
+              <button
+                onClick={() => bulkUpdateStatus('rejected')}
+                disabled={loading}
+                className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50"
+              >
+                予選敗退に変更
+              </button>
               <button
                 onClick={() => setShowEmailComposer(true)}
                 disabled={loading}
@@ -363,6 +446,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                選考ステータス変更
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 エントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -392,6 +478,18 @@ export default function EntryTable({ entries }: EntryTableProps) {
                       checked={selectedEntries.includes(entry.id)}
                       onChange={() => handleSelectEntry(entry.id)}
                     />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      value={entry.status}
+                      onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
+                      disabled={loading}
+                      className="rounded border-gray-300 text-xs disabled:opacity-50"
+                    >
+                      <option value="pending">未処理</option>
+                      <option value="selected">予選通過</option>
+                      <option value="rejected">予選敗退</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
