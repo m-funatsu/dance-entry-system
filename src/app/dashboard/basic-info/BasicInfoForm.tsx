@@ -88,7 +88,18 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     uniqueField: 'entry_id',
     validationRules: {}, // 初期ルールは空にする
     redirectPath: '/dashboard',
-    onSuccess: (message) => showToast(message, 'success'),
+    onSuccess: async (message) => {
+      showToast(message, 'success')
+      
+      // フォーム保存成功後にステータス更新
+      if (entryId) {
+        console.log('[BASIC INFO SUCCESS] ステータス更新チェック開始')
+        const isComplete = checkBasicInfoCompletion(formData, checkboxes)
+        console.log('[BASIC INFO SUCCESS] 完了判定結果:', isComplete)
+        await updateFormStatus('basic_info', entryId, isComplete)
+        console.log('[BASIC INFO SUCCESS] ステータス更新処理完了')
+      }
+    },
     onError: (error) => showToast(error, 'error'),
     validateBeforeSave: false // カスタムバリデーションを行うため
   })
@@ -343,17 +354,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       })
       console.log('===================')
 
-      // フォームデータを保存
+      console.log('[BASIC INFO SAVE] フォーム保存開始')
+      
+      // フォームデータを保存（onSuccessでステータス更新される）
       await saveForm(true)
-
-      // 必須項目が完了している場合はステータスを「登録済み」に更新
-      if (currentEntryId) {
-        const isComplete = checkBasicInfoCompletion(formData, checkboxes)
-        await updateFormStatus('basic_info', currentEntryId, isComplete)
-      }
+      console.log('[BASIC INFO SAVE] フォーム保存完了')
 
       // 保存成功後にダッシュボードにリダイレクト
-      showToast('基本情報を保存しました', 'success')
       setTimeout(() => {
         window.location.href = '/dashboard'
       }, 1500)
