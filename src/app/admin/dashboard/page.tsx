@@ -60,15 +60,15 @@ export default async function AdminDashboardPage() {
   }
 
   // ダンスジャンル別統計を計算
-  const danceStyleStats = entriesWithUsers.reduce((acc, entry) => {
-    const style = entry.dance_style || '未分類'
-    acc[style] = (acc[style] || 0) + 1
+  const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
+    const genre = entry.dance_style || '未分類'
+    acc[genre] = (acc[genre] || 0) + 1
     return acc
   }, {} as Record<string, number>)
 
   // ダンスジャンル統計を配列に変換してソート
-  const danceStyleArray = Object.entries(danceStyleStats)
-    .map(([style, count]) => ({ style, count: Number(count) }))
+  const danceGenreArray = Object.entries(danceGenreStats)
+    .map(([genre, count]) => ({ genre, count: Number(count) }))
     .sort((a, b) => b.count - a.count)
 
   return (
@@ -217,13 +217,13 @@ export default async function AdminDashboardPage() {
             <h2 className="text-lg font-medium text-gray-900 mb-4">ダンスジャンル別エントリー数</h2>
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-6">
-                {danceStyleArray.length > 0 ? (
+                {danceGenreArray.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {danceStyleArray.map(({ style, count }) => (
-                      <div key={style} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    {danceGenreArray.map(({ genre, count }) => (
+                      <div key={genre} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 truncate" title={style}>
-                            {style}
+                          <div className="text-sm font-medium text-gray-900 truncate" title={genre}>
+                            {genre}
                           </div>
                           <div className="text-xs text-gray-500">
                             {count}件のエントリー
