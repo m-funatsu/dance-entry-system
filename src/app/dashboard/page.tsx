@@ -5,6 +5,7 @@ import Link from 'next/link'
 import MessageAlert from '@/components/MessageAlert'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
+import EditButton from '@/components/dashboard/EditButton'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -502,9 +503,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('basic_info_deadline') ? (
-                    <Link href={`/dashboard/basic-info?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/basic-info">
                       {basicInfo ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -554,9 +555,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href={`/dashboard/preliminary?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/preliminary">
                       {preliminaryInfo ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -710,9 +711,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href={`/dashboard/semifinals?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/semifinals">
                       {semifinalsInfo ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -762,9 +763,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('finals_deadline') ? (
-                    <Link href={`/dashboard/finals?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/finals">
                       {finalsInfo ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -814,9 +815,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('sns_deadline') ? (
-                    <Link href={`/dashboard/sns?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/sns">
                       {entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
@@ -867,9 +868,9 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('optional_request_deadline') ? (
-                    <Link href={`/dashboard/applications?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <EditButton href="/dashboard/applications">
                       {checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請'} →
-                    </Link>
+                    </EditButton>
                   ) : (
                     <span className="font-medium text-gray-400">
                       期限切れ（編集不可）
