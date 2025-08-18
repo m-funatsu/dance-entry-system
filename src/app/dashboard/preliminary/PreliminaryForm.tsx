@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkPreliminaryInfoCompletion } from '@/lib/status-utils'
 import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
-import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
@@ -64,13 +63,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { save, saving, error, success } = useFormSave({
     tableName: 'preliminary_info',
     uniqueField: 'entry_id',
-    redirectPath: '/dashboard',
-    onSuccess: (message) => showToast(message, 'success'),
+    redirectPath: undefined,
+    onSuccess: (message) => console.log('Save success:', message),
     onError: (error) => showToast(error, 'error')
   })
   
   // ファイルアップロードフック
-  const { uploading, deleteFile } = useFileUploadV2({
+  const { uploading, deleteFile, uploadVideo } = useFileUploadV2({
     category: 'video',
     onSuccess: async (result: { url?: string; path?: string }) => {
       if (result.path) {
@@ -160,6 +159,28 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
   
+  const handleFileUpload = async (file: File) => {
+    if (!entryId) {
+      showToast('基本情報を先に保存してください', 'error')
+      router.push('/dashboard/basic-info')
+      return
+    }
+
+    if (videoFile) {
+      showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
+      return
+    }
+
+    // ファイルアップロード前に現在の入力データを一時保存
+    try {
+      await save({ ...formData, entry_id: entryId })
+      console.log('[PRELIMINARY UPLOAD] 一時保存完了')
+    } catch (tempSaveError) {
+      console.log('[PRELIMINARY UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
+    }
+
+    await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
+  }
 
   const handleFileDelete = async () => {
     if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
@@ -395,33 +416,23 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               </div>
             </div>
           ) : (
-            <FileUploadField
-              label="予選提出動画"
-              value={null}
-              onChange={(file) => {
-                console.log('[PRELIMINARY] File selected:', file.name)
-              }}
-              onUploadComplete={async (url) => {
-                console.log('[PRELIMINARY] Upload completed with URL:', url)
-                // ページをリロードしてファイル情報を更新
-                window.location.reload()
-              }}
-              uploadPath={(fileName) => {
-                // ファイル名をサニタイズ（日本語を英数字に変換）
-                const fileExt = fileName.split('.').pop()
-                const timestamp = Date.now()
-                return `${userId}/${entryId}/preliminary/video_${timestamp}.${fileExt}`
-              }}
-              category="video"
-              disabled={uploading || !!videoFile || !entryId}
-              required
-              maxSizeMB={250}
-              accept="video/*"
-              placeholder={{
-                title: "予選提出動画をドラッグ&ドロップ",
-                formats: "対応形式: MP4, MOV, AVI など（最大250MB）"
-              }}
-            />
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <input
+                type="file"
+                accept="video/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    handleFileUpload(file)
+                  }
+                }}
+                disabled={uploading || !!videoFile || !entryId}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+              />
+              <p className="mt-2 text-sm text-gray-500">
+                対応形式: MP4, MOV, AVI など（最大250MB）
+              </p>
+            </div>
           )}
         </div>
 
