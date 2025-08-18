@@ -7,27 +7,28 @@ import BackgroundLoader from '@/components/BackgroundLoader'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect('/auth/login')
-  }
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      redirect('/auth/login')
+    }
 
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle()
+    const { data: userProfile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle()
 
-  if (!userProfile) {
-    redirect('/auth/login')
-  }
+    if (!userProfile) {
+      redirect('/auth/login')
+    }
 
-  if (userProfile.role === 'admin') {
-    redirect('/admin/dashboard')
-  }
+    if (userProfile.role === 'admin') {
+      redirect('/admin/dashboard')
+    }
 
   // エントリー情報の取得（最新のエントリー）
   const { data: entries } = await supabase
@@ -1208,4 +1209,26 @@ export default async function DashboardPage() {
       </div>
     </>
   )
+  } catch (error) {
+    console.error('ダッシュボードエラー:', error)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">エラーが発生しました</h1>
+          <p className="text-gray-600 mb-4">ダッシュボードの読み込みに失敗しました。</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <p className="text-sm text-red-700">
+              {error instanceof Error ? error.message : 'Unknown error'}
+            </p>
+          </div>
+          <button 
+            onClick={() => window.location.href = '/auth/login'}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            ログインページに戻る
+          </button>
+        </div>
+      </div>
+    )
+  }
 }
