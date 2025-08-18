@@ -11,6 +11,8 @@ function UpdatePasswordForm() {
   const [error, setError] = useState('')
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [isFirstTime, setIsFirstTime] = useState(false)
+  const [isWelcome, setIsWelcome] = useState(false)
+  const [userName, setUserName] = useState('')
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -18,7 +20,12 @@ function UpdatePasswordForm() {
   useEffect(() => {
     // URLパラメータから初回ログインかどうかを判定
     const firstTime = searchParams.get('first_time') === 'true'
+    const welcome = searchParams.get('welcome') === 'true'
+    const name = searchParams.get('name') || ''
+    
     setIsFirstTime(firstTime)
+    setIsWelcome(welcome)
+    setUserName(decodeURIComponent(name))
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -83,7 +90,11 @@ function UpdatePasswordForm() {
       }
 
       // パスワード更新成功
-      if (isFirstTime) {
+      if (isWelcome) {
+        // ウェルカムメールからの場合
+        alert('パスワードが設定されました。ログイン画面へ移動します。')
+        router.push('/auth/login')
+      } else if (isFirstTime) {
         // 初回ログインの場合は、ダッシュボードへ直接リダイレクト
         alert('アカウントが正常に作成されました。ダッシュボードへ移動します。')
         router.push('/dashboard')
@@ -103,9 +114,18 @@ function UpdatePasswordForm() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isFirstTime ? 'アカウントの初期設定' : '新しいパスワードを設定'}
+            {isWelcome ? 'バルカーカップへようこそ！' : isFirstTime ? 'アカウントの初期設定' : '新しいパスワードを設定'}
           </h2>
-          {isFirstTime && (
+          {isWelcome && (
+            <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4">
+              <p className="text-center text-sm text-green-800">
+                {userName && `${userName}さん、`}バルカーカップダンスエントリーシステムへようこそ！<br />
+                管理者からの招待を受けてアカウントが作成されました。<br />
+                安全なパスワードを設定して、システムにアクセスしてください。
+              </p>
+            </div>
+          )}
+          {isFirstTime && !isWelcome && (
             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
               <p className="text-center text-sm text-blue-800">
                 ダンスエントリーシステムへようこそ！<br />
