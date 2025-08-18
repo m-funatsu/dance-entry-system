@@ -659,7 +659,8 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const relationshipOptions = [
     '振付師',
     '振付師の代理人',
-    'スポンサー'
+    'スポンサー',
+    '保護者'
   ]
 
 
