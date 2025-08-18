@@ -79,7 +79,14 @@ export function downloadCSV(content: string, filename: string) {
   
   document.body.appendChild(link)
   link.click()
-  document.body.removeChild(link)
+  
+  // 安全にremoveChildを実行
+  if (link.parentNode) {
+    link.parentNode.removeChild(link)
+  }
+  
+  // URLを解放
+  URL.revokeObjectURL(url)
 }
 
 // 日付フォーマット

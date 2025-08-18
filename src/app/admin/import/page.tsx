@@ -138,8 +138,12 @@ export default function AdminImportPage() {
         a.download = 'entry_template.csv'
         document.body.appendChild(a)
         a.click()
+        
+        // 安全にremoveChildを実行
+        if (a.parentNode) {
+          a.parentNode.removeChild(a)
+        }
         window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
       } else {
         setUploadResult({
           success: false,

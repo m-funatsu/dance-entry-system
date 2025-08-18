@@ -218,7 +218,11 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     link.download = filename
     document.body.appendChild(link)
     link.click()
-    document.body.removeChild(link)
+    
+    // 安全にremoveChildを実行
+    if (link.parentNode) {
+      link.parentNode.removeChild(link)
+    }
     URL.revokeObjectURL(url)
   }
 
