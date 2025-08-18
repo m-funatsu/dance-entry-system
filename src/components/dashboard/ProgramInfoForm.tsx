@@ -310,7 +310,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
     }
 
-    await save(dataToSave, isTemporary)
+    await save(dataToSave)
 
     router.refresh()
   }
