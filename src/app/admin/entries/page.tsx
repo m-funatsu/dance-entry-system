@@ -26,7 +26,15 @@ export default async function AdminEntriesPage() {
   const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select(`
-      *,
+      id,
+      user_id,
+      dance_style,
+      participant_names,
+      phone_number,
+      status,
+      basic_info_status,
+      created_at,
+      updated_at,
       users(name, email),
       entry_files(id, file_type),
       selections(id, status, score, created_at),
