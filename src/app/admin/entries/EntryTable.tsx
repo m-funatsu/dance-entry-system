@@ -107,31 +107,59 @@ export default function EntryTable({ entries }: EntryTableProps) {
     const hasSnsInfo = entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
 
     // デバッグログ（問題解決後は削除）
-    console.log(`Entry ${entry.id} 提出状況:`, {
-      basic: hasBasicInfo,
-      preliminary: hasPreliminaryInfo,
-      program: hasProgramInfo,
-      semifinals: hasSemifinalsInfo,
-      finals: hasFinalsInfo,
-      applications: hasApplicationsInfo,
-      sns: hasSnsInfo,
-      statusFields: {
-        basic_info_status: entry.basic_info_status,
-        preliminary_info_status: entry.preliminary_info_status,
-        semifinals_info_status: entry.semifinals_info_status,
-        finals_info_status: entry.finals_info_status,
-        program_info_status: entry.program_info_status,
-        sns_info_status: entry.sns_info_status,
-        applications_info_status: entry.applications_info_status
+    console.log(`Entry ${entry.id} 提出状況詳細:`, {
+      judgments: {
+        basic: hasBasicInfo,
+        preliminary: hasPreliminaryInfo,
+        program: hasProgramInfo,
+        semifinals: hasSemifinalsInfo,
+        finals: hasFinalsInfo,
+        applications: hasApplicationsInfo,
+        sns: hasSnsInfo
       },
-      rawData: {
-        basic_info: entry.basic_info,
-        preliminary_info: entry.preliminary_info,
-        program_info: entry.program_info,
-        semifinals_info: entry.semifinals_info,
-        finals_info: entry.finals_info,
-        applications_info: entry.applications_info,
-        sns_info: entry.sns_info
+      dataStructure: {
+        basic_info: {
+          exists: !!entry.basic_info,
+          isArray: Array.isArray(entry.basic_info),
+          length: Array.isArray(entry.basic_info) ? entry.basic_info.length : 'not array',
+          data: entry.basic_info
+        },
+        preliminary_info: {
+          exists: !!entry.preliminary_info,
+          isArray: Array.isArray(entry.preliminary_info),
+          length: Array.isArray(entry.preliminary_info) ? entry.preliminary_info.length : 'not array',
+          data: entry.preliminary_info
+        },
+        program_info: {
+          exists: !!entry.program_info,
+          isArray: Array.isArray(entry.program_info),
+          length: Array.isArray(entry.program_info) ? entry.program_info.length : 'not array',
+          data: entry.program_info
+        },
+        semifinals_info: {
+          exists: !!entry.semifinals_info,
+          isArray: Array.isArray(entry.semifinals_info),
+          length: Array.isArray(entry.semifinals_info) ? entry.semifinals_info.length : 'not array',
+          data: entry.semifinals_info
+        },
+        finals_info: {
+          exists: !!entry.finals_info,
+          isArray: Array.isArray(entry.finals_info),
+          length: Array.isArray(entry.finals_info) ? entry.finals_info.length : 'not array',
+          data: entry.finals_info
+        },
+        applications_info: {
+          exists: !!entry.applications_info,
+          isArray: Array.isArray(entry.applications_info),
+          length: Array.isArray(entry.applications_info) ? entry.applications_info.length : 'not array',
+          data: entry.applications_info
+        },
+        sns_info: {
+          exists: !!entry.sns_info,
+          isArray: Array.isArray(entry.sns_info),
+          length: Array.isArray(entry.sns_info) ? entry.sns_info.length : 'not array',
+          data: entry.sns_info
+        }
       }
     })
 
