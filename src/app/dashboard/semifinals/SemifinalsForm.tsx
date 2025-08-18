@@ -214,6 +214,19 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         return
       }
 
+      // ファイルアップロード前に現在の入力データを一時保存
+      console.log('[UPLOAD DEBUG] 現在の入力データを一時保存中...')
+      try {
+        const tempSaveData = {
+          ...semifinalsInfo,
+          entry_id: entry.id
+        }
+        await save(tempSaveData)
+        console.log('[UPLOAD DEBUG] 一時保存完了')
+      } catch (tempSaveError) {
+        console.log('[UPLOAD DEBUG] 一時保存に失敗（続行）:', tempSaveError)
+      }
+
       // 既存のファイルがある場合は削除
       if (audioFiles[field]) {
         await handleFileDelete(field)
