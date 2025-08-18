@@ -32,20 +32,81 @@ export async function POST(request: NextRequest) {
     // 管理者クライアントを使用
     const adminSupabase = createAdminClient()
 
-    // パスワードリセットメールをウェルカムメールとして送信
-    const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?welcome=true&name=${encodeURIComponent(name || '')}`
-      }
-    )
-
-    if (resetError) {
-      console.error('Welcome email error:', resetError)
-      return NextResponse.json(
-        { error: 'ウェルカムメールの送信に失敗しました' },
-        { status: 500 }
+    // 既存ユーザーかチェック（usersテーブルから確認）
+    const { data: existingUser } = await adminSupabase
+      .from('users')
+      .select('id, email')
+      .eq('email', email)
+      .single()
+    
+    if (existingUser) {
+      // 既存ユーザーの場合はパスワードリセットメールを送信
+      const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?welcome=true&name=${encodeURIComponent(name || '')}`
+        }
       )
+
+      if (resetError) {
+        console.error('Welcome email error:', resetError)
+        return NextResponse.json(
+          { error: 'ウェルカムメールの送信に失敗しました' },
+          { status: 500 }
+        )
+      }
+    } else {
+      // 新規ユーザーの場合はサインアップ確認メールを送信
+      const { data: newUser, error: signupError } = await adminSupabase.auth.admin.createUser({
+        email: email,
+        email_confirm: false, // メール確認が必要
+        user_metadata: {
+          name: name || '',
+          welcome_message: true
+        }
+      })
+
+      if (signupError) {
+        console.error('User creation error:', signupError)
+        return NextResponse.json(
+          { error: 'アカウント作成に失敗しました' },
+          { status: 500 }
+        )
+      }
+
+      // usersテーブルにレコードを作成
+      if (newUser.user) {
+        const { error: userInsertError } = await adminSupabase
+          .from('users')
+          .insert({
+            id: newUser.user.id,
+            email: email,
+            name: name || '',
+            role: 'participant'
+          })
+
+        if (userInsertError) {
+          console.error('User table insert error:', userInsertError)
+          // 認証ユーザーは作成されているので、エラーは警告レベルに留める
+        }
+      }
+
+      // サインアップ確認メールを再送信
+      const { error: resendError } = await adminSupabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?welcome=true&name=${encodeURIComponent(name || '')}`
+        }
+      })
+
+      if (resendError) {
+        console.error('Signup confirmation email error:', resendError)
+        return NextResponse.json(
+          { error: 'ウェルカム確認メールの送信に失敗しました' },
+          { status: 500 }
+        )
+      }
     }
 
     return NextResponse.json({ 
