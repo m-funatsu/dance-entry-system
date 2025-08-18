@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { useFormSave } from '@/hooks'
+import { updateFormStatus, checkFinalsInfoCompletion } from '@/lib/status-utils'
 import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
 import { 
   validateFinalsSection, 
@@ -426,17 +427,23 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       console.log('[DELETE] Starting delete for field:', field)
       
       // URLからファイルパスを抽出する関数（セキュリティチェック付き）
-      const extractFilePathFromUrl = (url: string): string | null => {
-        if (!url) return null
+      const extractFilePathFromUrl = (urlOrPath: string): string | null => {
+        if (!urlOrPath) return null
         
-        // URLが自分のSupabaseプロジェクトのものか確認（publicとrest両方を許可）
-        if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
-          console.error('[SECURITY] Invalid URL domain', url)
+        // 既にファイルパスの場合（URLではない）
+        if (!urlOrPath.startsWith('http') && !urlOrPath.includes('://')) {
+          console.log('[DELETE] Direct file path detected:', urlOrPath)
+          return urlOrPath
+        }
+        
+        // URLの場合はパスを抽出
+        if (!urlOrPath.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
+          console.error('[SECURITY] Invalid URL domain', urlOrPath)
           return null
         }
         
         // Supabase URLからファイルパスを抽出
-        const match = url.match(/files\/(.*?)(\?|$)/)
+        const match = urlOrPath.match(/files\/(.*?)(\?|$)/)
         if (match && match[1]) {
           const filePath = decodeURIComponent(match[1])
           
@@ -553,6 +560,10 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     }
 
     await save(dataToSave)
+    
+    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    const isComplete = checkFinalsInfoCompletion(finalsInfo)
+    await updateFormStatus('finals_info', entry.id, isComplete)
     
     // 保存成功後にダッシュボードにリダイレクト
     setValidationErrors({})

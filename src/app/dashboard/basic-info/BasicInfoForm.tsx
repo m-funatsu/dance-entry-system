@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { updateFormStatus, checkBasicInfoCompletion } from '@/lib/status-utils'
 import { FormField, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
@@ -344,6 +345,12 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
       // フォームデータを保存
       await saveForm(true)
+
+      // 必須項目が完了している場合はステータスを「登録済み」に更新
+      if (currentEntryId) {
+        const isComplete = checkBasicInfoCompletion(formData, checkboxes)
+        await updateFormStatus('basic_info', currentEntryId, isComplete)
+      }
 
       // 保存成功後にダッシュボードにリダイレクト
       showToast('基本情報を保存しました', 'success')

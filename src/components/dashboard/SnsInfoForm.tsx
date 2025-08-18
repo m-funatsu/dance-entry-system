@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import type { Entry, SnsInfo } from '@/lib/types'
 
 interface SnsInfoFormProps {
@@ -217,6 +218,12 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
         if (error) throw error
       }
+
+      // 必須項目が完了している場合はステータスを「登録済み」に更新
+      const hasPracticeVideo = !!snsInfo.practice_video_path
+      const hasIntroductionVideo = !!snsInfo.introduction_highlight_path
+      const isComplete = checkSnsInfoCompletion(snsInfo, hasPracticeVideo, hasIntroductionVideo)
+      await updateFormStatus('sns_info', entry.id, isComplete)
 
       setSuccess('SNS掲載情報を保存しました')
       setTimeout(() => {

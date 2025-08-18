@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { FormField, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
+import { updateFormStatus, checkProgramInfoCompletion } from '@/lib/status-utils'
 import type { Entry, ProgramInfo } from '@/lib/types'
 import { logger } from '@/lib/logger'
 
@@ -303,6 +304,10 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     }
 
     await save(dataToSave)
+
+    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    const isComplete = checkProgramInfoCompletion(programInfo)
+    await updateFormStatus('program_info', entry.id, isComplete)
 
     // 保存成功後にダッシュボードにリダイレクト
     setSuccess('プログラム情報を保存しました')

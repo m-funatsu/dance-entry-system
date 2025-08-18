@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { updateFormStatus, checkPreliminaryInfoCompletion } from '@/lib/status-utils'
 import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
@@ -247,6 +248,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     console.log('========================')
 
     await save(dataToSave) // 保存
+    
+    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    const isComplete = checkPreliminaryInfoCompletion(formData, !!videoFile)
+    await updateFormStatus('preliminary_info', entryId, isComplete)
     
     // 保存成功後にダッシュボードにリダイレクト
     showToast('予選情報を保存しました', 'success')

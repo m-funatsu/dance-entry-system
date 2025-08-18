@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { updateFormStatus, checkSemifinalsInfoCompletion } from '@/lib/status-utils'
 import { Alert, TabNavigation, SaveButton, CancelButton } from '@/components/ui'
 import { useFormSave } from '@/hooks'
 import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection } from '@/components/semifinals'
@@ -341,22 +342,28 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       console.log('[DELETE DEBUG] File from audioFiles:', fileToDelete)
       
       // URLからファイルパスを抽出する関数（セキュリティチェック付き）
-      const extractFilePathFromUrl = (url: string): string | null => {
-        if (!url) return null
+      const extractFilePathFromUrl = (urlOrPath: string): string | null => {
+        if (!urlOrPath) return null
         
-        console.log('[DELETE DEBUG] Extracting path from URL:', url)
+        console.log('[DELETE DEBUG] Processing:', urlOrPath)
         
-        // URLが自分のSupabaseプロジェクトのものか確認
-        if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
-          console.error('[SECURITY] Invalid URL domain', url)
+        // 既にファイルパスの場合（URLではない）
+        if (!urlOrPath.startsWith('http') && !urlOrPath.includes('://')) {
+          console.log('[DELETE DEBUG] Direct file path detected:', urlOrPath)
+          return urlOrPath
+        }
+        
+        // URLの場合はパスを抽出
+        if (!urlOrPath.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
+          console.error('[SECURITY] Invalid URL domain', urlOrPath)
           return null
         }
         
         // Supabase URLからファイルパスを抽出
-        const match = url.match(/files\/(.*?)(\?|$)/)
+        const match = urlOrPath.match(/files\/(.*?)(\?|$)/)
         if (match && match[1]) {
           const filePath = decodeURIComponent(match[1])
-          console.log('[DELETE DEBUG] Extracted file path:', filePath)
+          console.log('[DELETE DEBUG] Extracted file path from URL:', filePath)
           
           // パス走査攻撃を防ぐ
           if (filePath.includes('../') || filePath.includes('..\\')) {
@@ -561,6 +568,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     }
 
     await save(dataToSave) // 保存
+    
+    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    const isComplete = checkSemifinalsInfoCompletion(semifinalsInfo)
+    await updateFormStatus('semifinals_info', entry.id, isComplete)
     
     // 保存成功後にダッシュボードにリダイレクト
     showToast('準決勝情報を保存しました', 'success')
