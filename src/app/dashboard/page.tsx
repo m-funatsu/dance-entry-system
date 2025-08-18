@@ -502,7 +502,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('basic_info_deadline') ? (
-                    <Link href="/dashboard/basic-info" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/basic-info?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {basicInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -554,7 +554,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href="/dashboard/preliminary" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/preliminary?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {preliminaryInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -710,7 +710,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('music_info_deadline') ? (
-                    <Link href="/dashboard/semifinals" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/semifinals?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {semifinalsInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -762,7 +762,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('finals_deadline') ? (
-                    <Link href="/dashboard/finals" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/finals?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {finalsInfo ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -814,7 +814,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('sns_deadline') ? (
-                    <Link href="/dashboard/sns" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/sns?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録'} →
                     </Link>
                   ) : (
@@ -867,7 +867,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   {isFormEditable('optional_request_deadline') ? (
-                    <Link href="/dashboard/applications" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href={`/dashboard/applications?t=${Date.now()}`} className="font-medium text-indigo-600 hover:text-indigo-500">
                       {checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請'} →
                     </Link>
                   ) : (
