@@ -354,21 +354,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       // フォームデータを保存
       await saveForm(isTemporary)
 
-      // 必須項目がすべて入力されている場合、エントリーのステータスを「登録済み」に更新
+      // 必須項目がすべて入力されている場合のログ出力
       if (!isTemporary && validateAllWithDynamicRules() && checkboxes.agreement_checked && checkboxes.media_consent_checked && checkboxes.privacy_policy_checked) {
-        const { error: statusUpdateError } = await supabase
-          .from('entries')
-          .update({
-            basic_info_status: '登録済み',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', currentEntryId)
-
-        if (statusUpdateError) {
-          console.error('ステータス更新エラー:', statusUpdateError)
-        } else {
-          console.log('基本情報ステータスを「登録済み」に更新しました')
-        }
+        console.log('基本情報の必須項目がすべて入力されました')
       }
 
     } catch (error) {
