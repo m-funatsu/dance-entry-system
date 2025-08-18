@@ -217,8 +217,11 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // ファイルアップロード前に現在の入力データを一時保存
       console.log('[UPLOAD DEBUG] 現在の入力データを一時保存中...')
       try {
+        // 存在しないフィールドを除外して一時保存
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { work_title_kana: _, ...validData } = semifinalsInfo
         const tempSaveData = {
-          ...semifinalsInfo,
+          ...validData,
           entry_id: entry.id
         }
         await save(tempSaveData)
@@ -549,8 +552,11 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       return
     }
 
+    // 存在しないフィールドを除外して保存
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { work_title_kana: _, ...validData } = semifinalsInfo
     const dataToSave = {
-      ...semifinalsInfo,
+      ...validData,
       entry_id: entry.id
     }
 
