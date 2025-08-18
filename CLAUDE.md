@@ -186,8 +186,7 @@ Required for deployment:
 - Verify file permissions and policies
 - **Bucket Name**: Must use `files` bucket (other buckets don't exist)
 - **File Name Sanitization**: Japanese characters and special characters are automatically converted to underscores
-- **File Size Limits**: Video files 200MB max, other files 100MB max (after billing upgrade)
-- **Current Testing Limits**: 50MB/25MB due to Supabase free tier, will increase after billing
+- **File Size Limits**: Video files 250MB max, other files 100MB max (after billing upgrade)
 - **Supported Formats**:
   - Video: MP4, MOV, AVI (video/mp4, video/mov, video/avi, video/quicktime)
   - Audio: MP3, WAV, AAC (audio/mpeg, audio/wav, audio/aac, audio/mp3)

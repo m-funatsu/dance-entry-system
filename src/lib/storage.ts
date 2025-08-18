@@ -27,10 +27,9 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
-  // 課金後の制限: 動画200MB、その他100MB
-  // 現在はSupabaseの無料制限のため50MB/25MBでテスト中
-  const maxSizeInBytes = fileType === 'video' ? 200 * 1024 * 1024 : 100 * 1024 * 1024
-  const maxSizeText = fileType === 'video' ? '200MB' : '100MB'
+  // 課金後の実際の制限: 動画250MB、その他100MB
+  const maxSizeInBytes = fileType === 'video' ? 250 * 1024 * 1024 : 100 * 1024 * 1024
+  const maxSizeText = fileType === 'video' ? '250MB' : '100MB'
 
   if (file.size > maxSizeInBytes) {
     return { success: false, error: `ファイルサイズが${maxSizeText}を超えています。ファイルサイズを確認してください。` }
@@ -80,7 +79,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       finalFileName: fileName,
       fileType: file.type,
       fileSize: file.size,
-      maxSize: fileType === 'video' ? '200MB' : '100MB'
+      maxSize: fileType === 'video' ? '250MB' : '100MB'
     }
   })
 
@@ -140,8 +139,8 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       const errorObj = error as unknown as { statusCode?: string; error?: string; message?: string }
       
       if (error?.message?.includes('too large') || error?.message?.includes('413') || errorObj?.statusCode === '413') {
-        const currentLimit = fileType === 'video' ? '50MB' : '25MB'
-        errorMessage = `ファイルサイズが大きすぎます。現在のテスト環境では${currentLimit}以下のファイルをアップロードしてください。`
+        const actualLimit = fileType === 'video' ? '250MB' : '100MB'
+        errorMessage = `ファイルサイズが大きすぎます。現在の制限は${actualLimit}以下です。ファイルを圧縮するか、小さなファイルをアップロードしてください。`
       } else if (errorObj?.statusCode === '400' && errorObj?.error === 'InvalidKey') {
         errorMessage = 'ファイル名に使用できない文字が含まれています。ファイル名を英数字に変更してください。'
       } else if (errorObj?.statusCode === '404') {

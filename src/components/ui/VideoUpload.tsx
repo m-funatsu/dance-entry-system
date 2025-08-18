@@ -9,7 +9,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
   onChange,
   disabled = false,
   required = false,
-  maxSizeMB = 200,
+  maxSizeMB = 250,
   accept = 'video/*'
 }) => {
   const [isDragging, setIsDragging] = useState(false)
