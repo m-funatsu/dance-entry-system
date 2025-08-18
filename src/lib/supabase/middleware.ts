@@ -44,7 +44,8 @@ export async function updateSession(request: NextRequest) {
     '/auth/logout',
     '/auth/reset-password',
     '/auth/update-password',
-    '/api/admin/favicon' // ファビコン取得は公開
+    '/api/admin/favicon', // ファビコン取得は公開
+    '/api/admin/background' // 背景画像取得は公開
   ]
 
   // 管理者専用ルート
@@ -54,7 +55,10 @@ export async function updateSession(request: NextRequest) {
   ]
 
   // 公開ルートはスキップ
-  if (publicRoutes.includes(pathname) || pathname.startsWith('/_next')) {
+  if (publicRoutes.includes(pathname) || 
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api/admin/favicon') ||
+      pathname.startsWith('/api/admin/background')) {
     return supabaseResponse
   }
 
