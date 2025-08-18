@@ -47,7 +47,6 @@ export default async function AdminEntriesPage() {
       adminSupabase.from('entries').select(`
         id,
         user_id,
-        dance_style,
         participant_names,
         phone_number,
         status,
@@ -90,7 +89,7 @@ export default async function AdminEntriesPage() {
       console.log('最初のエントリーの構造:')
       console.log('- ID:', entries[0].id)
       console.log('- user_id:', entries[0].user_id)
-      console.log('- dance_style:', entries[0].dance_style)
+      console.log('- participant_names:', entries[0].participant_names)
       console.log('- basic_info:', JSON.stringify(entries[0].basic_info))
     }
     console.log('================================')
@@ -98,8 +97,22 @@ export default async function AdminEntriesPage() {
     // 手動でユーザーデータをマッピング（安全な処理）
     const entriesWithUsers = entries?.map(entry => {
       const user = allUsers?.find(u => u.id === entry.user_id)
+      
+      // 基本情報からdance_styleを取得
+      let dance_style = '未分類'
+      if (entry.basic_info) {
+        if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+          const basicInfo = entry.basic_info[0] as { dance_style?: string }
+          dance_style = basicInfo?.dance_style || '未分類'
+        } else if (!Array.isArray(entry.basic_info)) {
+          const basicInfo = entry.basic_info as { dance_style?: string }
+          dance_style = basicInfo.dance_style || '未分類'
+        }
+      }
+      
       return {
         ...entry,
+        dance_style, // 基本情報から取得したdance_styleを追加
         users: user ? { 
           name: user.name || '不明なユーザー', 
           email: user.email || 'メールアドレス不明' 
