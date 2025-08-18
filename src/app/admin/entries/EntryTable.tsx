@@ -79,7 +79,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
       case 'rejected':
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            不選考
+            予選敗退
           </span>
         )
       default:
@@ -328,7 +328,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 disabled={loading}
                 className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50"
               >
-                不選考に変更
+                予選敗退に変更
               </button>
               <button
                 onClick={() => setShowEmailComposer(true)}
@@ -336,6 +336,30 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50"
               >
                 メール送信
+              </button>
+              <button
+                onClick={async () => {
+                  setLoading(true)
+                  try {
+                    const selectedEmails = entries
+                      .filter(entry => selectedEntries.includes(entry.id))
+                      .map(entry => ({ email: entry.users.email, name: entry.users.name }))
+                    
+                    for (const user of selectedEmails) {
+                      await sendWelcomeEmail(user.email, user.name)
+                    }
+                    alert(`${selectedEmails.length}件のウェルカムメールを送信しました`)
+                  } catch (error) {
+                    console.error('Bulk welcome email error:', error)
+                    alert('ウェルカムメールの送信に失敗しました')
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                disabled={loading}
+                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+              >
+                ウェルカムメール
               </button>
             </div>
           </div>
@@ -350,7 +374,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 disabled={loading}
                 className="px-3 py-1 bg-red-700 text-white rounded text-sm hover:bg-red-800 disabled:opacity-50 border border-red-600 font-medium"
               >
-                🗑️ 選択されたエントリーを削除
+                🗑️ 削除
               </button>
             </div>
           </div>
@@ -370,19 +394,25 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                参加者情報
+                選考ステータス変更
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ダンス情報
+                エントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                提出状況
+                ペアエントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ステータス
+                代表者メールアドレス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                操作
+                提出ステータス
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                選考ステータス
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                詳細
               </th>
             </tr>
           </thead>
@@ -398,53 +428,30 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
-                      <div className="text-sm text-gray-500">{entry.users?.email || 'メールアドレス不明'}</div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        {formatDateLocale(entry.created_at)}
-                      </div>
+                    <select
+                      value={entry.status}
+                      onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
+                      disabled={loading}
+                      className="rounded border-gray-300 text-xs disabled:opacity-50"
+                    >
+                      <option value="pending">未処理</option>
+                      <option value="selected">選考通過</option>
+                      <option value="rejected">予選敗退</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {formatDateLocale(entry.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {(() => {
-                          // デバッグ: ダンススタイルの取得を確認
-                          let basicInfoStyle: string | undefined
-                          
-                          if (entry.basic_info) {
-                            if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-                              basicInfoStyle = entry.basic_info[0]?.dance_style
-                            } else if (!Array.isArray(entry.basic_info)) {
-                              basicInfoStyle = entry.basic_info.dance_style
-                            }
-                          }
-                          
-                          const entryStyle = entry.dance_style
-                          console.log(`Entry ${entry.id}: basic_info style = "${basicInfoStyle}", entry style = "${entryStyle}"`)
-                          return basicInfoStyle || entryStyle || 'ジャンル未設定'
-                        })()}
-                      </div>
-                      {(() => {
-                        let categoryDivision: string | undefined
-                        if (entry.basic_info) {
-                          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-                            categoryDivision = entry.basic_info[0]?.category_division
-                          } else if (!Array.isArray(entry.basic_info)) {
-                            categoryDivision = entry.basic_info.category_division
-                          }
-                        }
-                        return categoryDivision ? (
-                          <div className="text-xs text-gray-600">
-                            {categoryDivision}
-                          </div>
-                        ) : null
-                      })()}
-                      <div className="text-xs text-gray-500 mt-1">
-                        {entry.participant_names}
-                      </div>
+                    <div className="text-sm text-gray-900">
+                      {entry.participant_names || 'エントリー名なし'}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{entry.users?.email || 'メールアドレス不明'}</div>
                   </td>
                   <td className="px-6 py-4">
                     {getSubmissionBadge(entry)}
@@ -454,32 +461,22 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          href={`/admin/entries/${entry.id}`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          詳細
-                        </Link>
-                        <select
-                          value={entry.status}
-                          onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
-                          disabled={loading}
-                          className="rounded border-gray-300 text-xs disabled:opacity-50"
-                        >
-                          <option value="pending">未処理</option>
-                          <option value="selected">選考通過</option>
-                          <option value="rejected">不選考</option>
-                        </select>
-                      </div>
+                      <Link
+                        href={`/admin/entries/${entry.id}`}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        詳細
+                      </Link>
                       {entry.status === 'pending' && (
-                        <button
-                          onClick={() => sendWelcomeEmail(entry.users.email, entry.users.name)}
-                          disabled={loading}
-                          className="text-xs text-indigo-600 hover:text-indigo-900 disabled:opacity-50"
-                        >
-                          ウェルカムメールを送信
-                        </button>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => sendWelcomeEmail(entry.users.email, entry.users.name)}
+                            disabled={loading}
+                            className="text-xs text-indigo-600 hover:text-indigo-900 disabled:opacity-50"
+                          >
+                            ウェルカムメール
+                          </button>
+                        </div>
                       )}
                     </div>
                   </td>

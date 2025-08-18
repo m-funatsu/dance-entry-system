@@ -54,36 +54,8 @@ interface EntriesWithFiltersProps {
 export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps) {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [genreFilter, setGenreFilter] = useState<string>('')
-  const [submissionFilter, setSubmissionFilter] = useState<string>('')
   const [formFilter, setFormFilter] = useState<string>('')
 
-  // 各エントリーの提出状況を計算
-  const getSubmissionStatus = (entry: EntryWithDetails) => {
-    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : true)
-    const hasPreliminaryInfo = entry.preliminary_info && entry.preliminary_info.length > 0
-    const hasProgramInfo = entry.program_info && entry.program_info.length > 0
-    const hasSemifinalsInfo = entry.semifinals_info && entry.semifinals_info.length > 0
-    const hasFinalsInfo = entry.finals_info && entry.finals_info.length > 0
-    const hasApplicationsInfo = entry.applications_info && entry.applications_info.length > 0
-    const hasSnsInfo = entry.sns_info && entry.sns_info.length > 0
-
-    const statuses = {
-      basic: hasBasicInfo,
-      preliminary: hasPreliminaryInfo,
-      program: hasProgramInfo,
-      semifinals: hasSemifinalsInfo,
-      finals: hasFinalsInfo,
-      applications: hasApplicationsInfo,
-      sns: hasSnsInfo
-    }
-
-    const completedCount = Object.values(statuses).filter(Boolean).length
-    const totalCount = 7 // 全フォーム数
-
-    if (completedCount === 0) return 'not_started'
-    if (completedCount === totalCount) return 'completed'
-    return 'in_progress'
-  }
 
   // 特定のフォームが提出済みかチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
@@ -116,7 +88,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
       }
       
       const genreMatch = !genreFilter || entryGenre === genreFilter
-      const submissionMatch = !submissionFilter || getSubmissionStatus(entry) === submissionFilter
       const formMatch = !formFilter || (
         formFilter === 'has_' ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
         formFilter === 'no_' ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
@@ -124,9 +95,9 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
         formFilter.startsWith('no_') ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
         true
       )
-      return statusMatch && genreMatch && submissionMatch && formMatch
+      return statusMatch && genreMatch && formMatch
     })
-  }, [entries, statusFilter, genreFilter, submissionFilter, formFilter])
+  }, [entries, statusFilter, genreFilter, formFilter])
 
   // 利用可能なダンスジャンルを取得
   const availableGenres = useMemo(() => {
@@ -151,19 +122,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
             全エントリー ({filteredEntries.length}件 / {entries.length}件)
           </h2>
           <div className="flex items-center space-x-2 flex-wrap gap-2">
-            <CSVExportButton entries={filteredEntries} />
-            <CSVImportButton />
             <div className="flex space-x-2">
-            <select 
-              className="rounded-md border-gray-300 text-sm"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">全ステータス</option>
-              <option value="pending">未処理</option>
-              <option value="selected">選考通過</option>
-              <option value="rejected">不選考</option>
-            </select>
             <select 
               className="rounded-md border-gray-300 text-sm"
               value={genreFilter}
@@ -175,16 +134,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                   {genre}
                 </option>
               ))}
-            </select>
-            <select 
-              className="rounded-md border-gray-300 text-sm"
-              value={submissionFilter}
-              onChange={(e) => setSubmissionFilter(e.target.value)}
-            >
-              <option value="">全提出状況</option>
-              <option value="not_started">未開始</option>
-              <option value="in_progress">途中</option>
-              <option value="completed">完了</option>
             </select>
             <select 
               className="rounded-md border-gray-300 text-sm"
@@ -211,12 +160,21 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                 <option value="no_sns">SNS情報なし</option>
               </optgroup>
             </select>
-            {(statusFilter || genreFilter || submissionFilter || formFilter) && (
+            <select 
+              className="rounded-md border-gray-300 text-sm"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">全ステータス</option>
+              <option value="pending">未処理</option>
+              <option value="selected">選考通過</option>
+              <option value="rejected">予選敗退</option>
+            </select>
+            {(statusFilter || genreFilter || formFilter) && (
               <button
                 onClick={() => {
                   setStatusFilter('')
                   setGenreFilter('')
-                  setSubmissionFilter('')
                   setFormFilter('')
                 }}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50"
@@ -225,6 +183,8 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               </button>
             )}
             </div>
+            <CSVExportButton entries={filteredEntries} />
+            <CSVImportButton />
           </div>
         </div>
         
