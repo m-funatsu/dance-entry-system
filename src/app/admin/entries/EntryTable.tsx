@@ -179,33 +179,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
   }
 
-  const sendWelcomeEmail = async (email: string, name: string) => {
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/admin/send-welcome-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, name }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        alert(data.error || 'ウェルカムメールの送信に失敗しました')
-        return
-      }
-
-      alert(data.message || 'ウェルカムメールを送信しました')
-    } catch (error) {
-      console.error('Welcome email error:', error)
-      alert('ウェルカムメールの送信に失敗しました')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const updateEntryStatus = async (entryId: string, newStatus: string) => {
     setLoading(true)
@@ -357,23 +330,17 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 メール送信
               </button>
               <button
-                onClick={async () => {
-                  setLoading(true)
-                  try {
-                    const selectedEmails = entries
-                      .filter(entry => selectedEntries.includes(entry.id))
-                      .map(entry => ({ email: entry.users.email, name: entry.users.name }))
-                    
-                    for (const user of selectedEmails) {
-                      await sendWelcomeEmail(user.email, user.name)
-                    }
-                    alert(`${selectedEmails.length}件のウェルカムメールを送信しました`)
-                  } catch (error) {
-                    console.error('Bulk welcome email error:', error)
-                    alert('ウェルカムメールの送信に失敗しました')
-                  } finally {
-                    setLoading(false)
-                  }
+                onClick={() => {
+                  const selectedEmails = entries
+                    .filter(entry => selectedEntries.includes(entry.id))
+                    .map(entry => entry.users.email)
+                    .join(',')
+                  
+                  const subject = 'ダンスエントリーシステムへようこそ'
+                  const body = `ダンスエントリーシステムにご登録いただき、ありがとうございます。\n\nシステムへのログインURLをお送りいたします。\n\n${window.location.origin}\n\nご不明点がございましたら、お気軽にお問い合わせください。\n\nダンスコンペティション運営事務局`
+                  
+                  const mailtoLink = `mailto:${selectedEmails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+                  window.location.href = mailtoLink
                 }}
                 disabled={loading}
                 className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"

@@ -105,7 +105,6 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
-  const [sending, setSending] = useState(false)
   const [templates, setTemplates] = useState<NotificationTemplate[]>([])
   const [templatesLoading, setTemplatesLoading] = useState(true)
 
@@ -183,48 +182,29 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     }
   }
 
-  const handleSendEmails = async () => {
+  const handleSendEmails = () => {
     if (!subject.trim() || !body.trim()) {
       alert('件名とメール本文を入力してください')
       return
     }
 
-    if (!confirm(`${selectedEntriesData.length}名にメールを送信しますか？`)) {
-      return
-    }
+    // 全選択されたエントリーのメールアドレスを収集
+    const emailAddresses = selectedEntriesData.map(entry => entry.users.email).join(',')
+    
+    // 最初のエントリーでテンプレート変数を置換（参考用）
+    const firstEntry = selectedEntriesData[0]
+    const processedSubject = firstEntry ? replaceVariables(subject, firstEntry) : subject
+    const processedBody = firstEntry ? replaceVariables(body, firstEntry) : body
 
-    setSending(true)
-
-    try {
-      // メール送信APIを呼び出し
-      const emailData = selectedEntriesData.map(entry => ({
-        to: entry.users.email,
-        subject: replaceVariables(subject, entry),
-        body: replaceVariables(body, entry),
-        entryId: entry.id
-      }))
-
-      const response = await fetch('/api/admin/send-emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ emails: emailData }),
-      })
-
-      if (!response.ok) {
-        throw new Error('メール送信に失敗しました')
-      }
-
-      alert('メールの送信が完了しました')
-      onSent()
-      onClose()
-    } catch (error) {
-      console.error('Email sending error:', error)
-      alert('メール送信に失敗しました')
-    } finally {
-      setSending(false)
-    }
+    // mailtoリンクを作成
+    const mailtoLink = `mailto:${emailAddresses}?subject=${encodeURIComponent(processedSubject)}&body=${encodeURIComponent(processedBody)}`
+    
+    // メーラーを開く
+    window.location.href = mailtoLink
+    
+    // コンポーザーを閉じる
+    onSent()
+    onClose()
   }
 
   return (
@@ -360,10 +340,10 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
             </button>
             <button
               onClick={handleSendEmails}
-              disabled={sending || !subject.trim() || !body.trim() || selectedEntriesData.length === 0}
+              disabled={!subject.trim() || !body.trim() || selectedEntriesData.length === 0}
               className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {sending ? '送信中...' : `メール送信 (${selectedEntriesData.length}名)`}
+              メーラーを開く (${selectedEntriesData.length}名)
             </button>
           </div>
         </div>
