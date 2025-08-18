@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
+import { FileUploadField } from '@/components/ui/FileUploadField'
 import Image from 'next/image'
 import type { Entry, ApplicationsInfo, EntryFile, SeatRequest, BasicInfo } from '@/lib/types'
 
@@ -39,7 +40,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
   const [paymentSlipFiles, setPaymentSlipFiles] = useState<EntryFile[]>([])  // 複数の払込用紙を管理
   const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
-  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)  // 拡大表示用PDF URL
   const [makeupStyle1File, setMakeupStyle1File] = useState<EntryFile | null>(null)  // 希望スタイル①画像（準決勝）
   const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL（準決勝）
   const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像（準決勝）
@@ -1321,32 +1321,19 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                払込用紙のアップロード（複数枚可）
-              </label>
-              <div className="mt-2">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      handleFileUpload(file)
-                      e.target.value = ''  // inputをリセット
-                    }
-                  }}
-                  disabled={uploadingFile}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  対応形式: JPG、PNG、GIF、WEBP、PDF（最大10MB）
-                </p>
-                {uploadingFile && (
-                  <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
-                )}
-              </div>
-            </div>
+            <FileUploadField
+              label="払込用紙のアップロード（複数枚可）"
+              category="document"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
+              maxSizeMB={10}
+              onChange={handleFileUpload}
+              disabled={uploadingFile}
+              placeholder={{
+                title: "払込用紙をアップロード",
+                subtitle: "複数枚の画像やPDFをアップロード可能",
+                formats: "JPG, PNG, GIF, WEBP, PDF（最大10MB）"
+              }}
+            />
 
             {/* アップロード済みファイルのプレビューと管理 */}
             {paymentSlipFiles.length > 0 && (
@@ -1360,28 +1347,23 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       {/* プレビュー */}
                       {file.file_type === 'photo' || file.file_name.toLowerCase().endsWith('.pdf') ? (
                         file.file_name.toLowerCase().endsWith('.pdf') ? (
-                          paymentSlipUrls[file.id] ? (
-                            <div 
-                              className="h-40 mb-2 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => setSelectedPdfUrl(paymentSlipUrls[file.id])}
-                              title="クリックで拡大表示"
-                            >
-                              <iframe
-                                src={paymentSlipUrls[file.id]}
-                                className="w-full h-full pointer-events-none"
-                                title={file.file_name}
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
-                                <svg className="h-8 w-8 text-white opacity-0 hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                </svg>
-                              </div>
+                          <div 
+                            className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
+                            onClick={() => {
+                              if (paymentSlipUrls[file.id]) {
+                                window.open(paymentSlipUrls[file.id], '_blank')
+                              }
+                            }}
+                            title="クリックで新しいタブで開く"
+                          >
+                            <div className="text-center">
+                              <svg className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                              <p className="text-sm text-gray-600">PDFファイル</p>
+                              <p className="text-xs text-gray-500">クリックで開く</p>
                             </div>
-                          ) : (
-                            <div className="h-40 mb-2 bg-gray-100 rounded flex items-center justify-center">
-                              <span className="text-sm text-gray-500">PDFを読み込み中...</span>
-                            </div>
-                          )
+                          </div>
                         ) : (
                           <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
                             {paymentSlipUrls[file.id] ? (
@@ -1447,34 +1429,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         </div>
       )}
 
-      {/* PDFモーダル */}
-      {selectedPdfUrl && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedPdfUrl(null)}
-        >
-          <div 
-            className="bg-white rounded-lg w-full max-w-6xl h-5/6 relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedPdfUrl(null)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
-            >
-              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="h-full rounded-lg overflow-hidden">
-              <iframe
-                src={selectedPdfUrl}
-                className="w-full h-full"
-                title="PDFプレビュー"
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 観覧席希望申請 */}
       {activeTab === 'seat' && (
