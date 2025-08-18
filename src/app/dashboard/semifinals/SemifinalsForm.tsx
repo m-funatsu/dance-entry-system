@@ -576,7 +576,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     // 保存成功後にダッシュボードにリダイレクト
     showToast('準決勝情報を保存しました', 'success')
     setTimeout(() => {
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
     }, 1500)
     
     setValidationErrors({})

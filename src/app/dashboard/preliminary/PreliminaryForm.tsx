@@ -70,7 +70,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   })
   
   // ファイルアップロードフック
-  const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
+  const { uploading, deleteFile } = useFileUploadV2({
     category: 'video',
     onSuccess: async (result: { url?: string; path?: string }) => {
       if (result.path) {
@@ -160,27 +160,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
   
-  const handleFileUpload = async (file: File) => {
-    if (!entryId) {
-      showToast('基本情報を先に保存してください', 'error')
-      return
-    }
-
-    if (videoFile) {
-      showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
-      return
-    }
-
-    // ファイルアップロード前に現在の入力データを一時保存
-    try {
-      await save({ ...formData, entry_id: entryId })
-      console.log('[PRELIMINARY UPLOAD] 一時保存完了')
-    } catch (tempSaveError) {
-      console.log('[PRELIMINARY UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
-    }
-
-    await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
-  }
 
   const handleFileDelete = async () => {
     if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
@@ -256,7 +235,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     // 保存成功後にダッシュボードにリダイレクト
     showToast('予選情報を保存しました', 'success')
     setTimeout(() => {
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
     }, 1500)
   }
 
@@ -419,7 +398,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             <FileUploadField
               label="予選提出動画"
               value={null}
-              onChange={handleFileUpload}
+              onChange={() => {}} // 空の関数（自動アップロードを使用）
+              onUploadComplete={(url) => {
+                console.log('[PRELIMINARY] Upload completed with URL:', url)
+                // ページをリロードしてファイル情報を更新
+                window.location.reload()
+              }}
+              uploadPath={(fileName) => `${userId}/${entryId}/preliminary/${fileName}`}
               category="video"
               disabled={uploading || !!videoFile || !entryId}
               required

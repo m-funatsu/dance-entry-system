@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import type { Entry, SnsInfo } from '@/lib/types'
@@ -10,6 +11,7 @@ interface SnsInfoFormProps {
 }
 
 export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
+  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -227,7 +229,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
       setSuccess('SNS掲載情報を保存しました')
       setTimeout(() => {
-        window.location.href = '/dashboard'
+        router.push('/dashboard')
       }, 1500)
     } catch (err) {
       console.error('保存エラー:', err)
