@@ -158,29 +158,6 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     ]
   }
 
-  const replaceVariables = (text: string, entry: typeof selectedEntriesData[0]) => {
-    return text
-      .replace(/\{\{name\}\}/g, entry.users.name)
-      .replace(/\{\{email\}\}/g, entry.users.email)
-      .replace(/\{\{dance_style\}\}/g, entry.dance_style)
-      .replace(/\{\{representative_name\}\}/g, entry.representative_name || entry.users.name)
-      .replace(/\{\{partner_name\}\}/g, entry.partner_name || 'パートナ名未設定')
-      .replace(/\{\{team_name\}\}/g, entry.team_name || '個人参加')
-      .replace(/\{\{participant_names\}\}/g, entry.participant_names)
-      .replace(/\{\{status\}\}/g, getStatusText(entry.status))
-      .replace(/\{\{competition_name\}\}/g, 'ダンスコンペティション')
-      .replace(/\{\{organization_name\}\}/g, 'ダンスコンペティション運営事務局')
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return '未処理'
-      case 'submitted': return '提出済み'
-      case 'selected': return '選考通過'
-      case 'rejected': return '不選考'
-      default: return '未設定'
-    }
-  }
 
   const handleSendEmails = () => {
     if (!subject.trim() || !body.trim()) {
@@ -199,13 +176,8 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
     
-    // 最初のエントリーでテンプレート変数を置換（参考用）
-    const firstEntry = selectedEntriesData[0]
-    const processedSubject = firstEntry ? replaceVariables(subject, firstEntry) : subject
-    const processedBody = firstEntry ? replaceVariables(body, firstEntry) : body
-
     // mailtoリンクを作成
-    const mailtoLink = `mailto:${emailAddresses}?subject=${encodeURIComponent(processedSubject)}&body=${encodeURIComponent(processedBody)}`
+    const mailtoLink = `mailto:${emailAddresses}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     
     // メーラーを開く
     window.location.href = mailtoLink
@@ -328,10 +300,10 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
                   </h4>
                   <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
                     <div className="mb-2">
-                      <strong>件名:</strong> {replaceVariables(subject, selectedEntriesData[0])}
+                      <strong>件名:</strong> {subject}
                     </div>
                     <div className="whitespace-pre-wrap text-sm">
-                      {replaceVariables(body, selectedEntriesData[0])}
+                      {body}
                     </div>
                   </div>
                 </div>

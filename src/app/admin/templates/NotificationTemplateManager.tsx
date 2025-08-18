@@ -214,16 +214,8 @@ export default function NotificationTemplateManager() {
                 value={formData.body}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="{{representative_name}}様..."
+                placeholder="メール本文を入力してください..."
               />
-              <div className="mt-2 p-3 bg-gray-50 rounded-md">
-                <p className="text-sm font-medium text-gray-700 mb-2">利用可能な変数：</p>
-                <div className="grid grid-cols-1 gap-2 text-xs text-gray-600">
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{representative_name}}'}</code> - 代表者名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{partner_name}}'}</code> - ペア名</div>
-                  <div>• <code className="bg-gray-200 px-1 rounded">{'{{dance_style}}'}</code> - ダンススタイル</div>
-                </div>
-              </div>
             </div>
 
             <div className="flex items-center">
