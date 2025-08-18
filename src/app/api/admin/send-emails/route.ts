@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getFromEmailAddress } from '@/lib/settings'
 
 interface EmailData {
   to: string
@@ -50,31 +51,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // メール送信の実装（現在はダミー実装）
-    // 実際の環境では、SendGrid、Amazon SES、Resendなどのメールサービスを使用
+    // 管理者のFromアドレスを取得
+    const fromEmail = await getFromEmailAddress()
+    
+    // メール送信の実装（Supabase Edge Functionを使用）
     const results = []
+    const adminSupabase = createAdminClient()
     
     for (const email of emails) {
       try {
-        // TODO: 実際のメール送信処理を実装
-        // 例: SendGridの場合
-        // await sendGridClient.send({
-        //   to: email.to,
-        //   from: 'noreply@example.com',
-        //   subject: email.subject,
-        //   text: email.body,
-        // })
+        // Supabase Edge Functionでメール送信
+        const { data: emailResult, error: emailError } = await adminSupabase.functions.invoke('send-custom-email', {
+          body: {
+            to: email.to,
+            from: fromEmail,
+            subject: email.subject,
+            html: email.body.replace(/\n/g, '<br>')
+          }
+        })
+
+        if (emailError) {
+          throw emailError
+        }
 
         // 開発環境用：コンソールにログ出力
         console.log('=== EMAIL SENT ===')
+        console.log('From:', fromEmail)
         console.log('To:', email.to)
         console.log('Subject:', email.subject)
         console.log('Body:', email.body)
         console.log('Entry ID:', email.entryId)
+        console.log('Result:', emailResult)
         console.log('==================')
 
         // メール送信ログをデータベースに記録
-        const adminSupabase = createAdminClient()
         await adminSupabase
           .from('email_logs')
           .insert({

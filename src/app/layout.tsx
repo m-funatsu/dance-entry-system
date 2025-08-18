@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClientProviders from "@/components/ClientProviders";
-import { getFaviconUrl, getSiteTitle } from "@/lib/favicon";
+import FaviconLoader from "@/components/FaviconLoader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,28 +14,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const [faviconUrl, siteTitle] = await Promise.all([
-    getFaviconUrl(),
-    getSiteTitle()
-  ]);
-
-  const metadata: Metadata = {
-    title: siteTitle,
-    description: "ダンス大会のエントリー管理システム",
-  };
-
-  // ファビコンが設定されている場合は追加
-  if (faviconUrl) {
-    metadata.icons = {
-      icon: faviconUrl,
-      shortcut: faviconUrl,
-      apple: faviconUrl,
-    };
-  }
-
-  return metadata;
-}
+export const metadata: Metadata = {
+  title: "2025 バルカーカップ ダンスエントリーシステム",
+  description: "ダンス大会のエントリー管理システム",
+};
 
 export default function RootLayout({
   children,
@@ -44,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <FaviconLoader />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
