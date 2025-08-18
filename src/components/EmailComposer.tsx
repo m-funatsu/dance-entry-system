@@ -108,7 +108,7 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
   const [templates, setTemplates] = useState<NotificationTemplate[]>([])
   const [templatesLoading, setTemplatesLoading] = useState(true)
 
-  const selectedEntriesData = entries.filter(entry => selectedEntries.includes(entry.id))
+  const selectedEntriesData = entries?.filter(entry => selectedEntries.includes(entry.id)) || []
 
   // テンプレートをデータベースから取得
   useEffect(() => {
@@ -189,7 +189,15 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     }
 
     // 全選択されたエントリーのメールアドレスを収集
-    const emailAddresses = selectedEntriesData.map(entry => entry.users.email).join(',')
+    const emailAddresses = selectedEntriesData
+      .filter(entry => entry?.users?.email)
+      .map(entry => entry.users.email)
+      .join(',')
+    
+    if (!emailAddresses) {
+      alert('有効なメールアドレスが見つかりません')
+      return
+    }
     
     // 最初のエントリーでテンプレート変数を置換（参考用）
     const firstEntry = selectedEntriesData[0]

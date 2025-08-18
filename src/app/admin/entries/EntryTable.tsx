@@ -172,6 +172,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const handleSelectAll = () => {
+    if (!entries || entries.length === 0) return
+    
     if (selectedEntries.length === entries.length) {
       setSelectedEntries([])
     } else {
@@ -331,10 +333,20 @@ export default function EntryTable({ entries }: EntryTableProps) {
               </button>
               <button
                 onClick={() => {
+                  if (!entries || entries.length === 0) {
+                    alert('エントリーが見つかりません')
+                    return
+                  }
+                  
                   const selectedEmails = entries
-                    .filter(entry => selectedEntries.includes(entry.id))
+                    .filter(entry => selectedEntries.includes(entry.id) && entry?.users?.email)
                     .map(entry => entry.users.email)
                     .join(',')
+                  
+                  if (!selectedEmails) {
+                    alert('有効なメールアドレスが見つかりません')
+                    return
+                  }
                   
                   const subject = 'ダンスエントリーシステムへようこそ'
                   const body = `ダンスエントリーシステムにご登録いただき、ありがとうございます。\n\nシステムへのログインURLをお送りいたします。\n\n${window.location.origin}\n\nご不明点がございましたら、お気軽にお問い合わせください。\n\nダンスコンペティション運営事務局`
@@ -375,7 +387,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 <input
                   type="checkbox"
                   className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  checked={selectedEntries.length === entries.length && entries.length > 0}
+                  checked={entries?.length > 0 && selectedEntries.length === entries.length}
                   onChange={handleSelectAll}
                 />
               </th>
@@ -403,7 +415,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {entries.map((entry) => (
+            {entries?.length > 0 && entries.map((entry) => (
                 <tr key={entry.id} className={selectedEntries.includes(entry.id) ? 'bg-indigo-50' : ''}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
