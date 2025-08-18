@@ -348,7 +348,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         
         // URLが自分のSupabaseプロジェクトのものか確認
         if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
-          console.error('[SECURITY] Invalid URL domain')
+          console.error('[SECURITY] Invalid URL domain', url)
           return null
         }
         

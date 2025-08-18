@@ -429,9 +429,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       const extractFilePathFromUrl = (url: string): string | null => {
         if (!url) return null
         
-        // URLが自分のSupabaseプロジェクトのものか確認
+        // URLが自分のSupabaseプロジェクトのものか確認（publicとrest両方を許可）
         if (!url.includes('ckffwsmgtivqjqkhppkj.supabase.co')) {
-          console.error('[SECURITY] Invalid URL domain')
+          console.error('[SECURITY] Invalid URL domain', url)
           return null
         }
         
