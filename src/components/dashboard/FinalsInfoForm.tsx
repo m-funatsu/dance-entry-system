@@ -569,6 +569,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     setValidationErrors({})
     setTimeout(() => {
       router.push('/dashboard')
+      setTimeout(() => window.location.reload(), 100)
     }, 1500)
   }
 

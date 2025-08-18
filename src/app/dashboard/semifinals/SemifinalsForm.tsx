@@ -577,6 +577,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     showToast('準決勝情報を保存しました', 'success')
     setTimeout(() => {
       router.push('/dashboard')
+      setTimeout(() => window.location.reload(), 100)
     }, 1500)
     
     setValidationErrors({})

@@ -315,6 +315,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     setSuccess('プログラム情報を保存しました')
     setTimeout(() => {
       router.push('/dashboard')
+      setTimeout(() => window.location.reload(), 100)
     }, 1500)
   }
 
