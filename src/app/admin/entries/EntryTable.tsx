@@ -12,6 +12,12 @@ interface EntryWithDetails {
   participant_names: string
   status: 'pending' | 'submitted' | 'selected' | 'rejected'
   basic_info_status?: string
+  preliminary_info_status?: string
+  semifinals_info_status?: string
+  finals_info_status?: string
+  program_info_status?: string
+  sns_info_status?: string
+  applications_info_status?: string
   created_at: string
   updated_at: string
   users: {
@@ -91,29 +97,42 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // 基本情報の判定ロジック（basic_info_statusを優先）
+    // 各フォームの判定ロジック（ステータスフィールドを優先）
     const hasBasicInfo = entry.basic_info_status === '登録済み' || 
       (entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info))
-    const hasPreliminaryInfo = entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
-    const hasProgramInfo = entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
-    const hasSemifinalsInfo = entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
-    const hasFinalsInfo = entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0
-    const hasApplicationsInfo = entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0
-    const hasSnsInfo = entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
+    const hasPreliminaryInfo = entry.preliminary_info_status === '登録済み' || 
+      (entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0)
+    const hasProgramInfo = entry.program_info_status === '登録済み' || 
+      (entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0)
+    const hasSemifinalsInfo = entry.semifinals_info_status === '登録済み' || 
+      (entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0)
+    const hasFinalsInfo = entry.finals_info_status === '登録済み' || 
+      (entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0)
+    const hasApplicationsInfo = entry.applications_info_status === '登録済み' || 
+      (entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0)
+    const hasSnsInfo = entry.sns_info_status === '登録済み' || 
+      (entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0)
 
     // デバッグログ（問題解決後は削除）
     console.log(`Entry ${entry.id} 提出状況:`, {
       basic: hasBasicInfo,
-      basicInfoStatus: entry.basic_info_status,
       preliminary: hasPreliminaryInfo,
       program: hasProgramInfo,
       semifinals: hasSemifinalsInfo,
       finals: hasFinalsInfo,
       applications: hasApplicationsInfo,
       sns: hasSnsInfo,
+      statusFields: {
+        basic_info_status: entry.basic_info_status,
+        preliminary_info_status: entry.preliminary_info_status,
+        semifinals_info_status: entry.semifinals_info_status,
+        finals_info_status: entry.finals_info_status,
+        program_info_status: entry.program_info_status,
+        sns_info_status: entry.sns_info_status,
+        applications_info_status: entry.applications_info_status
+      },
       rawData: {
         basic_info: entry.basic_info,
-        basic_info_status: entry.basic_info_status,
         preliminary_info: entry.preliminary_info,
         program_info: entry.program_info,
         semifinals_info: entry.semifinals_info,

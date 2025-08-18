@@ -16,26 +16,39 @@ export async function updateFormStatus(
     
     // フォームが完了している場合のみステータスを更新
     if (isFormComplete) {
-      const statusField = `${tableName.replace('_info', '')}_info_status`
+      // 各フォームのステータスフィールドを更新
+      const statusFieldMap: Record<string, string> = {
+        'basic_info': 'basic_info_status',
+        'preliminary_info': 'preliminary_info_status',
+        'semifinals_info': 'semifinals_info_status',
+        'finals_info': 'finals_info_status',
+        'program_info': 'program_info_status',
+        'sns_info': 'sns_info_status',
+        'applications_info': 'applications_info_status'
+      }
       
-      console.log(`[STATUS UPDATE] ${tableName} - ${statusField} を「登録済み」に更新`)
+      const statusFieldName = statusFieldMap[tableName]
       
-      // basic_infoテーブルの場合
-      if (tableName === 'basic_info') {
-        // entriesテーブルのbasic_info_statusを更新
+      console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「登録済み」に更新`)
+      
+      if (statusFieldName) {
+        // entriesテーブルの該当ステータスフィールドを更新
+        const updateData = { [statusFieldName]: '登録済み' }
+        
         const { data, error } = await supabase
           .from('entries')
-          .update({ basic_info_status: '登録済み' })
+          .update(updateData)
           .eq('id', entryId)
           .select()
         
         if (error) {
           console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
         } else {
-          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ステータスを「登録済み」に更新完了`, data)
+          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「登録済み」に更新完了`, data)
         }
+      } else {
+        console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません`)
       }
-      // 他のフォームの場合は、将来的にステータスフィールドを追加可能
     } else {
       console.log(`[STATUS UPDATE] ${tableName} - フォーム未完了のためステータス更新をスキップ`)
     }
