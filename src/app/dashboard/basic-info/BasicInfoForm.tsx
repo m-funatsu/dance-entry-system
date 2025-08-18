@@ -355,8 +355,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       // 保存成功後にダッシュボードにリダイレクト
       showToast('基本情報を保存しました', 'success')
       setTimeout(() => {
-        router.push('/dashboard')
-        setTimeout(() => window.location.reload(), 100)
+        window.location.href = '/dashboard'
       }, 1500)
 
     } catch (error) {

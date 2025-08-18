@@ -229,8 +229,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
       setSuccess('SNS掲載情報を保存しました')
       setTimeout(() => {
-        router.push('/dashboard')
-        setTimeout(() => window.location.reload(), 100)
+        window.location.href = '/dashboard'
       }, 1500)
     } catch (err) {
       console.error('保存エラー:', err)

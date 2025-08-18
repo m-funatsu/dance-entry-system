@@ -568,8 +568,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     // 保存成功後にダッシュボードにリダイレクト
     setValidationErrors({})
     setTimeout(() => {
-      router.push('/dashboard')
-      setTimeout(() => window.location.reload(), 100)
+      window.location.href = '/dashboard'
     }, 1500)
   }
 
