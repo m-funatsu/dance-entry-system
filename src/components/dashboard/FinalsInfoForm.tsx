@@ -532,22 +532,13 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     setActiveSection(sectionId)
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     // 50文字制限のチェック
     if (finalsInfo.work_character_story && finalsInfo.work_character_story.length > 50) {
       return
     }
 
-    // 必須項目チェック（一時保存時はスキップ）
-    if (!isTemporary) {
-      const allErrors = validateAllFinalsSection(finalsInfo)
-      if (Object.keys(allErrors).length > 0) {
-        setValidationErrors(allErrors)
-        const firstErrorSection = Object.keys(allErrors)[0]
-        setActiveSection(firstErrorSection)
-        return
-      }
-    }
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
 
     const dataToSave = {
       ...finalsInfo,
@@ -555,9 +546,12 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     }
 
     await save(dataToSave)
-    // save関数が例外をスローしなければ成功とみなす
-    // 保存成功時はエラーをクリア
+    
+    // 保存成功後にダッシュボードにリダイレクト
     setValidationErrors({})
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   if (loading) {
@@ -635,14 +629,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       )}
 
       <div className="flex justify-end pt-6 space-x-4">
-        <TemporarySaveButton
-          onClick={() => handleSave(true)}
-          disabled={saving}
-          loading={saving}
-        />
         <SaveButton
-          onClick={() => handleSave(false)}
-          disabled={saving || !isFinalsAllRequiredFieldsValid(finalsInfo)}
+          onClick={handleSave}
+          disabled={saving}
           loading={saving}
         />
       </div>

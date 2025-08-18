@@ -253,7 +253,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     setError(null)
     setSuccess(null)
     setSaving(true)
@@ -362,7 +362,10 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         }
       }
 
-      setSuccess(isTemporary ? '各種申請情報を一時保存しました' : '各種申請情報を保存しました')
+      setSuccess('各種申請情報を保存しました')
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
       // router.refresh()を削除して再レンダリングを防ぐ
     } catch (err) {
       console.error('保存エラー:', err)
@@ -1579,14 +1582,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       <div className="flex justify-end pt-6 space-x-4">
         <button
-          onClick={() => handleSave(true)}
-          disabled={saving}
-          className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
-        >
-          {saving ? '一時保存中...' : '一時保存'}
-        </button>
-        <button
-          onClick={() => handleSave(false)}
+          onClick={handleSave}
           disabled={saving}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >

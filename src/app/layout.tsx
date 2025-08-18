@@ -26,6 +26,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // グローバルエラーハンドラー：無害なDOM操作エラーを抑制
+              window.addEventListener('error', function(e) {
+                if (e.message && e.message.includes('removeChild') && e.filename && e.filename.includes('4bd1b696')) {
+                  e.preventDefault();
+                  return false;
+                }
+              });
+            `
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

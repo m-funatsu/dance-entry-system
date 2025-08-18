@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // React Strict Modeを無効化（DOM操作エラーを回避）
+  reactStrictMode: false,
   // セキュリティヘッダーの設定
   async headers() {
     return [

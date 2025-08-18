@@ -148,25 +148,13 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     setError(null)
     setSuccess(null)
     setSaving(true)
 
     try {
-      // 一時保存でない場合は必須項目をチェック
-      if (!isTemporary) {
-        if (!snsInfo.practice_video_path) {
-          setError('練習風景動画をアップロードしてください')
-          setSaving(false)
-          return
-        }
-        if (!snsInfo.introduction_highlight_path) {
-          setError('選手紹介・見所動画をアップロードしてください')
-          setSaving(false)
-          return
-        }
-      }
+      // バリデーションはステータスチェック用のみ（保存は常に可能）
 
       const { data: existingData } = await supabase
         .from('sns_info')
@@ -197,8 +185,10 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
         if (error) throw error
       }
 
-      setSuccess(isTemporary ? 'SNS掲載情報を一時保存しました' : 'SNS掲載情報を保存しました')
-      router.refresh()
+      setSuccess('SNS掲載情報を保存しました')
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
     } catch (err) {
       console.error('保存エラー:', err)
       setError(err instanceof Error ? err.message : 'SNS掲載情報の保存に失敗しました')
@@ -436,21 +426,10 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
       <div className="flex justify-end pt-6 space-x-4">
         <button
-          onClick={() => handleSave(true)}
+          onClick={handleSave}
           disabled={saving}
           className={`px-6 py-2 rounded-md text-white ${
             saving
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-gray-600 hover:bg-gray-700'
-          }`}
-        >
-          {saving ? '一時保存中...' : '一時保存'}
-        </button>
-        <button
-          onClick={() => handleSave(false)}
-          disabled={saving || !isAllRequiredFieldsValid()}
-          className={`px-6 py-2 rounded-md text-white ${
-            saving || !isAllRequiredFieldsValid()
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-blue-600 hover:bg-blue-700'
           }`}

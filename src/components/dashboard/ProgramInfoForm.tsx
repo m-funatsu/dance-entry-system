@@ -280,17 +280,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     setError(null)
     setSuccess(null)
 
-    // 完了保存の場合はバリデーション
-    if (!isTemporary) {
-      if (!validateAll(programInfo)) {
-        setError('入力内容に誤りがあります')
-        return
-      }
-    }
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
 
     // 保存するデータを準備（URLではなくパスのみを保存）
     const dataToSave = { ...programInfo, entry_id: entry.id }
@@ -312,7 +306,11 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
     await save(dataToSave)
 
-    router.refresh()
+    // 保存成功後にダッシュボードにリダイレクト  
+    setSuccess('プログラム情報を保存しました')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   if (loading) {
@@ -547,14 +545,9 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       </div>
 
       <div className="flex justify-end space-x-4">
-        <TemporarySaveButton
-          onClick={() => handleSave(true)}
-          disabled={saving || uploading}
-          loading={saving}
-        />
         <SaveButton
-          onClick={() => handleSave(false)}
-          disabled={saving || uploading || !isAllRequiredFieldsValid(programInfo)}
+          onClick={handleSave}
+          disabled={saving || uploading}
           loading={saving}
         />
       </div>
