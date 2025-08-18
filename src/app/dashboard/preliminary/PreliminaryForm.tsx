@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkPreliminaryInfoCompletion } from '@/lib/status-utils'
-import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync, VideoUpload } from '@/components/ui'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
@@ -416,23 +416,15 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <input
-                type="file"
-                accept="video/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    handleFileUpload(file)
-                  }
-                }}
-                disabled={uploading || !!videoFile || !entryId}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-              />
-              <p className="mt-2 text-sm text-gray-500">
-                対応形式: MP4, MOV, AVI など（最大250MB）
-              </p>
-            </div>
+            <VideoUpload
+              value={videoFile ? (videoFile as EntryFile).file_name : ''}
+              onChange={handleFileUpload}
+              onDelete={() => handleFileDelete()}
+              disabled={uploading || !!videoFile || !entryId}
+              required
+              maxSizeMB={500}
+              accept="video/*"
+            />
           )}
         </div>
 

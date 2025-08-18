@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import EmailComposer from '@/components/EmailComposer'
@@ -59,7 +59,13 @@ export default function EntryTable({ entries }: EntryTableProps) {
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [showEmailComposer, setShowEmailComposer] = useState(false)
+  const [localEntries, setLocalEntries] = useState<EntryWithDetails[]>(entries)
   const router = useRouter()
+  
+  // props entriesが変更されたら内部状態を更新
+  useEffect(() => {
+    setLocalEntries(entries)
+  }, [entries])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -219,12 +225,12 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const handleSelectAll = () => {
-    if (!entries || entries.length === 0) return
+    if (!localEntries || localEntries.length === 0) return
     
-    if (selectedEntries.length === entries.length) {
+    if (selectedEntries.length === localEntries.length) {
       setSelectedEntries([])
     } else {
-      setSelectedEntries(entries.map(entry => entry.id))
+      setSelectedEntries(localEntries.map(entry => entry.id))
     }
   }
 
@@ -232,6 +238,15 @@ export default function EntryTable({ entries }: EntryTableProps) {
     setLoading(true)
 
     try {
+      // 楽観的更新: 先に画面を更新
+      setLocalEntries(prev => 
+        prev.map(entry => 
+          entry.id === entryId 
+            ? { ...entry, status: newStatus as 'pending' | 'submitted' | 'selected' | 'rejected' }
+            : entry
+        )
+      )
+
       const response = await fetch('/api/admin/entries/status', {
         method: 'PUT',
         headers: {
@@ -244,13 +259,20 @@ export default function EntryTable({ entries }: EntryTableProps) {
       })
 
       if (!response.ok) {
+        // エラーの場合は元に戻す
+        setLocalEntries(entries)
         const errorData = await response.json()
         alert(errorData.error || 'ステータスの更新に失敗しました')
         return
       }
 
-      router.refresh()
+      // 成功時は最新データで更新
+      setTimeout(() => {
+        router.refresh()
+      }, 1000)
     } catch (error) {
+      // エラーの場合は元に戻す
+      setLocalEntries(entries)
       console.error('Status update error:', error)
       alert('ステータスの更新に失敗しました')
     } finally {
@@ -264,13 +286,24 @@ export default function EntryTable({ entries }: EntryTableProps) {
       return
     }
 
-    if (!confirm(`選択したエントリーのステータスを「${newStatus}」に変更しますか？`)) {
+    const statusText = newStatus === 'selected' ? '予選通過' : newStatus === 'rejected' ? '予選敗退' : newStatus
+    if (!confirm(`選択したエントリーのステータスを「${statusText}」に変更しますか？`)) {
       return
     }
 
     setLoading(true)
+    const originalEntries = [...localEntries]
 
     try {
+      // 楽観的更新: 先に画面を更新
+      setLocalEntries(prev => 
+        prev.map(entry => 
+          selectedEntries.includes(entry.id)
+            ? { ...entry, status: newStatus as 'pending' | 'submitted' | 'selected' | 'rejected' }
+            : entry
+        )
+      )
+
       const response = await fetch('/api/admin/entries/status', {
         method: 'PUT',
         headers: {
@@ -283,14 +316,22 @@ export default function EntryTable({ entries }: EntryTableProps) {
       })
 
       if (!response.ok) {
+        // エラーの場合は元に戻す
+        setLocalEntries(originalEntries)
         const errorData = await response.json()
         alert(errorData.error || 'ステータスの更新に失敗しました')
         return
       }
 
       setSelectedEntries([])
-      router.refresh()
+      
+      // 成功時は最新データで更新
+      setTimeout(() => {
+        router.refresh()
+      }, 1000)
     } catch (error) {
+      // エラーの場合は元に戻す
+      setLocalEntries(originalEntries)
       console.error('Bulk status update error:', error)
       alert('ステータスの更新に失敗しました')
     } finally {
@@ -382,7 +423,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 onClick={async () => {
                   setLoading(true)
                   try {
-                    const selectedUsersWithEmails = entries
+                    const selectedUsersWithEmails = localEntries
                       .filter(entry => selectedEntries.includes(entry.id))
                       .map(entry => ({ email: entry.users.email, name: entry.users.name }))
                     
@@ -441,7 +482,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 <input
                   type="checkbox"
                   className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  checked={entries?.length > 0 && selectedEntries.length === entries.length}
+                  checked={localEntries?.length > 0 && selectedEntries.length === localEntries.length}
                   onChange={handleSelectAll}
                 />
               </th>
@@ -469,7 +510,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {entries?.length > 0 && entries.map((entry) => (
+            {localEntries?.length > 0 && localEntries.map((entry) => (
                 <tr key={entry.id} className={selectedEntries.includes(entry.id) ? 'bg-indigo-50' : ''}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -534,7 +575,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
         </table>
       </div>
 
-      {entries.length === 0 && (
+      {localEntries.length === 0 && (
         <div className="text-center py-12">
           <div className="text-sm text-gray-500">エントリーがありません</div>
         </div>
@@ -543,7 +584,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
       {showEmailComposer && (
         <EmailComposer
           selectedEntries={selectedEntries}
-          entries={entries}
+          entries={localEntries}
           onClose={() => setShowEmailComposer(false)}
           onSent={() => {
             setSelectedEntries([])
