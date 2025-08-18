@@ -11,26 +11,29 @@ export interface EntryWithUser extends Entry {
   }
 }
 
-// CSVヘッダーの定義
+// CSVヘッダーの定義（カテゴリ付き）
 export const CSV_HEADERS = [
-  { key: 'id', label: 'エントリーID' },
-  { key: 'user_name', label: 'ユーザー名' },
-  { key: 'user_email', label: 'メールアドレス' },
-  { key: 'dance_style', label: 'ダンスジャンル' },
-  { key: 'phone_number', label: '電話番号' },
-  { key: 'music_title', label: '曲名' },
-  { key: 'choreographer', label: '振付師' },
-  { key: 'choreographer_furigana', label: '振付師フリガナ' },
-  { key: 'story', label: 'ストーリー' },
-  { key: 'status', label: 'ステータス' },
-  { key: 'created_at', label: '作成日時' },
-  { key: 'updated_at', label: '更新日時' },
+  { key: 'id', label: 'エントリーID', category: '基本情報' },
+  { key: 'user_name', label: 'ユーザー名', category: '基本情報' },
+  { key: 'user_email', label: 'メールアドレス', category: '基本情報' },
+  { key: 'dance_style', label: 'ダンスジャンル', category: '基本情報' },
+  { key: 'phone_number', label: '電話番号', category: '基本情報' },
+  { key: 'music_title', label: '曲名', category: '作品情報' },
+  { key: 'choreographer', label: '振付師', category: '作品情報' },
+  { key: 'choreographer_furigana', label: '振付師フリガナ', category: '作品情報' },
+  { key: 'story', label: 'ストーリー', category: '作品情報' },
+  { key: 'status', label: 'ステータス', category: '管理情報' },
+  { key: 'created_at', label: '作成日時', category: '管理情報' },
+  { key: 'updated_at', label: '更新日時', category: '管理情報' },
 ] as const
 
-// エントリーをCSV形式に変換
+// エントリーをCSV形式に変換（2行ヘッダー対応）
 export function entriesToCSV(entries: EntryWithUser[]): string {
-  // ヘッダー行を作成
-  const headers = CSV_HEADERS.map(h => h.label).join(',')
+  // 1行目：カテゴリヘッダー
+  const categoryHeaders = CSV_HEADERS.map(h => h.category).join(',')
+  
+  // 2行目：フィールドヘッダー
+  const fieldHeaders = CSV_HEADERS.map(h => h.label).join(',')
   
   // データ行を作成
   const rows = entries.map(entry => {
@@ -61,7 +64,7 @@ export function entriesToCSV(entries: EntryWithUser[]): string {
     }).join(',')
   })
   
-  return [headers, ...rows].join('\n')
+  return [categoryHeaders, fieldHeaders, ...rows].join('\n')
 }
 
 // CSVをダウンロード
@@ -91,12 +94,13 @@ function formatDate(dateString: string): string {
   return `${year}/${month}/${day} ${hours}:${minutes}`
 }
 
-// CSVからエントリーデータを解析（インポート用）
+// CSVからエントリーデータを解析（インポート用・2行ヘッダー対応）
 export function parseCSV(csvContent: string): Partial<Entry>[] {
   const lines = csvContent.split('\n').filter(line => line.trim())
-  if (lines.length < 2) return []
+  if (lines.length < 3) return [] // カテゴリ行 + フィールド行 + 最低1行のデータ
   
-  const headers = lines[0].split(',').map(h => h.trim())
+  // 2行目がフィールドヘッダー（1行目はカテゴリヘッダー）
+  const headers = lines[1].split(',').map(h => h.trim())
   const entries: Partial<Entry>[] = []
   
   // ヘッダーのマッピングを作成
@@ -108,8 +112,8 @@ export function parseCSV(csvContent: string): Partial<Entry>[] {
     }
   })
   
-  // データ行を解析
-  for (let i = 1; i < lines.length; i++) {
+  // データ行を解析（3行目から開始）
+  for (let i = 2; i < lines.length; i++) {
     const values = parseCSVLine(lines[i])
     const entry: Partial<Entry> = {}
     
