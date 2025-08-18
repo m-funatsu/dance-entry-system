@@ -97,14 +97,14 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // 各フォームの判定ロジック（従来の方式、将来的にステータスフィールド対応予定）
+    // 各フォームの判定ロジック（配列・単一オブジェクト両方に対応）
     const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
-    const hasPreliminaryInfo = entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
-    const hasProgramInfo = entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
-    const hasSemifinalsInfo = entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
-    const hasFinalsInfo = entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0
-    const hasApplicationsInfo = entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0
-    const hasSnsInfo = entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
+    const hasPreliminaryInfo = entry.preliminary_info && (Array.isArray(entry.preliminary_info) ? entry.preliminary_info.length > 0 : !!entry.preliminary_info)
+    const hasProgramInfo = entry.program_info && (Array.isArray(entry.program_info) ? entry.program_info.length > 0 : !!entry.program_info)
+    const hasSemifinalsInfo = entry.semifinals_info && (Array.isArray(entry.semifinals_info) ? entry.semifinals_info.length > 0 : !!entry.semifinals_info)
+    const hasFinalsInfo = entry.finals_info && (Array.isArray(entry.finals_info) ? entry.finals_info.length > 0 : !!entry.finals_info)
+    const hasApplicationsInfo = entry.applications_info && (Array.isArray(entry.applications_info) ? entry.applications_info.length > 0 : !!entry.applications_info)
+    const hasSnsInfo = entry.sns_info && (Array.isArray(entry.sns_info) ? entry.sns_info.length > 0 : !!entry.sns_info)
 
     // デバッグログ（問題解決後は削除）
     const debugInfo = {

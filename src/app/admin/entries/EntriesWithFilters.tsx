@@ -67,12 +67,12 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
     switch(formType) {
       case 'basic': return entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
-      case 'preliminary': return entry.preliminary_info && Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0
-      case 'program': return entry.program_info && Array.isArray(entry.program_info) && entry.program_info.length > 0
-      case 'semifinals': return entry.semifinals_info && Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0
-      case 'finals': return entry.finals_info && Array.isArray(entry.finals_info) && entry.finals_info.length > 0
-      case 'applications': return entry.applications_info && Array.isArray(entry.applications_info) && entry.applications_info.length > 0
-      case 'sns': return entry.sns_info && Array.isArray(entry.sns_info) && entry.sns_info.length > 0
+      case 'preliminary': return entry.preliminary_info && (Array.isArray(entry.preliminary_info) ? entry.preliminary_info.length > 0 : !!entry.preliminary_info)
+      case 'program': return entry.program_info && (Array.isArray(entry.program_info) ? entry.program_info.length > 0 : !!entry.program_info)
+      case 'semifinals': return entry.semifinals_info && (Array.isArray(entry.semifinals_info) ? entry.semifinals_info.length > 0 : !!entry.semifinals_info)
+      case 'finals': return entry.finals_info && (Array.isArray(entry.finals_info) ? entry.finals_info.length > 0 : !!entry.finals_info)
+      case 'applications': return entry.applications_info && (Array.isArray(entry.applications_info) ? entry.applications_info.length > 0 : !!entry.applications_info)
+      case 'sns': return entry.sns_info && (Array.isArray(entry.sns_info) ? entry.sns_info.length > 0 : !!entry.sns_info)
       default: return true
     }
   }
