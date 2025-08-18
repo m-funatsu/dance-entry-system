@@ -12,6 +12,8 @@ export async function updateFormStatus(
   try {
     const supabase = createClient()
     
+    console.log(`[STATUS UPDATE] ${tableName} - エントリーID: ${entryId}, 完了状況: ${isFormComplete}`)
+    
     // フォームが完了している場合のみステータスを更新
     if (isFormComplete) {
       const statusField = `${tableName.replace('_info', '')}_info_status`
@@ -21,18 +23,21 @@ export async function updateFormStatus(
       // basic_infoテーブルの場合
       if (tableName === 'basic_info') {
         // entriesテーブルのbasic_info_statusを更新
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('entries')
           .update({ basic_info_status: '登録済み' })
           .eq('id', entryId)
+          .select()
         
         if (error) {
           console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
         } else {
-          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ステータスを「登録済み」に更新`)
+          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ステータスを「登録済み」に更新完了`, data)
         }
       }
       // 他のフォームの場合は、将来的にステータスフィールドを追加可能
+    } else {
+      console.log(`[STATUS UPDATE] ${tableName} - フォーム未完了のためステータス更新をスキップ`)
     }
   } catch (error) {
     console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
@@ -48,7 +53,7 @@ export function checkBasicInfoCompletion(
 ): boolean {
   const requiredFields = [
     'representative_name',
-    'representative_name_furigana', 
+    'representative_furigana', 
     'dance_style',
     'category_division',
     'phone_number',
@@ -58,7 +63,9 @@ export function checkBasicInfoCompletion(
   // 必須フィールドの入力チェック
   const hasAllRequiredFields = requiredFields.every(field => {
     const value = formData[field]
-    return value && value.toString().trim() !== ''
+    const isValid = value && value.toString().trim() !== ''
+    console.log(`[BASIC INFO CHECK] ${field}: "${value}" -> ${isValid}`)
+    return isValid
   })
   
   // 同意事項のチェック
@@ -66,7 +73,10 @@ export function checkBasicInfoCompletion(
     checkboxes.media_consent_checked && 
     checkboxes.privacy_policy_checked
   
-  return hasAllRequiredFields && hasAllAgreements
+  const result = hasAllRequiredFields && hasAllAgreements
+  console.log(`[BASIC INFO CHECK] フィールド完了: ${hasAllRequiredFields}, 同意事項完了: ${hasAllAgreements}, 最終結果: ${result}`)
+  
+  return result
 }
 
 /**
