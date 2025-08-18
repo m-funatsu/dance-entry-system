@@ -332,28 +332,34 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 メール送信
               </button>
               <button
-                onClick={() => {
-                  if (!entries || entries.length === 0) {
-                    alert('エントリーが見つかりません')
-                    return
+                onClick={async () => {
+                  setLoading(true)
+                  try {
+                    const selectedUsersWithEmails = entries
+                      .filter(entry => selectedEntries.includes(entry.id))
+                      .map(entry => ({ email: entry.users.email, name: entry.users.name }))
+                    
+                    for (const user of selectedUsersWithEmails) {
+                      const response = await fetch('/api/admin/send-welcome-email', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: user.email, name: user.name }),
+                      })
+                      
+                      if (!response.ok) {
+                        const errorData = await response.json()
+                        throw new Error(errorData.error || 'ウェルカムメールの送信に失敗しました')
+                      }
+                    }
+                    alert(`${selectedUsersWithEmails.length}件のウェルカムメールを送信しました`)
+                  } catch (error) {
+                    console.error('Bulk welcome email error:', error)
+                    alert('ウェルカムメールの送信に失敗しました')
+                  } finally {
+                    setLoading(false)
                   }
-                  
-                  const selectedEmails = entries
-                    .filter(entry => selectedEntries.includes(entry.id) && entry?.users?.email)
-                    .map(entry => entry.users.email)
-                    .join(',')
-                  
-                  if (!selectedEmails) {
-                    alert('有効なメールアドレスが見つかりません')
-                    return
-                  }
-                  
-                  const toAddress = 'entry_vqcup@valqua.com'
-                  const subject = 'ダンスエントリーシステムへようこそ'
-                  const body = `ダンスエントリーシステムにご登録いただき、ありがとうございます。\n\nシステムへのログインURLをお送りいたします。\n\n${window.location.origin}\n\nご不明点がございましたら、お気軽にお問い合わせください。\n\nダンスコンペティション運営事務局`
-                  
-                  const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(selectedEmails)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-                  window.location.href = mailtoLink
                 }}
                 disabled={loading}
                 className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
