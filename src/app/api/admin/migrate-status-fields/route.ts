@@ -25,48 +25,23 @@ export async function POST() {
 
     const adminSupabase = createAdminClient()
 
-    // 各ステータスフィールドを個別に追加
-    const statusFields = [
-      'preliminary_info_status',
-      'semifinals_info_status', 
-      'finals_info_status',
-      'program_info_status',
-      'sns_info_status',
-      'applications_info_status'
-    ]
+    // 簡単にマイグレーション状況を確認
+    const { data: testQuery } = await adminSupabase
+      .from('entries')
+      .select('id, basic_info_status')
+      .limit(1)
 
-    const results = []
-    
-    for (const fieldName of statusFields) {
-      try {
-        // フィールドが存在するかチェック
-        const { data: columns } = await adminSupabase
-          .from('information_schema.columns')
-          .select('column_name')
-          .eq('table_name', 'entries')
-          .eq('column_name', fieldName)
-        
-        if (!columns || columns.length === 0) {
-          // フィールドが存在しない場合は追加
-          // 注意: 直接SQLを実行するため、エラーが発生する可能性があります
-          console.log(`${fieldName} フィールドを追加中...`)
-          results.push(`${fieldName}: フィールド追加が必要（手動で実行してください）`)
-        } else {
-          results.push(`${fieldName}: 既に存在`)
-        }
-      } catch (error) {
-        console.error(`${fieldName} チェックエラー:`, error)
-        results.push(`${fieldName}: エラー - ${error}`)
-      }
+    let hasStatusFields = false
+    if (testQuery && testQuery.length > 0 && 'basic_info_status' in testQuery[0]) {
+      hasStatusFields = true
     }
 
     return NextResponse.json({ 
       success: true,
-      message: 'ステータスフィールドのチェックが完了しました',
-      results,
+      hasStatusFields,
+      message: hasStatusFields ? 'ステータスフィールドは既に存在します' : 'ステータスフィールドの追加が必要です',
       migration_sql: `
--- 以下のSQLを手動でSupabase SQLエディタで実行してください:
-
+-- フィールド追加のみ（制約は後で追加）
 ALTER TABLE entries 
 ADD COLUMN IF NOT EXISTS preliminary_info_status text DEFAULT '入力中',
 ADD COLUMN IF NOT EXISTS semifinals_info_status text DEFAULT '入力中',
@@ -74,6 +49,9 @@ ADD COLUMN IF NOT EXISTS finals_info_status text DEFAULT '入力中',
 ADD COLUMN IF NOT EXISTS program_info_status text DEFAULT '入力中',
 ADD COLUMN IF NOT EXISTS sns_info_status text DEFAULT '入力中',
 ADD COLUMN IF NOT EXISTS applications_info_status text DEFAULT '入力中';
+
+-- 実行完了確認
+SELECT 'ステータスフィールドの追加が完了しました' as result;
       `
     })
 
