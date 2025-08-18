@@ -40,7 +40,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const { save, saving, error, success } = useFormSave({
     tableName: 'semifinals_info',
     uniqueField: 'entry_id',
-    redirectPath: '/dashboard',
+    redirectPath: '', // リダイレクトを無効化
     onSuccess: (message) => showToast(message, 'success'),
     onError: (message) => showToast(message, 'error')
   })
