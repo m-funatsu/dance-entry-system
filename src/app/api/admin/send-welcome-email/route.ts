@@ -32,16 +32,17 @@ export async function POST(request: NextRequest) {
     // 管理者クライアントを使用
     const adminSupabase = createAdminClient()
 
-    // パスワードリセットメールを送信（初回ログインパラメータ付き）
-    const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/update-password?first_time=true`
+    // Confirm signupメールを再送信
+    const { error: resendError } = await adminSupabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
       }
-    )
+    })
 
-    if (resetError) {
-      console.error('Welcome email error:', resetError)
+    if (resendError) {
+      console.error('Welcome email error:', resendError)
       return NextResponse.json(
         { error: 'ウェルカムメールの送信に失敗しました' },
         { status: 500 }
