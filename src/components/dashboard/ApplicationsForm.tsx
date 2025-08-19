@@ -886,6 +886,20 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {activeTab === 'makeup' && (
         <div className="space-y-8">
           <h4 className="font-medium">メイク・ヘアメイク予約申請</h4>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="text-sm text-blue-800 space-y-2">
+              <p>
+                大会当日、会場にてメイク・ヘアセットブースを設置いたします。ご予約をご希望の方は、本フォームよりお申込をお願いいたします。
+              </p>
+              <p>
+                ※また、直接美容師へご連絡いただいた場合も、必ず本フォームよりご予約ください。
+              </p>
+              <p>
+                ※料金は、大会当日直接美容師にお支払いください。
+              </p>
+            </div>
+          </div>
 
           {/* 準決勝用 */}
           <div className="border rounded-lg p-6 space-y-4">

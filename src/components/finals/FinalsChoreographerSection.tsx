@@ -193,6 +193,14 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
       <div className="border-t pt-4">
         <h4 className="font-medium mb-3">作品振付師出席情報</h4>
         
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+          <p className="text-sm text-blue-800">
+            当日、決勝入賞したペアの振付師を表彰する際、振付師の方にご登壇いただきます。その際、ご希望であれば、振付師の代理人の方でも、ご登壇いただくことが可能です。<br />
+            その際、会場モニターへお写真を追加いたしますので、振付師の方のお写真を登録ください。<br />
+            また、振付師の方の出席状況についてもあわせてご回答お願いいたします。
+          </p>
+        </div>
+        
         <div className="space-y-4">
           <FormField
             label="作品振付師出席予定"
