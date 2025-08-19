@@ -227,16 +227,18 @@ export default async function DashboardPage() {
   const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
+    // status-utils.tsのcheckPreliminaryInfoCompletionと同じ必須フィールドを使用
     const requiredFields = [
       'work_title',
+      'work_title_kana', // 作品タイトルふりがな（重要な必須項目）
       'work_story',
-      'music_rights_cleared',
       'music_title',
       'cd_title',
       'artist',
       'record_number',
       'jasrac_code',
-      'music_type'
+      'choreographer1_name',
+      'choreographer1_furigana'
     ]
     return requiredFields.every(field => {
       const value = preliminaryInfo[field]
@@ -248,47 +250,17 @@ export default async function DashboardPage() {
   const checkSemifinalsInfoComplete = (semifinalsInfo: { [key: string]: unknown } | null) => {
     if (!semifinalsInfo) return false
     
-    // 必須フィールドのチェック
+    // status-utils.tsのcheckSemifinalsInfoCompletionと同じ必須フィールドを使用
     const requiredFields = [
-      // 楽曲情報
-      'music_change_from_preliminary',
       'work_title',
-      'work_character_story',
-      'copyright_permission',
+      'work_character_story', 
       'music_title',
       'cd_title',
       'artist',
       'record_number',
       'jasrac_code',
       'music_type',
-      'music_data_path',
-      // 音響指示情報
-      'sound_start_timing',
-      'chaser_song_designation',
-      'fade_out_start_time',
-      'fade_out_complete_time',
-      // 照明指示情報
-      'dance_start_timing',
-      'scene1_time',
-      'scene1_trigger',
-      'scene1_color_type',
-      'scene1_color_other',
-      'scene1_image',
-      'scene1_image_path',
-      'chaser_exit_time',
-      'chaser_exit_trigger',
-      'chaser_exit_color_type',
-      'chaser_exit_color_other',
-      'chaser_exit_image',
-      'chaser_exit_image_path',
-      // 振付情報
-      'choreographer_change_from_preliminary',
-      // 賞金振込先情報
-      'bank_name',
-      'branch_name', 
-      'account_type',
-      'account_number',
-      'account_holder'
+      'copyright_permission'
     ]
     
     return requiredFields.every(field => {
@@ -302,10 +274,17 @@ export default async function DashboardPage() {
   const checkFinalsInfoComplete = (finalsInfo: { [key: string]: unknown } | null) => {
     if (!finalsInfo) return false
     
-    // 必須フィールドのチェック（決勝情報フォームに合わせて後で調整）
+    // status-utils.tsのcheckFinalsInfoCompletionと同じ必須フィールドを使用
     const requiredFields = [
+      'work_title',
+      'work_character_story', 
       'music_title',
-      'artist'
+      'cd_title',
+      'artist',
+      'record_number',
+      'jasrac_code',
+      'music_type',
+      'copyright_permission'
     ]
     
     return requiredFields.every(field => {
