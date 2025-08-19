@@ -14,7 +14,14 @@ export async function updateFormStatus(
     
     console.log(`[STATUS UPDATE] ${tableName} - エントリーID: ${entryId}, 完了状況: ${isFormComplete}`)
     
-    // フォームが完了している場合のみステータスを更新
+    // basic_infoの場合は特別な処理（ステータス更新をスキップ）
+    if (tableName === 'basic_info') {
+      console.log(`[STATUS UPDATE] ${tableName} - 独立したテーブルのため、entriesでのステータス更新をスキップ`)
+      console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete} をログに記録（ダッシュボードは基本情報テーブルの存在で判定）`)
+      return
+    }
+    
+    // フォームが完了している場合は「登録済み」、未完了の場合は「入力中」に更新
     if (isFormComplete) {
       // 各フォームのステータスフィールドを更新
       const statusFieldMap: Record<string, string> = {
@@ -28,13 +35,6 @@ export async function updateFormStatus(
       }
       
       const statusFieldName = statusFieldMap[tableName]
-      
-      // basic_infoの場合は特別な処理
-      if (tableName === 'basic_info') {
-        console.log(`[STATUS UPDATE] ${tableName} - 独立したテーブルのため、entriesでのステータス更新をスキップ`)
-        console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete} をログに記録（ダッシュボードは基本情報テーブルの存在で判定）`)
-        return // 処理を終了
-      }
       
       console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「登録済み」に更新`)
       
@@ -73,7 +73,41 @@ export async function updateFormStatus(
         console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません`)
       }
     } else {
-      console.log(`[STATUS UPDATE] ${tableName} - フォーム未完了のためステータス更新をスキップ`)
+      // フォームが未完了の場合は「入力中」に更新
+      const statusFieldMap: Record<string, string> = {
+        'preliminary_info': 'preliminary_info_status',
+        'semifinals_info': 'semifinals_info_status',
+        'finals_info': 'finals_info_status',
+        'program_info': 'program_info_status',
+        'sns_info': 'sns_info_status',
+        'applications_info': 'applications_info_status'
+      }
+      
+      const statusFieldName = statusFieldMap[tableName]
+      
+      console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「入力中」に更新`)
+      
+      if (statusFieldName) {
+        // entriesテーブルの該当ステータスフィールドを「入力中」に更新
+        const updateData = { [statusFieldName]: '入力中' }
+        
+        console.log(`[STATUS UPDATE] 更新データ（入力中）:`, updateData)
+        console.log(`[STATUS UPDATE] 対象エントリーID:`, entryId)
+        
+        const { data, error } = await supabase
+          .from('entries')
+          .update(updateData)
+          .eq('id', entryId)
+          .select()
+        
+        if (error) {
+          console.error(`[STATUS UPDATE ERROR] ${tableName} (入力中への更新):`, error)
+        } else {
+          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「入力中」に更新完了`, data)
+        }
+      } else {
+        console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません（入力中への更新）`)
+      }
     }
   } catch (error) {
     console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
