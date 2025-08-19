@@ -91,17 +91,23 @@ export function checkBasicInfoCompletion(
   console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
   console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
   
-  // ダッシュボードのcheckBasicInfoComplete関数と同じ必須フィールドを使用
+  // 基本情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'dance_style',
+    'category_division',
     'representative_name',
     'representative_furigana',
     'representative_email',
     'partner_name',
     'partner_furigana',
     'phone_number',
-    'choreographer',
-    'choreographer_furigana'
+    'real_name',
+    'real_name_kana',
+    'partner_real_name',
+    'partner_real_name_kana',
+    'emergency_contact_name_1',
+    'emergency_contact_phone_1'
+    // choreographer, choreographer_furiganaは基本情報フォームに存在しないため除外
   ]
   
   console.log(`[BASIC INFO CHECK] チェック対象フィールド:`, requiredFields)
