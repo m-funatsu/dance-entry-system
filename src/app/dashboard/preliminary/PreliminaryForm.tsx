@@ -72,17 +72,34 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { uploading, deleteFile, uploadVideo } = useFileUploadV2({
     category: 'video',
     onSuccess: async (result: { url?: string; path?: string }) => {
-      if (result.path) {
-        // ファイル情報をデータベースに保存
-        await saveVideoFileInfo(result.path)
-        
-        // 署名付きURLを取得してプレビューを更新
-        const { data } = await supabase.storage
-          .from('files')
-          .createSignedUrl(result.path, 3600)
-        if (data?.signedUrl) {
-          setVideoUrl(data.signedUrl)
+      console.log('[UPLOAD SUCCESS] onSuccess呼び出し:', result)
+      try {
+        if (result.path) {
+          // ファイル情報をデータベースに保存
+          console.log('[UPLOAD SUCCESS] saveVideoFileInfo開始')
+          const savedFile = await saveVideoFileInfo(result.path)
+          console.log('[UPLOAD SUCCESS] saveVideoFileInfo完了:', savedFile)
+          
+          // setVideoFileの更新（useEffectとの重複を避けるため条件付き）
+          if (savedFile.id !== videoFile?.id) {
+            console.log('[UPLOAD SUCCESS] setVideoFile更新実行')
+            setVideoFile(savedFile)
+          } else {
+            console.log('[UPLOAD SUCCESS] setVideoFile更新スキップ（同じファイル）')
+          }
+          
+          // 署名付きURLを取得してプレビューを更新
+          console.log('[UPLOAD SUCCESS] 署名付きURL取得開始')
+          const { data } = await supabase.storage
+            .from('files')
+            .createSignedUrl(result.path, 3600)
+          if (data?.signedUrl) {
+            console.log('[UPLOAD SUCCESS] 署名付きURL取得完了')
+            setVideoUrl(data.signedUrl)
+          }
         }
+      } catch (error) {
+        console.error('[UPLOAD SUCCESS] onSuccess処理でエラー:', error)
       }
     },
     onError: (error: string) => showToast(error, 'error')
@@ -90,7 +107,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
   // 動画ファイルの状態と署名付きURLを管理
   useEffect(() => {
-    if (preliminaryVideo) {
+    if (preliminaryVideo && preliminaryVideo.id !== videoFile?.id) {
       console.log('[VIDEO] Setting video file from preliminaryVideo:', preliminaryVideo)
       setVideoFile(preliminaryVideo)
       
@@ -123,9 +140,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         console.log('[VIDEO] No file_path in preliminaryVideo')
       }
     } else {
-      console.log('[VIDEO] No preliminaryVideo provided')
+      console.log('[VIDEO] No preliminaryVideo provided or same as current')
     }
-  }, [preliminaryVideo?.id, preliminaryVideo?.file_path]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [preliminaryVideo?.id, videoFile?.id, preliminaryVideo, supabase])
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -279,12 +296,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }, 1500)
   }
 
-  // レンダリング時の状態をログ出力
-  console.log('[COMPONENT RENDER] === PreliminaryForm レンダリング ===')
-  console.log('[COMPONENT RENDER] saving:', saving)
-  console.log('[COMPONENT RENDER] uploading:', uploading)
-  console.log('[COMPONENT RENDER] videoFile:', !!videoFile)
-  console.log('[COMPONENT RENDER] entryId:', entryId)
+  // 無限レンダリング調査のため一時的にコメントアウト
+  // console.log('[COMPONENT RENDER] === PreliminaryForm レンダリング ===')
+  // console.log('[COMPONENT RENDER] saving:', saving)
+  // console.log('[COMPONENT RENDER] uploading:', uploading)
+  // console.log('[COMPONENT RENDER] videoFile:', !!videoFile)
+  // console.log('[COMPONENT RENDER] entryId:', entryId)
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
