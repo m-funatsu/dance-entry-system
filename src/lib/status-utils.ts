@@ -18,7 +18,7 @@ export async function updateFormStatus(
     if (isFormComplete) {
       // 各フォームのステータスフィールドを更新
       const statusFieldMap: Record<string, string> = {
-        'basic_info': 'basic_info_status',
+        // 'basic_info': 'basic_info_status', // basic_infoは独立したテーブルのためentriesでステータス管理しない
         'preliminary_info': 'preliminary_info_status',
         'semifinals_info': 'semifinals_info_status',
         'finals_info': 'finals_info_status',
@@ -29,11 +29,21 @@ export async function updateFormStatus(
       
       const statusFieldName = statusFieldMap[tableName]
       
+      // basic_infoの場合は特別な処理
+      if (tableName === 'basic_info') {
+        console.log(`[STATUS UPDATE] ${tableName} - 独立したテーブルのため、entriesでのステータス更新をスキップ`)
+        console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete} をログに記録（ダッシュボードは基本情報テーブルの存在で判定）`)
+        return // 処理を終了
+      }
+      
       console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「登録済み」に更新`)
       
       if (statusFieldName) {
         // entriesテーブルの該当ステータスフィールドを更新
         const updateData = { [statusFieldName]: '登録済み' }
+        
+        console.log(`[STATUS UPDATE] 更新データ:`, updateData)
+        console.log(`[STATUS UPDATE] 対象エントリーID:`, entryId)
         
         const { data, error } = await supabase
           .from('entries')
@@ -43,6 +53,19 @@ export async function updateFormStatus(
         
         if (error) {
           console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
+          console.error(`[STATUS UPDATE ERROR] 詳細 - コード:`, error.code)
+          console.error(`[STATUS UPDATE ERROR] 詳細 - メッセージ:`, error.message)
+          console.error(`[STATUS UPDATE ERROR] 詳細 - 更新しようとしたフィールド:`, statusFieldName)
+          console.error(`[STATUS UPDATE ERROR] 詳細 - 更新データ:`, updateData)
+          
+          // フィールドが存在しない場合は、代替手段を試行
+          if (error.message?.includes("Could not find") && error.message?.includes("column")) {
+            console.log(`[STATUS UPDATE] ${statusFieldName}フィールドが存在しません。代替手段を試行...`)
+            
+            // basic_info_statusの代わりにstatusフィールドまたは他のフィールドを使用する
+            // とりあえずログのみ出力して処理を続行
+            console.log(`[STATUS UPDATE] ${tableName}の完了状況: ${isFormComplete} をログに記録`)
+          }
         } else {
           console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「登録済み」に更新完了`, data)
         }
