@@ -213,42 +213,92 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   }
 
   const handleFileDelete = async () => {
-    if (!videoFile || !window.confirm('予選動画を削除してもよろしいですか？')) return
+    console.log('[VIDEO DELETE] === 動画削除開始 ===')
+    console.log('[VIDEO DELETE] videoFile:', videoFile)
+    console.log('[VIDEO DELETE] videoUrl:', videoUrl)
+    
+    if (!videoFile) {
+      console.log('[VIDEO DELETE] videoFileが存在しないため処理を終了')
+      return
+    }
+
+    if (!window.confirm('予選動画を削除してもよろしいですか？')) {
+      console.log('[VIDEO DELETE] ユーザーがキャンセルしたため処理を終了')
+      return
+    }
+
+    // 削除前の状態を保存
+    const previousVideoFile = videoFile
+    const previousVideoUrl = videoUrl
+    console.log('[VIDEO DELETE] 削除前の状態を保存完了')
+    console.log('[VIDEO DELETE] previousVideoFile:', previousVideoFile)
+    console.log('[VIDEO DELETE] previousVideoUrl:', previousVideoUrl)
 
     try {
-      // 即座にUIを更新（楽観的更新）
-      const tempVideoFile = videoFile
-      const tempVideoUrl = videoUrl
+      console.log('[VIDEO DELETE] Step 1: UIの即座更新開始（楽観的更新）')
       setVideoFile(null)
       setVideoUrl(null)
+      console.log('[VIDEO DELETE] Step 1: UIの即座更新完了')
       
-      // ストレージから削除
-      const deleteSuccess = await deleteFile(videoFile.file_path)
+      console.log('[VIDEO DELETE] Step 2: ストレージからの削除開始')
+      console.log('[VIDEO DELETE] 削除対象ファイルパス:', previousVideoFile.file_path)
+      const deleteSuccess = await deleteFile(previousVideoFile.file_path)
+      console.log('[VIDEO DELETE] Step 2: ストレージ削除結果:', deleteSuccess)
       
       if (deleteSuccess) {
-        // データベースから削除
+        console.log('[VIDEO DELETE] Step 3: データベースからの削除開始')
+        console.log('[VIDEO DELETE] 削除対象ファイルID:', previousVideoFile.id)
+        
         const { error: dbError } = await supabase
           .from('entry_files')
           .delete()
-          .eq('id', videoFile.id)
+          .eq('id', previousVideoFile.id)
 
         if (dbError) {
-          // エラーの場合は元に戻す
-          setVideoFile(tempVideoFile)
-          setVideoUrl(tempVideoUrl)
+          console.error('[VIDEO DELETE] Step 3: データベース削除でエラー発生:', dbError)
+          console.log('[VIDEO DELETE] エラー時の状態復元開始')
+          setVideoFile(previousVideoFile)
+          setVideoUrl(previousVideoUrl)
+          console.log('[VIDEO DELETE] エラー時の状態復元完了')
           throw dbError
         }
 
+        console.log('[VIDEO DELETE] Step 3: データベース削除完了')
+        console.log('[VIDEO DELETE] Step 4: 成功メッセージ表示')
         showToast('予選動画を削除しました', 'success')
+        
+        console.log('[VIDEO DELETE] Step 5: 削除後のリロード処理開始（1秒後）')
+        setTimeout(() => {
+          console.log('[VIDEO DELETE] Step 5: ページリロード実行')
+          window.location.reload()
+        }, 1000)
       } else {
-        // エラーの場合は元に戻す
-        setVideoFile(tempVideoFile)
-        setVideoUrl(tempVideoUrl)
-        throw new Error('ファイルの削除に失敗しました')
+        console.error('[VIDEO DELETE] ストレージ削除が失敗したため状態を復元')
+        setVideoFile(previousVideoFile)
+        setVideoUrl(previousVideoUrl)
+        console.log('[VIDEO DELETE] 状態復元完了')
+        throw new Error('ストレージからのファイル削除に失敗しました')
       }
     } catch (error) {
-      console.error('Error deleting file:', error)
-      showToast('削除に失敗しました', 'error')
+      console.error('[VIDEO DELETE] 動画削除処理でエラー発生:', error)
+      console.log('[VIDEO DELETE] エラー詳細:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        previousVideoFile,
+        previousVideoUrl
+      })
+      
+      // エラー時は状態を確実に復元
+      console.log('[VIDEO DELETE] エラー時の最終状態復元開始')
+      setVideoFile(previousVideoFile)
+      setVideoUrl(previousVideoUrl)
+      console.log('[VIDEO DELETE] エラー時の最終状態復元完了')
+      
+      showToast('動画の削除に失敗しました', 'error')
+    } finally {
+      console.log('[VIDEO DELETE] === 動画削除処理完了 ===')
+      console.log('[VIDEO DELETE] 最終状態 - videoFile:', videoFile)
+      console.log('[VIDEO DELETE] 最終状態 - videoUrl:', videoUrl)
     }
   }
 
