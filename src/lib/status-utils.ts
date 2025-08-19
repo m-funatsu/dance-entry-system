@@ -91,13 +91,17 @@ export function checkBasicInfoCompletion(
   console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
   console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
   
+  // ダッシュボードのcheckBasicInfoComplete関数と同じ必須フィールドを使用
   const requiredFields = [
-    'representative_name',
-    'representative_furigana', 
     'dance_style',
-    'category_division',
+    'representative_name',
+    'representative_furigana',
+    'representative_email',
+    'partner_name',
+    'partner_furigana',
     'phone_number',
-    'emergency_contact_name_1' // emergency_contactではなく実際のフィールド名
+    'choreographer',
+    'choreographer_furigana'
   ]
   
   console.log(`[BASIC INFO CHECK] チェック対象フィールド:`, requiredFields)
@@ -113,14 +117,14 @@ export function checkBasicInfoCompletion(
   
   const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
   
-  // 同意事項のチェック
+  // ダッシュボードと同じ同意事項チェック - basic_infoテーブルのデータから判定
   const agreementResults = {
-    agreement_checked: checkboxes.agreement_checked,
-    media_consent_checked: checkboxes.media_consent_checked,
-    privacy_policy_checked: checkboxes.privacy_policy_checked
+    agreement_checked: formData.agreement_checked || checkboxes.agreement_checked,
+    privacy_policy_checked: formData.privacy_policy_checked || checkboxes.privacy_policy_checked
+    // media_consent_checkedはダッシュボードでチェックしていない
   }
   
-  console.log(`[BASIC INFO CHECK] 同意事項チェック:`, agreementResults)
+  console.log(`[BASIC INFO CHECK] 同意事項チェック（ダッシュボード準拠）:`, agreementResults)
   
   const hasAllAgreements = Object.values(agreementResults).every(result => result === true)
   
