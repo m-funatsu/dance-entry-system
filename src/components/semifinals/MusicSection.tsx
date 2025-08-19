@@ -33,7 +33,8 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         artist: preliminaryInfo?.artist || '',
         record_number: preliminaryInfo?.record_number || '',
         jasrac_code: preliminaryInfo?.jasrac_code || '',
-        music_type: preliminaryInfo?.music_type || ''
+        music_type: preliminaryInfo?.music_type || '',
+        copyright_permission: preliminaryInfo?.music_rights_cleared || ''
       })
     } else {
       // 予選とは異なる楽曲を使用する場合：クリア
@@ -47,7 +48,8 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         artist: '',
         record_number: '',
         jasrac_code: '',
-        music_type: ''
+        music_type: '',
+        copyright_permission: ''
       })
     }
   }
@@ -140,40 +142,49 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           楽曲著作権許諾 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
               value="commercial"
               checked={semifinalsInfo.copyright_permission === 'commercial'}
               onChange={() => onChange({ copyright_permission: 'commercial' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             A.市販の楽曲を使用する
           </label>
-          <label className="flex items-center">
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
               value="licensed"
               checked={semifinalsInfo.copyright_permission === 'licensed'}
               onChange={() => onChange({ copyright_permission: 'licensed' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             B.自身で著作権に対し許諾を取った楽曲を使用する
           </label>
-          <label className="flex items-center">
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
               value="original"
               checked={semifinalsInfo.copyright_permission === 'original'}
               onChange={() => onChange({ copyright_permission: 'original' })}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+              disabled={!semifinalsInfo.music_change_from_preliminary}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             C.独自に製作されたオリジナル楽曲を使用する
           </label>
         </div>
+        
+        {!semifinalsInfo.music_change_from_preliminary && (
+          <p className="text-xs text-gray-500 mt-2">
+            予選で選択された楽曲著作権許諾が使用されます。
+          </p>
+        )}
       </div>
 
       <FormField
