@@ -99,10 +99,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         console.log('[BASIC INFO SUCCESS] 現在のformData:', formData)
         console.log('[BASIC INFO SUCCESS] 現在のcheckboxes:', checkboxes)
         
+        const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || 
+                         Object.values(checkboxes).some(value => value === true)
         const isComplete = checkBasicInfoCompletion(formData, checkboxes)
+        console.log('[BASIC INFO SUCCESS] データ存在判定:', hasAnyData)
         console.log('[BASIC INFO SUCCESS] 完了判定結果:', isComplete)
         
-        await updateFormStatus('basic_info', entryId, isComplete)
+        await updateFormStatus('basic_info', entryId, isComplete, hasAnyData)
         console.log('[BASIC INFO SUCCESS] ステータス更新処理完了')
       } else {
         console.log('[BASIC INFO SUCCESS] entryIdが存在しないためステータス更新をスキップ')

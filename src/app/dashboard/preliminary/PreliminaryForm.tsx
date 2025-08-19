@@ -249,9 +249,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
     await save(dataToSave) // 保存
     
-    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    // ステータス更新（データ存在判定も含めて）
+    const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || !!videoFile
     const isComplete = checkPreliminaryInfoCompletion(formData, !!videoFile)
-    await updateFormStatus('preliminary_info', entryId, isComplete)
+    await updateFormStatus('preliminary_info', entryId, isComplete, hasAnyData)
     
     // 保存成功後にダッシュボードにリダイレクト
     showToast('予選情報を保存しました', 'success')

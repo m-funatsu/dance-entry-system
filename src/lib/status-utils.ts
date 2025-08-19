@@ -1,18 +1,85 @@
 import { createClient } from '@/lib/supabase/client'
 
 /**
+ * バリデーションルールから必須フィールドを抽出する汎用関数
+ */
+export function getRequiredFieldsFromValidation(validationRules: Record<string, Record<string, unknown>>): string[] {
+  return Object.keys(validationRules).filter(field => 
+    validationRules[field]?.required === true
+  )
+}
+
+/**
+ * フォームデータが存在するかチェックする汎用関数
+ */
+function hasAnyFormData(formData: Record<string, unknown>): boolean {
+  return Object.values(formData).some(value => {
+    if (typeof value === 'boolean') return true // booleanは常にデータありとみなす
+    return value && value.toString().trim() !== ''
+  })
+}
+
+/**
+ * 汎用的なフォーム完了チェック関数
+ */
+export function checkFormCompletion(
+  formName: string,
+  formData: Record<string, unknown>,
+  requiredFields: string[],
+  additionalConditions: boolean = true
+): { isComplete: boolean; hasData: boolean; missingFields: string[] } {
+  console.log(`[${formName.toUpperCase()} CHECK] === ${formName}完了チェック開始 ===`)
+  console.log(`[${formName.toUpperCase()} CHECK] 受信したformData:`, formData)
+  console.log(`[${formName.toUpperCase()} CHECK] チェック対象フィールド:`, requiredFields)
+  console.log(`[${formName.toUpperCase()} CHECK] 追加条件:`, additionalConditions)
+  
+  const hasData = hasAnyFormData(formData)
+  console.log(`[${formName.toUpperCase()} CHECK] データ存在判定: ${hasData}`)
+  
+  const fieldResults: Record<string, boolean> = {}
+  const missingFields: string[] = []
+  
+  requiredFields.forEach(field => {
+    const value = formData[field]
+    const isValid = !!(value && value.toString().trim() !== '')
+    fieldResults[field] = isValid
+    console.log(`[${formName.toUpperCase()} CHECK] ${field}: "${value}" -> ${isValid}`)
+    
+    if (!isValid) {
+      missingFields.push(field)
+    }
+  })
+  
+  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+  const isComplete = hasAllRequiredFields && additionalConditions
+  
+  console.log(`[${formName.toUpperCase()} CHECK] === チェック結果まとめ ===`)
+  console.log(`[${formName.toUpperCase()} CHECK] データ存在: ${hasData}`)
+  console.log(`[${formName.toUpperCase()} CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
+  console.log(`[${formName.toUpperCase()} CHECK] 追加条件満足: ${additionalConditions}`)
+  console.log(`[${formName.toUpperCase()} CHECK] 未入力フィールド:`, missingFields)
+  console.log(`[${formName.toUpperCase()} CHECK] 最終完了判定: ${isComplete}`)
+  console.log(`[${formName.toUpperCase()} CHECK] === ${formName}完了チェック終了 ===`)
+  
+  return { isComplete, hasData, missingFields }
+}
+
+/**
  * フォームのステータスを更新する関数
- * 必須項目がすべて入力されている場合は「登録済み」に変更
+ * データの状況に応じて「未入力」「入力中」「登録済み」のステータスを管理
  */
 export async function updateFormStatus(
   tableName: string,
   entryId: string,
-  isFormComplete: boolean
+  isFormComplete: boolean,
+  hasAnyData: boolean = true // デフォルトはデータありとして扱う
 ) {
   try {
     const supabase = createClient()
     
-    console.log(`[STATUS UPDATE] ${tableName} - エントリーID: ${entryId}, 完了状況: ${isFormComplete}`)
+    console.log(`[STATUS UPDATE] ${tableName} - エントリーID: ${entryId}`)
+    console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete}`)
+    console.log(`[STATUS UPDATE] ${tableName} - データ存在: ${hasAnyData}`)
     
     // basic_infoの場合は特別な処理（ステータス更新をスキップ）
     if (tableName === 'basic_info') {
@@ -21,93 +88,53 @@ export async function updateFormStatus(
       return
     }
     
-    // フォームが完了している場合は「登録済み」、未完了の場合は「入力中」に更新
-    if (isFormComplete) {
-      // 各フォームのステータスフィールドを更新
-      const statusFieldMap: Record<string, string> = {
-        // 'basic_info': 'basic_info_status', // basic_infoは独立したテーブルのためentriesでステータス管理しない
-        'preliminary_info': 'preliminary_info_status',
-        'semifinals_info': 'semifinals_info_status',
-        'finals_info': 'finals_info_status',
-        'program_info': 'program_info_status',
-        'sns_info': 'sns_info_status',
-        'applications_info': 'applications_info_status'
-      }
+    // ステータスを決定
+    let newStatus: string
+    if (!hasAnyData) {
+      newStatus = '未入力'
+    } else if (isFormComplete) {
+      newStatus = '登録済み'
+    } else {
+      newStatus = '入力中'
+    }
+    
+    console.log(`[STATUS UPDATE] ${tableName} - 新しいステータス: ${newStatus}`)
+    
+    const statusFieldMap: Record<string, string> = {
+      'preliminary_info': 'preliminary_info_status',
+      'semifinals_info': 'semifinals_info_status',
+      'finals_info': 'finals_info_status',
+      'program_info': 'program_info_status',
+      'sns_info': 'sns_info_status',
+      'applications_info': 'applications_info_status'
+    }
+    
+    const statusFieldName = statusFieldMap[tableName]
+    
+    if (statusFieldName) {
+      // entriesテーブルの該当ステータスフィールドを更新
+      const updateData = { [statusFieldName]: newStatus }
       
-      const statusFieldName = statusFieldMap[tableName]
+      console.log(`[STATUS UPDATE] 更新データ:`, updateData)
+      console.log(`[STATUS UPDATE] 対象エントリーID:`, entryId)
       
-      console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「登録済み」に更新`)
+      const { data, error } = await supabase
+        .from('entries')
+        .update(updateData)
+        .eq('id', entryId)
+        .select()
       
-      if (statusFieldName) {
-        // entriesテーブルの該当ステータスフィールドを更新
-        const updateData = { [statusFieldName]: '登録済み' }
-        
-        console.log(`[STATUS UPDATE] 更新データ:`, updateData)
-        console.log(`[STATUS UPDATE] 対象エントリーID:`, entryId)
-        
-        const { data, error } = await supabase
-          .from('entries')
-          .update(updateData)
-          .eq('id', entryId)
-          .select()
-        
-        if (error) {
-          console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
-          console.error(`[STATUS UPDATE ERROR] 詳細 - コード:`, error.code)
-          console.error(`[STATUS UPDATE ERROR] 詳細 - メッセージ:`, error.message)
-          console.error(`[STATUS UPDATE ERROR] 詳細 - 更新しようとしたフィールド:`, statusFieldName)
-          console.error(`[STATUS UPDATE ERROR] 詳細 - 更新データ:`, updateData)
-          
-          // フィールドが存在しない場合は、代替手段を試行
-          if (error.message?.includes("Could not find") && error.message?.includes("column")) {
-            console.log(`[STATUS UPDATE] ${statusFieldName}フィールドが存在しません。代替手段を試行...`)
-            
-            // basic_info_statusの代わりにstatusフィールドまたは他のフィールドを使用する
-            // とりあえずログのみ出力して処理を続行
-            console.log(`[STATUS UPDATE] ${tableName}の完了状況: ${isFormComplete} をログに記録`)
-          }
-        } else {
-          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「登録済み」に更新完了`, data)
-        }
+      if (error) {
+        console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
+        console.error(`[STATUS UPDATE ERROR] 詳細 - コード:`, error.code)
+        console.error(`[STATUS UPDATE ERROR] 詳細 - メッセージ:`, error.message)
+        console.error(`[STATUS UPDATE ERROR] 詳細 - 更新しようとしたフィールド:`, statusFieldName)
+        console.error(`[STATUS UPDATE ERROR] 詳細 - 更新データ:`, updateData)
       } else {
-        console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません`)
+        console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「${newStatus}」に更新完了`, data)
       }
     } else {
-      // フォームが未完了の場合は「入力中」に更新
-      const statusFieldMap: Record<string, string> = {
-        'preliminary_info': 'preliminary_info_status',
-        'semifinals_info': 'semifinals_info_status',
-        'finals_info': 'finals_info_status',
-        'program_info': 'program_info_status',
-        'sns_info': 'sns_info_status',
-        'applications_info': 'applications_info_status'
-      }
-      
-      const statusFieldName = statusFieldMap[tableName]
-      
-      console.log(`[STATUS UPDATE] ${tableName} - ${statusFieldName} を「入力中」に更新`)
-      
-      if (statusFieldName) {
-        // entriesテーブルの該当ステータスフィールドを「入力中」に更新
-        const updateData = { [statusFieldName]: '入力中' }
-        
-        console.log(`[STATUS UPDATE] 更新データ（入力中）:`, updateData)
-        console.log(`[STATUS UPDATE] 対象エントリーID:`, entryId)
-        
-        const { data, error } = await supabase
-          .from('entries')
-          .update(updateData)
-          .eq('id', entryId)
-          .select()
-        
-        if (error) {
-          console.error(`[STATUS UPDATE ERROR] ${tableName} (入力中への更新):`, error)
-        } else {
-          console.log(`[STATUS UPDATE SUCCESS] ${tableName} ${statusFieldName}を「入力中」に更新完了`, data)
-        }
-      } else {
-        console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません（入力中への更新）`)
-      }
+      console.warn(`[STATUS UPDATE WARNING] ${tableName} に対応するステータスフィールドが見つかりません`)
     }
   } catch (error) {
     console.error(`[STATUS UPDATE ERROR] ${tableName}:`, error)
@@ -187,10 +214,6 @@ export function checkPreliminaryInfoCompletion(
   formData: Record<string, unknown>,
   hasVideo: boolean
 ): boolean {
-  console.log(`[PRELIMINARY INFO CHECK] === 予選情報完了チェック開始 ===`)
-  console.log(`[PRELIMINARY INFO CHECK] 受信したformData:`, formData)
-  console.log(`[PRELIMINARY INFO CHECK] hasVideo:`, hasVideo)
-  
   // 予選情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'work_title',
@@ -206,36 +229,14 @@ export function checkPreliminaryInfoCompletion(
     // choreographer2は任意項目のため除外
   ]
   
-  console.log(`[PRELIMINARY INFO CHECK] チェック対象フィールド:`, requiredFields)
-  
-  const fieldResults: Record<string, boolean> = {}
-  requiredFields.forEach(field => {
-    const value = formData[field]
-    const isValid = !!(value && value.toString().trim() !== '')
-    fieldResults[field] = isValid
-    console.log(`[PRELIMINARY INFO CHECK] ${field}: "${value}" -> ${isValid}`)
-  })
-  
-  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
-  
-  const result = hasAllRequiredFields && hasVideo
-  console.log(`[PRELIMINARY INFO CHECK] === チェック結果まとめ ===`)
-  console.log(`[PRELIMINARY INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
-  console.log(`[PRELIMINARY INFO CHECK] フィールド詳細:`, fieldResults)
-  console.log(`[PRELIMINARY INFO CHECK] 動画アップロード済み: ${hasVideo}`)
-  console.log(`[PRELIMINARY INFO CHECK] 最終結果: ${result}`)
-  console.log(`[PRELIMINARY INFO CHECK] === 予選情報完了チェック終了 ===`)
-  
-  return result
+  const { isComplete } = checkFormCompletion('PRELIMINARY INFO', formData, requiredFields, hasVideo)
+  return isComplete
 }
 
 /**
  * 準決勝情報フォームの完了状況をチェック
  */
 export function checkSemifinalsInfoCompletion(formData: Record<string, unknown>): boolean {
-  console.log(`[SEMIFINALS INFO CHECK] === 準決勝情報完了チェック開始 ===`)
-  console.log(`[SEMIFINALS INFO CHECK] 受信したformData:`, formData)
-  
   // 準決勝情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'work_title',
@@ -250,25 +251,8 @@ export function checkSemifinalsInfoCompletion(formData: Record<string, unknown>)
     // choreographer関連は準決勝では変更可能で、基本的にはコピーされるため一旦除外
   ]
   
-  console.log(`[SEMIFINALS INFO CHECK] チェック対象フィールド:`, requiredFields)
-  
-  const fieldResults: Record<string, boolean> = {}
-  requiredFields.forEach(field => {
-    const value = formData[field]
-    const isValid = !!(value && value.toString().trim() !== '')
-    fieldResults[field] = isValid
-    console.log(`[SEMIFINALS INFO CHECK] ${field}: "${value}" -> ${isValid}`)
-  })
-  
-  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
-  
-  console.log(`[SEMIFINALS INFO CHECK] === チェック結果まとめ ===`)
-  console.log(`[SEMIFINALS INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
-  console.log(`[SEMIFINALS INFO CHECK] フィールド詳細:`, fieldResults)
-  console.log(`[SEMIFINALS INFO CHECK] 最終結果: ${hasAllRequiredFields}`)
-  console.log(`[SEMIFINALS INFO CHECK] === 準決勝情報完了チェック終了 ===`)
-  
-  return hasAllRequiredFields
+  const { isComplete } = checkFormCompletion('SEMIFINALS INFO', formData, requiredFields)
+  return isComplete
 }
 
 /**
@@ -290,9 +274,6 @@ export function checkProgramInfoCompletion(formData: Record<string, unknown>): b
  * 決勝情報フォームの完了状況をチェック
  */
 export function checkFinalsInfoCompletion(formData: Record<string, unknown>): boolean {
-  console.log(`[FINALS INFO CHECK] === 決勝情報完了チェック開始 ===`)
-  console.log(`[FINALS INFO CHECK] 受信したformData:`, formData)
-  
   // 決勝情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'work_title',
@@ -307,25 +288,8 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     // choreographer関連は決勝でも変更可能で、基本的にはコピーされるため一旦除外
   ]
   
-  console.log(`[FINALS INFO CHECK] チェック対象フィールド:`, requiredFields)
-  
-  const fieldResults: Record<string, boolean> = {}
-  requiredFields.forEach(field => {
-    const value = formData[field]
-    const isValid = !!(value && value.toString().trim() !== '')
-    fieldResults[field] = isValid
-    console.log(`[FINALS INFO CHECK] ${field}: "${value}" -> ${isValid}`)
-  })
-  
-  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
-  
-  console.log(`[FINALS INFO CHECK] === チェック結果まとめ ===`)
-  console.log(`[FINALS INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
-  console.log(`[FINALS INFO CHECK] フィールド詳細:`, fieldResults)
-  console.log(`[FINALS INFO CHECK] 最終結果: ${hasAllRequiredFields}`)
-  console.log(`[FINALS INFO CHECK] === 決勝情報完了チェック終了 ===`)
-  
-  return hasAllRequiredFields
+  const { isComplete } = checkFormCompletion('FINALS INFO', formData, requiredFields)
+  return isComplete
 }
 
 /**
