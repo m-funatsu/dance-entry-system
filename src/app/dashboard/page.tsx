@@ -198,16 +198,22 @@ export default async function DashboardPage() {
   // 必須項目のチェック関数
   const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
     if (!basicInfo) return false
+    // status-utils.tsのcheckBasicInfoCompletionと同じ必須フィールドを使用
     const requiredFields = [
       'dance_style',
+      'category_division',
       'representative_name',
       'representative_furigana',
       'representative_email',
       'partner_name',
       'partner_furigana',
       'phone_number',
-      'choreographer',
-      'choreographer_furigana',
+      'real_name',
+      'real_name_kana',
+      'partner_real_name',
+      'partner_real_name_kana',
+      'emergency_contact_name_1',
+      'emergency_contact_phone_1',
       'agreement_checked',
       'privacy_policy_checked'
     ]
