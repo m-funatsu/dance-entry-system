@@ -22,6 +22,16 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
 }) => {
   const handleMusicChange = (useSameMusic: boolean) => {
     if (useSameMusic) {
+      // 予選の楽曲著作権許諾値を準決勝形式にマッピング
+      const mapCopyrightPermission = (prelimValue: string | undefined) => {
+        switch (prelimValue) {
+          case 'A': return 'commercial'
+          case 'B': return 'licensed'
+          case 'C': return 'original'
+          default: return ''
+        }
+      }
+
       // 予選と同じ楽曲を使用する場合：予選情報からコピー
       onChange({
         music_change_from_preliminary: false,
@@ -34,7 +44,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         record_number: preliminaryInfo?.record_number || '',
         jasrac_code: preliminaryInfo?.jasrac_code || '',
         music_type: preliminaryInfo?.music_type || '',
-        copyright_permission: preliminaryInfo?.music_rights_cleared || ''
+        copyright_permission: mapCopyrightPermission(preliminaryInfo?.music_rights_cleared)
       })
     } else {
       // 予選とは異なる楽曲を使用する場合：クリア
