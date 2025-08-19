@@ -89,16 +89,25 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     validationRules: {}, // 初期ルールは空にする
     redirectPath: '/dashboard',
     onSuccess: async (message) => {
+      console.log('[BASIC INFO SUCCESS] === onSuccess コールバック開始 ===')
+      console.log('[BASIC INFO SUCCESS] 成功メッセージ:', message)
       showToast(message, 'success')
       
       // フォーム保存成功後にステータス更新
       if (entryId) {
-        console.log('[BASIC INFO SUCCESS] ステータス更新チェック開始')
+        console.log('[BASIC INFO SUCCESS] entryId存在、ステータス更新チェック開始')
+        console.log('[BASIC INFO SUCCESS] 現在のformData:', formData)
+        console.log('[BASIC INFO SUCCESS] 現在のcheckboxes:', checkboxes)
+        
         const isComplete = checkBasicInfoCompletion(formData, checkboxes)
         console.log('[BASIC INFO SUCCESS] 完了判定結果:', isComplete)
+        
         await updateFormStatus('basic_info', entryId, isComplete)
         console.log('[BASIC INFO SUCCESS] ステータス更新処理完了')
+      } else {
+        console.log('[BASIC INFO SUCCESS] entryIdが存在しないためステータス更新をスキップ')
       }
+      console.log('[BASIC INFO SUCCESS] === onSuccess コールバック終了 ===')
     },
     onError: (error) => showToast(error, 'error'),
     validateBeforeSave: false // カスタムバリデーションを行うため
@@ -340,19 +349,29 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
 
       // デバッグ: 保存するデータをログ出力
-      console.log('=== 保存するデータ ===')
-      console.log('formData:', JSON.stringify(formData, null, 2))
-      console.log('checkboxes:', JSON.stringify(checkboxes, null, 2))
+      console.log('=== [BASIC INFO SAVE] 保存処理開始 ===')
+      console.log('[BASIC INFO SAVE] entryId:', entryId)
+      console.log('[BASIC INFO SAVE] currentEntryId:', currentEntryId)
+      console.log('[BASIC INFO SAVE] formData:', JSON.stringify(formData, null, 2))
+      console.log('[BASIC INFO SAVE] checkboxes:', JSON.stringify(checkboxes, null, 2))
+      
       const saveData = {
         ...formData,
         ...checkboxes,
         entry_id: currentEntryId
       }
-      console.log('最終的な保存データ（全フィールド）:')
+      
+      console.log('[BASIC INFO SAVE] 最終的な保存データ（全フィールド）:')
       Object.keys(saveData).forEach(key => {
-        console.log(`  ${key}: ${saveData[key as keyof typeof saveData]}`)
+        const value = saveData[key as keyof typeof saveData]
+        console.log(`  ${key}: "${value}" (型: ${typeof value})`)
       })
-      console.log('===================')
+      
+      // 必須フィールドの事前チェック（デバッグ用）
+      console.log('[BASIC INFO SAVE] === 事前必須フィールドチェック ===')
+      const preCheckResult = checkBasicInfoCompletion(formData, checkboxes)
+      console.log('[BASIC INFO SAVE] 事前チェック結果:', preCheckResult)
+      console.log('[BASIC INFO SAVE] ================================')
 
       console.log('[BASIC INFO SAVE] フォーム保存開始')
       

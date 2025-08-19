@@ -64,30 +64,51 @@ export function checkBasicInfoCompletion(
   formData: Record<string, unknown>,
   checkboxes: Record<string, boolean>
 ): boolean {
+  console.log(`[BASIC INFO CHECK] === 基本情報完了チェック開始 ===`)
+  console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
+  console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
+  
   const requiredFields = [
     'representative_name',
     'representative_furigana', 
     'dance_style',
     'category_division',
     'phone_number',
-    'emergency_contact'
+    'emergency_contact_name_1' // emergency_contactではなく実際のフィールド名
   ]
   
+  console.log(`[BASIC INFO CHECK] チェック対象フィールド:`, requiredFields)
+  
   // 必須フィールドの入力チェック
-  const hasAllRequiredFields = requiredFields.every(field => {
+  const fieldResults: Record<string, boolean> = {}
+  requiredFields.forEach(field => {
     const value = formData[field]
-    const isValid = value && value.toString().trim() !== ''
+    const isValid = !!(value && value.toString().trim() !== '')
+    fieldResults[field] = isValid
     console.log(`[BASIC INFO CHECK] ${field}: "${value}" -> ${isValid}`)
-    return isValid
   })
   
+  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+  
   // 同意事項のチェック
-  const hasAllAgreements = checkboxes.agreement_checked && 
-    checkboxes.media_consent_checked && 
-    checkboxes.privacy_policy_checked
+  const agreementResults = {
+    agreement_checked: checkboxes.agreement_checked,
+    media_consent_checked: checkboxes.media_consent_checked,
+    privacy_policy_checked: checkboxes.privacy_policy_checked
+  }
+  
+  console.log(`[BASIC INFO CHECK] 同意事項チェック:`, agreementResults)
+  
+  const hasAllAgreements = Object.values(agreementResults).every(result => result === true)
   
   const result = hasAllRequiredFields && hasAllAgreements
-  console.log(`[BASIC INFO CHECK] フィールド完了: ${hasAllRequiredFields}, 同意事項完了: ${hasAllAgreements}, 最終結果: ${result}`)
+  console.log(`[BASIC INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[BASIC INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
+  console.log(`[BASIC INFO CHECK] フィールド詳細:`, fieldResults)
+  console.log(`[BASIC INFO CHECK] 同意事項完了: ${hasAllAgreements}`)
+  console.log(`[BASIC INFO CHECK] 同意事項詳細:`, agreementResults)
+  console.log(`[BASIC INFO CHECK] 最終結果: ${result}`)
+  console.log(`[BASIC INFO CHECK] === 基本情報完了チェック終了 ===`)
   
   return result
 }
