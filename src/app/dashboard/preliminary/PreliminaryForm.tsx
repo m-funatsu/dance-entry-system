@@ -63,7 +63,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const { save, saving, error, success } = useFormSave({
     tableName: 'preliminary_info',
     uniqueField: 'entry_id',
-    redirectPath: undefined,
+    redirectPath: '', // 空文字列で自動リダイレクトを無効化
     onSuccess: (message) => console.log('Save success:', message),
     onError: (error) => showToast(error, 'error')
   })
@@ -350,9 +350,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const isComplete = checkPreliminaryInfoCompletion(formData, !!videoFile)
     await updateFormStatus('preliminary_info', entryId, isComplete, hasAnyData)
     
-    // 保存成功後にダッシュボードにリダイレクト
+    // 保存成功後にダッシュボードにリダイレクト（強制リロード）
     showToast('予選情報を保存しました', 'success')
     setTimeout(() => {
+      console.log('[SAVE SUCCESS] ダッシュボードに強制リロードで遷移')
       window.location.href = '/dashboard'
     }, 1500)
   }
@@ -704,18 +705,15 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
       <div className="flex justify-between pt-6">
         <CancelButton onClick={() => {
-          alert('戻るボタンがクリックされました') // 緊急デバッグ用
           console.log('[CANCEL BUTTON] === 戻るボタンクリック ===')
           console.log('[CANCEL BUTTON] saving state:', saving)
           console.log('[CANCEL BUTTON] uploading state:', uploading)
-          router.push('/dashboard')
+          console.log('[CANCEL BUTTON] 強制リロードでダッシュボードに遷移')
+          window.location.href = '/dashboard'
         }} />
         <div className="space-x-4">
           <SaveButton
-            onClick={() => {
-              alert('保存ボタンがクリックされました') // 緊急デバッグ用
-              handleSave()
-            }}
+            onClick={handleSave}
             disabled={saving || uploading}
             loading={saving}
           />
