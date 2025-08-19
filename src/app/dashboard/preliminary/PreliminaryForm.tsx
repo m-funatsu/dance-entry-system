@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -105,44 +105,55 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     onError: (error: string) => showToast(error, 'error')
   })
 
-  // 動画ファイルの状態と署名付きURLを管理
+  // 署名付きURL取得の安定した関数
+  const fetchSignedUrl = useCallback(async (filePath: string) => {
+    console.log('[VIDEO URL] 署名付きURL取得開始:', filePath)
+    try {
+      const { data, error } = await supabase.storage
+        .from('files')
+        .createSignedUrl(filePath, 3600)
+      
+      if (error) {
+        console.error('[VIDEO URL] 署名付きURL取得エラー:', error)
+        return null
+      }
+      
+      if (data?.signedUrl) {
+        console.log('[VIDEO URL] 署名付きURL取得成功')
+        return data.signedUrl
+      } else {
+        console.warn('[VIDEO URL] 署名付きURLが返されませんでした')
+        return null
+      }
+    } catch (err) {
+      console.error('[VIDEO URL] 署名付きURL取得例外:', err)
+      return null
+    }
+  }, [supabase])
+
+  // 動画ファイルの状態管理
   useEffect(() => {
-    if (preliminaryVideo && preliminaryVideo.id !== videoFile?.id) {
-      console.log('[VIDEO] Setting video file from preliminaryVideo:', preliminaryVideo)
+    console.log('[VIDEO EFFECT] === useEffect実行 ===')
+    console.log('[VIDEO EFFECT] preliminaryVideo:', preliminaryVideo ? `id=${preliminaryVideo.id}` : 'null')
+    
+    if (preliminaryVideo) {
+      console.log('[VIDEO EFFECT] 動画ファイル情報を設定')
       setVideoFile(preliminaryVideo)
       
       if (preliminaryVideo.file_path) {
-        console.log('[VIDEO] Fetching signed URL for:', preliminaryVideo.file_path)
-        // 署名付きURLを取得
-        const getVideoUrl = async () => {
-          try {
-            const { data, error } = await supabase.storage
-              .from('files')
-              .createSignedUrl(preliminaryVideo.file_path, 3600)
-            
-            if (error) {
-              console.error('[VIDEO] Error getting signed URL:', error)
-              return
-            }
-            
-            if (data?.signedUrl) {
-              console.log('[VIDEO] Got signed URL successfully')
-              setVideoUrl(data.signedUrl)
-            } else {
-              console.warn('[VIDEO] No signed URL returned')
-            }
-          } catch (err) {
-            console.error('[VIDEO] Exception getting signed URL:', err)
+        fetchSignedUrl(preliminaryVideo.file_path).then(url => {
+          if (url) {
+            console.log('[VIDEO EFFECT] URLを状態に設定')
+            setVideoUrl(url)
           }
-        }
-        getVideoUrl()
-      } else {
-        console.log('[VIDEO] No file_path in preliminaryVideo')
+        })
       }
     } else {
-      console.log('[VIDEO] No preliminaryVideo provided or same as current')
+      console.log('[VIDEO EFFECT] preliminaryVideoなし、状態をクリア')
+      setVideoFile(null)
+      setVideoUrl(null)
     }
-  }, [preliminaryVideo?.id, videoFile?.id, preliminaryVideo, supabase])
+  }, [preliminaryVideo, fetchSignedUrl])
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
