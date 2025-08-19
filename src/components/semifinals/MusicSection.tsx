@@ -152,7 +152,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           楽曲著作権許諾 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
@@ -160,11 +160,17 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               checked={semifinalsInfo.copyright_permission === 'commercial'}
               onChange={() => onChange({ copyright_permission: 'commercial' })}
               disabled={!semifinalsInfo.music_change_from_preliminary}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
+                !semifinalsInfo.music_change_from_preliminary 
+                  ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
+                  : ''
+              }`}
             />
-            A.市販の楽曲を使用する
+            <span className={!semifinalsInfo.music_change_from_preliminary ? 'text-gray-600' : 'text-gray-900'}>
+              A.市販の楽曲を使用する
+            </span>
           </label>
-          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
@@ -172,11 +178,17 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               checked={semifinalsInfo.copyright_permission === 'licensed'}
               onChange={() => onChange({ copyright_permission: 'licensed' })}
               disabled={!semifinalsInfo.music_change_from_preliminary}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
+                !semifinalsInfo.music_change_from_preliminary 
+                  ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
+                  : ''
+              }`}
             />
-            B.自身で著作権に対し許諾を取った楽曲を使用する
+            <span className={!semifinalsInfo.music_change_from_preliminary ? 'text-gray-600' : 'text-gray-900'}>
+              B.自身で著作権に対し許諾を取った楽曲を使用する
+            </span>
           </label>
-          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <label className={`flex items-center ${!semifinalsInfo.music_change_from_preliminary ? 'cursor-not-allowed' : ''}`}>
             <input
               type="radio"
               name="copyright_permission"
@@ -184,9 +196,15 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               checked={semifinalsInfo.copyright_permission === 'original'}
               onChange={() => onChange({ copyright_permission: 'original' })}
               disabled={!semifinalsInfo.music_change_from_preliminary}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
+                !semifinalsInfo.music_change_from_preliminary 
+                  ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
+                  : ''
+              }`}
             />
-            C.独自に製作されたオリジナル楽曲を使用する
+            <span className={!semifinalsInfo.music_change_from_preliminary ? 'text-gray-600' : 'text-gray-900'}>
+              C.独自に製作されたオリジナル楽曲を使用する
+            </span>
           </label>
         </div>
         
