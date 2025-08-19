@@ -279,6 +279,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }, 1500)
   }
 
+  // レンダリング時の状態をログ出力
+  console.log('[COMPONENT RENDER] === PreliminaryForm レンダリング ===')
+  console.log('[COMPONENT RENDER] saving:', saving)
+  console.log('[COMPONENT RENDER] uploading:', uploading)
+  console.log('[COMPONENT RENDER] videoFile:', !!videoFile)
+  console.log('[COMPONENT RENDER] entryId:', entryId)
+
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {error && <Alert type="error" message={error} />}
@@ -619,6 +626,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
       <div className="flex justify-between pt-6">
         <CancelButton onClick={() => {
+          alert('戻るボタンがクリックされました') // 緊急デバッグ用
           console.log('[CANCEL BUTTON] === 戻るボタンクリック ===')
           console.log('[CANCEL BUTTON] saving state:', saving)
           console.log('[CANCEL BUTTON] uploading state:', uploading)
@@ -626,7 +634,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         }} />
         <div className="space-x-4">
           <SaveButton
-            onClick={handleSave}
+            onClick={() => {
+              alert('保存ボタンがクリックされました') // 緊急デバッグ用
+              handleSave()
+            }}
             disabled={saving || uploading}
             loading={saving}
           />
