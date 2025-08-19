@@ -704,6 +704,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               <span className="text-sm text-red-500 ml-2">（18歳未満のため必須）</span>
             </h3>
             
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+              <p className="text-sm text-blue-800">
+                中学生以下の未成年選手につきましては、保護者の同伴が必要となります。<br />
+                詳細は事務局より追ってご案内申し上げます。
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 label="保護者氏名"
@@ -745,6 +752,13 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               ペア保護者情報
               <span className="text-sm text-red-500 ml-2">（18歳未満のため必須）</span>
             </h3>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+              <p className="text-sm text-blue-800">
+                中学生以下の未成年選手につきましては、保護者の同伴が必要となります。<br />
+                詳細は事務局より追ってご案内申し上げます。
+              </p>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
