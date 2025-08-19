@@ -482,7 +482,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
             {/* あらすじ・ストーリー */}
             <FormField
-              label="作品目あらすじ・ストーリー（100文字以内）"
+              label="作品あらすじ・ストーリー（100文字以内）"
               name="final_story"
               type="textarea"
               value={programInfo.final_story || ''}
@@ -495,7 +495,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
             {/* 見所 */}
             <FormField
-              label="作品目見所（50文字以内）"
+              label="作品見所（50文字以内）"
               name="final_highlight"
               type="textarea"
               value={programInfo.final_highlight || ''}
