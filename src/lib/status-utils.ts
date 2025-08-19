@@ -153,38 +153,88 @@ export function checkPreliminaryInfoCompletion(
   formData: Record<string, unknown>,
   hasVideo: boolean
 ): boolean {
+  console.log(`[PRELIMINARY INFO CHECK] === 予選情報完了チェック開始 ===`)
+  console.log(`[PRELIMINARY INFO CHECK] 受信したformData:`, formData)
+  console.log(`[PRELIMINARY INFO CHECK] hasVideo:`, hasVideo)
+  
+  // 予選情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'work_title',
-    'work_summary',
+    'work_title_kana', // 作品タイトルふりがな（必須だがチェックされていなかった）
+    'work_story', // work_summaryではなくwork_story
+    'music_title',
+    'cd_title',
+    'artist',
+    'record_number',
+    'jasrac_code',
     'choreographer1_name',
     'choreographer1_furigana'
+    // choreographer2は任意項目のため除外
   ]
   
-  const hasAllRequiredFields = requiredFields.every(field => {
+  console.log(`[PRELIMINARY INFO CHECK] チェック対象フィールド:`, requiredFields)
+  
+  const fieldResults: Record<string, boolean> = {}
+  requiredFields.forEach(field => {
     const value = formData[field]
-    return value && value.toString().trim() !== ''
+    const isValid = !!(value && value.toString().trim() !== '')
+    fieldResults[field] = isValid
+    console.log(`[PRELIMINARY INFO CHECK] ${field}: "${value}" -> ${isValid}`)
   })
   
-  return hasAllRequiredFields && hasVideo
+  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+  
+  const result = hasAllRequiredFields && hasVideo
+  console.log(`[PRELIMINARY INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[PRELIMINARY INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
+  console.log(`[PRELIMINARY INFO CHECK] フィールド詳細:`, fieldResults)
+  console.log(`[PRELIMINARY INFO CHECK] 動画アップロード済み: ${hasVideo}`)
+  console.log(`[PRELIMINARY INFO CHECK] 最終結果: ${result}`)
+  console.log(`[PRELIMINARY INFO CHECK] === 予選情報完了チェック終了 ===`)
+  
+  return result
 }
 
 /**
  * 準決勝情報フォームの完了状況をチェック
  */
 export function checkSemifinalsInfoCompletion(formData: Record<string, unknown>): boolean {
+  console.log(`[SEMIFINALS INFO CHECK] === 準決勝情報完了チェック開始 ===`)
+  console.log(`[SEMIFINALS INFO CHECK] 受信したformData:`, formData)
+  
+  // 準決勝情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
-    'choreographer1_name',
-    'choreographer1_furigana',
     'work_title',
-    'work_summary',
+    'work_character_story', // work_summaryではなく実際のフィールド名
     'music_title',
+    'cd_title',
+    'artist',
+    'record_number',
+    'jasrac_code',
+    'music_type',
     'copyright_permission'
+    // choreographer関連は準決勝では変更可能で、基本的にはコピーされるため一旦除外
   ]
   
-  return requiredFields.every(field => {
+  console.log(`[SEMIFINALS INFO CHECK] チェック対象フィールド:`, requiredFields)
+  
+  const fieldResults: Record<string, boolean> = {}
+  requiredFields.forEach(field => {
     const value = formData[field]
-    return value && value.toString().trim() !== ''
+    const isValid = !!(value && value.toString().trim() !== '')
+    fieldResults[field] = isValid
+    console.log(`[SEMIFINALS INFO CHECK] ${field}: "${value}" -> ${isValid}`)
   })
+  
+  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+  
+  console.log(`[SEMIFINALS INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[SEMIFINALS INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
+  console.log(`[SEMIFINALS INFO CHECK] フィールド詳細:`, fieldResults)
+  console.log(`[SEMIFINALS INFO CHECK] 最終結果: ${hasAllRequiredFields}`)
+  console.log(`[SEMIFINALS INFO CHECK] === 準決勝情報完了チェック終了 ===`)
+  
+  return hasAllRequiredFields
 }
 
 /**
@@ -206,19 +256,42 @@ export function checkProgramInfoCompletion(formData: Record<string, unknown>): b
  * 決勝情報フォームの完了状況をチェック
  */
 export function checkFinalsInfoCompletion(formData: Record<string, unknown>): boolean {
+  console.log(`[FINALS INFO CHECK] === 決勝情報完了チェック開始 ===`)
+  console.log(`[FINALS INFO CHECK] 受信したformData:`, formData)
+  
+  // 決勝情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
-    'choreographer1_name',
-    'choreographer1_furigana',
     'work_title',
-    'work_summary',
+    'work_character_story', // work_summaryではなく実際のフィールド名
     'music_title',
+    'cd_title',
+    'artist',
+    'record_number',
+    'jasrac_code',
+    'music_type',
     'copyright_permission'
+    // choreographer関連は決勝でも変更可能で、基本的にはコピーされるため一旦除外
   ]
   
-  return requiredFields.every(field => {
+  console.log(`[FINALS INFO CHECK] チェック対象フィールド:`, requiredFields)
+  
+  const fieldResults: Record<string, boolean> = {}
+  requiredFields.forEach(field => {
     const value = formData[field]
-    return value && value.toString().trim() !== ''
+    const isValid = !!(value && value.toString().trim() !== '')
+    fieldResults[field] = isValid
+    console.log(`[FINALS INFO CHECK] ${field}: "${value}" -> ${isValid}`)
   })
+  
+  const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+  
+  console.log(`[FINALS INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[FINALS INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
+  console.log(`[FINALS INFO CHECK] フィールド詳細:`, fieldResults)
+  console.log(`[FINALS INFO CHECK] 最終結果: ${hasAllRequiredFields}`)
+  console.log(`[FINALS INFO CHECK] === 決勝情報完了チェック終了 ===`)
+  
+  return hasAllRequiredFields
 }
 
 /**
