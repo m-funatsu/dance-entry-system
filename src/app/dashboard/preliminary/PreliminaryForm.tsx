@@ -160,6 +160,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   }
   
   const handleFileUpload = async (file: File) => {
+    console.log('[VIDEO UPLOAD] === 動画アップロード開始 ===')
+    console.log('[VIDEO UPLOAD] uploading state before:', uploading)
+    
     if (!entryId) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
@@ -179,7 +182,17 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       console.log('[PRELIMINARY UPLOAD] 一時保存に失敗（続行）:', tempSaveError)
     }
 
-    await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
+    try {
+      console.log('[VIDEO UPLOAD] uploadVideo関数呼び出し開始')
+      await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
+      console.log('[VIDEO UPLOAD] uploadVideo関数呼び出し完了')
+    } catch (error) {
+      console.error('[VIDEO UPLOAD] uploadVideo関数でエラー:', error)
+      showToast('動画のアップロードに失敗しました', 'error')
+    } finally {
+      console.log('[VIDEO UPLOAD] uploading state after:', uploading)
+      console.log('[VIDEO UPLOAD] === 動画アップロード処理完了 ===')
+    }
   }
 
   const handleFileDelete = async () => {
@@ -223,6 +236,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   }
 
   const handleSave = async () => {
+    console.log('[SAVE BUTTON] === 保存ボタンクリック ===')
+    console.log('[SAVE BUTTON] saving state:', saving)
+    console.log('[SAVE BUTTON] uploading state:', uploading)
+    console.log('[SAVE BUTTON] disabled state:', saving || uploading)
+    
     if (!entryId) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
@@ -600,7 +618,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       </div>
 
       <div className="flex justify-between pt-6">
-        <CancelButton onClick={() => router.push('/dashboard')} />
+        <CancelButton onClick={() => {
+          console.log('[CANCEL BUTTON] === 戻るボタンクリック ===')
+          console.log('[CANCEL BUTTON] saving state:', saving)
+          console.log('[CANCEL BUTTON] uploading state:', uploading)
+          router.push('/dashboard')
+        }} />
         <div className="space-x-4">
           <SaveButton
             onClick={handleSave}
