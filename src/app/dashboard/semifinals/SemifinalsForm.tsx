@@ -75,15 +75,28 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           .maybeSingle()
         
         if (semiData) {
+          console.log('[SEMIFINALS DEBUG] === 準決勝情報読み込み完了 ===')
+          console.log('[SEMIFINALS DEBUG] 取得データ:', semiData)
+          console.log('[SEMIFINALS DEBUG] work_title_kana値:', semiData.work_title_kana)
           setSemifinalsInfo(semiData)
           
           // すべてのファイル情報を取得
-          const { data: filesData } = await supabase
+          console.log('[MUSIC DEBUG] === ファイル取得クエリ開始 ===')
+          console.log('[MUSIC DEBUG] entry.id:', entry.id)
+          
+          const { data: filesData, error: filesError } = await supabase
             .from('entry_files')
             .select('*')
             .eq('entry_id', entry.id)
           
-          console.log('[DEBUG] All files from database:', filesData)
+          if (filesError) {
+            console.error('[MUSIC DEBUG] ファイル取得エラー:', filesError)
+            return
+          }
+          
+          console.log('[MUSIC DEBUG] ファイル取得成功')
+          console.log('[MUSIC DEBUG] 取得件数:', filesData?.length || 0)
+          console.log('[MUSIC DEBUG] All files from database:', filesData)
           
           // チェイサー曲の検索デバッグ
           if (filesData) {
