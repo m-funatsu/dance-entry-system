@@ -11,6 +11,7 @@ interface FinalsMusicSectionProps {
   onMusicChangeOption: (option: 'changed' | 'unchanged') => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
+  audioFiles?: Record<string, { file_name: string }>
 }
 
 export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
@@ -20,8 +21,13 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
   onChange,
   onMusicChangeOption,
   onFileUpload,
-  onFileDelete
+  onFileDelete,
+  audioFiles
 }) => {
+  console.log('[FINALS MUSIC SECTION DEBUG] === FinalsMusicSection レンダリング ===')
+  console.log('[FINALS MUSIC SECTION DEBUG] audioFiles:', audioFiles)
+  console.log('[FINALS MUSIC SECTION DEBUG] audioFiles?.music_data_path:', audioFiles?.music_data_path)
+  console.log('[FINALS MUSIC SECTION DEBUG] finalsInfo.music_data_path:', finalsInfo.music_data_path)
   return (
     <div className="space-y-4">
       <h4 className="font-medium">楽曲情報</h4>
@@ -208,9 +214,26 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         </label>
         <AudioUpload
           label=""
-          value={finalsInfo.music_data_path}
-          onChange={(file) => onFileUpload('music_data_path', file)}
-          onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
+          value={(() => {
+            console.log('[FINALS MUSIC DATA DISPLAY] === 決勝楽曲データ表示値の計算 ===')
+            console.log('[FINALS MUSIC DATA DISPLAY] audioFiles:', audioFiles)
+            console.log('[FINALS MUSIC DATA DISPLAY] audioFiles?.music_data_path:', audioFiles?.music_data_path)
+            console.log('[FINALS MUSIC DATA DISPLAY] audioFiles?.music_data_path?.file_name:', audioFiles?.music_data_path?.file_name)
+            
+            const displayValue = audioFiles?.music_data_path?.file_name || ''
+            console.log('[FINALS MUSIC DATA DISPLAY] 最終表示値:', displayValue)
+            
+            return displayValue
+          })()}
+          onChange={(file) => {
+            console.log('[FINALS MUSIC DATA UPLOAD] === 決勝楽曲データファイル選択 ===')
+            console.log('[FINALS MUSIC DATA UPLOAD] 選択されたファイル:', file.name)
+            onFileUpload('music_data_path', file)
+          }}
+          onDelete={onFileDelete ? () => {
+            console.log('[FINALS MUSIC DATA DELETE] === 決勝楽曲データ削除 ===')
+            onFileDelete('music_data_path')
+          } : undefined}
           disabled={musicChangeOption === 'unchanged'}
           required={musicChangeOption === 'changed'}
           accept=".wav,.mp3,.m4a"

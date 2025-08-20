@@ -40,6 +40,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     choreographer_attendance: '',
     choreographer_photo_permission: ''
   })
+  const [audioFiles, setAudioFiles] = useState<Record<string, { file_name: string }>>({})
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -69,7 +70,13 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       }
 
       if (data) {
+        console.log('[FINALS DEBUG] === 決勝情報データ読み込み完了 ===')
+        console.log('[FINALS DEBUG] 取得データ:', data)
         setFinalsInfo(data)
+        
+        // ファイル情報を読み込み
+        await loadAudioFiles()
+        
         // オプションの状態を復元
         if (data.music_change === false && data.music_title) {
           setMusicChangeOption('unchanged')
@@ -96,6 +103,72 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
       console.error('決勝情報の読み込みエラー:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadAudioFiles = async () => {
+    console.log('[FINALS AUDIO DEBUG] === 決勝音声ファイル読み込み開始 ===')
+    try {
+      const { data: filesData, error: filesError } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .in('purpose', ['music_data_path', 'chaser_song'])
+        .order('uploaded_at', { ascending: false })
+
+      if (filesError) {
+        console.error('[FINALS AUDIO DEBUG] ファイル取得エラー:', filesError)
+        return
+      }
+
+      console.log('[FINALS AUDIO DEBUG] 取得したファイル数:', filesData?.length || 0)
+      console.log('[FINALS AUDIO DEBUG] 全ファイル情報:', filesData)
+
+      if (filesData && filesData.length > 0) {
+        const filesMap: Record<string, { file_name: string }> = {}
+        const urlUpdates: Record<string, string> = {}
+
+        for (const file of filesData) {
+          console.log('[FINALS AUDIO DEBUG] 処理中のファイル:', {
+            id: file.id,
+            file_name: file.file_name,
+            file_type: file.file_type,
+            purpose: file.purpose,
+            file_path: file.file_path
+          })
+
+          // 音楽関連のファイルを適切なフィールドにマッピング
+          const isAudioFile = (file.file_type === 'music' || file.file_type === 'audio') && 
+                              !file.file_name.match(/\.(jpg|jpeg|png|gif|bmp)$/i)
+
+          console.log('[FINALS AUDIO DEBUG] 音声ファイル判定:', isAudioFile)
+
+          if (isAudioFile) {
+            if (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') {
+              console.log('[FINALS AUDIO DEBUG] Purpose一致でマッピング:', file.purpose)
+              filesMap[file.purpose] = { file_name: file.file_name }
+
+              // 署名付きURLを取得
+              const { data: urlData } = await supabase.storage
+                .from('files')
+                .createSignedUrl(file.file_path, 3600)
+
+              if (urlData?.signedUrl) {
+                urlUpdates[file.purpose] = urlData.signedUrl
+              }
+            }
+          }
+        }
+
+        console.log('[FINALS AUDIO DEBUG] === ファイルマッピング結果 ===')
+        console.log('[FINALS AUDIO DEBUG] Final audioFiles state:', filesMap)
+        console.log('[FINALS AUDIO DEBUG] Final URL updates:', urlUpdates)
+
+        setAudioFiles(filesMap)
+        setFinalsInfo(prev => ({ ...prev, ...urlUpdates }))
+      }
+    } catch (error) {
+      console.error('[FINALS AUDIO DEBUG] ファイル読み込みエラー:', error)
     }
   }
 
@@ -609,6 +682,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           onMusicChangeOption={handleMusicChangeOption}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          audioFiles={audioFiles}
         />
       )}
 
