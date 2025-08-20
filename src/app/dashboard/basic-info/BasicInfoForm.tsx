@@ -210,8 +210,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           return true
         }
       },
-      real_name: { required: true },
-      real_name_kana: { required: true },
       emergency_contact_name_1: { required: true },
       emergency_contact_phone_1: { required: true },
       partner_name: { 
@@ -233,8 +231,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       },
       partner_romaji: { required: true },
       partner_birthdate: { required: true },
-      partner_real_name: { required: true },
-      partner_real_name_kana: { required: true },
     } as Record<string, {
       required?: boolean
       pattern?: RegExp
@@ -893,7 +889,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
               placeholder="山田太郎"
-              required
               error={fieldErrors.real_name || errors.real_name}
             />
             
@@ -903,7 +898,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
               placeholder="ヤマダタロウ"
-              required
               error={fieldErrors.real_name_kana || errors.real_name_kana}
             />
             
@@ -913,7 +907,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
               placeholder="田中花子"
-              required
               error={fieldErrors.partner_real_name || errors.partner_real_name}
             />
             
@@ -923,7 +916,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
               placeholder="タナカハナコ"
-              required
               error={fieldErrors.partner_real_name_kana || errors.partner_real_name_kana}
             />
           </div>

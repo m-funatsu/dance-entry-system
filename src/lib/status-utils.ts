@@ -152,7 +152,7 @@ export function checkBasicInfoCompletion(
   console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
   console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
   
-  // 基本情報フォームのバリデーションルールと完全一致させる
+  // 基本情報フォームのバリデーションルールと完全一致させる（本名フィールドは任意）
   const requiredFields = [
     'dance_style',
     'category_division',
@@ -162,16 +162,12 @@ export function checkBasicInfoCompletion(
     'representative_birthdate',
     'representative_email',
     'phone_number',
-    'real_name',
-    'real_name_kana',
     'emergency_contact_name_1',
     'emergency_contact_phone_1',
     'partner_name',
     'partner_furigana',
     'partner_romaji',
-    'partner_birthdate',
-    'partner_real_name',
-    'partner_real_name_kana'
+    'partner_birthdate'
   ]
   
   console.log(`[BASIC INFO CHECK] チェック対象フィールド:`, requiredFields)
