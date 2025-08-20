@@ -536,13 +536,24 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           }
           
           // ファイルパスの形式を確認
-          // パスは「entryId/finals/」の形式
+          // パスは「entryId/finals/」または「userId/entryId/semifinals/」の形式（準決勝からコピーされた場合）
           if (entry.id) {
-            const validPattern = `${entry.id}/finals/`
+            const finalsPattern = `${entry.id}/finals/`
+            const semifinalsPattern = `/semifinals/` // 準決勝からのファイル
             
-            if (!filePath.startsWith(validPattern)) {
+            const isValidPath = filePath.startsWith(finalsPattern) || 
+                               (filePath.includes(entry.id) && filePath.includes(semifinalsPattern))
+            
+            console.log('[DELETE] パス検証:', {
+              filePath,
+              finalsPattern,
+              semifinalsPattern,
+              isValidPath
+            })
+            
+            if (!isValidPath) {
               console.error('[SECURITY] File path does not match expected pattern')
-              console.log('[DELETE] Expected pattern:', validPattern)
+              console.log('[DELETE] Expected patterns:', { finalsPattern, semifinalsPattern })
               console.log('[DELETE] Actual path:', filePath)
               return null
             }
