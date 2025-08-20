@@ -794,69 +794,77 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             }}
           />
           
-          {/* アップロード済みファイルのプレビュー */}
-          {bankSlipFile && (
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-800">アップロード済み</p>
-                  <p className="text-xs text-green-700">{bankSlipFile.file_name}</p>
-                </div>
-                <div className="flex space-x-2">
-                  {bankSlipFile.url && (
+          {/* アップロード済みファイルのプレビュー（常に表示） */}
+          <div className="mt-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">アップロード状況</h4>
+            {bankSlipFile ? (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-800">アップロード済み</p>
+                    <p className="text-xs text-green-700">{bankSlipFile.file_name}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    {bankSlipFile.url && (
+                      <button
+                        type="button"
+                        onClick={() => window.open(bankSlipFile.url, '_blank')}
+                        className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                      >
+                        プレビュー
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => window.open(bankSlipFile.url, '_blank')}
-                      className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                      onClick={async () => {
+                        console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
+                        if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
+                          return
+                        }
+                        
+                        try {
+                          // ストレージから削除
+                          const { error: storageError } = await supabase.storage
+                            .from('files')
+                            .remove([bankSlipFile.file_path])
+
+                          if (storageError) {
+                            console.error('[BANK SLIP DELETE] ストレージ削除エラー:', storageError)
+                          }
+
+                          // データベースから削除
+                          const { error: dbError } = await supabase
+                            .from('entry_files')
+                            .delete()
+                            .eq('entry_id', entryId)
+                            .eq('purpose', 'bank_slip')
+
+                          if (dbError) {
+                            console.error('[BANK SLIP DELETE] データベース削除エラー:', dbError)
+                          }
+
+                          setBankSlipFile(null)
+                          console.log('[BANK SLIP DELETE] 削除完了')
+                          showToast('振込確認用紙を削除しました', 'success')
+                        } catch (error) {
+                          console.error('[BANK SLIP DELETE] 削除エラー:', error)
+                          showToast('振込確認用紙の削除に失敗しました', 'error')
+                        }
+                      }}
+                      className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
                     >
-                      プレビュー
+                      削除
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
-                      if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
-                        return
-                      }
-                      
-                      try {
-                        // ストレージから削除
-                        const { error: storageError } = await supabase.storage
-                          .from('files')
-                          .remove([bankSlipFile.file_path])
-
-                        if (storageError) {
-                          console.error('[BANK SLIP DELETE] ストレージ削除エラー:', storageError)
-                        }
-
-                        // データベースから削除
-                        const { error: dbError } = await supabase
-                          .from('entry_files')
-                          .delete()
-                          .eq('entry_id', entryId)
-                          .eq('purpose', 'bank_slip')
-
-                        if (dbError) {
-                          console.error('[BANK SLIP DELETE] データベース削除エラー:', dbError)
-                        }
-
-                        setBankSlipFile(null)
-                        console.log('[BANK SLIP DELETE] 削除完了')
-                        showToast('振込確認用紙を削除しました', 'success')
-                      } catch (error) {
-                        console.error('[BANK SLIP DELETE] 削除エラー:', error)
-                        showToast('振込確認用紙の削除に失敗しました', 'error')
-                      }
-                    }}
-                    className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
-                  >
-                    削除
-                  </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-sm text-gray-600">振込確認用紙はまだアップロードされていません</p>
+                <p className="text-xs text-gray-500 mt-1">上記のフォームからファイルを選択してアップロードしてください</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 本名情報セクション */}
