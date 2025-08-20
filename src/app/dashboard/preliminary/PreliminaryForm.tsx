@@ -527,7 +527,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               onDelete={() => handleFileDelete()}
               disabled={uploading || !!videoFile || !entryId}
               required
-              maxSizeMB={500}
+              maxSizeMB={250}
               accept="video/*"
             />
           )}
