@@ -126,6 +126,45 @@ Required for deployment:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (for admin operations)
 
+## SOLID原則 / SOLID Principles
+
+このプロジェクトではSOLID原則に則ったコーディングを行うこと：
+
+### 1. **Single Responsibility Principle (単一責任の原則)**
+- 各コンポーネント・関数は1つの責任のみを持つ
+- 例：フォーム保存、バリデーション、UI表示を分離
+- ❌ 悪い例：1つのコンポーネントでAPI呼び出し、バリデーション、UI描画をすべて処理
+- ✅ 良い例：`useFormSave`, `useFormValidation`, `FormComponent`で責任を分離
+
+### 2. **Open/Closed Principle (開放閉鎖の原則)**  
+- 拡張に対して開放的、修正に対して閉鎖的
+- 例：汎用的なフック（`useFormSave`, `useFileUpload`）で新機能に対応
+- ❌ 悪い例：新しいフォームごとに既存コードを修正
+- ✅ 良い例：設定パラメータで動作を変更可能な汎用コンポーネント
+
+### 3. **Liskov Substitution Principle (リスコフの置換原則)**
+- サブタイプはベースタイプと置換可能であること
+- 例：`EntryFile`, `BasicInfo`などの型を適切に継承・実装
+- インターフェースの契約を守る
+
+### 4. **Interface Segregation Principle (インターフェース分離の原則)**
+- クライアントが依存しないインターフェースへの依存を強制しない
+- 例：大きなpropsオブジェクトではなく、必要な部分のみを渡す
+- ❌ 悪い例：`props: { user: User, entry: Entry, files: EntryFile[], ... }`
+- ✅ 良い例：`props: { userId: string, entryId: string }` など必要最小限
+
+### 5. **Dependency Inversion Principle (依存関係逆転の原則)**
+- 上位モジュールは下位モジュールに依存してはならない
+- 抽象に依存し、具象に依存しない
+- 例：Supabaseクライアントを直接使わず、ラッパー関数を通して使用
+- ✅ 良い例：`createClient()`, `updateFormStatus()` などの抽象化された関数
+
+### 実装ガイドライン
+- **コンポーネント分割**: 50行を超えたら分割を検討
+- **カスタムフック活用**: ロジックの再利用と責任分離
+- **型安全性**: 適切なTypeScript型定義で契約を明確化
+- **テスタビリティ**: 単一責任により単体テストが容易
+
 ## Code Standards
 
 ### TypeScript
