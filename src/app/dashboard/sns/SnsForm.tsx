@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, FileUploadField, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, FileUploadField, Alert, SaveButton, CancelButton, DeadlineNoticeAsync } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
@@ -284,20 +284,15 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     }
   }
 
-  const handleSave = async (isTemporary = false) => {
+  const handleSave = async () => {
     if (!entry?.id) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
       return
     }
 
-    // 完了登録の場合は動画が必須
-    if (!isTemporary && (!practiceVideoFile || !introVideoFile)) {
-      showToast('すべての動画をアップロードしてください', 'error')
-      return
-    }
-
-    await save(isTemporary)
+    // バリデーションはステータスチェック用のみ（保存は常に可能）
+    await save(false)
   }
 
   if (loading || formLoading) {
@@ -578,29 +573,15 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
         )}
 
         {/* ボタン */}
-        <div className="flex justify-end space-x-4 pt-6">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => router.push('/dashboard')}
-          >
-            キャンセル
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => handleSave(true)}
-            disabled={saving || uploading || !entry}
-          >
-            一時保存
-          </Button>
-          <Button
-            type="button"
-            onClick={() => handleSave(false)}
-            disabled={saving || uploading || !entry}
-          >
-            {saving ? '保存中...' : '保存'}
-          </Button>
+        <div className="flex justify-between pt-6">
+          <CancelButton onClick={() => router.push('/dashboard')} />
+          <div className="space-x-4">
+            <SaveButton
+              onClick={handleSave}
+              disabled={saving || uploading || !entry}
+              loading={saving}
+            />
+          </div>
         </div>
       </div>
     </form>
