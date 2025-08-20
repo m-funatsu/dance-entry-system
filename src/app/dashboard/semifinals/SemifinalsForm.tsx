@@ -7,6 +7,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkSemifinalsInfoCompletion } from '@/lib/status-utils'
 import { Alert, TabNavigation, SaveButton, CancelButton } from '@/components/ui'
 import { useFormSave } from '@/hooks'
+import { DebugLogger } from '@/lib/debug-logger'
 import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection } from '@/components/semifinals'
 import { 
   validateSemifinalsSection, 
@@ -23,6 +24,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
+  const debugLogger = DebugLogger.getInstance()
   
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
@@ -55,6 +57,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     
     const loadData = async () => {
       try {
+        debugLogger.log('SEMIFINALS INIT', 'データ読み込み開始', { entry_id: entry.id })
         
         // 予選情報を取得
         const { data: prelimData } = await supabase
@@ -75,9 +78,12 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           .maybeSingle()
         
         if (semiData) {
-          console.log('[SEMIFINALS DEBUG] === 準決勝情報読み込み完了 ===')
-          console.log('[SEMIFINALS DEBUG] 取得データ:', semiData)
-          console.log('[SEMIFINALS DEBUG] work_title_kana値:', semiData.work_title_kana)
+          debugLogger.log('SEMIFINALS LOAD', '準決勝情報読み込み完了', {
+            id: semiData.id,
+            work_title: semiData.work_title,
+            work_title_kana: semiData.work_title_kana,
+            music_change_from_preliminary: semiData.music_change_from_preliminary
+          })
           setSemifinalsInfo(semiData)
           
           // すべてのファイル情報を取得
@@ -233,7 +239,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     }
     
     loadData()
-  }, [entry?.id, supabase, showToast])
+  }, [entry?.id, supabase, showToast, debugLogger])
 
   // タブ切り替え時の検証
   const handleSectionChange = (sectionId: string) => {
@@ -613,11 +619,20 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       entry_id: entry.id
     }
     
-    console.log('[SEMIFINALS SAVE] === 準決勝情報保存開始 ===')
-    console.log('[SEMIFINALS SAVE] 保存するデータ:', dataToSave)
-    console.log('[SEMIFINALS SAVE] work_title_kana値:', dataToSave.work_title_kana)
+    debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存開始', {
+      work_title: dataToSave.work_title,
+      work_title_kana: dataToSave.work_title_kana,
+      music_change_from_preliminary: dataToSave.music_change_from_preliminary,
+      entry_id: dataToSave.entry_id,
+      dataSize: Object.keys(dataToSave).length
+    })
 
     await save(dataToSave) // 保存
+    
+    debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存完了', {
+      message: '保存処理完了',
+      work_title_kana_saved: dataToSave.work_title_kana
+    })
     
     // 必須項目が完了している場合はステータスを「登録済み」に更新
     const isComplete = checkSemifinalsInfoCompletion(semifinalsInfo)
@@ -626,6 +641,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     // 保存成功後にダッシュボードにリダイレクト
     showToast('準決勝情報を保存しました', 'success')
     setTimeout(() => {
+      debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト')
       window.location.href = '/dashboard'
     }, 1500)
     
