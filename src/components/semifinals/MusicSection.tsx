@@ -22,6 +22,11 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
   onFileDelete,
   audioFiles
 }) => {
+  console.log('[MUSIC SECTION DEBUG] === MusicSection レンダリング ===')
+  console.log('[MUSIC SECTION DEBUG] audioFiles:', audioFiles)
+  console.log('[MUSIC SECTION DEBUG] audioFiles.music_data_path:', audioFiles?.music_data_path)
+  console.log('[MUSIC SECTION DEBUG] file_name for display:', audioFiles?.music_data_path?.file_name)
+  console.log('[MUSIC SECTION DEBUG] semifinalsInfo.music_data_path:', semifinalsInfo.music_data_path)
   const handleMusicChange = (useSameMusic: boolean) => {
     if (useSameMusic) {
       // 予選の楽曲著作権許諾値を準決勝形式にマッピング
@@ -280,9 +285,24 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       <div>
         <AudioUpload
           label="楽曲データ"
-          value={audioFiles?.music_data_path?.file_name || ''}
-          onChange={(file) => onFileUpload('music_data_path', file)}
+          value={(() => {
+            console.log('[MUSIC DATA DISPLAY] === 楽曲データ表示値の計算 ===')
+            console.log('[MUSIC DATA DISPLAY] audioFiles:', audioFiles)
+            console.log('[MUSIC DATA DISPLAY] audioFiles?.music_data_path:', audioFiles?.music_data_path)
+            console.log('[MUSIC DATA DISPLAY] audioFiles?.music_data_path?.file_name:', audioFiles?.music_data_path?.file_name)
+            
+            const displayValue = audioFiles?.music_data_path?.file_name || ''
+            console.log('[MUSIC DATA DISPLAY] 最終表示値:', displayValue)
+            
+            return displayValue
+          })()}
+          onChange={(file) => {
+            console.log('[MUSIC DATA UPLOAD] === 楽曲データファイル選択 ===')
+            console.log('[MUSIC DATA UPLOAD] 選択されたファイル:', file.name)
+            onFileUpload('music_data_path', file)
+          }}
           onDelete={() => {
+            console.log('[MUSIC DATA DELETE] === 楽曲データ削除 ===')
             if (onFileDelete) {
               onFileDelete('music_data_path')
             }

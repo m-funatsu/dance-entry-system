@@ -98,15 +98,30 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             const filesMap: Record<string, EntryFile> = {}
             const urlUpdates: Record<string, string> = {}
             
+            console.log('[MUSIC DEBUG] === ファイルデータ読み込み開始 ===')
+            console.log('[MUSIC DEBUG] 取得したファイル数:', filesData.length)
+            console.log('[MUSIC DEBUG] 全ファイル情報:', filesData)
+            
             for (const file of filesData) {
+              console.log('[MUSIC DEBUG] 処理中のファイル:', {
+                id: file.id,
+                file_name: file.file_name,
+                file_type: file.file_type,
+                purpose: file.purpose,
+                file_path: file.file_path
+              })
+              
               // 音楽関連のファイルを適切なフィールドにマッピング
               // ファイル拡張子でもチェックして、誤ったfile_typeを除外
               const isAudioFile = (file.file_type === 'music' || file.file_type === 'audio') && 
                                   !file.file_name.match(/\.(jpg|jpeg|png|gif|bmp)$/i)
               
+              console.log('[MUSIC DEBUG] 音声ファイル判定:', isAudioFile)
+              
               if (isAudioFile) {
                 // purposeが設定されている場合はそれを使用
                 if (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') {
+                  console.log('[MUSIC DEBUG] Purpose一致でマッピング:', file.purpose)
                   filesMap[file.purpose] = file
                   
                   // 署名付きURLを取得
@@ -148,11 +163,29 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
               }
             }
             
-            console.log('[DEBUG] Final audioFiles state:', filesMap)
-            console.log('[DEBUG] Final URL updates:', urlUpdates)
+            console.log('[MUSIC DEBUG] === ファイルマッピング結果 ===')
+            console.log('[MUSIC DEBUG] Final audioFiles state:', filesMap)
+            console.log('[MUSIC DEBUG] Final URL updates:', urlUpdates)
+            console.log('[MUSIC DEBUG] music_data_path file info:', filesMap['music_data_path'])
+            console.log('[MUSIC DEBUG] chaser_song file info:', filesMap['chaser_song'])
             
-            setAudioFiles(filesMap)
-            setSemifinalsInfo(prev => ({ ...prev, ...urlUpdates }))
+            // audioFiles状態の更新をログ出力
+            console.log('[MUSIC DEBUG] setAudioFiles実行前の状態')
+            setAudioFiles(prev => {
+              console.log('[MUSIC DEBUG] setAudioFiles - 前の状態:', prev)
+              console.log('[MUSIC DEBUG] setAudioFiles - 新しい状態:', filesMap)
+              return filesMap
+            })
+            
+            // semifinalsInfo状態の更新をログ出力
+            console.log('[MUSIC DEBUG] setSemifinalsInfo実行（URL更新）')
+            setSemifinalsInfo(prev => {
+              console.log('[MUSIC DEBUG] setSemifinalsInfo - 前の状態:', prev)
+              console.log('[MUSIC DEBUG] setSemifinalsInfo - URL更新:', urlUpdates)
+              const newState = { ...prev, ...urlUpdates }
+              console.log('[MUSIC DEBUG] setSemifinalsInfo - 新しい状態:', newState)
+              return newState
+            })
           }
         } else {
           // 新規作成時の初期設定

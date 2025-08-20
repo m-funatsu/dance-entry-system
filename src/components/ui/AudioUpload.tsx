@@ -13,6 +13,10 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   maxSizeMB = 200,
   accept = '.wav,.mp3,.m4a'
 }) => {
+  console.log('[AUDIO UPLOAD DEBUG] === AudioUpload レンダリング ===')
+  console.log('[AUDIO UPLOAD DEBUG] label:', label)
+  console.log('[AUDIO UPLOAD DEBUG] value:', value)
+  console.log('[AUDIO UPLOAD DEBUG] onDelete exists:', !!onDelete)
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
