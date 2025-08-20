@@ -9,6 +9,7 @@ interface SoundSectionProps {
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
+  audioFiles?: Record<string, { file_name: string }>
 }
 
 export const SoundSection: React.FC<SoundSectionProps> = ({
@@ -16,7 +17,8 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
   validationErrors,
   onChange,
   onFileUpload,
-  onFileDelete
+  onFileDelete,
+  audioFiles
 }) => {
   return (
     <div className="space-y-4">
@@ -75,7 +77,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         <div>
           <AudioUpload
             label="チェイサー（退場）曲音源"
-            value={semifinalsInfo.chaser_song}
+            value={audioFiles?.chaser_song?.file_name || ''}
             onChange={(file) => {
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)

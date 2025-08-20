@@ -624,6 +624,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          audioFiles={audioFiles}
         />
       )}
 
@@ -634,6 +635,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          audioFiles={audioFiles}
         />
       )}
 
