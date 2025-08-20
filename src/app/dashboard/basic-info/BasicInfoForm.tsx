@@ -397,7 +397,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   
   // フィールド変更時のバリデーション
-  const handleFieldChangeWithValidation = (field: keyof BasicInfoFormData, value: string) => {
+  const handleFieldChangeWithValidation = async (field: keyof BasicInfoFormData, value: string) => {
+    console.log(`[FIELD CHANGE] === フィールド変更: ${field} ===`)
+    console.log(`[FIELD CHANGE] 新しい値: "${value}"`)
+    
     handleFieldChange(field, value)
     
     // 動的ルールに基づいてバリデーション
@@ -430,6 +433,28 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         }
         return newErrors
       })
+    }
+    
+    // フィールド変更時にリアルタイムでステータスをチェック
+    if (entryId) {
+      console.log(`[FIELD CHANGE] ステータスリアルタイムチェック開始`)
+      setTimeout(async () => {
+        try {
+          const updatedFormData = { ...formData, [field]: value }
+          console.log(`[FIELD CHANGE] 更新後のformData:`, updatedFormData)
+          
+          const hasAnyData = Object.values(updatedFormData).some(val => val && val.toString().trim() !== '') || 
+                          Object.values(checkboxes).some(val => val === true)
+          const isComplete = checkBasicInfoCompletion(updatedFormData, checkboxes)
+          
+          console.log(`[FIELD CHANGE] リアルタイムチェック結果 - hasData: ${hasAnyData}, isComplete: ${isComplete}`)
+          
+          await updateFormStatus('basic_info', entryId, isComplete, hasAnyData)
+          console.log(`[FIELD CHANGE] ステータス更新完了`)
+        } catch (error) {
+          console.error(`[FIELD CHANGE] ステータス更新エラー:`, error)
+        }
+      }, 500) // 0.5秒後に実行（入力完了を待つ）
     }
   }
 
