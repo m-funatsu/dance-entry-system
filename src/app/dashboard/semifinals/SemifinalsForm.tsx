@@ -251,13 +251,15 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // ファイルアップロード前に現在の入力データを一時保存
       console.log('[UPLOAD DEBUG] 現在の入力データを一時保存中...')
       try {
-        // 存在しないフィールドを除外して一時保存
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { work_title_kana: _, ...validData } = semifinalsInfo
+        // 一時保存（work_title_kanaも含める）
         const tempSaveData = {
-          ...validData,
+          ...semifinalsInfo,
           entry_id: entry.id
         }
+        
+        console.log('[UPLOAD DEBUG] 一時保存データ:', tempSaveData)
+        console.log('[UPLOAD DEBUG] work_title_kana値:', tempSaveData.work_title_kana)
+        
         await save(tempSaveData)
         console.log('[UPLOAD DEBUG] 一時保存完了')
       } catch (tempSaveError) {
@@ -592,13 +594,15 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       return
     }
 
-    // 存在しないフィールドを除外して保存
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { work_title_kana: _, ...validData } = semifinalsInfo
+    // 保存データを準備（work_title_kanaも含める）
     const dataToSave = {
-      ...validData,
+      ...semifinalsInfo,
       entry_id: entry.id
     }
+    
+    console.log('[SEMIFINALS SAVE] === 準決勝情報保存開始 ===')
+    console.log('[SEMIFINALS SAVE] 保存するデータ:', dataToSave)
+    console.log('[SEMIFINALS SAVE] work_title_kana値:', dataToSave.work_title_kana)
 
     await save(dataToSave) // 保存
     
