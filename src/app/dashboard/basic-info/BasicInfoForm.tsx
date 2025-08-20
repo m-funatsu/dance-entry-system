@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -24,7 +24,55 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     media_consent_checked: initialData?.media_consent_checked || false,
     privacy_policy_checked: initialData?.privacy_policy_checked || false
   })
+  const [bankSlipFile, setBankSlipFile] = useState<{file_name: string; file_path: string; url?: string} | null>(null)
 
+  // 振込確認用紙ファイルを読み込む
+  useEffect(() => {
+    const loadBankSlipFile = async () => {
+      if (!entryId) return
+      
+      console.log('[BANK SLIP LOAD] === 振込確認用紙読み込み開始 ===')
+      try {
+        const { data: fileData, error: fileError } = await supabase
+          .from('entry_files')
+          .select('*')
+          .eq('entry_id', entryId)
+          .eq('purpose', 'bank_slip')
+          .order('uploaded_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (fileError) {
+          console.error('[BANK SLIP LOAD] ファイル取得エラー:', fileError)
+          return
+        }
+
+        if (fileData) {
+          console.log('[BANK SLIP LOAD] 振込確認用紙ファイル発見:', fileData)
+          
+          // 署名付きURLを取得
+          const { data: urlData } = await supabase.storage
+            .from('files')
+            .createSignedUrl(fileData.file_path, 3600)
+
+          setBankSlipFile({
+            file_name: fileData.file_name,
+            file_path: fileData.file_path,
+            url: urlData?.signedUrl
+          })
+          
+          console.log('[BANK SLIP LOAD] 振込確認用紙状態更新完了')
+        } else {
+          console.log('[BANK SLIP LOAD] 振込確認用紙ファイルなし')
+          setBankSlipFile(null)
+        }
+      } catch (error) {
+        console.error('[BANK SLIP LOAD] 読み込みエラー:', error)
+      }
+    }
+
+    loadBankSlipFile()
+  }, [entryId, supabase])
 
   // 年齢計算関数（2025年11月23日時点）
   const calculateAge = (birthdate: string): string => {
@@ -717,7 +765,18 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   throw dbError
                 }
                 
-                console.log('[BANK SLIP UPLOAD] アップロード成功')
+                // 署名付きURLを取得してプレビュー用に設定
+                const { data: urlData } = await supabase.storage
+                  .from('files')
+                  .createSignedUrl(fileName, 3600)
+
+                setBankSlipFile({
+                  file_name: file.name,
+                  file_path: fileName,
+                  url: urlData?.signedUrl
+                })
+                
+                console.log('[BANK SLIP UPLOAD] アップロード成功、状態更新完了')
                 showToast('振込確認用紙をアップロードしました', 'success')
                 
               } catch (error) {
@@ -734,6 +793,70 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               formats: "JPG, PNG, GIF など（最大10MB）"
             }}
           />
+          
+          {/* アップロード済みファイルのプレビュー */}
+          {bankSlipFile && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-800">アップロード済み</p>
+                  <p className="text-xs text-green-700">{bankSlipFile.file_name}</p>
+                </div>
+                <div className="flex space-x-2">
+                  {bankSlipFile.url && (
+                    <button
+                      type="button"
+                      onClick={() => window.open(bankSlipFile.url, '_blank')}
+                      className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                    >
+                      プレビュー
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
+                      if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
+                        return
+                      }
+                      
+                      try {
+                        // ストレージから削除
+                        const { error: storageError } = await supabase.storage
+                          .from('files')
+                          .remove([bankSlipFile.file_path])
+
+                        if (storageError) {
+                          console.error('[BANK SLIP DELETE] ストレージ削除エラー:', storageError)
+                        }
+
+                        // データベースから削除
+                        const { error: dbError } = await supabase
+                          .from('entry_files')
+                          .delete()
+                          .eq('entry_id', entryId)
+                          .eq('purpose', 'bank_slip')
+
+                        if (dbError) {
+                          console.error('[BANK SLIP DELETE] データベース削除エラー:', dbError)
+                        }
+
+                        setBankSlipFile(null)
+                        console.log('[BANK SLIP DELETE] 削除完了')
+                        showToast('振込確認用紙を削除しました', 'success')
+                      } catch (error) {
+                        console.error('[BANK SLIP DELETE] 削除エラー:', error)
+                        showToast('振込確認用紙の削除に失敗しました', 'error')
+                      }
+                    }}
+                    className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 本名情報セクション */}
