@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { useFormSave } from '@/hooks'
 import { updateFormStatus, checkFinalsInfoCompletion } from '@/lib/status-utils'
@@ -18,8 +18,8 @@ interface FinalsInfoFormProps {
 }
 
 export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
@@ -46,9 +46,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const { save, saving, error, success } = useFormSave({
     tableName: 'finals_info',
     uniqueField: 'entry_id',
-    redirectPath: '/dashboard',
-    onSuccess: () => router.refresh(),
-    onError: (message) => console.error(message)
+    redirectPath: '', // 空文字列で自動リダイレクトを無効化
+    onSuccess: (message) => console.log('[FINALS SAVE SUCCESS]', message),
+    onError: (message) => console.error('[FINALS SAVE ERROR]', message)
   })
 
   useEffect(() => {
@@ -670,6 +670,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     
     // 保存成功後にダッシュボードにリダイレクト
     setValidationErrors({})
+    showToast('決勝情報を保存しました', 'success')
     setTimeout(() => {
       window.location.href = '/dashboard'
     }, 1500)

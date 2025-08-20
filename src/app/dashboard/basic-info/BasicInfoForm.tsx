@@ -136,7 +136,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
     tableName: 'basic_info',
     uniqueField: 'entry_id',
     validationRules: {}, // 初期ルールは空にする
-    redirectPath: '/dashboard',
+    redirectPath: '', // 空文字列で自動リダイレクトを無効化
     onSuccess: async (message) => {
       console.log('[BASIC INFO SUCCESS] === onSuccess コールバック開始 ===')
       console.log('[BASIC INFO SUCCESS] 成功メッセージ:', message)
