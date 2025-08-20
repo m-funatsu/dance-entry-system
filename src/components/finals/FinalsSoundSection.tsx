@@ -11,6 +11,7 @@ interface FinalsSoundSectionProps {
   onSoundChangeOption: (option: 'same' | 'different') => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
+  audioFiles?: Record<string, { file_name: string }>
 }
 
 export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
@@ -20,8 +21,12 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   onChange,
   onSoundChangeOption,
   onFileUpload,
-  onFileDelete
+  onFileDelete,
+  audioFiles
 }) => {
+  console.log('[FINALS SOUND SECTION DEBUG] === FinalsSoundSection レンダリング ===')
+  console.log('[FINALS SOUND SECTION DEBUG] audioFiles:', audioFiles)
+  console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.chaser_song:', audioFiles?.chaser_song)
   return (
     <div className="space-y-4">
       <h4 className="font-medium">音響指示情報</h4>
@@ -95,9 +100,26 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         <div>
           <AudioUpload
             label="チェイサー（退場）曲 音源"
-            value={finalsInfo.chaser_song}
-            onChange={(file) => onFileUpload('chaser_song', file)}
-            onDelete={onFileDelete ? () => onFileDelete('chaser_song') : undefined}
+            value={(() => {
+              console.log('[FINALS CHASER DISPLAY] === 決勝チェイサー曲表示値の計算 ===')
+              console.log('[FINALS CHASER DISPLAY] audioFiles:', audioFiles)
+              console.log('[FINALS CHASER DISPLAY] audioFiles?.chaser_song:', audioFiles?.chaser_song)
+              console.log('[FINALS CHASER DISPLAY] audioFiles?.chaser_song?.file_name:', audioFiles?.chaser_song?.file_name)
+              
+              const displayValue = audioFiles?.chaser_song?.file_name || ''
+              console.log('[FINALS CHASER DISPLAY] 最終表示値:', displayValue)
+              
+              return displayValue
+            })()}
+            onChange={(file) => {
+              console.log('[FINALS CHASER UPLOAD] === 決勝チェイサー曲ファイル選択 ===')
+              console.log('[FINALS CHASER UPLOAD] 選択されたファイル:', file.name)
+              onFileUpload('chaser_song', file)
+            }}
+            onDelete={onFileDelete ? () => {
+              console.log('[FINALS CHASER DELETE] === 決勝チェイサー曲削除 ===')
+              onFileDelete('chaser_song')
+            } : undefined}
             disabled={soundChangeOption === 'same'}
             required={soundChangeOption === 'different' && finalsInfo.chaser_song_designation === '必要'}
             accept=".wav,.mp3,.m4a"

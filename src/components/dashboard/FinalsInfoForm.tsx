@@ -695,6 +695,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           onSoundChangeOption={handleSoundChangeOption}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          audioFiles={audioFiles}
         />
       )}
 
