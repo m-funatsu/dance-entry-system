@@ -8,6 +8,7 @@ import { FormField, FileUploadField, Alert, SaveButton, CancelButton, DeadlineNo
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
+import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import type { Entry, SnsFormData, EntryFile } from '@/lib/types'
 
 interface SNSFormProps {
@@ -59,8 +60,8 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     tableName: 'sns_info',
     uniqueField: 'entry_id',
     validationRules,
-    redirectPath: '/dashboard',
-    onSuccess: (message) => showToast(message, 'success'),
+    redirectPath: undefined, // 自動リダイレクト無効化
+    onSuccess: (message) => console.log('Save success:', message),
     onError: (error) => showToast(error, 'error')
   })
 
@@ -292,7 +293,17 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     }
 
     // バリデーションはステータスチェック用のみ（保存は常に可能）
-    await save(false)
+    await save(true) // 一時保存モード（バリデーション無し）
+    
+    // 必須項目が完了している場合はステータスを「登録済み」に更新
+    const isComplete = checkSnsInfoCompletion(formData, !!practiceVideoFile, !!introVideoFile)
+    await updateFormStatus('sns_info', entry.id, isComplete)
+    
+    // 保存成功後にダッシュボードにリダイレクト
+    showToast('SNS情報を保存しました', 'success')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 1500)
   }
 
   if (loading || formLoading) {
