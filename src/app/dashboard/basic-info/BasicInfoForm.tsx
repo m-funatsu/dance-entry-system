@@ -618,6 +618,43 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           </div>
         </div>
 
+        {/* 振込確認用紙アップロードセクション */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">振込確認用紙アップロード</h3>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            <div className="text-sm text-blue-800 space-y-2">
+              <div>
+                <p className="font-medium">■オンライン予選エントリー料</p>
+                <p className="ml-4">8,000円</p>
+              </div>
+              <div>
+                <p className="font-medium">■お振込先</p>
+                <div className="ml-4 space-y-1">
+                  <p>三井住友銀行</p>
+                  <p>新宿西口支店</p>
+                  <p>普通　２２４１７６９</p>
+                  <p>カ）バルカー</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              振込確認用紙の画像をアップロードしてください
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            />
+            <p className="mt-2 text-sm text-gray-500">
+              対応形式: JPG, PNG, GIF など（最大10MB）
+            </p>
+          </div>
+        </div>
+
         {/* 本名情報セクション */}
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">本名情報</h3>
