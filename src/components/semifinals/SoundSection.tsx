@@ -80,10 +80,12 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)
             }}
-            onDelete={onFileDelete ? () => {
+            onDelete={() => {
               console.log('[SOUND SECTION] Deleting chaser_song')
-              onFileDelete('chaser_song')
-            } : undefined}
+              if (onFileDelete) {
+                onFileDelete('chaser_song')
+              }
+            }}
             required
             accept=".wav,.mp3,.m4a"
           />

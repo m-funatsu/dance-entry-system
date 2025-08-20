@@ -280,7 +280,11 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           label="楽曲データ"
           value={semifinalsInfo.music_data_path}
           onChange={(file) => onFileUpload('music_data_path', file)}
-          onDelete={onFileDelete ? () => onFileDelete('music_data_path') : undefined}
+          onDelete={() => {
+            if (onFileDelete) {
+              onFileDelete('music_data_path')
+            }
+          }}
           required
           accept=".wav,.mp3,.m4a"
         />
