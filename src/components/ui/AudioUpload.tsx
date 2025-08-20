@@ -126,9 +126,12 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-sm font-medium text-green-700">アップロード済み</p>
+            <p className="text-xs text-gray-600 mt-1">
+              {typeof value === 'string' ? value : value?.name || 'ファイル名不明'}
+            </p>
             {uploadingFile && (
-              <p className="text-xs text-gray-600">
-                {uploadingFile.name} ({formatFileSize(uploadingFile.size)})
+              <p className="text-xs text-gray-500 mt-1">
+                サイズ: {formatFileSize(uploadingFile.size)}
               </p>
             )}
             
