@@ -489,6 +489,15 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         [field]: publicUrl
       }))
       
+      // audioFiles状態も更新（音声ファイルの場合）
+      if (fileType === 'audio') {
+        console.log('[UPLOAD] Updating audioFiles state for field:', field)
+        setAudioFiles(prev => ({
+          ...prev,
+          [field]: { file_name: file.name }
+        }))
+      }
+      
       console.log('[UPLOAD] File uploaded successfully')
     } catch (err) {
       console.error('[UPLOAD] File upload error:', err)
@@ -597,6 +606,16 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         ...prev,
         [field]: ''
       }))
+      
+      // audioFiles状態も更新（音声ファイルの場合）
+      if (field === 'music_data_path' || field === 'chaser_song') {
+        console.log('[DELETE] Updating audioFiles state for field:', field)
+        setAudioFiles(prev => {
+          const newState = { ...prev }
+          delete newState[field]
+          return newState
+        })
+      }
 
       console.log('[DELETE] File deleted successfully')
     } catch (err) {
