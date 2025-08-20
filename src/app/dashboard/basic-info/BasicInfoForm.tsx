@@ -668,7 +668,63 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <FileUploadField
             label="振込確認用紙"
             value={null}
-            onChange={(file) => console.log('File selected:', file.name)}
+            onChange={async (file) => {
+              console.log('[BANK SLIP UPLOAD] === 振込確認用紙アップロード開始 ===')
+              console.log('[BANK SLIP UPLOAD] 選択されたファイル:', file.name)
+              console.log('[BANK SLIP UPLOAD] ファイルサイズ:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+              console.log('[BANK SLIP UPLOAD] ファイルタイプ:', file.type)
+              
+              if (!entryId) {
+                console.error('[BANK SLIP UPLOAD] entryIdが存在しません')
+                showToast('基本情報を先に保存してください', 'error')
+                return
+              }
+              
+              try {
+                // ファイルアップロード処理
+                const fileExt = file.name.split('.').pop()
+                const fileName = `${entryId}/bank_slip_${Date.now()}.${fileExt}`
+                
+                console.log('[BANK SLIP UPLOAD] アップロード先:', fileName)
+                
+                const { error: uploadError } = await supabase.storage
+                  .from('files')
+                  .upload(fileName, file)
+                
+                if (uploadError) {
+                  console.error('[BANK SLIP UPLOAD] ストレージアップロードエラー:', uploadError)
+                  throw uploadError
+                }
+                
+                // ファイル情報をデータベースに保存
+                const insertData = {
+                  entry_id: entryId,
+                  file_type: 'photo',
+                  file_name: file.name,
+                  file_path: fileName,
+                  purpose: 'bank_slip',
+                  uploaded_at: new Date().toISOString()
+                }
+                
+                console.log('[BANK SLIP UPLOAD] データベース保存:', insertData)
+                
+                const { error: dbError } = await supabase
+                  .from('entry_files')
+                  .insert(insertData)
+                
+                if (dbError) {
+                  console.error('[BANK SLIP UPLOAD] データベース保存エラー:', dbError)
+                  throw dbError
+                }
+                
+                console.log('[BANK SLIP UPLOAD] アップロード成功')
+                showToast('振込確認用紙をアップロードしました', 'success')
+                
+              } catch (error) {
+                console.error('[BANK SLIP UPLOAD] アップロードエラー:', error)
+                showToast('振込確認用紙のアップロードに失敗しました', 'error')
+              }
+            }}
             category="image"
             accept="image/jpeg,image/jpg,image/png,image/gif"
             maxSizeMB={10}
