@@ -65,7 +65,7 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
   })
 
   // ファイルアップロードフック（新システム）
-  const { uploadVideo, uploading, deleteFile } = useFileUploadV2({
+  const { uploadVideo, uploading, progress, deleteFile } = useFileUploadV2({
     category: 'video',
     onError: (error: string) => showToast(error, 'error')
   })
@@ -312,6 +312,27 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
+
+      {/* アップロード中のプログレスバー */}
+      {uploading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div className="flex items-center mb-2">
+            <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm font-medium text-blue-800">
+              動画をアップロード中... {Math.round(progress)}%
+            </span>
+          </div>
+          <div className="w-full bg-blue-200 rounded-full h-2">
+            <div 
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
 
       <DeadlineNoticeAsync deadlineKey="sns_deadline" />
 
