@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkBasicInfoCompletion } from '@/lib/status-utils'
-import { FormField, Alert, Button, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, Alert, Button, DeadlineNoticeAsync, FileUploadField } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
@@ -640,19 +640,18 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              振込確認用紙の画像をアップロードしてください
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-            />
-            <p className="mt-2 text-sm text-gray-500">
-              対応形式: JPG, PNG, GIF など（最大10MB）
-            </p>
-          </div>
+          <FileUploadField
+            label="振込確認用紙"
+            value={null}
+            onChange={(file) => console.log('File selected:', file.name)}
+            category="image"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
+            maxSizeMB={10}
+            placeholder={{
+              title: "振込確認用紙をアップロード",
+              formats: "JPG, PNG, GIF など（最大10MB）"
+            }}
+          />
         </div>
 
         {/* 本名情報セクション */}
