@@ -7,6 +7,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkBasicInfoCompletion } from '@/lib/status-utils'
 import { FormField, Alert, Button, DeadlineNoticeAsync, FileUploadField } from '@/components/ui'
 import { useBaseForm } from '@/hooks'
+import Image from 'next/image'
 import type { BasicInfo, BasicInfoFormData } from '@/lib/types'
 
 interface BasicInfoFormProps {
@@ -713,155 +714,166 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             </div>
           </div>
 
-          <FileUploadField
-            label="振込確認用紙"
-            value={null}
-            onChange={async (file) => {
-              console.log('[BANK SLIP UPLOAD] === 振込確認用紙アップロード開始 ===')
-              console.log('[BANK SLIP UPLOAD] 選択されたファイル:', file.name)
-              console.log('[BANK SLIP UPLOAD] ファイルサイズ:', (file.size / 1024 / 1024).toFixed(2), 'MB')
-              console.log('[BANK SLIP UPLOAD] ファイルタイプ:', file.type)
-              
-              if (!entryId) {
-                console.error('[BANK SLIP UPLOAD] entryIdが存在しません')
-                showToast('基本情報を先に保存してください', 'error')
-                return
-              }
-              
-              try {
-                // ファイルアップロード処理
-                const fileExt = file.name.split('.').pop()
-                const fileName = `${entryId}/bank_slip_${Date.now()}.${fileExt}`
+          <div className="space-y-4">
+            <FileUploadField
+              label="振込確認用紙"
+              value={null}
+              onChange={async (file) => {
+                console.log('[BANK SLIP UPLOAD] === 振込確認用紙アップロード開始 ===')
+                console.log('[BANK SLIP UPLOAD] 選択されたファイル:', file.name)
+                console.log('[BANK SLIP UPLOAD] ファイルサイズ:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+                console.log('[BANK SLIP UPLOAD] ファイルタイプ:', file.type)
                 
-                console.log('[BANK SLIP UPLOAD] アップロード先:', fileName)
-                
-                const { error: uploadError } = await supabase.storage
-                  .from('files')
-                  .upload(fileName, file)
-                
-                if (uploadError) {
-                  console.error('[BANK SLIP UPLOAD] ストレージアップロードエラー:', uploadError)
-                  throw uploadError
+                if (bankSlipFile) {
+                  showToast('既にファイルがアップロードされています。新しいファイルをアップロードするには、先に既存のファイルを削除してください。', 'error')
+                  return
                 }
                 
-                // ファイル情報をデータベースに保存
-                const insertData = {
-                  entry_id: entryId,
-                  file_type: 'photo',
-                  file_name: file.name,
-                  file_path: fileName,
-                  purpose: 'bank_slip',
-                  uploaded_at: new Date().toISOString()
+                if (!entryId) {
+                  console.error('[BANK SLIP UPLOAD] entryIdが存在しません')
+                  showToast('基本情報を先に保存してください', 'error')
+                  return
                 }
                 
-                console.log('[BANK SLIP UPLOAD] データベース保存:', insertData)
-                
-                const { error: dbError } = await supabase
-                  .from('entry_files')
-                  .insert(insertData)
-                
-                if (dbError) {
-                  console.error('[BANK SLIP UPLOAD] データベース保存エラー:', dbError)
-                  throw dbError
-                }
-                
-                // 署名付きURLを取得してプレビュー用に設定
-                const { data: urlData } = await supabase.storage
-                  .from('files')
-                  .createSignedUrl(fileName, 3600)
+                try {
+                  // ファイルアップロード処理
+                  const fileExt = file.name.split('.').pop()
+                  const fileName = `${entryId}/bank_slip_${Date.now()}.${fileExt}`
+                  
+                  console.log('[BANK SLIP UPLOAD] アップロード先:', fileName)
+                  
+                  const { error: uploadError } = await supabase.storage
+                    .from('files')
+                    .upload(fileName, file)
+                  
+                  if (uploadError) {
+                    console.error('[BANK SLIP UPLOAD] ストレージアップロードエラー:', uploadError)
+                    throw uploadError
+                  }
+                  
+                  // ファイル情報をデータベースに保存
+                  const insertData = {
+                    entry_id: entryId,
+                    file_type: 'photo',
+                    file_name: file.name,
+                    file_path: fileName,
+                    purpose: 'bank_slip',
+                    uploaded_at: new Date().toISOString()
+                  }
+                  
+                  console.log('[BANK SLIP UPLOAD] データベース保存:', insertData)
+                  
+                  const { error: dbError } = await supabase
+                    .from('entry_files')
+                    .insert(insertData)
+                  
+                  if (dbError) {
+                    console.error('[BANK SLIP UPLOAD] データベース保存エラー:', dbError)
+                    throw dbError
+                  }
+                  
+                  // 署名付きURLを取得してプレビュー用に設定
+                  const { data: urlData } = await supabase.storage
+                    .from('files')
+                    .createSignedUrl(fileName, 3600)
 
-                setBankSlipFile({
-                  file_name: file.name,
-                  file_path: fileName,
-                  url: urlData?.signedUrl
-                })
-                
-                console.log('[BANK SLIP UPLOAD] アップロード成功、状態更新完了')
-                showToast('振込確認用紙をアップロードしました', 'success')
-                
-              } catch (error) {
-                console.error('[BANK SLIP UPLOAD] アップロードエラー:', error)
-                showToast('振込確認用紙のアップロードに失敗しました', 'error')
-              }
-            }}
-            category="image"
-            accept="image/jpeg,image/jpg,image/png,image/gif"
-            maxSizeMB={10}
-            required
-            placeholder={{
-              title: "振込確認用紙をアップロード",
-              formats: "JPG, PNG, GIF など（最大10MB）"
-            }}
-          />
-          
-          {/* アップロード済みファイルのプレビュー（常に表示） */}
-          <div className="mt-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">アップロード状況</h4>
+                  setBankSlipFile({
+                    file_name: file.name,
+                    file_path: fileName,
+                    url: urlData?.signedUrl
+                  })
+                  
+                  console.log('[BANK SLIP UPLOAD] アップロード成功、状態更新完了')
+                  showToast('振込確認用紙をアップロードしました', 'success')
+                  
+                } catch (error) {
+                  console.error('[BANK SLIP UPLOAD] アップロードエラー:', error)
+                  showToast('振込確認用紙のアップロードに失敗しました', 'error')
+                }
+              }}
+              category="image"
+              accept="image/jpeg,image/jpg,image/png,image/gif"
+              maxSizeMB={10}
+              required
+              disabled={!!bankSlipFile}
+              placeholder={{
+                title: bankSlipFile ? "既にアップロード済みです" : "振込確認用紙をアップロード",
+                formats: "JPG, PNG, GIF など（最大10MB、1件まで）"
+              }}
+            />
+
+            {/* アップロード済みファイルのプレビュー（常時表示） */}
             {bankSlipFile ? (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center justify-between">
+              <div className="border rounded-lg p-3 bg-white">
+                {/* プレビュー画像（常時表示） */}
+                <div className="relative h-40 mb-2 bg-gray-100 rounded overflow-hidden">
+                  {bankSlipFile.url ? (
+                    <Image
+                      src={bankSlipFile.url}
+                      alt={bankSlipFile.file_name}
+                      fill
+                      className="object-contain"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-gray-500 text-sm">プレビュー読み込み中...</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* ファイル情報と操作ボタン */}
+                <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-green-800">アップロード済み</p>
-                    <p className="text-xs text-green-700">{bankSlipFile.file_name}</p>
+                    <p className="text-sm font-medium text-gray-900">{bankSlipFile.file_name}</p>
+                    <p className="text-xs text-gray-500">振込確認用紙</p>
                   </div>
-                  <div className="flex space-x-2">
-                    {bankSlipFile.url && (
-                      <button
-                        type="button"
-                        onClick={() => window.open(bankSlipFile.url, '_blank')}
-                        className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
-                      >
-                        プレビュー
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
-                        if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
-                          return
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
+                      if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
+                        return
+                      }
+                      
+                      try {
+                        // ストレージから削除
+                        const { error: storageError } = await supabase.storage
+                          .from('files')
+                          .remove([bankSlipFile.file_path])
+
+                        if (storageError) {
+                          console.error('[BANK SLIP DELETE] ストレージ削除エラー:', storageError)
                         }
-                        
-                        try {
-                          // ストレージから削除
-                          const { error: storageError } = await supabase.storage
-                            .from('files')
-                            .remove([bankSlipFile.file_path])
 
-                          if (storageError) {
-                            console.error('[BANK SLIP DELETE] ストレージ削除エラー:', storageError)
-                          }
+                        // データベースから削除
+                        const { error: dbError } = await supabase
+                          .from('entry_files')
+                          .delete()
+                          .eq('entry_id', entryId)
+                          .eq('purpose', 'bank_slip')
 
-                          // データベースから削除
-                          const { error: dbError } = await supabase
-                            .from('entry_files')
-                            .delete()
-                            .eq('entry_id', entryId)
-                            .eq('purpose', 'bank_slip')
-
-                          if (dbError) {
-                            console.error('[BANK SLIP DELETE] データベース削除エラー:', dbError)
-                          }
-
-                          setBankSlipFile(null)
-                          console.log('[BANK SLIP DELETE] 削除完了')
-                          showToast('振込確認用紙を削除しました', 'success')
-                        } catch (error) {
-                          console.error('[BANK SLIP DELETE] 削除エラー:', error)
-                          showToast('振込確認用紙の削除に失敗しました', 'error')
+                        if (dbError) {
+                          console.error('[BANK SLIP DELETE] データベース削除エラー:', dbError)
                         }
-                      }}
-                      className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
-                    >
-                      削除
-                    </button>
-                  </div>
+
+                        setBankSlipFile(null)
+                        console.log('[BANK SLIP DELETE] 削除完了')
+                        showToast('振込確認用紙を削除しました', 'success')
+                      } catch (error) {
+                        console.error('[BANK SLIP DELETE] 削除エラー:', error)
+                        showToast('振込確認用紙の削除に失敗しました', 'error')
+                      }
+                    }}
+                    className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                  >
+                    削除
+                  </button>
                 </div>
               </div>
             ) : (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <p className="text-sm text-gray-600">振込確認用紙はまだアップロードされていません</p>
-                <p className="text-xs text-gray-500 mt-1">上記のフォームからファイルを選択してアップロードしてください</p>
+                <p className="text-xs text-gray-500 mt-1">上記のフォームからファイルを選択してください（1件まで）</p>
               </div>
             )}
           </div>
