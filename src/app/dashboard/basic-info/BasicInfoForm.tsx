@@ -672,6 +672,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             category="image"
             accept="image/jpeg,image/jpg,image/png,image/gif"
             maxSizeMB={10}
+            required
             placeholder={{
               title: "振込確認用紙をアップロード",
               formats: "JPG, PNG, GIF など（最大10MB）"
