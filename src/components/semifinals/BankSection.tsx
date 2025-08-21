@@ -116,7 +116,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
       </div>
 
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">賞金振込先情報</h4>
+        <h4 className="font-medium">本大会エントリー料振込確認 / 賞金振込先情報</h4>
         <p className="text-sm text-gray-500">
           <span className="text-red-500">*</span> は必須項目です
         </p>
