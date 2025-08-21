@@ -12,35 +12,52 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [submitCount, setSubmitCount] = useState(0)
   const router = useRouter()
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
-    console.log('[LOGIN] Form submission triggered at', new Date().toISOString())
+    const currentSubmitCount = submitCount + 1
+    setSubmitCount(currentSubmitCount)
+    
+    console.log('[LOGIN] Form submission triggered at', new Date().toISOString(), {
+      submitCount: currentSubmitCount,
+      currentLoadingState: loading
+    })
     e.preventDefault()
     
     // 重複送信防止
     if (loading) {
-      console.log('[LOGIN] Login already in progress, ignoring submission')
+      console.log('[LOGIN] Login already in progress, ignoring submission (attempt #' + currentSubmitCount + ')')
       return
     }
     
-    console.log('[LOGIN] Setting loading state to true')
+    console.log('[LOGIN] Setting loading state to true (attempt #' + currentSubmitCount + ')')
     setLoading(true)
     setError('')
     console.log('[LOGIN] Login attempt started at', new Date().toISOString(), {
       email: email,
+      submitCount: currentSubmitCount,
       formElement: e.target,
       eventType: e.type
     })
 
     try {
+      console.log('[LOGIN] Calling Supabase signInWithPassword...')
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
       })
+      
+      console.log('[LOGIN] Supabase response received:', { 
+        hasData: !!data, 
+        hasUser: !!data?.user, 
+        hasError: !!error,
+        errorMessage: error?.message 
+      })
 
       if (error) {
+        console.log('[LOGIN] Login error:', error)
         // エラーメッセージを日本語化
         let errorMessage = 'ログインに失敗しました'
         if (error.message.includes('Invalid login credentials')) {
@@ -55,17 +72,26 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        console.log('[LOGIN] User authenticated successfully:', data.user.email)
+        
         // プロフィールの存在確認
+        console.log('[LOGIN] Checking user profile...')
         const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single()
 
+        console.log('[LOGIN] Profile check result:', { 
+          hasProfile: !!profile, 
+          profileError: profileError?.code 
+        })
+
         // プロフィールが存在しない場合は作成
         if (!profile && profileError?.code === 'PGRST116') {
+          console.log('[LOGIN] Creating user profile...')
           const userName = data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'ユーザー'
-          await supabase
+          const { error: insertError } = await supabase
             .from('users')
             .insert([
               {
@@ -75,16 +101,26 @@ export default function LoginPage() {
                 role: 'participant',
               },
             ])
+          
+          if (insertError) {
+            console.log('[LOGIN] Profile creation error:', insertError)
+          } else {
+            console.log('[LOGIN] Profile created successfully')
+          }
         }
 
         // 少し待ってからリダイレクト（Hydrationエラー回避）
+        console.log('[LOGIN] Preparing to redirect to dashboard...')
         setTimeout(() => {
+          console.log('[LOGIN] Executing redirect to /dashboard')
           router.push('/dashboard')
         }, 100)
       }
-    } catch {
+    } catch (catchError) {
+      console.log('[LOGIN] Unexpected error during login:', catchError)
       setError('ログインに失敗しました')
     } finally {
+      console.log('[LOGIN] Setting loading state to false')
       setLoading(false)
     }
   }
