@@ -20,7 +20,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       onChange({
         choreographer_change_from_preliminary: true,
         choreographer_name: '',
-        choreographer_name_kana: '',
+        choreographer_furigana: '',
         choreographer2_name: '',
         choreographer2_furigana: ''
       })
@@ -29,7 +29,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       onChange({
         choreographer_change_from_preliminary: false,
         choreographer_name: preliminaryInfo?.choreographer1_name || '',
-        choreographer_name_kana: preliminaryInfo?.choreographer1_furigana || '',
+        choreographer_furigana: preliminaryInfo?.choreographer1_furigana || '',
         choreographer2_name: preliminaryInfo?.choreographer2_name || '',
         choreographer2_furigana: preliminaryInfo?.choreographer2_furigana || ''
       })
