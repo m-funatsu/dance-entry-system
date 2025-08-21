@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavigationLogger from '@/components/NavigationLogger'
 import Link from 'next/link'
 import BackgroundLoader from '@/components/BackgroundLoader'
@@ -13,7 +12,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitCount, setSubmitCount] = useState(0)
-  const router = useRouter()
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -112,8 +110,8 @@ export default function LoginPage() {
         // 少し待ってからリダイレクト（Hydrationエラー回避）
         console.log('[LOGIN] Preparing to redirect to dashboard...')
         setTimeout(() => {
-          console.log('[LOGIN] Executing redirect to /dashboard')
-          router.push('/dashboard')
+          console.log('[LOGIN] Executing redirect to /dashboard with window.location.href')
+          window.location.href = '/dashboard'
         }, 100)
       }
     } catch (catchError) {

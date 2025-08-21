@@ -1,11 +1,10 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 
 function CallbackContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -33,17 +32,17 @@ function CallbackContent() {
           if (welcome) {
             // ウェルカムメッセージを表示してダッシュボードへ
             alert(`${name ? `${decodeURIComponent(name)}さん、` : ''}バルカーカップへようこそ！アカウントが有効化されました。`)
-            router.push('/dashboard')
+            window.location.href = '/dashboard'
           } else {
             // 通常の確認完了
-            router.push('/dashboard')
+            window.location.href = '/dashboard'
           }
         } else {
           // セッションがない場合は確認待ち状態
           if (welcome) {
             alert(`${name ? `${decodeURIComponent(name)}さん、` : ''}ウェルカムメールを確認してください。メール内のリンクをクリックしてアカウントを有効化してください。`)
           }
-          router.push('/auth/login')
+          window.location.href = '/auth/login'
         }
       } catch (err) {
         console.error('コールバック処理エラー:', err)
@@ -73,7 +72,7 @@ function CallbackContent() {
         <div className="text-center">
           <div className="text-red-600 text-lg font-medium">{error}</div>
           <button
-            onClick={() => router.push('/auth/login')}
+            onClick={() => window.location.href = '/auth/login'}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
           >
             ログインページへ
