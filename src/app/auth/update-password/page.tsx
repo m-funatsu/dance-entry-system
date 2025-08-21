@@ -80,12 +80,22 @@ function UpdatePasswordForm() {
     }
 
     try {
+      // 現在の認証状態を確認
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('現在のセッション状態:', session)
+      
+      if (!session) {
+        setError('認証セッションが無効です。再度ログインしてください。')
+        return
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: password
       })
 
       if (error) {
-        setError('パスワードの更新に失敗しました')
+        console.error('パスワード更新エラー詳細:', error)
+        setError(`パスワードの更新に失敗しました: ${error.message}`)
         return
       }
 
