@@ -734,6 +734,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           validationErrors={validationErrors.lighting || []}
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
         />
       )}
 

@@ -7,6 +7,7 @@ import { ImageUploadProps } from '@/lib/types'
 export default function ImageUpload({ 
   value, 
   onChange, 
+  onDelete,
   label, 
   required = false,
   accept = "image/*" 
@@ -80,6 +81,8 @@ export default function ImageUpload({
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
+    // 親コンポーネントの削除処理を呼び出し
+    onDelete?.()
   }
 
   return (

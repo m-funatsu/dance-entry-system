@@ -9,13 +9,15 @@ interface LightingSectionProps {
   validationErrors: string[]
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete: (field: string) => void
 }
 
 export const LightingSection: React.FC<LightingSectionProps> = ({
   semifinalsInfo,
   validationErrors,
   onChange,
-  onFileUpload
+  onFileUpload,
+  onFileDelete
 }) => {
   return (
     <div className="space-y-6">
@@ -111,6 +113,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               <ImageUpload
                 value={semifinalsInfo[`scene${sceneNum}_image_path` as keyof SemifinalsInfo] as string}
                 onChange={(file) => onFileUpload(`scene${sceneNum}_image_path`, file)}
+                onDelete={() => onFileDelete(`scene${sceneNum}_image_path`)}
                 required={sceneNum === 1}
               />
             </div>
@@ -188,6 +191,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             <ImageUpload
               value={semifinalsInfo.chaser_exit_image_path}
               onChange={(file) => onFileUpload('chaser_exit_image_path', file)}
+              onDelete={() => onFileDelete('chaser_exit_image_path')}
               required
             />
           </div>
