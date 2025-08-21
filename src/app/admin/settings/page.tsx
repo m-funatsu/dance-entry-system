@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 import Image from 'next/image'
 interface Settings {
   admin_email: string
@@ -190,9 +190,9 @@ export default function AdminSettingsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+              <AdminLink href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
                 ← 管理ダッシュボードに戻る
-              </Link>
+              </AdminLink>
               <h1 className="text-2xl font-bold text-gray-900">
                 システム設定
               </h1>
@@ -412,12 +412,12 @@ export default function AdminSettingsPage() {
 
                 {/* 保存ボタン */}
                 <div className="flex justify-end space-x-3">
-                  <Link
+                  <AdminLink
                     href="/admin/dashboard"
                     className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     キャンセル
-                  </Link>
+                  </AdminLink>
                   <button
                     type="submit"
                     disabled={isSaving}

@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import NavigationLogger from '@/components/NavigationLogger'
 import Link from 'next/link'
 import BackgroundLoader from '@/components/BackgroundLoader'
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
+    console.log('[LOGIN] Form submission triggered at', new Date().toISOString())
     e.preventDefault()
     
     // 重複送信防止
@@ -23,9 +25,14 @@ export default function LoginPage() {
       return
     }
     
+    console.log('[LOGIN] Setting loading state to true')
     setLoading(true)
     setError('')
-    console.log('[LOGIN] Login attempt started at', new Date().toISOString())
+    console.log('[LOGIN] Login attempt started at', new Date().toISOString(), {
+      email: email,
+      formElement: e.target,
+      eventType: e.type
+    })
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -84,6 +91,7 @@ export default function LoginPage() {
 
   return (
     <>
+      <NavigationLogger />
       <BackgroundLoader pageType="login" />
       <div className="min-h-screen flex items-center justify-center bg-gray-50" style={{
         backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--login-bg-image, none)',

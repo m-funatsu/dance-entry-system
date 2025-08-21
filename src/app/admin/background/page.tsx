@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 import BackgroundSettings from './BackgroundSettings'
 
 export default async function BackgroundPage() {
@@ -41,9 +41,9 @@ export default async function BackgroundPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+              <AdminLink href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
                 ← 管理ダッシュボードに戻る
-              </Link>
+              </AdminLink>
               <h1 className="text-2xl font-bold text-gray-900">
                 背景画像設定
               </h1>
