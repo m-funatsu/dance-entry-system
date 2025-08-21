@@ -171,7 +171,8 @@ export function useBaseForm<T extends Record<string, unknown>>({
       }
       
       // 成功処理
-      const successMessage = isTemporary ? 'データを一時保存しました' : 'データを保存しました'
+      const successMessage = isTemporary ? 'データを一時保存しました' : 
+        tableName === 'basic_info' ? '基本情報を保存しました' : 'データを保存しました'
       setSuccess(successMessage)
       
       if (onSuccess) {
