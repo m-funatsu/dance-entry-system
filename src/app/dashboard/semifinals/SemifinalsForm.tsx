@@ -89,14 +89,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           .maybeSingle()
         
         if (semiData) {
-          // 読み込み時の値をalertで確認
-          setTimeout(() => {
-            alert(`データベースから読み込んだ値:
-work_title: "${semiData.work_title || ''}"
-work_title_kana: "${semiData.work_title_kana || ''}"
-ID: "${semiData.id}"`)
-          }, 1000)
-          
           debugLogger.log('SEMIFINALS LOAD', '準決勝情報読み込み完了', {
             id: semiData.id,
             work_title: semiData.work_title,
