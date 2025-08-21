@@ -114,7 +114,20 @@ function UpdatePasswordForm() {
 
       if (error) {
         console.error('パスワード更新エラー詳細:', error)
-        setError(`パスワードの更新に失敗しました: ${error.message}`)
+        
+        // エラーメッセージを日本語化
+        let errorMessage = 'パスワードの更新に失敗しました'
+        if (error.message.includes('New password should be different from the old password')) {
+          errorMessage = '新しいパスワードは現在のパスワードと異なるものを設定してください'
+        } else if (error.message.includes('Password should be at least')) {
+          errorMessage = 'パスワードは8文字以上で設定してください'
+        } else if (error.message.includes('weak password')) {
+          errorMessage = 'より強力なパスワードを設定してください'
+        } else {
+          errorMessage = `パスワードの更新に失敗しました: ${error.message}`
+        }
+        
+        setError(errorMessage)
         return
       }
 
