@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 import DeadlineSettings from './DeadlineSettings'
 
 export default async function AdminDeadlinesPage() {
@@ -32,16 +32,15 @@ export default async function AdminDeadlinesPage() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              期日管理
-            </h1>
             <div className="flex items-center space-x-4">
-              <Link
-                href="/admin/dashboard"
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                管理画面に戻る
-              </Link>
+              <AdminLink href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+                ← 管理者ダッシュボードに戻る
+              </AdminLink>
+              <h1 className="text-2xl font-bold text-gray-900">
+                期日管理
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
               <form action="/auth/logout" method="post">
                 <button
                   type="submit"

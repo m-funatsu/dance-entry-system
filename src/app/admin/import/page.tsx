@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 export default function AdminImportPage() {
   const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -164,13 +164,12 @@ export default function AdminImportPage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-semibold text-gray-900">CSVインポート</h1>
-              <Link
-                href="/admin/dashboard"
-                className="text-sm text-indigo-600 hover:text-indigo-500"
-              >
-                ダッシュボードに戻る
-              </Link>
+              <div className="flex items-center space-x-4">
+                <AdminLink href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+                  ← 管理者ダッシュボードに戻る
+                </AdminLink>
+                <h1 className="text-xl font-semibold text-gray-900">CSVインポート</h1>
+              </div>
             </div>
           </div>
 
