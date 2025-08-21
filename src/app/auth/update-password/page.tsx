@@ -85,8 +85,27 @@ function UpdatePasswordForm() {
       console.log('現在のセッション状態:', session)
       
       if (!session) {
-        setError('認証セッションが無効です。再度ログインしてください。')
-        return
+        // セッションが無効な場合、URLパラメータから認証情報を確認
+        const urlParams = new URLSearchParams(window.location.search)
+        const accessToken = urlParams.get('access_token')
+        const refreshToken = urlParams.get('refresh_token')
+        
+        if (accessToken && refreshToken) {
+          // URLから認証情報を設定
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          })
+          
+          if (sessionError) {
+            console.error('セッション設定エラー:', sessionError)
+            setError('認証セッションの設定に失敗しました。パスワードリセットメールを再送信してください。')
+            return
+          }
+        } else {
+          setError('認証セッションが無効です。パスワードリセットメールを再送信してください。')
+          return
+        }
       }
 
       const { error } = await supabase.auth.updateUser({
