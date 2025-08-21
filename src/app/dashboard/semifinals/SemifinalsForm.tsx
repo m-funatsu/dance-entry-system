@@ -638,12 +638,6 @@ ID: "${semiData.id}"`)
       entry_id: entry.id
     }
     
-    // 保存前の状態をalertで確認
-    alert(`保存前の確認:
-work_title: "${dataToSave.work_title}"
-work_title_kana: "${dataToSave.work_title_kana}"
-entry_id: "${dataToSave.entry_id}"`)
-
     debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存開始', {
       work_title: dataToSave.work_title,
       work_title_kana: dataToSave.work_title_kana,
@@ -654,11 +648,6 @@ entry_id: "${dataToSave.entry_id}"`)
 
     try {
       await save(dataToSave) // 保存
-      
-      // 保存成功後の確認
-      alert(`保存処理完了:
-work_title_kana: "${dataToSave.work_title_kana}"
-保存が成功しました`)
       
       debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存完了', {
         message: '保存処理完了',
