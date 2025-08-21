@@ -781,6 +781,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       {activeSection === 'choreographer' && (
         <ChoreographerSection
           semifinalsInfo={semifinalsInfo}
+          preliminaryInfo={preliminaryInfo}
           onChange={handleFieldChange}
         />
       )}

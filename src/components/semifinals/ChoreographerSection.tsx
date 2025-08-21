@@ -1,21 +1,39 @@
 'use client'
 
 import { FormField } from '@/components/ui'
-import type { SemifinalsInfo } from '@/lib/types'
+import type { SemifinalsInfo, PreliminaryInfo } from '@/lib/types'
 
 interface ChoreographerSectionProps {
   semifinalsInfo: Partial<SemifinalsInfo>
+  preliminaryInfo: PreliminaryInfo | null
   onChange: (updates: Partial<SemifinalsInfo>) => void
 }
 
 export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
   semifinalsInfo,
+  preliminaryInfo,
   onChange
 }) => {
   const handleChoreographerChange = (checked: boolean) => {
-    onChange({
-      choreographer_change_from_preliminary: checked
-    })
+    if (checked) {
+      // 変更する場合：フィールドをクリア
+      onChange({
+        choreographer_change_from_preliminary: true,
+        choreographer_name: '',
+        choreographer_name_kana: '',
+        choreographer2_name: '',
+        choreographer2_furigana: ''
+      })
+    } else {
+      // 変更しない場合：予選情報からコピー
+      onChange({
+        choreographer_change_from_preliminary: false,
+        choreographer_name: preliminaryInfo?.choreographer1_name || '',
+        choreographer_name_kana: preliminaryInfo?.choreographer1_furigana || '',
+        choreographer2_name: preliminaryInfo?.choreographer2_name || '',
+        choreographer2_furigana: preliminaryInfo?.choreographer2_furigana || ''
+      })
+    }
   }
 
   return (
@@ -32,6 +50,12 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           />
           予選との振付師の変更
         </label>
+        
+        {!semifinalsInfo.choreographer_change_from_preliminary && (
+          <p className="text-xs text-gray-500 mt-2">
+            予選で登録された振付師情報が使用されます。
+          </p>
+        )}
       </div>
 
       <FormField
@@ -39,6 +63,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
         name="choreographer_name"
         value={semifinalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
+        disabled={!semifinalsInfo.choreographer_change_from_preliminary}
         required
       />
 
@@ -47,6 +72,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
         name="choreographer_furigana"
         value={semifinalsInfo.choreographer_furigana || ''}
         onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
+        disabled={!semifinalsInfo.choreographer_change_from_preliminary}
         required
         placeholder="ひらがなで入力"
       />
@@ -61,6 +87,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           name="choreographer2_name"
           value={semifinalsInfo.choreographer2_name || ''}
           onChange={(e) => onChange({ choreographer2_name: e.target.value })}
+          disabled={!semifinalsInfo.choreographer_change_from_preliminary}
         />
 
         <FormField
@@ -68,6 +95,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           name="choreographer2_furigana"
           value={semifinalsInfo.choreographer2_furigana || ''}
           onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
+          disabled={!semifinalsInfo.choreographer_change_from_preliminary}
           placeholder="ひらがなで入力"
         />
       </div>
