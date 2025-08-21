@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 import NotificationTemplateManager from './NotificationTemplateManager'
 
 export default async function NotificationTemplatesPage() {
@@ -28,9 +28,9 @@ export default async function NotificationTemplatesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
+              <AdminLink href="/admin/dashboard" className="text-indigo-600 hover:text-indigo-900">
                 ← 管理者ダッシュボードに戻る
-              </Link>
+              </AdminLink>
               <h1 className="text-2xl font-bold text-gray-900">
                 通知テンプレート管理
               </h1>

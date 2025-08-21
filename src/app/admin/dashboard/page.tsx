@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import AdminLink from '@/components/admin/AdminLink'
 import DataExportManager from '@/components/DataExportManager'
 import NavigationLogger from '@/components/NavigationLogger'
 
@@ -342,12 +343,12 @@ export default async function AdminDashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <div className="space-y-2">
-                    <Link href="/admin/entries" className="block font-medium text-indigo-600 hover:text-indigo-500">
+                    <AdminLink href="/admin/entries" className="block font-medium text-indigo-600 hover:text-indigo-500">
                       エントリー一覧を表示 →
-                    </Link>
-                    <Link href="/admin/test-data" className="block text-sm text-gray-600 hover:text-gray-800">
+                    </AdminLink>
+                    <AdminLink href="/admin/test-data" className="block text-sm text-gray-600 hover:text-gray-800">
                       🔧 テストデータ確認
-                    </Link>
+                    </AdminLink>
                   </div>
                 </div>
               </div>
@@ -376,9 +377,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/admin/deadlines" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <AdminLink href="/admin/deadlines" className="font-medium text-indigo-600 hover:text-indigo-500">
                     期日を設定 →
-                  </Link>
+                  </AdminLink>
                 </div>
               </div>
             </div>
@@ -406,9 +407,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/admin/settings" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <AdminLink href="/admin/settings" className="font-medium text-indigo-600 hover:text-indigo-500">
                     設定を変更 →
-                  </Link>
+                  </AdminLink>
                 </div>
               </div>
             </div>
@@ -437,9 +438,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/admin/background" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <AdminLink href="/admin/background" className="font-medium text-indigo-600 hover:text-indigo-500">
                     背景画像設定 →
-                  </Link>
+                  </AdminLink>
                 </div>
               </div>
             </div>
@@ -467,9 +468,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <Link href="/admin/templates" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <AdminLink href="/admin/templates" className="font-medium text-indigo-600 hover:text-indigo-500">
                     テンプレート管理 →
-                  </Link>
+                  </AdminLink>
                 </div>
               </div>
             </div>

@@ -26,7 +26,8 @@ export default function EditButton({ href, children, className = "font-medium te
     console.log('[EDIT BUTTON] Navigating to:', href, 'at', new Date().toISOString())
     
     try {
-      router.push(href)
+      // 管理者画面では確実にページ遷移するためwindow.location.hrefを使用
+      window.location.href = href
     } catch (error) {
       console.error('[EDIT BUTTON] Navigation failed:', error)
       setIsNavigating(false)
