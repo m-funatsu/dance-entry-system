@@ -1548,11 +1548,18 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         </div>
       )}
 
-      <div className="flex justify-end pt-6 space-x-4">
+      <div className="flex justify-between pt-6">
+        <button
+          type="button"
+          onClick={() => window.location.href = '/dashboard'}
+          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+        >
+          ダッシュボードに戻る
+        </button>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
         >
           {saving ? '保存中...' : '保存'}
         </button>
