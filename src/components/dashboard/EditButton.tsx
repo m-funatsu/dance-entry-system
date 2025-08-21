@@ -16,7 +16,7 @@ export default function EditButton({ href, children, className = "font-medium te
   return (
     <button 
       onClick={handleClick}
-      className={className}
+      className={`cursor-pointer ${className}`}
     >
       {children}
     </button>
