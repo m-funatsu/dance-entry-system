@@ -424,7 +424,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       console.log('[BASIC INFO SAVE] フォーム保存開始')
       
       // フォームデータを保存（onSuccessでステータス更新される）
-      await saveForm(false)  // 通常保存として実行
+      await saveForm(true)  // 一時保存として実行
       console.log('[BASIC INFO SAVE] フォーム保存完了')
 
       // 保存成功後にダッシュボードにリダイレクト
