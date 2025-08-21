@@ -825,6 +825,21 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           <p className="text-sm text-gray-600">
             選手と同伴される方の情報を入力してください。（1名につき {COMPANION_FEE.toLocaleString()}円）
           </p>
+          
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="text-sm text-blue-800 space-y-2">
+              <p className="font-medium">📌 選手同伴申請について</p>
+              <p>
+                メイク・ヘアセット・整体等の理由で、控室にご同伴いただくことが可能です。
+              </p>
+              <p className="text-red-700 font-medium">
+                ※会場・飛天にお入りいただくことはできませんのでご注意ください。
+              </p>
+              <p>
+                但し、必ず事前申請をお願いいたします。当日の受付はいたしかねますのでご了承ください。
+              </p>
+            </div>
+          </div>
 
           {[1, 2, 3].map((num) => (
             <div key={`companion${num}`} className="border rounded-lg p-4 space-y-4">
