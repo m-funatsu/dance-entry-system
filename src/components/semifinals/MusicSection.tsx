@@ -116,6 +116,15 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
           <option value="different">予選とは異なる楽曲を使用する</option>
         </select>
         
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-sm text-blue-800 font-medium">
+            📌 シード選手の方へ
+          </p>
+          <p className="text-xs text-blue-700 mt-1">
+            シード選手の方は「予選とは異なる楽曲を使用する」を選択してください
+          </p>
+        </div>
+        
         {!semifinalsInfo.music_change_from_preliminary && (
           <p className="text-xs text-gray-500 mt-2">
             予選で登録された楽曲情報が使用されます。
