@@ -19,13 +19,16 @@ export function BackButton({
   return (
     <button
       onClick={handleClick}
-      className={`cursor-pointer ${className}`}
+      className={`cursor-pointer inline-flex items-center ${className}`}
       type="button"
     >
       {children || (
-        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-        </svg>
+        <>
+          <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          ダッシュボードに戻る
+        </>
       )}
     </button>
   )
