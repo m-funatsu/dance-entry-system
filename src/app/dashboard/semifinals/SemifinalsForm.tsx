@@ -296,8 +296,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         console.log('[UPLOAD DEBUG] 一時保存に失敗（続行）:', tempSaveError)
       }
 
-      // 既存のファイルがある場合は削除
-      if (audioFiles[field]) {
+      // 既存のファイルがある場合は削除（audioFilesまたはsemifinalsInfoから確認）
+      const hasExistingFile = audioFiles[field] || semifinalsInfo[field as keyof SemifinalsInfo]
+      if (hasExistingFile) {
+        console.log('[UPLOAD DEBUG] Existing file detected, deleting:', hasExistingFile)
         await handleFileDelete(field)
       }
 
@@ -313,14 +315,19 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       }
 
       // ファイル情報をデータベースに保存（purposeフィールドを確実に設定）
-      // チェイサー曲とmusic_data_pathは音声ファイルとして保存
+      // ファイルタイプを適切に判定
+      const isImageField = field.includes('image_path')
+      const fileType = isImageField ? 'photo' : 'audio'
+      
       const insertData = {
         entry_id: entry.id,
-        file_type: 'audio',  // 音声ファイルは'audio'タイプ
+        file_type: fileType,
         file_name: file.name,
         file_path: fileName,
         purpose: field  // purposeフィールドを確実に設定
       }
+      
+      console.log('[UPLOAD DEBUG] File type determined:', fileType, 'for field:', field)
       
       console.log('[UPLOAD DEBUG] Inserting to database:', insertData)
       
@@ -343,18 +350,24 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         .createSignedUrl(fileName, 3600)
 
       // UIの状態を更新
-      setSemifinalsInfo(prev => ({
-        ...prev,
-        [field]: urlData?.signedUrl || ''
-      }))
+      console.log('[UPLOAD DEBUG] Updating UI state with signed URL:', urlData?.signedUrl)
+      setSemifinalsInfo(prev => {
+        const updated = {
+          ...prev,
+          [field]: urlData?.signedUrl || ''
+        }
+        console.log('[UPLOAD DEBUG] setSemifinalsInfo - 前の状態:', prev[field as keyof SemifinalsInfo])
+        console.log('[UPLOAD DEBUG] setSemifinalsInfo - 新しい状態:', updated[field as keyof SemifinalsInfo])
+        return updated
+      })
 
       setAudioFiles(prev => ({
         ...prev,
         [field]: fileData
       }))
       
-      // semifinals_infoテーブルの音楽関連フィールドも更新
-      if ((field === 'music_data_path' || field === 'chaser_song') && entry.id) {
+      // semifinals_infoテーブルのフィールドも更新（音楽ファイルと照明画像）
+      if (entry.id) {
         // まず既存のレコードがあるか確認
         const { data: existingData } = await supabase
           .from('semifinals_info')
@@ -364,27 +377,37 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         
         if (existingData) {
           // 既存レコードがある場合は更新
+          const updateValue = urlData?.signedUrl || fileName
+          console.log('[UPLOAD DEBUG] Updating semifinals_info with:', { field, value: updateValue })
+          
           const { error: updateError } = await supabase
             .from('semifinals_info')
             .update({
-              [field]: fileName
+              [field]: updateValue
             })
             .eq('entry_id', entry.id)
           
           if (updateError) {
             console.error('Error updating semifinals_info:', updateError)
+          } else {
+            console.log('[UPLOAD DEBUG] Database updated successfully for field:', field)
           }
         } else {
           // 既存レコードがない場合は作成
+          const insertValue = urlData?.signedUrl || fileName
+          console.log('[UPLOAD DEBUG] Inserting new semifinals_info with:', { field, value: insertValue })
+          
           const { error: insertError } = await supabase
             .from('semifinals_info')
             .insert({
               entry_id: entry.id,
-              [field]: fileName
+              [field]: insertValue
             })
           
           if (insertError) {
             console.error('Error inserting semifinals_info:', insertError)
+          } else {
+            console.log('[UPLOAD DEBUG] Database insert successful for field:', field)
           }
         }
       }
