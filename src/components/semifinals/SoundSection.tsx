@@ -75,24 +75,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
 
       {semifinalsInfo.chaser_song_designation === 'required' && (
         <div>
-          <AudioUpload
-            label="チェイサー（退場）曲音源"
-            value={audioFiles?.chaser_song?.file_name || ''}
-            onChange={(file) => {
-              console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
-              onFileUpload('chaser_song', file)
-            }}
-            onDelete={() => {
-              console.log('[SOUND SECTION] Deleting chaser_song')
-              if (onFileDelete) {
-                onFileDelete('chaser_song')
-              }
-            }}
-            required
-            accept=".wav,.mp3,.m4a"
-          />
-          
-          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
             <div className="text-sm text-yellow-800 space-y-2">
               <p className="font-medium">チェイサー（退場曲）について</p>
               <p>
@@ -117,6 +100,23 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               </div>
             </div>
           </div>
+          
+          <AudioUpload
+            label="チェイサー（退場）曲音源"
+            value={audioFiles?.chaser_song?.file_name || ''}
+            onChange={(file) => {
+              console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
+              onFileUpload('chaser_song', file)
+            }}
+            onDelete={() => {
+              console.log('[SOUND SECTION] Deleting chaser_song')
+              if (onFileDelete) {
+                onFileDelete('chaser_song')
+              }
+            }}
+            required
+            accept=".wav,.mp3,.m4a"
+          />
         </div>
       )}
 
