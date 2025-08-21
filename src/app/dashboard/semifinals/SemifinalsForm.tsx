@@ -26,6 +26,17 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const { showToast } = useToast()
   const debugLogger = DebugLogger.getInstance()
   
+  // クライアントサイドでのデバッグロガー初期化を確認
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      ;(window as unknown as Record<string, unknown>).debugLogger = debugLogger
+      debugLogger.log('SEMIFINALS INIT', 'コンポーネント初期化完了', { 
+        hasEntry: !!entry,
+        entryId: entry?.id 
+      })
+    }
+  }, [])
+  
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('music')
@@ -78,6 +89,14 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           .maybeSingle()
         
         if (semiData) {
+          // 読み込み時の値をalertで確認
+          setTimeout(() => {
+            alert(`データベースから読み込んだ値:
+work_title: "${semiData.work_title || ''}"
+work_title_kana: "${semiData.work_title_kana || ''}"
+ID: "${semiData.id}"`)
+          }, 1000)
+          
           debugLogger.log('SEMIFINALS LOAD', '準決勝情報読み込み完了', {
             id: semiData.id,
             work_title: semiData.work_title,
@@ -619,6 +638,12 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       entry_id: entry.id
     }
     
+    // 保存前の状態をalertで確認
+    alert(`保存前の確認:
+work_title: "${dataToSave.work_title}"
+work_title_kana: "${dataToSave.work_title_kana}"
+entry_id: "${dataToSave.entry_id}"`)
+
     debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存開始', {
       work_title: dataToSave.work_title,
       work_title_kana: dataToSave.work_title_kana,
@@ -627,12 +652,23 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       dataSize: Object.keys(dataToSave).length
     })
 
-    await save(dataToSave) // 保存
-    
-    debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存完了', {
-      message: '保存処理完了',
-      work_title_kana_saved: dataToSave.work_title_kana
-    })
+    try {
+      await save(dataToSave) // 保存
+      
+      // 保存成功後の確認
+      alert(`保存処理完了:
+work_title_kana: "${dataToSave.work_title_kana}"
+保存が成功しました`)
+      
+      debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存完了', {
+        message: '保存処理完了',
+        work_title_kana_saved: dataToSave.work_title_kana
+      })
+    } catch (saveError) {
+      alert(`保存エラー: ${saveError}`)
+      console.error('保存エラー詳細:', saveError)
+      throw saveError
+    }
     
     // 必須項目が完了している場合はステータスを「登録済み」に更新
     const isComplete = checkSemifinalsInfoCompletion(semifinalsInfo)
@@ -640,9 +676,15 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     
     // 保存成功後にダッシュボードにリダイレクト
     showToast('準決勝情報を保存しました', 'success')
+    
+    // ログ保存を確実にするため少し待機
+    debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト開始')
     setTimeout(() => {
-      debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト')
-      window.location.href = '/dashboard'
+      debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト実行')
+      // リダイレクト前にlocalStorageの保存を確認
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 100)
     }, 1500)
     
     setValidationErrors({})

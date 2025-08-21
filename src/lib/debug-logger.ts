@@ -83,5 +83,11 @@ export class DebugLogger {
 
 // グローバルからアクセス可能にする
 if (typeof window !== 'undefined') {
-  (window as Record<string, unknown>).debugLogger = DebugLogger.getInstance()
+  const instance = DebugLogger.getInstance()
+  ;(window as unknown as Record<string, unknown>).debugLogger = instance
+  
+  // 初期化ログを出力
+  instance.log('SYSTEM', 'デバッグロガー初期化完了', { 
+    timestamp: new Date().toISOString() 
+  })
 }
