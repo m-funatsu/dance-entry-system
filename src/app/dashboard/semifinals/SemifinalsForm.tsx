@@ -157,7 +157,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
                   // 署名付きURLを取得
                   const { data: urlData } = await supabase.storage
                     .from('files')
-                    .createSignedUrl(file.file_path, 3600)
+                    .createSignedUrl(file.file_path, 86400)  // 24時間に延長
                   
                   if (urlData?.signedUrl) {
                     urlUpdates[file.purpose] = urlData.signedUrl
@@ -172,7 +172,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
                     // 署名付きURLを取得
                     const { data: urlData } = await supabase.storage
                       .from('files')
-                      .createSignedUrl(file.file_path, 3600)
+                      .createSignedUrl(file.file_path, 86400)  // 24時間に延長
                     
                     if (urlData?.signedUrl) {
                       urlUpdates['chaser_song'] = urlData.signedUrl
@@ -183,7 +183,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
                     // 署名付きURLを取得
                     const { data: urlData } = await supabase.storage
                       .from('files')
-                      .createSignedUrl(file.file_path, 3600)
+                      .createSignedUrl(file.file_path, 86400)  // 24時間に延長
                     
                     if (urlData?.signedUrl) {
                       urlUpdates['music_data_path'] = urlData.signedUrl
@@ -347,7 +347,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // 署名付きURLを取得
       const { data: urlData } = await supabase.storage
         .from('files')
-        .createSignedUrl(fileName, 3600)
+        .createSignedUrl(fileName, 86400)  // 24時間に延長
 
       // UIの状態を更新
       console.log('[UPLOAD DEBUG] Updating UI state with signed URL:', urlData?.signedUrl)

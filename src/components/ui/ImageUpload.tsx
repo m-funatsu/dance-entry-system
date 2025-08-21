@@ -14,11 +14,13 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
+  const [imageError, setImageError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // valueが変更されたら（削除された場合を含む）、previewを更新
   useEffect(() => {
     setPreview(typeof value === 'string' ? value : null)
+    setImageError(false)  // 新しい画像の場合はエラー状態をリセット
   }, [value])
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -111,7 +113,7 @@ export default function ImageUpload({
           className="hidden"
         />
 
-        {preview ? (
+        {preview && !imageError ? (
           <div className="relative">
             <div className="relative h-48 w-full">
               <Image
@@ -119,6 +121,10 @@ export default function ImageUpload({
                 alt="アップロード画像のプレビュー"
                 fill
                 className="object-contain"
+                onError={() => {
+                  console.log('Image load error, URL may be expired:', preview)
+                  setImageError(true)
+                }}
               />
             </div>
             <button
@@ -133,6 +139,23 @@ export default function ImageUpload({
             <p className="mt-4 text-sm text-gray-600">
               クリックまたは新しい画像をドラッグして変更
             </p>
+          </div>
+        ) : imageError ? (
+          <div className="space-y-2 bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="text-center">
+              <svg className="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <p className="text-sm text-red-600 font-medium">画像の読み込みに失敗しました</p>
+              <p className="text-xs text-red-500">URLの有効期限が切れている可能性があります</p>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+              >
+                削除して再アップロード
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-2">
