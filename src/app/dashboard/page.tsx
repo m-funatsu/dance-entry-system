@@ -6,6 +6,7 @@ import MessageAlert from '@/components/MessageAlert'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import EditButton from '@/components/dashboard/EditButton'
+import URLCleaner from '@/components/URLCleaner'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -352,6 +353,7 @@ export default async function DashboardPage() {
 
   return (
     <>
+      <URLCleaner />
       <BackgroundLoader pageType="dashboard" />
       <div className="min-h-screen bg-gray-50" style={{
         backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), var(--dashboard-bg-image, none)',

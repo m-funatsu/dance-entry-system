@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import URLCleaner from '@/components/URLCleaner'
 
 function UpdatePasswordForm() {
   const [password, setPassword] = useState('')
@@ -152,8 +153,10 @@ function UpdatePasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
+    <>
+      <URLCleaner />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {isWelcome ? 'バルカーカップへようこそ！' : isFirstTime ? 'アカウントの初期設定' : '新しいパスワードを設定'}
@@ -247,8 +250,9 @@ function UpdatePasswordForm() {
             </button>
           </div>
         </form>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

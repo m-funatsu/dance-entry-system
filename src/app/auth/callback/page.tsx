@@ -26,6 +26,9 @@ function CallbackContent() {
         const name = searchParams.get('name') || ''
 
         if (data.session) {
+          // URLから認証情報をクリア（セキュリティ対策）
+          window.history.replaceState({}, document.title, '/auth/callback')
+          
           // セッションが取得できた場合（確認完了）
           if (welcome) {
             // ウェルカムメッセージを表示してダッシュボードへ
