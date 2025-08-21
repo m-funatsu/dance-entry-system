@@ -53,7 +53,7 @@ function CallbackContent() {
     }
 
     handleAuthCallback()
-  }, [router, searchParams, supabase.auth])
+  }, [searchParams, supabase.auth])
 
   if (loading) {
     return (
