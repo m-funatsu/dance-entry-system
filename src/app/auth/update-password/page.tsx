@@ -10,6 +10,8 @@ function UpdatePasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [isFirstTime, setIsFirstTime] = useState(false)
   const [isWelcome, setIsWelcome] = useState(false)
@@ -133,23 +135,67 @@ function UpdatePasswordForm() {
       }
 
       // パスワード更新成功
+      setSuccess(true)
       if (isWelcome) {
         // ウェルカムメールからの場合
-        alert('パスワードが設定されました。ログイン画面へ移動します。')
-        router.push('/auth/login')
+        setSuccessMessage(`${userName ? `${userName}さん、` : ''}パスワードが設定されました。下記のボタンからログインしてください。`)
       } else if (isFirstTime) {
         // 初回ログインの場合は、ダッシュボードへ直接リダイレクト
-        alert('アカウントが正常に作成されました。ダッシュボードへ移動します。')
-        router.push('/dashboard')
+        setSuccessMessage('アカウントが正常に作成されました。下記のボタンからダッシュボードにアクセスしてください。')
       } else {
-        alert('パスワードが更新されました')
-        router.push('/auth/login')
+        setSuccessMessage('パスワードが更新されました。下記のボタンからログインしてください。')
       }
     } catch {
       setError('パスワードの更新に失敗しました')
     } finally {
       setLoading(false)
     }
+  }
+
+  // 成功画面を表示
+  if (success) {
+    return (
+      <>
+        <URLCleaner />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="max-w-md w-full space-y-8">
+            <div className="text-center">
+              <div className="mx-auto h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                パスワード更新完了
+              </h2>
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4">
+                <p className="text-center text-sm text-green-800">
+                  {successMessage}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {isFirstTime && !isWelcome ? (
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  ダッシュボードへ移動
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/auth/login')}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  ログイン画面へ移動
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
