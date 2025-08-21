@@ -91,7 +91,7 @@ export const semifinalsSections = [
   { id: 'sound', label: '音響指示情報' },
   { id: 'lighting', label: '照明指示情報' },
   { id: 'choreographer', label: '振付情報' },
-  { id: 'bank', label: '賞金振込先情報' }
+  { id: 'bank', label: '本大会エントリー料振込確認 / 賞金振込先情報' }
 ]
 
 export const colorTypes = ['暖色系', '寒色系', 'その他色指定']
