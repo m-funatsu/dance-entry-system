@@ -229,6 +229,34 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
             予選で選択された楽曲著作権許諾が使用されます。
           </p>
         )}
+        
+        {semifinalsInfo.music_change_from_preliminary && semifinalsInfo.copyright_permission === 'commercial' && (
+          <div className="mt-3 p-4 bg-orange-50 border border-orange-200 rounded-md">
+            <div className="text-sm text-orange-800 space-y-2">
+              <p className="font-medium">◆「A.市販の楽曲を使用する」を選択される場合</p>
+              <p>
+                JASRAC、NexTone 等の音楽著作権管理団体の管理楽曲（管理状況で演奏、ビデオ、放送、配信にすべて〇がついているもの）である必要があります。
+              </p>
+              <p>
+                下記の検索から規定を満たす楽曲であるかご確認をお願いいたします。
+              </p>
+              <div className="space-y-1 mt-2">
+                <p>
+                  <a href="https://www2.jasrac.or.jp/eJwid/main?trxID=F00100" target="_blank" rel="noopener noreferrer" 
+                     className="text-blue-600 hover:text-blue-800 underline">
+                    JASRAC検索
+                  </a>
+                </p>
+                <p>
+                  <a href="https://search.nex-tone.co.jp/list" target="_blank" rel="noopener noreferrer"
+                     className="text-blue-600 hover:text-blue-800 underline">
+                    NexTone検索
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <FormField
@@ -290,6 +318,28 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         <option value="download">データダウンロード楽曲</option>
         <option value="other">その他（オリジナル曲）</option>
       </FormField>
+      
+      {semifinalsInfo.music_change_from_preliminary && (semifinalsInfo.music_type === 'cd' || semifinalsInfo.music_type === 'download') && (
+        <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <div className="text-sm text-blue-800 space-y-2">
+            <p className="font-medium">◆「CD楽曲」または「データダウンロード楽曲」を選択される場合</p>
+            <p>
+              日本レコード協会に加盟している出版社から市販されている音源を使用する必要があります。
+            </p>
+            <p>
+              下記の出版社検索から加盟済であるかご確認をお願いいたします。
+            </p>
+            <div className="mt-2">
+              <p>
+                <a href="https://www.riaj.or.jp/about/member/" target="_blank" rel="noopener noreferrer" 
+                   className="text-blue-600 hover:text-blue-800 underline">
+                  日本レコード協会加盟出版社検索
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div>
         <AudioUpload
