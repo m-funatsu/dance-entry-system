@@ -91,6 +91,32 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
             required
             accept=".wav,.mp3,.m4a"
           />
+          
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+            <div className="text-sm text-yellow-800 space-y-2">
+              <p className="font-medium">チェイサー（退場曲）について</p>
+              <p>
+                作品に一般曲（自作曲ではない楽曲）をご指定の場合、作品と同じ楽曲を使用することは不可とさせていただきます。
+              </p>
+              <p>
+                チェイサー楽曲が必要な場合は、下記サイトより楽曲をお選びいただき、下記に楽曲データをアップロードお願いいたします。
+              </p>
+              <div className="space-y-1 mt-2">
+                <p>
+                  <a href="https://dova-s.jp/" target="_blank" rel="noopener noreferrer" 
+                     className="text-blue-600 hover:text-blue-800 underline">
+                    DOVA-SYNDROME
+                  </a>
+                </p>
+                <p>
+                  <a href="https://bgmer.net/" target="_blank" rel="noopener noreferrer"
+                     className="text-blue-600 hover:text-blue-800 underline">
+                    BGMer
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
