@@ -19,7 +19,7 @@ export function BackButton({
   return (
     <button
       onClick={handleClick}
-      className={className}
+      className={`cursor-pointer ${className}`}
       type="button"
     >
       {children || (
