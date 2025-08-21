@@ -748,6 +748,27 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
           <p className="text-sm text-gray-600">
             関係者チケット（1枚 {TICKET_PRICE.toLocaleString()}円）を購入される方の情報を入力してください。
           </p>
+          
+          <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="text-sm text-green-800 space-y-2">
+              <p className="font-medium">📌 関係者チケット注文申請について</p>
+              <p>
+                振付師の方、選手のスポンサーの方（衣装など）については、以下の料金で控室・飛天にお入りいただくことが可能です。
+              </p>
+              <p className="font-medium">
+                ・場所：フロアステージ横の関係者用テーブル
+              </p>
+              <p className="text-blue-700 font-medium">
+                ※振付師の方については、選手が3位までに入賞された場合、表彰式にて表彰を受けていただきます。
+              </p>
+              <p className="text-orange-700 font-medium">
+                ※ドレスコードあり。準正装でお願いいたします。
+              </p>
+              <p>
+                必ず事前申請をお願いいたします。当日の受付はいたしかねますのでご了承ください。
+              </p>
+            </div>
+          </div>
 
           {[1, 2, 3, 4, 5].map((num) => (
             <div key={`related${num}`} className="border rounded-lg p-4 space-y-4">
