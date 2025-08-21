@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import AdminLink from '@/components/admin/AdminLink'
 import DataExportManager from '@/components/DataExportManager'
 import NavigationLogger from '@/components/NavigationLogger'

@@ -35,7 +35,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         entryId: entry?.id 
       })
     }
-  }, [])
+  }, [debugLogger, entry])
   
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)

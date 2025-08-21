@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 interface EditButtonProps {
@@ -10,7 +9,6 @@ interface EditButtonProps {
 }
 
 export default function EditButton({ href, children, className = "font-medium text-indigo-600 hover:text-indigo-500" }: EditButtonProps) {
-  const router = useRouter()
   const [isNavigating, setIsNavigating] = useState(false)
 
   const handleClick = async (e: React.MouseEvent) => {
