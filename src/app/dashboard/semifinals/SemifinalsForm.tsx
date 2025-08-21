@@ -580,7 +580,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       // UIの状態を更新
       setSemifinalsInfo(prev => ({
         ...prev,
-        [field]: ''
+        [field]: null
       }))
 
       setAudioFiles(prev => {
@@ -589,8 +589,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         return newFiles
       })
       
-      // semifinals_infoテーブルのmusic_data_pathまたはchaser_songもクリア
-      if ((field === 'music_data_path' || field === 'chaser_song') && entry?.id) {
+      // semifinals_infoテーブルのフィールドもクリア（照明画像を含む）
+      if (entry?.id) {
         const { error: updateError } = await supabase
           .from('semifinals_info')
           .update({
@@ -600,9 +600,26 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         
         if (updateError) {
           console.error('Error updating semifinals_info:', updateError)
+        } else {
+          console.log('[DELETE DEBUG] Database field cleared:', field)
         }
       }
 
+      // 強制的に再レンダリングを促すため、少し待ってから再度確認
+      setTimeout(() => {
+        console.log('[DELETE DEBUG] Final UI state check:', {
+          field: field,
+          semifinalsInfo_value: semifinalsInfo[field as keyof SemifinalsInfo],
+          audioFiles_has_field: field in audioFiles
+        })
+      }, 100)
+      
+      console.log('[DELETE DEBUG] UI state updated:', {
+        field: field,
+        semifinalsInfo_field_cleared: !semifinalsInfo[field as keyof SemifinalsInfo],
+        audioFiles_field_removed: !audioFiles[field]
+      })
+      
       showToast('ファイルを削除しました', 'success')
     } catch (err) {
       console.error('ファイル削除エラー:', err)
