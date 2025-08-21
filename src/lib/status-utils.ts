@@ -235,7 +235,10 @@ export function checkPreliminaryInfoCompletion(
 /**
  * 準決勝情報フォームの完了状況をチェック
  */
-export function checkSemifinalsInfoCompletion(formData: Record<string, unknown>): boolean {
+export async function checkSemifinalsInfoCompletion(
+  formData: Record<string, unknown>, 
+  entryId?: string
+): Promise<boolean> {
   // 準決勝情報フォームに実際に存在する必須フィールドのみを使用
   const requiredFields = [
     'work_title',
@@ -250,8 +253,33 @@ export function checkSemifinalsInfoCompletion(formData: Record<string, unknown>)
     // choreographer関連は準決勝では変更可能で、基本的にはコピーされるため一旦除外
   ]
   
-  const { isComplete } = checkFormCompletion('SEMIFINALS INFO', formData, requiredFields)
-  return isComplete
+  const { isComplete: fieldsComplete } = checkFormCompletion('SEMIFINALS INFO', formData, requiredFields)
+  
+  // 振込確認用紙のチェック
+  let hasPaymentSlip = false
+  if (entryId) {
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      
+      const { data: paymentSlipData } = await supabase
+        .from('entry_files')
+        .select('id')
+        .eq('entry_id', entryId)
+        .eq('purpose', 'semifinals_payment_slip')
+        .single()
+      
+      hasPaymentSlip = !!paymentSlipData
+    } catch (error) {
+      console.log('振込確認用紙チェックエラー:', error)
+      hasPaymentSlip = false
+    }
+  }
+  
+  const result = fieldsComplete && hasPaymentSlip
+  console.log('[SEMIFINALS COMPLETION] フィールド完了:', fieldsComplete, '振込確認用紙:', hasPaymentSlip, '結果:', result)
+  
+  return result
 }
 
 /**

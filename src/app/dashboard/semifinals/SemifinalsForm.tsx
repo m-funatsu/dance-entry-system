@@ -692,7 +692,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     }
     
     // 必須項目が完了している場合はステータスを「登録済み」に更新
-    const isComplete = checkSemifinalsInfoCompletion(semifinalsInfo)
+    const isComplete = await checkSemifinalsInfoCompletion(semifinalsInfo, entry.id)
     await updateFormStatus('semifinals_info', entry.id, isComplete)
     
     // 保存成功後にダッシュボードにリダイレクト

@@ -93,6 +93,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
             accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
             maxSizeMB={10}
             category="document"
+            required
           />
           
           {paymentSlipUrl && (
