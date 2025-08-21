@@ -1,5 +1,8 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 interface EditButtonProps {
   href: string
   children: React.ReactNode
@@ -7,16 +10,34 @@ interface EditButtonProps {
 }
 
 export default function EditButton({ href, children, className = "font-medium text-indigo-600 hover:text-indigo-500" }: EditButtonProps) {
-  const handleClick = (e: React.MouseEvent) => {
+  const router = useRouter()
+  const [isNavigating, setIsNavigating] = useState(false)
+
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault()
-    console.log('[EDIT BUTTON] Navigating to:', href)
-    window.location.href = href
+    
+    // 重複クリック防止
+    if (isNavigating) {
+      console.log('[EDIT BUTTON] Navigation already in progress, ignoring click')
+      return
+    }
+
+    setIsNavigating(true)
+    console.log('[EDIT BUTTON] Navigating to:', href, 'at', new Date().toISOString())
+    
+    try {
+      router.push(href)
+    } catch (error) {
+      console.error('[EDIT BUTTON] Navigation failed:', error)
+      setIsNavigating(false)
+    }
   }
 
   return (
     <button 
       onClick={handleClick}
-      className={`cursor-pointer ${className}`}
+      disabled={isNavigating}
+      className={`cursor-pointer ${isNavigating ? 'opacity-50' : ''} ${className}`}
     >
       {children}
     </button>

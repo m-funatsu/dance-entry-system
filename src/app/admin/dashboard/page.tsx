@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DataExportManager from '@/components/DataExportManager'
+import NavigationLogger from '@/components/NavigationLogger'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -137,8 +138,10 @@ export default async function AdminDashboardPage() {
     .sort((a, b) => b.count - a.count)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+    <>
+      <NavigationLogger />
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
@@ -403,9 +406,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <a href="/admin/settings" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link href="/admin/settings" className="font-medium text-indigo-600 hover:text-indigo-500">
                     設定を変更 →
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -482,6 +485,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   )
 }
