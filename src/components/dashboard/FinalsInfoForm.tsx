@@ -396,9 +396,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             ...prev,
             choreographer_change: false,
             choreographer_name: semifinalsData.choreographer_name,
-            choreographer_furigana: semifinalsData.choreographer_name_kana,
+            choreographer_furigana: semifinalsData.choreographer_furigana,
             choreographer2_name: semifinalsData.choreographer2_name,
-            choreographer2_furigana: semifinalsData.choreographer2_name_kana
+            choreographer2_furigana: semifinalsData.choreographer2_furigana
           }))
           console.log('[FINALS DEBUG] 振付師情報をコピーしました')
         }
