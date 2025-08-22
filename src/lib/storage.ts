@@ -8,7 +8,7 @@ export const STORAGE_BUCKET = 'files'
 export interface FileUploadOptions {
   userId: string
   entryId: string
-  fileType: 'music' | 'audio' | 'photo' | 'video'
+  fileType: 'music' | 'audio' | 'photo' | 'video' | 'pdf'
   file: File
 }
 
@@ -27,9 +27,13 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
-  // 課金後の実際の制限: 動画250MB、その他200MB
-  const maxSizeInBytes = fileType === 'video' ? 250 * 1024 * 1024 : 200 * 1024 * 1024
-  const maxSizeText = fileType === 'video' ? '250MB' : '200MB'
+  // 課金後の実際の制限: 動画250MB、PDF100MB、その他200MB
+  const maxSizeInBytes = fileType === 'video' ? 250 * 1024 * 1024 : 
+                        fileType === 'pdf' ? 100 * 1024 * 1024 : 
+                        200 * 1024 * 1024
+  const maxSizeText = fileType === 'video' ? '250MB' : 
+                     fileType === 'pdf' ? '100MB' : 
+                     '200MB'
 
   if (file.size > maxSizeInBytes) {
     return { success: false, error: `ファイルサイズが${maxSizeText}を超えています。ファイルサイズを確認してください。` }
@@ -39,7 +43,8 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     music: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3'],
     audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3'],
     photo: ['image/jpeg', 'image/jpg', 'image/png'],
-    video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime']
+    video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'],
+    pdf: ['application/pdf']
   }
 
   if (!allowedTypes[fileType].includes(file.type)) {

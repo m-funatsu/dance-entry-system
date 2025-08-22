@@ -67,7 +67,7 @@ export interface Entry {
 export interface EntryFile {
   id: string
   entry_id: string
-  file_type: 'music' | 'audio' | 'photo' | 'video'
+  file_type: 'music' | 'audio' | 'photo' | 'video' | 'pdf'
   file_name: string
   file_path: string
   file_size?: number

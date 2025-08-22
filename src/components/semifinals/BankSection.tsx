@@ -111,7 +111,8 @@ export const BankSection: React.FC<BankSectionProps> = ({
       console.log('[BANK SECTION] ストレージアップロード成功:', uploadData)
 
       // データベースに記録（ファイルタイプを適切に判定）
-      const fileType = file.type.startsWith('image/') ? 'photo' : 'document'
+      const fileType = file.type.startsWith('image/') ? 'photo' : 
+                      file.type === 'application/pdf' ? 'pdf' : 'photo'
       console.log('[BANK SECTION] ファイルタイプ判定:', {
         originalType: file.type,
         determinedType: fileType
