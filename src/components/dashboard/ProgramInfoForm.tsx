@@ -312,7 +312,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
     // 保存成功後にダッシュボードにリダイレクト
     setSuccess('プログラム情報を保存しました')
     setTimeout(() => {
-      window.location.href = '/dashboard'
+      window.location.reload()
     }, 1500)
   }
 

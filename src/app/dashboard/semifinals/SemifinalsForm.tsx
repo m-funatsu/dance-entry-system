@@ -695,17 +695,13 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     const isComplete = await checkSemifinalsInfoCompletion(semifinalsInfo, entry.id)
     await updateFormStatus('semifinals_info', entry.id, isComplete)
     
-    // 保存成功後にダッシュボードにリダイレクト
+    // 保存成功後にページをリロード
     showToast('準決勝情報を保存しました', 'success')
     
-    // ログ保存を確実にするため少し待機
-    debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト開始')
+    // ページをリロードして最新データを表示
+    debugLogger.log('SEMIFINALS RELOAD', 'ページリロード実行')
     setTimeout(() => {
-      debugLogger.log('SEMIFINALS REDIRECT', 'ダッシュボードにリダイレクト実行')
-      // リダイレクト前にlocalStorageの保存を確認
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 100)
+      window.location.reload()
     }, 1500)
     
     setValidationErrors({})

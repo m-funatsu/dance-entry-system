@@ -672,7 +672,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     setValidationErrors({})
     showToast('決勝情報を保存しました', 'success')
     setTimeout(() => {
-      window.location.href = '/dashboard'
+      window.location.reload()
     }, 1500)
   }
 

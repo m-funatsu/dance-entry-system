@@ -364,7 +364,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       setSuccess('各種申請情報を保存しました')
       setTimeout(() => {
-        window.location.href = '/dashboard'
+        window.location.reload()
       }, 1500)
       // router.refresh()を削除して再レンダリングを防ぐ
     } catch (err) {
