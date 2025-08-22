@@ -13,6 +13,30 @@ function CallbackContent() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // URLパラメータをチェック
+        const type = searchParams.get('type')
+        
+        // パスワードリセット用のコールバックの場合
+        if (type === 'recovery') {
+          const { data, error } = await supabase.auth.getSession()
+          
+          if (error) {
+            console.error('パスワードリセット認証エラー:', error)
+            setError('パスワードリセットの認証に失敗しました')
+            return
+          }
+
+          if (data.session) {
+            // パスワード変更画面に遷移
+            window.location.href = '/auth/update-password'
+            return
+          } else {
+            setError('パスワードリセットのセッションが無効です')
+            return
+          }
+        }
+
+        // 通常のメール確認コールバック処理
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
