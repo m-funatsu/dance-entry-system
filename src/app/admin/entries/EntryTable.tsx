@@ -234,51 +234,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
     }
   }
 
-  const updateEntryStatus = async (entryId: string, newStatus: string) => {
-    setLoading(true)
-
-    try {
-      // 楽観的更新: 先に画面を更新
-      setLocalEntries(prev => 
-        prev.map(entry => 
-          entry.id === entryId 
-            ? { ...entry, status: newStatus as 'pending' | 'submitted' | 'selected' | 'rejected' }
-            : entry
-        )
-      )
-
-      const response = await fetch('/api/admin/entries/status', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          entryIds: [entryId],
-          status: newStatus,
-        }),
-      })
-
-      if (!response.ok) {
-        // エラーの場合は元に戻す
-        setLocalEntries(entries)
-        const errorData = await response.json()
-        alert(errorData.error || 'ステータスの更新に失敗しました')
-        return
-      }
-
-      // 成功時は最新データで更新
-      setTimeout(() => {
-        router.refresh()
-      }, 1000)
-    } catch (error) {
-      // エラーの場合は元に戻す
-      setLocalEntries(entries)
-      console.error('Status update error:', error)
-      alert('ステータスの更新に失敗しました')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const bulkUpdateStatus = async (newStatus: string) => {
     if (selectedEntries.length === 0) {
@@ -487,9 +442,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                選考ステータス変更
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 エントリー名
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -519,18 +471,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                       checked={selectedEntries.includes(entry.id)}
                       onChange={() => handleSelectEntry(entry.id)}
                     />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={entry.status}
-                      onChange={(e) => updateEntryStatus(entry.id, e.target.value)}
-                      disabled={loading}
-                      className="rounded border-gray-300 text-xs disabled:opacity-50"
-                    >
-                      <option value="pending">未処理</option>
-                      <option value="selected">予選通過</option>
-                      <option value="rejected">予選敗退</option>
-                    </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{entry.users?.name || '不明なユーザー'}</div>
