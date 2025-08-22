@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import Link from 'next/link'
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('')
@@ -103,12 +102,15 @@ export default function ResetPasswordPage() {
           </div>
 
           <div className="text-center">
-            <Link
-              href="/auth/login"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+            <button
+              onClick={() => {
+                console.log('🔸 [RESET_PASSWORD] ログインページに戻るクリック')
+                window.location.href = '/auth/login'
+              }}
+              className="font-medium text-indigo-600 hover:text-indigo-500 bg-transparent border-none cursor-pointer underline"
             >
               ログインページに戻る
-            </Link>
+            </button>
           </div>
         </form>
       </div>
