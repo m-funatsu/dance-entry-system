@@ -124,6 +124,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       }
 
       if (data) {
+        console.log('[MAKEUP DEBUG] applications_info データ:', data)
         setApplicationsInfo(data)
       }
 
@@ -146,7 +147,41 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         .maybeSingle()
       
       if (basicData) {
+        console.log('[MAKEUP DEBUG] basic_info データ:', basicData)
         setBasicInfo(basicData)
+        
+        // メイク申請者を逆引きで設定
+        if (data) {
+          console.log('[MAKEUP DEBUG] メイク申請者逆引き開始')
+          console.log('[MAKEUP DEBUG] makeup_name:', data.makeup_name)
+          console.log('[MAKEUP DEBUG] representative_name:', basicData.representative_name)
+          console.log('[MAKEUP DEBUG] partner_name:', basicData.partner_name)
+          
+          // 準決勝用
+          if (data.makeup_name === basicData.representative_name) {
+            console.log('[MAKEUP DEBUG] 準決勝申請者: representative')
+            setMakeupApplicant('representative')
+          } else if (data.makeup_name === basicData.partner_name) {
+            console.log('[MAKEUP DEBUG] 準決勝申請者: partner')
+            setMakeupApplicant('partner')
+          } else {
+            console.log('[MAKEUP DEBUG] 準決勝申請者: 未設定')
+            setMakeupApplicant('')
+          }
+          
+          // 決勝用
+          console.log('[MAKEUP DEBUG] makeup_name_final:', data.makeup_name_final)
+          if (data.makeup_name_final === basicData.representative_name) {
+            console.log('[MAKEUP DEBUG] 決勝申請者: representative')
+            setMakeupApplicantFinal('representative')
+          } else if (data.makeup_name_final === basicData.partner_name) {
+            console.log('[MAKEUP DEBUG] 決勝申請者: partner')
+            setMakeupApplicantFinal('partner')
+          } else {
+            console.log('[MAKEUP DEBUG] 決勝申請者: 未設定')
+            setMakeupApplicantFinal('')
+          }
+        }
       }
       
       // 払込用紙ファイルを取得
@@ -271,7 +306,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
       if (existingData) {
         // 更新
-        console.log('更新するapplications_infoデータ:', applicationsInfo)
+        console.log('[MAKEUP DEBUG] 更新するapplications_infoデータ:', applicationsInfo)
+        console.log('[MAKEUP DEBUG] makeup_name値:', applicationsInfo.makeup_name)
+        console.log('[MAKEUP DEBUG] makeup_name_final値:', applicationsInfo.makeup_name_final)
         const { error } = await supabase
           .from('applications_info')
           .update({
@@ -292,7 +329,9 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
         }
       } else {
         // 新規作成
-        console.log('新規作成するapplications_infoデータ:', applicationsInfo)
+        console.log('[MAKEUP DEBUG] 新規作成するapplications_infoデータ:', applicationsInfo)
+        console.log('[MAKEUP DEBUG] makeup_name値:', applicationsInfo.makeup_name)
+        console.log('[MAKEUP DEBUG] makeup_name_final値:', applicationsInfo.makeup_name_final)
         const { error } = await supabase
           .from('applications_info')
           .insert({
@@ -965,7 +1004,10 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 setMakeupApplicant(value)
                 
                 // 選択に応じて氏名、メール、電話番号を自動設定
+                console.log('[MAKEUP DEBUG] 準決勝申請者変更:', value)
+                console.log('[MAKEUP DEBUG] 基本情報:', basicInfo)
                 if (value === 'representative' && basicInfo) {
+                  console.log('[MAKEUP DEBUG] 代表者を設定')
                   setApplicationsInfo(prev => ({
                     ...prev,
                     makeup_name: basicInfo.representative_name || '',
@@ -973,6 +1015,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     makeup_phone: basicInfo.phone_number || ''
                   }))
                 } else if (value === 'partner' && basicInfo && basicInfo.partner_name) {
+                  console.log('[MAKEUP DEBUG] パートナーを設定')
                   setApplicationsInfo(prev => ({
                     ...prev,
                     makeup_name: basicInfo.partner_name || '',
@@ -980,6 +1023,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     makeup_phone: basicInfo.phone_number || '' // 電話番号は共通
                   }))
                 } else {
+                  console.log('[MAKEUP DEBUG] 申請者をクリア')
                   setApplicationsInfo(prev => ({
                     ...prev,
                     makeup_name: '',
@@ -1172,17 +1216,22 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   setMakeupApplicantFinal(value)
                   
                   // 選択に応じて氏名を設定（メールと電話番号は手動入力）
+                  console.log('[MAKEUP DEBUG] 決勝申請者変更:', value)
+                  console.log('[MAKEUP DEBUG] 基本情報:', basicInfo)
                   if (value === 'representative' && basicInfo) {
+                    console.log('[MAKEUP DEBUG] 決勝代表者を設定')
                     setApplicationsInfo(prev => ({
                       ...prev,
                       makeup_name_final: basicInfo.representative_name || ''
                     }))
                   } else if (value === 'partner' && basicInfo && basicInfo.partner_name) {
+                    console.log('[MAKEUP DEBUG] 決勝パートナーを設定')
                     setApplicationsInfo(prev => ({
                       ...prev,
                       makeup_name_final: basicInfo.partner_name || ''
                     }))
                   } else {
+                    console.log('[MAKEUP DEBUG] 決勝申請者をクリア')
                     setApplicationsInfo(prev => ({
                       ...prev,
                       makeup_name_final: ''
