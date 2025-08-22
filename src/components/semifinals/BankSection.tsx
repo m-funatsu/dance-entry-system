@@ -259,9 +259,14 @@ export const BankSection: React.FC<BankSectionProps> = ({
           )}
         </div>
         
-        <p className="text-sm text-gray-600 mt-2">
-          ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
-        </p>
+        <div className="mt-2 space-y-2">
+          <p className="text-sm text-gray-600">
+            ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
+          </p>
+          <p className="text-xs text-gray-500">
+            <strong>対応ファイル形式:</strong> JPEG, JPG, PNG, GIF, PDF（最大10MB）
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
