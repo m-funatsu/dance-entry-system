@@ -651,6 +651,16 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   }
 
   const handleSave = async () => {
+    console.log('[SEMIFINALS SAVE] === 保存処理開始 ===')
+    console.log('[SEMIFINALS SAVE] デバイス情報:', {
+      userAgent: navigator.userAgent,
+      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      touchEnabled: 'ontouchstart' in window,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      connectionType: (navigator as any).connection?.effectiveType || 'unknown'
+    })
+    
     if (!entry?.id) {
       showToast('基本情報を先に保存してください', 'error')
       router.push('/dashboard/basic-info')
