@@ -185,7 +185,14 @@ function UpdatePasswordForm() {
                 </button>
               ) : (
                 <button
-                  onClick={() => window.location.href = '/auth/login'}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    // セッションクリアしてからリダイレクト
+                    supabase.auth.signOut().finally(() => {
+                      window.location.replace('/auth/login')
+                    })
+                  }}
                   className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   ログイン画面へ移動
