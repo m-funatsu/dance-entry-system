@@ -24,30 +24,50 @@ export const BankSection: React.FC<BankSectionProps> = ({
   // 既存の振込確認用紙を読み込む
   useEffect(() => {
     const loadPaymentSlip = async () => {
-      if (!semifinalsInfo.entry_id) return
+      console.log('[BANK SECTION LOAD] === 振込確認用紙読み込み開始 ===')
+      console.log('[BANK SECTION LOAD] entry_id:', semifinalsInfo.entry_id)
+      
+      if (!semifinalsInfo.entry_id) {
+        console.log('[BANK SECTION LOAD] entry_idがないため読み込みスキップ')
+        return
+      }
 
       try {
+        console.log('[BANK SECTION LOAD] データベースから振込確認用紙を検索...')
+        
         // entry_filesテーブルから振込確認用紙を取得
-        const { data: fileData } = await supabase
+        const { data: fileData, error: searchError } = await supabase
           .from('entry_files')
           .select('*')
           .eq('entry_id', semifinalsInfo.entry_id)
           .eq('purpose', 'semifinals_payment_slip')
           .single()
 
-        if (fileData) {
-          // 署名付きURLを生成
-          const { data: urlData } = await supabase.storage
-            .from('files')
-            .createSignedUrl(fileData.file_path, 3600)
+        console.log('[BANK SECTION LOAD] 検索結果:', fileData)
+        console.log('[BANK SECTION LOAD] 検索エラー:', searchError)
 
-          if (urlData?.signedUrl) {
-            setPaymentSlipUrl(urlData.signedUrl)
+        if (fileData) {
+          console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりました:', fileData.file_name)
+          
+          // パブリックURLを生成
+          const { data: urlData } = supabase.storage
+            .from('files')
+            .getPublicUrl(fileData.file_path)
+
+          console.log('[BANK SECTION LOAD] パブリックURL:', urlData?.publicUrl)
+
+          if (urlData?.publicUrl) {
+            setPaymentSlipUrl(urlData.publicUrl)
+            console.log('[BANK SECTION LOAD] URL設定完了')
           }
+        } else {
+          console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりませんでした')
         }
       } catch (error) {
-        console.error('振込確認用紙の読み込みエラー:', error)
+        console.error('[BANK SECTION LOAD] 振込確認用紙の読み込みエラー:', error)
       }
+      
+      console.log('[BANK SECTION LOAD] === 振込確認用紙読み込み完了 ===')
     }
 
     loadPaymentSlip()
@@ -55,12 +75,80 @@ export const BankSection: React.FC<BankSectionProps> = ({
 
   // ファイルアップロード処理
   const handleFileUpload = async (file: File) => {
-    setPaymentSlip(file)
+    console.log('[BANK SECTION] === 振込確認用紙アップロード開始 ===')
+    console.log('[BANK SECTION] ファイル情報:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: new Date(file.lastModified).toISOString()
+    })
+    console.log('[BANK SECTION] entry_id:', semifinalsInfo.entry_id)
     
-    // 保存処理はSemifinalsInfoFormで行うため、ここではファイルを保持するのみ
-    // 親コンポーネントに通知する場合は、onChangeを使用
-    if (onChange) {
-      onChange({ payment_slip_file: file } as Partial<SemifinalsInfo> & { payment_slip_file: File })
+    try {
+      if (!semifinalsInfo.entry_id) {
+        console.error('[BANK SECTION] エラー: entry_idが存在しません')
+        console.log('[BANK SECTION] 現在のsemifinalsInfo:', semifinalsInfo)
+        return
+      }
+
+      // ファイルアップロード処理を実行
+      console.log('[BANK SECTION] Supabaseアップロード開始...')
+      
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${semifinalsInfo.entry_id}/semifinals/payment_slip_${Date.now()}.${fileExt}`
+      
+      console.log('[BANK SECTION] アップロードファイル名:', fileName)
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('files')
+        .upload(fileName, file)
+
+      if (uploadError) {
+        console.error('[BANK SECTION] ストレージアップロードエラー:', uploadError)
+        return
+      }
+      
+      console.log('[BANK SECTION] ストレージアップロード成功:', uploadData)
+
+      // データベースに記録
+      const insertData = {
+        entry_id: semifinalsInfo.entry_id,
+        file_type: 'photo',
+        file_name: file.name,
+        file_path: fileName,
+        purpose: 'semifinals_payment_slip'
+      }
+      
+      console.log('[BANK SECTION] データベース挿入データ:', insertData)
+
+      const { data: fileData, error: dbError } = await supabase
+        .from('entry_files')
+        .insert(insertData)
+        .select()
+        .single()
+
+      if (dbError) {
+        console.error('[BANK SECTION] データベースエラー:', dbError)
+        return
+      }
+      
+      console.log('[BANK SECTION] データベース保存成功:', fileData)
+
+      // パブリックURLを取得
+      const { data: urlData } = supabase.storage
+        .from('files')
+        .getPublicUrl(fileName)
+
+      if (urlData?.publicUrl) {
+        console.log('[BANK SECTION] パブリックURL取得成功:', urlData.publicUrl)
+        setPaymentSlipUrl(urlData.publicUrl)
+      }
+
+      setPaymentSlip(file)
+      console.log('[BANK SECTION] === 振込確認用紙アップロード完了 ===')
+      
+    } catch (error) {
+      console.error('[BANK SECTION] 予期しないエラー:', error)
     }
   }
 
