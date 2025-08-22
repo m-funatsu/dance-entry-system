@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -12,7 +11,6 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [validationErrors, setValidationErrors] = useState<string[]>([])
-  const router = useRouter()
   const supabase = createClient()
 
   const validatePassword = (password: string): string[] => {
@@ -100,7 +98,7 @@ export default function RegisterPage() {
       if (data.user) {
         // トリガーによってプロフィールが自動作成されるか、
         // メール確認後にログイン時に作成される
-        router.push('/auth/login?message=登録が完了しました。ログインしてください。')
+        window.location.href = '/auth/login?message=登録が完了しました。ログインしてください。'
       }
     } catch {
       setError('登録に失敗しました')
