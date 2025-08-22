@@ -4,6 +4,7 @@ import { useState, useRef, memo, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import { FileCategory, formatFileSize, validateFile } from '@/lib/file-upload'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
+import { trackBehaviorDifference } from '@/lib/device-detector'
 
 export interface FileUploadFieldProps {
   label: string
@@ -105,27 +106,20 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
   }, [disabled, handleFile])
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('[FILE UPLOAD] === ファイル選択イベント ===')
-    console.log('[FILE UPLOAD] デバイス情報:', {
-      userAgent: navigator.userAgent,
-      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      touchEnabled: 'ontouchstart' in window,
-      screenWidth: window.screen.width,
-      screenHeight: window.screen.height
-    })
-    
     const file = e.target.files?.[0]
-    console.log('[FILE UPLOAD] 選択されたファイル:', file ? {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      lastModified: new Date(file.lastModified).toISOString()
-    } : 'ファイルが選択されていません')
+    
+    trackBehaviorDifference('FILE_UPLOAD', 'FILE_SELECT', file ? 'success' : 'error', {
+      fileName: file?.name,
+      fileType: file?.type,
+      fileSize: file?.size,
+      category: category,
+      accept: accept
+    })
     
     if (file) {
       handleFile(file)
     }
-  }, [handleFile])
+  }, [handleFile, category, accept])
 
   const getDefaultIcon = useMemo(() => {
     switch (category) {

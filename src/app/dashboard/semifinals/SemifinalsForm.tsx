@@ -13,6 +13,7 @@ import {
   validateSemifinalsSection, 
   semifinalsSections 
 } from '@/utils/semifinalsValidation'
+import { logDeviceInfo, trackBehaviorDifference } from '@/lib/device-detector'
 import type { Entry, SemifinalsInfo, PreliminaryInfo, EntryFile } from '@/lib/types'
 
 interface SemifinalsFormProps {
@@ -651,14 +652,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   }
 
   const handleSave = async () => {
-    console.log('[SEMIFINALS SAVE] === 保存処理開始 ===')
-    console.log('[SEMIFINALS SAVE] デバイス情報:', {
-      userAgent: navigator.userAgent,
-      isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      touchEnabled: 'ontouchstart' in window,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      connectionType: (navigator as any).connection?.effectiveType || 'unknown'
+    const deviceInfo = logDeviceInfo('SEMIFINALS SAVE')
+    trackBehaviorDifference('SEMIFINALS', 'SAVE_START', 'success', {
+      hasEntry: !!entry,
+      dataSize: Object.keys(semifinalsInfo).length
     })
     
     if (!entry?.id) {
@@ -696,6 +693,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         work_title_kana_saved: dataToSave.work_title_kana
       })
     } catch (saveError) {
+      trackBehaviorDifference('SEMIFINALS', 'SAVE_ERROR', 'error', {
+        errorMessage: saveError instanceof Error ? saveError.message : String(saveError),
+        errorType: saveError instanceof Error ? saveError.constructor.name : 'Unknown'
+      })
       alert(`保存エラー: ${saveError}`)
       console.error('保存エラー詳細:', saveError)
       throw saveError
@@ -706,6 +707,11 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     await updateFormStatus('semifinals_info', entry.id, isComplete)
     
     // 保存成功後にページをリロード
+    trackBehaviorDifference('SEMIFINALS', 'SAVE_SUCCESS', 'success', {
+      isComplete: isComplete,
+      reloadMethod: 'window.location.reload'
+    })
+    
     showToast('準決勝情報を保存しました', 'success')
     
     // ページをリロードして最新データを表示
