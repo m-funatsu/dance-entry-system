@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import NavigationLogger from '@/components/NavigationLogger'
-import Link from 'next/link'
 import BackgroundLoader from '@/components/BackgroundLoader'
 
 export default function LoginPage() {
@@ -195,20 +194,27 @@ export default function LoginPage() {
 
           <div className="text-center space-y-2">
             <div>
-              <Link
-                href="/auth/reset-password"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('🔸 [LOGIN] パスワード忘れリンククリック')
+                  window.location.href = '/auth/reset-password'
+                }}
+                className="font-medium text-indigo-600 hover:text-indigo-500 bg-transparent border-none cursor-pointer underline"
               >
                 パスワードを忘れた方はこちら
-              </Link>
+              </button>
             </div>
             <div>
               <p className="text-sm text-gray-600">
                 アカウントをお持ちでない場合は、
                 <button
                   type="button"
-                  onClick={() => window.location.href = '/auth/register'}
-                  className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer underline"
+                  onClick={() => {
+                    console.log('🔸 [LOGIN] 新規登録リンククリック')
+                    window.location.href = '/auth/register'
+                  }}
+                  className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer underline bg-transparent border-none"
                 >
                   新規登録
                 </button>
