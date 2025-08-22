@@ -362,6 +362,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   }
 
   const handleSubmit = async () => {
+    console.log('[BASIC INFO SUBMIT] === 保存ボタンクリック ===')
+    console.log('[BASIC INFO SUBMIT] 一時保存モードで実行開始')
+    
     // バリデーションはステータスチェック用のみ（保存は常に可能）
 
     try {
