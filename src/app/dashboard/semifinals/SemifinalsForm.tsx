@@ -652,7 +652,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   }
 
   const handleSave = async () => {
-    const deviceInfo = logDeviceInfo('SEMIFINALS SAVE')
+    logDeviceInfo('SEMIFINALS SAVE')
     trackBehaviorDifference('SEMIFINALS', 'SAVE_START', 'success', {
       hasEntry: !!entry,
       dataSize: Object.keys(semifinalsInfo).length

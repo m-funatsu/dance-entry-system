@@ -60,7 +60,7 @@ export function getDeviceInfo(): DeviceInfo {
       width: window.innerWidth,
       height: window.innerHeight
     },
-    connectionType: (navigator as any).connection?.effectiveType || 'unknown',
+    connectionType: (navigator as Navigator & { connection?: { effectiveType?: string } }).connection?.effectiveType || 'unknown',
     userAgent,
     timestamp: new Date().toISOString()
   }
@@ -89,7 +89,7 @@ export function trackBehaviorDifference(
   context: string, 
   action: string, 
   result: 'success' | 'error', 
-  details?: any
+  details?: Record<string, unknown>
 ) {
   const deviceInfo = getDeviceInfo()
   console.log(`[${context}] === PC/モバイル挙動追跡 ===`)
