@@ -184,10 +184,13 @@ export const BankSection: React.FC<BankSectionProps> = ({
             label="振込確認用紙"
             value={paymentSlipUrl}
             onChange={handleFileUpload}
-            accept="image/jpeg,image/jpg,image/png,image/gif,application/pdf"
+            accept=".jpg,.jpeg,.png,.gif,.pdf"
             maxSizeMB={10}
             category="document"
             required
+            placeholder={{
+              formats: "JPEG, JPG, PNG, GIF, PDF"
+            }}
           />
           
           {paymentSlipUrl && (
