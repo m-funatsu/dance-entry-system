@@ -587,6 +587,40 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   </span>
                 </label>
               </div>
+              
+              {/* 著作権許諾注意事項 */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mt-4">
+                <div className="text-sm text-blue-800">
+                  <p className="font-semibold mb-2">◆「A.市販の楽曲を使用する」を選択される場合</p>
+                  <p className="mb-2">
+                    JASRAC、NexTone 等の音楽著作権管理団体の管理楽曲(管理状況で演奏、ビデオ、放送、配信にすべて〇がついているもの)である必要があります。
+                  </p>
+                  <p className="mb-2">下記の検索から規定を満たす楽曲であるかご確認をお願いいたします。</p>
+                  <div className="space-y-1">
+                    <p>
+                      <a 
+                        href="https://www2.jasrac.or.jp/eJwid/main?trxID=F00100" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="font-medium text-blue-600 hover:text-blue-500 underline"
+                      >
+                        JASRAC検索
+                      </a>
+                    </p>
+                    <p>
+                      <a 
+                        href="https://search.nex-tone.co.jp/list" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="font-medium text-blue-600 hover:text-blue-500 underline"
+                      >
+                        NexTone検索
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               {errors.music_rights_cleared && (
                 <p className="mt-1 text-sm text-red-600">{errors.music_rights_cleared}</p>
               )}
@@ -656,6 +690,27 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               <option value="download">データダウンロード楽曲</option>
               <option value="other">その他（オリジナル曲）</option>
             </FormField>
+            
+            {/* 楽曲種類注意事項 */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mt-4">
+              <div className="text-sm text-yellow-800">
+                <p className="font-semibold mb-2">◆「CD楽曲」または「データダウンロード曲」を選択される場合</p>
+                <p className="mb-2">
+                  日本レコード協会に加盟している出版社から市販されている音源を使用する必要があります。
+                </p>
+                <p className="mb-2">下記の出版社検索から加盟済であるかご確認をお願いいたします。</p>
+                <p>
+                  <a 
+                    href="https://www.riaj.or.jp/about/member/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-medium text-yellow-700 hover:text-yellow-600 underline"
+                  >
+                    日本レコード協会加盟出版社検索
+                  </a>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
