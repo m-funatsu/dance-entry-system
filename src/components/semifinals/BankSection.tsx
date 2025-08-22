@@ -187,11 +187,66 @@ export const BankSection: React.FC<BankSectionProps> = ({
           {paymentSlipUrl && (
             <button
               type="button"
-              onClick={() => {
-                setPaymentSlip(null)
-                setPaymentSlipUrl('')
+              onClick={async () => {
+                console.log('[BANK SECTION DELETE] === 振込確認用紙削除開始 ===')
+                console.log('[BANK SECTION DELETE] 現在のURL:', paymentSlipUrl)
+                console.log('[BANK SECTION DELETE] entry_id:', semifinalsInfo.entry_id)
+                
+                try {
+                  if (!semifinalsInfo.entry_id) {
+                    console.error('[BANK SECTION DELETE] エラー: entry_idが存在しません')
+                    return
+                  }
+
+                  // データベースからファイル情報を取得
+                  const { data: fileData, error: searchError } = await supabase
+                    .from('entry_files')
+                    .select('*')
+                    .eq('entry_id', semifinalsInfo.entry_id)
+                    .eq('purpose', 'semifinals_payment_slip')
+                    .single()
+
+                  console.log('[BANK SECTION DELETE] 削除対象ファイル:', fileData)
+                  console.log('[BANK SECTION DELETE] 検索エラー:', searchError)
+
+                  if (fileData) {
+                    // ストレージからファイル削除
+                    console.log('[BANK SECTION DELETE] ストレージから削除中:', fileData.file_path)
+                    const { error: storageError } = await supabase.storage
+                      .from('files')
+                      .remove([fileData.file_path])
+
+                    if (storageError) {
+                      console.error('[BANK SECTION DELETE] ストレージ削除エラー:', storageError)
+                    } else {
+                      console.log('[BANK SECTION DELETE] ストレージ削除成功')
+                    }
+
+                    // データベースからレコード削除
+                    console.log('[BANK SECTION DELETE] データベースから削除中:', fileData.id)
+                    const { error: dbError } = await supabase
+                      .from('entry_files')
+                      .delete()
+                      .eq('id', fileData.id)
+
+                    if (dbError) {
+                      console.error('[BANK SECTION DELETE] データベース削除エラー:', dbError)
+                    } else {
+                      console.log('[BANK SECTION DELETE] データベース削除成功')
+                    }
+                  }
+
+                  // UI状態をクリア
+                  setPaymentSlip(null)
+                  setPaymentSlipUrl('')
+                  console.log('[BANK SECTION DELETE] UI状態クリア完了')
+                  console.log('[BANK SECTION DELETE] === 振込確認用紙削除完了 ===')
+                  
+                } catch (error) {
+                  console.error('[BANK SECTION DELETE] 削除処理エラー:', error)
+                }
               }}
-              className="mt-2 text-sm text-red-600 hover:text-red-800"
+              className="mt-2 text-sm text-red-600 hover:text-red-800 cursor-pointer"
             >
               ファイルを削除
             </button>
