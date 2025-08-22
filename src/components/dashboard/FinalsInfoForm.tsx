@@ -391,12 +391,16 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
           .maybeSingle()
 
         if (semifinalsData) {
+          console.log('[FINALS DEBUG] 準決勝データ:', semifinalsData)
           setFinalsInfo(prev => ({
             ...prev,
             choreographer_change: false,
             choreographer_name: semifinalsData.choreographer_name,
-            choreographer_name_kana: semifinalsData.choreographer_name_kana
+            choreographer_furigana: semifinalsData.choreographer_name_kana,
+            choreographer2_name: semifinalsData.choreographer2_name,
+            choreographer2_furigana: semifinalsData.choreographer2_name_kana
           }))
+          console.log('[FINALS DEBUG] 振付師情報をコピーしました')
         }
       } catch (err) {
         console.error('準決勝情報の読み込みエラー:', err)
@@ -407,7 +411,9 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         ...prev,
         choreographer_change: true,
         choreographer_name: '',
-        choreographer_name_kana: ''
+        choreographer_furigana: '',
+        choreographer2_name: '',
+        choreographer2_furigana: ''
       }))
     }
   }
