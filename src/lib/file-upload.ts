@@ -27,7 +27,7 @@ export const FILE_UPLOAD_DEFAULTS = {
     image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
     video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime', 'video/webm'],
     audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg'],
-    document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
   },
   // 現在のSupabase課金後の制限
   currentLimits: {
@@ -84,8 +84,17 @@ export function validateFile(
   file: File,
   config: FileUploadConfig = {}
 ): FileValidationResult {
+  console.log('[FILE VALIDATION] === ファイルバリデーション開始 ===')
+  console.log('[FILE VALIDATION] ファイル情報:', {
+    name: file.name,
+    type: file.type,
+    size: file.size
+  })
+  console.log('[FILE VALIDATION] 設定:', config)
+  
   // ファイルが存在しない
   if (!file) {
+    console.log('[FILE VALIDATION] エラー: ファイルが選択されていません')
     return {
       valid: false,
       error: 'ファイルが選択されていません',
@@ -94,7 +103,14 @@ export function validateFile(
   }
 
   const category = config.category || getFileCategory(file.type)
+  console.log('[FILE VALIDATION] カテゴリ判定:', {
+    configCategory: config.category,
+    detectedCategory: getFileCategory(file.type),
+    finalCategory: category
+  })
+  
   if (!category) {
+    console.log('[FILE VALIDATION] エラー: サポートされていないファイル形式')
     return {
       valid: false,
       error: 'サポートされていないファイル形式です',
@@ -115,7 +131,20 @@ export function validateFile(
   // ファイルタイプチェック
   const categoryAllowedTypes = FILE_UPLOAD_DEFAULTS.allowedTypes[category as keyof typeof FILE_UPLOAD_DEFAULTS.allowedTypes]
   const allowedTypes = config.allowedTypes || (categoryAllowedTypes ? [...categoryAllowedTypes] : [])
+  
+  console.log('[FILE VALIDATION] ファイルタイプチェック:', {
+    category: category,
+    categoryAllowedTypes: categoryAllowedTypes,
+    configAllowedTypes: config.allowedTypes,
+    finalAllowedTypes: allowedTypes,
+    fileType: file.type,
+    isAllowed: allowedTypes?.includes(file.type)
+  })
+  
   if (!allowedTypes || !allowedTypes.includes(file.type)) {
+    console.log('[FILE VALIDATION] エラー: 許可されていないファイル形式')
+    console.log('[FILE VALIDATION] 許可されている形式:', allowedTypes)
+    console.log('[FILE VALIDATION] ファイル形式:', file.type)
     return {
       valid: false,
       error: '許可されていないファイル形式です',
@@ -123,6 +152,7 @@ export function validateFile(
     }
   }
 
+  console.log('[FILE VALIDATION] バリデーション成功')
   return { valid: true }
 }
 
