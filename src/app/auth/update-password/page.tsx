@@ -16,6 +16,7 @@ function UpdatePasswordForm() {
   const [isFirstTime, setIsFirstTime] = useState(false)
   const [isWelcome, setIsWelcome] = useState(false)
   const [userName, setUserName] = useState('')
+  const [clickCount, setClickCount] = useState(0)
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -154,6 +155,7 @@ function UpdatePasswordForm() {
 
   // 成功画面を表示
   if (success) {
+    console.log('🔸 [SUCCESS_SCREEN] 成功画面表示中', { isFirstTime, isWelcome, successMessage })
     return (
       <>
         <URLCleaner />
@@ -178,7 +180,10 @@ function UpdatePasswordForm() {
             <div className="space-y-4">
               {isFirstTime && !isWelcome ? (
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => {
+                    console.log('🔸 [DASHBOARD_BUTTON] ダッシュボードボタンクリック')
+                    router.push('/dashboard')
+                  }}
                   className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   ダッシュボードへ移動
@@ -186,12 +191,30 @@ function UpdatePasswordForm() {
               ) : (
                 <button
                   onClick={(e) => {
+                    const currentCount = clickCount + 1
+                    setClickCount(currentCount)
+                    console.log(`🔸 [LOGIN_BUTTON] クリック回数: ${currentCount}`)
+                    console.log('🔸 [LOGIN_BUTTON] クリックイベント開始')
                     e.preventDefault()
                     e.stopPropagation()
+                    console.log('🔸 [LOGIN_BUTTON] イベント制御完了')
+                    
                     // セッションクリアしてからリダイレクト
-                    supabase.auth.signOut().finally(() => {
-                      window.location.replace('/auth/login')
-                    })
+                    console.log('🔸 [LOGIN_BUTTON] サインアウト開始')
+                    supabase.auth.signOut()
+                      .then(() => {
+                        console.log('🔸 [LOGIN_BUTTON] サインアウト成功')
+                      })
+                      .catch((error) => {
+                        console.log('🔸 [LOGIN_BUTTON] サインアウトエラー:', error)
+                      })
+                      .finally(() => {
+                        console.log('🔸 [LOGIN_BUTTON] リダイレクト実行中...')
+                        setTimeout(() => {
+                          console.log('🔸 [LOGIN_BUTTON] window.location.replace実行')
+                          window.location.replace('/auth/login')
+                        }, 100)
+                      })
                   }}
                   className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
