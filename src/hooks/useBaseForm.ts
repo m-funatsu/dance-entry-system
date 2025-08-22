@@ -120,6 +120,17 @@ export function useBaseForm<T extends Record<string, unknown>>({
         delete dataToSave.id
       }
       
+      // 空文字列をnullに変換（特に日付フィールド）
+      Object.keys(dataToSave).forEach(key => {
+        const value = (dataToSave as Record<string, unknown>)[key]
+        if (value === '') {
+          // 日付フィールドや数値フィールドの場合はnullに変換
+          if (key.includes('date') || key.includes('birthdate') || key.includes('_at')) {
+            (dataToSave as Record<string, unknown>)[key] = null
+          }
+        }
+      })
+      
       // タイムスタンプの追加
       const now = new Date().toISOString()
       ;(dataToSave as Record<string, unknown>).updated_at = now
