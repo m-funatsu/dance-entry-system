@@ -110,10 +110,16 @@ export const BankSection: React.FC<BankSectionProps> = ({
       
       console.log('[BANK SECTION] ストレージアップロード成功:', uploadData)
 
-      // データベースに記録
+      // データベースに記録（ファイルタイプを適切に判定）
+      const fileType = file.type.startsWith('image/') ? 'photo' : 'document'
+      console.log('[BANK SECTION] ファイルタイプ判定:', {
+        originalType: file.type,
+        determinedType: fileType
+      })
+      
       const insertData = {
         entry_id: semifinalsInfo.entry_id,
-        file_type: 'photo',
+        file_type: fileType,
         file_name: file.name,
         file_path: fileName,
         purpose: 'semifinals_payment_slip'
