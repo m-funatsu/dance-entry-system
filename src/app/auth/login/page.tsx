@@ -205,9 +205,13 @@ export default function LoginPage() {
             <div>
               <p className="text-sm text-gray-600">
                 アカウントをお持ちでない場合は、
-                <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <button
+                  type="button"
+                  onClick={() => window.location.href = '/auth/register'}
+                  className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer underline"
+                >
                   新規登録
-                </Link>
+                </button>
               </p>
             </div>
           </div>
