@@ -157,7 +157,7 @@ export default function RegisterPage() {
         console.log('[REGISTER] 登録完了 - ログインページにリダイレクト')
         
         // デバッグ用：リダイレクト前にログを確認できるよう一時停止
-        alert('✅ 登録が完了しました！\nコンソールログを確認してから「OK」を押してください。\n\n確認メールをお送りしましたので、メール内のリンクをクリックしてアカウントを有効化してください。')
+        alert('✅ 登録が完了しました！\nコンソールログを確認してから「OK」を押してください。\n\n確認メールをお送りしましたので、メール確認画面に移動します。')
         
         console.log('[REGISTER] === 登録処理完了サマリー ===')
         console.log('ユーザーID:', data.user.id)
@@ -165,7 +165,7 @@ export default function RegisterPage() {
         console.log('名前:', name.trim())
         console.log('=================================')
         
-        window.location.href = '/auth/login?message=登録が完了しました。ログインしてください。'
+        window.location.href = `/auth/confirm-email?email=${encodeURIComponent(data.user.email || email.trim())}`
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
         alert('❌ 登録処理でエラーが発生しました\nコンソールログを確認してください')
