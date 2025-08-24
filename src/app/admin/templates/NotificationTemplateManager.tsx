@@ -68,15 +68,15 @@ export default function NotificationTemplateManager() {
         await fetchTemplates()
         resetForm()
       } else {
-        const errorData = await response.json()
-        setError(errorData.error || 'テンプレートの保存に失敗しました')
+        setError('保存に失敗しました')
       }
     } catch {
-      setError('テンプレートの保存に失敗しました')
+      setError('保存に失敗しました')
     }
   }
 
   const handleEdit = (template: NotificationTemplate) => {
+    console.log('編集ボタンクリック:', template.id, template.name)
     setEditingTemplate(template)
     setFormData({
       name: template.name,
@@ -99,11 +99,19 @@ export default function NotificationTemplateManager() {
       if (response.ok) {
         await fetchTemplates()
       } else {
-        setError('テンプレートの削除に失敗しました')
+        setError('削除に失敗しました')
       }
     } catch {
-      setError('テンプレートの削除に失敗しました')
+      setError('削除に失敗しました')
     }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
   }
 
   const resetForm = () => {
@@ -116,16 +124,8 @@ export default function NotificationTemplateManager() {
     })
     setEditingTemplate(null)
     setIsCreating(false)
+    setError('')
   }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }))
-  }
-
 
   if (loading) {
     return (
@@ -278,49 +278,46 @@ export default function NotificationTemplateManager() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {templates.map((template) => {
-              console.log('テンプレート描画中:', template.id, template.name)
-              return (
-                <tr key={template.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{template.name}</div>
-                      {template.description && (
-                        <div className="text-sm text-gray-500">{template.description}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {template.subject}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      template.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {template.is_active ? 'アクティブ' : '無効'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleEdit(template)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium"
-                      >
-                        編集
-                      </button>
-                      <button
-                        onClick={() => handleDelete(template.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
-                      >
-                        削除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
+            {templates.map((template) => (
+              <tr key={template.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{template.name}</div>
+                    {template.description && (
+                      <div className="text-sm text-gray-500">{template.description}</div>
+                    )}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {template.subject}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    template.is_active 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {template.is_active ? 'アクティブ' : '無効'}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEdit(template)}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium"
+                    >
+                      編集
+                    </button>
+                    <button
+                      onClick={() => handleDelete(template.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
