@@ -70,21 +70,32 @@ export default async function BasicInfoListPage() {
   console.log('[BASIC INFO DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[BASIC INFO DEBUG] ファイルエラー:', filesError)
 
-  // データをマッピング
+  // データをマッピング（全データを表示）
   const mappedBasicInfoList = basicInfoList?.map(basicInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === basicInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === basicInfo.entry_id)
     
+    console.log(`[BASIC INFO DEBUG] エントリーID ${basicInfo.entry_id}:`, {
+      hasEntry: !!relatedEntry,
+      hasUser: !!relatedUser,
+      fileCount: relatedFiles?.length || 0
+    })
+    
     return {
       ...basicInfo,
       entries: relatedEntry ? {
         ...relatedEntry,
-        users: relatedUser
-      } : null,
+        users: relatedUser || { name: '不明なユーザー', email: '不明' }
+      } : { 
+        id: '', 
+        participant_names: 'エントリー情報なし', 
+        status: 'unknown',
+        users: { name: '不明なユーザー', email: '不明' }
+      },
       entry_files: relatedFiles || []
     }
-  })
+  }) || []
 
   console.log('[BASIC INFO DEBUG] マッピング完了')
   console.log('[BASIC INFO DEBUG] マッピング後データ件数:', mappedBasicInfoList?.length || 0)

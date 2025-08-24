@@ -27,38 +27,65 @@ export default async function PreliminaryInfoListPage() {
   
   console.log('[PRELIMINARY DEBUG] === 予選情報一覧データ取得開始 ===')
   
-  const { data: preliminaryInfoList, error } = await adminSupabase
+  // 予選情報を取得
+  const { data: preliminaryInfoList, error: preliminaryError } = await adminSupabase
     .from('preliminary_info')
-    .select(`
-      *,
-      entries!inner (
-        id,
-        participant_names,
-        status,
-        user_id,
-        users (
-          name,
-          email
-        )
-      ),
-      entry_files (
-        id,
-        file_type,
-        file_name,
-        file_path,
-        purpose
-      )
-    `)
+    .select('*')
     .order('created_at', { ascending: false })
 
-  console.log('[PRELIMINARY DEBUG] クエリ実行完了')
-  console.log('[PRELIMINARY DEBUG] データ件数:', preliminaryInfoList?.length || 0)
-  console.log('[PRELIMINARY DEBUG] エラー:', error)
-  console.log('[PRELIMINARY DEBUG] 取得データ:', JSON.stringify(preliminaryInfoList, null, 2))
+  console.log('[PRELIMINARY DEBUG] 予選情報取得完了')
+  console.log('[PRELIMINARY DEBUG] 予選情報件数:', preliminaryInfoList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] 予選情報エラー:', preliminaryError)
 
-  if (error) {
-    console.error('予選情報取得エラー:', error)
+  if (preliminaryError) {
+    console.error('予選情報取得エラー:', preliminaryError)
+    return <div>予選情報の取得に失敗しました</div>
   }
+
+  // エントリー情報を取得
+  const { data: entriesList } = await adminSupabase
+    .from('entries')
+    .select('*')
+
+  // ユーザー情報を取得
+  const { data: usersList } = await adminSupabase
+    .from('users')
+    .select('*')
+
+  // ファイル情報を取得
+  const { data: filesList } = await adminSupabase
+    .from('entry_files')
+    .select('*')
+
+  // データをマッピング
+  const mappedPreliminaryInfoList = preliminaryInfoList?.map(preliminaryInfo => {
+    const relatedEntry = entriesList?.find(entry => entry.id === preliminaryInfo.entry_id)
+    const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
+    const relatedFiles = filesList?.filter(file => file.entry_id === preliminaryInfo.entry_id)
+    
+    console.log(`[PRELIMINARY DEBUG] エントリーID ${preliminaryInfo.entry_id}:`, {
+      hasEntry: !!relatedEntry,
+      hasUser: !!relatedUser,
+      fileCount: relatedFiles?.length || 0
+    })
+    
+    return {
+      ...preliminaryInfo,
+      entries: relatedEntry ? {
+        ...relatedEntry,
+        users: relatedUser || { name: '不明なユーザー', email: '不明' }
+      } : { 
+        id: '', 
+        participant_names: 'エントリー情報なし', 
+        status: 'unknown',
+        users: { name: '不明なユーザー', email: '不明' }
+      },
+      entry_files: relatedFiles || []
+    }
+  }) || []
+
+  console.log('[PRELIMINARY DEBUG] マッピング完了')
+  console.log('[PRELIMINARY DEBUG] マッピング後データ件数:', mappedPreliminaryInfoList?.length || 0)
 
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
@@ -91,7 +118,7 @@ export default async function PreliminaryInfoListPage() {
         </AdminLink>
       </div>
 
-      {preliminaryInfoList && preliminaryInfoList.length > 0 ? (
+      {mappedPreliminaryInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -118,14 +145,14 @@ export default async function PreliminaryInfoListPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {preliminaryInfoList.map((preliminaryInfo) => (
+                {mappedPreliminaryInfoList.map((preliminaryInfo) => (
                   <tr key={preliminaryInfo.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {(preliminaryInfo.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'}
+                        {preliminaryInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {(preliminaryInfo.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'}
+                        {preliminaryInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
                     <td className="px-4 py-4">
@@ -161,9 +188,9 @@ export default async function PreliminaryInfoListPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="space-y-1">
-                        {((preliminaryInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.filter(file => 
+                        {preliminaryInfo.entry_files?.filter((file: { purpose?: string }) => 
                           file.purpose === 'preliminary'
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -175,22 +202,22 @@ export default async function PreliminaryInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!((preliminaryInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.some(file => file.purpose === 'preliminary') && (
+                        {!preliminaryInfo.entry_files?.some((file: { purpose?: string }) => file.purpose === 'preliminary') && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        (preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        (preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        (preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                        preliminaryInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
+                        preliminaryInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        preliminaryInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {(preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'pending' && '審査待ち'}
-                        {(preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' && '提出済み'}
-                        {(preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' && '選考通過'}
-                        {(preliminaryInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' && '不選考'}
+                        {preliminaryInfo.entries?.status === 'pending' && '審査待ち'}
+                        {preliminaryInfo.entries?.status === 'submitted' && '提出済み'}
+                        {preliminaryInfo.entries?.status === 'selected' && '選考通過'}
+                        {preliminaryInfo.entries?.status === 'rejected' && '不選考'}
                       </span>
                     </td>
                   </tr>
