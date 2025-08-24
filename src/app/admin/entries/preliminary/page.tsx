@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 
+
 export default async function PreliminaryInfoListPage() {
   const supabase = await createClient()
   
@@ -43,21 +44,33 @@ export default async function PreliminaryInfoListPage() {
   }
 
   // エントリー情報を取得
-  const { data: entriesList } = await adminSupabase
+  const { data: entriesList, error: entriesError } = await adminSupabase
     .from('entries')
     .select('*')
 
+  console.log('[PRELIMINARY DEBUG] エントリー情報取得完了')
+  console.log('[PRELIMINARY DEBUG] エントリー件数:', entriesList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] エントリーエラー:', entriesError)
+
   // ユーザー情報を取得
-  const { data: usersList } = await adminSupabase
+  const { data: usersList, error: usersError } = await adminSupabase
     .from('users')
     .select('*')
 
+  console.log('[PRELIMINARY DEBUG] ユーザー情報取得完了')
+  console.log('[PRELIMINARY DEBUG] ユーザー件数:', usersList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] ユーザーエラー:', usersError)
+
   // ファイル情報を取得
-  const { data: filesList } = await adminSupabase
+  const { data: filesList, error: filesError } = await adminSupabase
     .from('entry_files')
     .select('*')
 
-  // データをマッピング
+  console.log('[PRELIMINARY DEBUG] ファイル情報取得完了')
+  console.log('[PRELIMINARY DEBUG] ファイル件数:', filesList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] ファイルエラー:', filesError)
+
+  // データをマッピング（全データを表示）
   const mappedPreliminaryInfoList = preliminaryInfoList?.map(preliminaryInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === preliminaryInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
@@ -86,6 +99,7 @@ export default async function PreliminaryInfoListPage() {
 
   console.log('[PRELIMINARY DEBUG] マッピング完了')
   console.log('[PRELIMINARY DEBUG] マッピング後データ件数:', mappedPreliminaryInfoList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] マッピング後データ:', JSON.stringify(mappedPreliminaryInfoList, null, 2))
 
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
@@ -109,16 +123,56 @@ export default async function PreliminaryInfoListPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">予選情報一覧</h1>
-          <p className="text-gray-600">エントリーの予選情報をまとめて確認できます</p>
-        </div>
         <AdminLink href="/admin/entries">
-          エントリー一覧に戻る
+          ← エントリー一覧に戻る
         </AdminLink>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => {
+              const csvContent = [
+                ['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', 'ステータス'],
+                ...mappedPreliminaryInfoList.map(item => [
+                  item.id,
+                  item.entry_id,
+                  item.work_title || '',
+                  item.work_title_kana || '',
+                  item.work_story || '',
+                  item.music_title || '',
+                  item.artist || '',
+                  item.cd_title || '',
+                  item.jasrac_code || '',
+                  item.copyright_permission || '',
+                  item.lyricist || '',
+                  item.composer || '',
+                  item.choreographer1_name || '',
+                  item.choreographer1_furigana || '',
+                  item.choreographer1_copyright || '',
+                  item.choreographer2_name || '',
+                  item.choreographer2_furigana || '',
+                  item.choreographer2_copyright || '',
+                  item.entries?.status || ''
+                ])
+              ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+              
+              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+              const link = document.createElement('a')
+              link.href = URL.createObjectURL(blob)
+              link.download = `preliminary_info_${new Date().toISOString().split('T')[0]}.csv`
+              link.click()
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+          >
+            📥 CSV ダウンロード
+          </button>
+        </div>
+      </div>
+      
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900">予選情報一覧</h1>
+        <p className="text-gray-600">エントリーの予選情報をまとめて確認できます（{mappedPreliminaryInfoList?.length || 0}件）</p>
       </div>
 
-      {mappedPreliminaryInfoList.length > 0 ? (
+      {mappedPreliminaryInfoList && mappedPreliminaryInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -143,6 +197,9 @@ export default async function PreliminaryInfoListPage() {
                     振付師2
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    その他詳細
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -153,48 +210,80 @@ export default async function PreliminaryInfoListPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {mappedPreliminaryInfoList.map((preliminaryInfo) => (
                   <tr key={preliminaryInfo.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-900">
                         {preliminaryInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-xs text-gray-500">
                         {preliminaryInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{preliminaryInfo.work_title || '未入力'}</div>
                         <div className="text-gray-500">{preliminaryInfo.work_title_kana || ''}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-gray-500 mt-1">
                           {preliminaryInfo.work_story ? 
                             `${preliminaryInfo.work_story.slice(0, 50)}${preliminaryInfo.work_story.length > 50 ? '...' : ''}` 
                             : '未入力'}
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{preliminaryInfo.music_title || '未入力'}</div>
                         <div className="text-gray-500">{preliminaryInfo.artist || ''}</div>
-                        <div className="text-xs text-gray-500">{preliminaryInfo.cd_title || ''}</div>
-                        <div className="text-xs text-gray-500">JASRAC: {preliminaryInfo.jasrac_code || '未入力'}</div>
+                        <div className="text-gray-500">{preliminaryInfo.cd_title || ''}</div>
+                        <div className="text-gray-500">JASRAC: {preliminaryInfo.jasrac_code || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
-                        <div className="font-medium">{preliminaryInfo.choreographer1_name || '未入力'}</div>
-                        <div className="text-gray-500">{preliminaryInfo.choreographer1_furigana || ''}</div>
-                        {preliminaryInfo.choreographer2_name && (
-                          <>
-                            <div className="font-medium mt-1">{preliminaryInfo.choreographer2_name}</div>
-                            <div className="text-gray-500">{preliminaryInfo.choreographer2_furigana || ''}</div>
-                          </>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{preliminaryInfo.copyright_permission || '未入力'}</div>
+                        {preliminaryInfo.lyricist && (
+                          <div className="text-gray-500 mt-1">作詞者: {preliminaryInfo.lyricist}</div>
+                        )}
+                        {preliminaryInfo.composer && (
+                          <div className="text-gray-500">作曲者: {preliminaryInfo.composer}</div>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{preliminaryInfo.choreographer1_name || '未入力'}</div>
+                        <div className="text-gray-500">{preliminaryInfo.choreographer1_furigana || ''}</div>
+                        {preliminaryInfo.choreographer1_copyright && (
+                          <div className="text-gray-500 text-xs">著作権: {preliminaryInfo.choreographer1_copyright}</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {preliminaryInfo.choreographer2_name ? (
+                          <>
+                            <div className="font-medium">{preliminaryInfo.choreographer2_name}</div>
+                            <div className="text-gray-500">{preliminaryInfo.choreographer2_furigana || ''}</div>
+                            {preliminaryInfo.choreographer2_copyright && (
+                              <div className="text-gray-500 text-xs">著作権: {preliminaryInfo.choreographer2_copyright}</div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-gray-400">未入力</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {preliminaryInfo.work_title_kana && (
+                          <div className="text-gray-500">タイトルカナ: {preliminaryInfo.work_title_kana}</div>
+                        )}
+                        <div className="text-gray-500 mt-1">作成日: {preliminaryInfo.created_at ? new Date(preliminaryInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">更新日: {preliminaryInfo.updated_at ? new Date(preliminaryInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {preliminaryInfo.entry_files?.filter((file: { purpose?: string }) => 
+                        {(preliminaryInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
                           file.purpose === 'preliminary'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
                           <div key={file.id}>
@@ -208,12 +297,12 @@ export default async function PreliminaryInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!preliminaryInfo.entry_files?.some((file: { purpose?: string }) => file.purpose === 'preliminary') && (
+                        {!(preliminaryInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => file.purpose === 'preliminary') && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-2 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         preliminaryInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
                         preliminaryInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
