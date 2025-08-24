@@ -319,8 +319,7 @@ export default function NotificationTemplateManager() {
                   </div>
                 </td>
               </tr>
-              )
-            })}
+            )})}
           </tbody>
         </table>
 
