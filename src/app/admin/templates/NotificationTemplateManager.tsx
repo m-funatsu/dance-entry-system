@@ -213,17 +213,74 @@ export default function NotificationTemplateManager() {
               <label htmlFor="body" className="block text-sm font-medium text-gray-700">
                 本文 *
               </label>
-              <textarea
-                id="body"
-                name="body"
-                required
-                rows={10}
-                value={formData.body}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="メール本文を入力してください..."
-              />
+              <div className="mt-1">
+                <textarea
+                  id="body"
+                  name="body"
+                  required
+                  rows={10}
+                  value={formData.body}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  placeholder="メール本文を入力してください..."
+                />
+                <div className="mt-2 text-xs text-gray-500 space-y-1">
+                  <p><strong>リンクの挿入方法:</strong></p>
+                  <p>• プレーンテキスト: https://example.com （自動的にリンクになります）</p>
+                  <p>• HTMLリンク: &lt;a href=&quot;https://example.com&quot;&gt;リンクテキスト&lt;/a&gt;</p>
+                  <p>• よく使用するリンク:</p>
+                  <div className="ml-2 space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const loginUrl = 'https://dance-entry-system.vercel.app/auth/login'
+                        setFormData(prev => ({
+                          ...prev,
+                          body: prev.body + `\n\nログインページ:\n${loginUrl}\n`
+                        }))
+                      }}
+                      className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+                    >
+                      ログインページ追加
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const dashboardUrl = 'https://dance-entry-system.vercel.app/dashboard'
+                        setFormData(prev => ({
+                          ...prev,
+                          body: prev.body + `\n\nダッシュボード:\n${dashboardUrl}\n`
+                        }))
+                      }}
+                      className="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200"
+                    >
+                      ダッシュボード追加
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* プレビュー機能 */}
+            {formData.body && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  プレビュー
+                </label>
+                <div className="border rounded-md p-4 bg-gray-50 text-sm">
+                  <div className="font-medium mb-2">件名: {formData.subject}</div>
+                  <div 
+                    className="whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{
+                      __html: formData.body
+                        .replace(/\n/g, '<br>')
+                        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>')
+                        .replace(/<a href="([^"]+)">([^<]+)<\/a>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$2</a>')
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center">
               <input
