@@ -148,18 +148,58 @@ export default async function SemifinalsInfoListPage() {
               item.account_number || '',
               item.account_holder || '',
               item.sound_scene1_instruction || '',
+              item.sound_scene1_time || '',
+              item.sound_scene1_cue || '',
+              item.sound_scene1_volume || '',
+              item.sound_scene1_effect || '',
               item.sound_scene2_instruction || '',
+              item.sound_scene2_time || '',
+              item.sound_scene2_cue || '',
+              item.sound_scene2_volume || '',
+              item.sound_scene2_effect || '',
               item.sound_scene3_instruction || '',
+              item.sound_scene3_time || '',
+              item.sound_scene3_cue || '',
+              item.sound_scene3_volume || '',
+              item.sound_scene3_effect || '',
               item.sound_scene4_instruction || '',
+              item.sound_scene4_time || '',
+              item.sound_scene4_cue || '',
+              item.sound_scene4_volume || '',
+              item.sound_scene4_effect || '',
               item.sound_scene5_instruction || '',
+              item.sound_scene5_time || '',
+              item.sound_scene5_cue || '',
+              item.sound_scene5_volume || '',
+              item.sound_scene5_effect || '',
               item.lighting_scene1_instruction || '',
+              item.lighting_scene1_time || '',
+              item.lighting_scene1_cue || '',
+              item.lighting_scene1_color || '',
+              item.lighting_scene1_intensity || '',
               item.lighting_scene2_instruction || '',
+              item.lighting_scene2_time || '',
+              item.lighting_scene2_cue || '',
+              item.lighting_scene2_color || '',
+              item.lighting_scene2_intensity || '',
               item.lighting_scene3_instruction || '',
+              item.lighting_scene3_time || '',
+              item.lighting_scene3_cue || '',
+              item.lighting_scene3_color || '',
+              item.lighting_scene3_intensity || '',
               item.lighting_scene4_instruction || '',
+              item.lighting_scene4_time || '',
+              item.lighting_scene4_cue || '',
+              item.lighting_scene4_color || '',
+              item.lighting_scene4_intensity || '',
               item.lighting_scene5_instruction || '',
+              item.lighting_scene5_time || '',
+              item.lighting_scene5_cue || '',
+              item.lighting_scene5_color || '',
+              item.lighting_scene5_intensity || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響シーン1', '音響シーン2', '音響シーン3', '音響シーン4', '音響シーン5', '照明シーン1', '照明シーン2', '照明シーン3', '照明シーン4', '照明シーン5', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響シーン1指示', '音響シーン1時間', '音響シーン1きっかけ', '音響シーン1音量', '音響シーン1効果', '音響シーン2指示', '音響シーン2時間', '音響シーン2きっかけ', '音響シーン2音量', '音響シーン2効果', '音響シーン3指示', '音響シーン3時間', '音響シーン3きっかけ', '音響シーン3音量', '音響シーン3効果', '音響シーン4指示', '音響シーン4時間', '音響シーン4きっかけ', '音響シーン4音量', '音響シーン4効果', '音響シーン5指示', '音響シーン5時間', '音響シーン5きっかけ', '音響シーン5音量', '音響シーン5効果', '照明シーン1指示', '照明シーン1時間', '照明シーン1きっかけ', '照明シーン1色', '照明シーン1強度', '照明シーン2指示', '照明シーン2時間', '照明シーン2きっかけ', '照明シーン2色', '照明シーン2強度', '照明シーン3指示', '照明シーン3時間', '照明シーン3きっかけ', '照明シーン3色', '照明シーン3強度', '照明シーン4指示', '照明シーン4時間', '照明シーン4きっかけ', '照明シーン4色', '照明シーン4強度', '照明シーン5指示', '照明シーン5時間', '照明シーン5きっかけ', '照明シーン5色', '照明シーン5強度', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -192,10 +232,34 @@ export default async function SemifinalsInfoListPage() {
                     銀行情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響指示（シーン別）
+                    音響シーン1
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明指示（シーン別）
+                    音響シーン2
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    音響シーン3
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    音響シーン4
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    音響シーン5
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明シーン1
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明シーン2
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明シーン3
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明シーン4
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明シーン5
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
@@ -264,46 +328,92 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">シーン1:</div>
-                        <div>音響: {semifinalsInfo.sound_scene1_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン2:</div>
-                        <div>音響: {semifinalsInfo.sound_scene2_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン3:</div>
-                        <div>音響: {semifinalsInfo.sound_scene3_instruction || '未入力'}</div>
-                        {semifinalsInfo.sound_scene4_instruction && (
-                          <>
-                            <div className="text-gray-500 mt-1">シーン4:</div>
-                            <div>音響: {semifinalsInfo.sound_scene4_instruction}</div>
-                          </>
-                        )}
-                        {semifinalsInfo.sound_scene5_instruction && (
-                          <>
-                            <div className="text-gray-500 mt-1">シーン5:</div>
-                            <div>音響: {semifinalsInfo.sound_scene5_instruction}</div>
-                          </>
-                        )}
+                        <div className="font-medium">指示: {semifinalsInfo.sound_scene1_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene1_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene1_cue || '未入力'}</div>
+                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene1_volume || '未入力'}</div>
+                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene1_effect || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">シーン1:</div>
-                        <div>照明: {semifinalsInfo.lighting_scene1_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン2:</div>
-                        <div>照明: {semifinalsInfo.lighting_scene2_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン3:</div>
-                        <div>照明: {semifinalsInfo.lighting_scene3_instruction || '未入力'}</div>
-                        {semifinalsInfo.lighting_scene4_instruction && (
-                          <>
-                            <div className="text-gray-500 mt-1">シーン4:</div>
-                            <div>照明: {semifinalsInfo.lighting_scene4_instruction}</div>
-                          </>
-                        )}
-                        {semifinalsInfo.lighting_scene5_instruction && (
-                          <>
-                            <div className="text-gray-500 mt-1">シーン5:</div>
-                            <div>照明: {semifinalsInfo.lighting_scene5_instruction}</div>
-                          </>
-                        )}
+                        <div className="font-medium">指示: {semifinalsInfo.sound_scene2_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene2_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene2_cue || '未入力'}</div>
+                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene2_volume || '未入力'}</div>
+                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene2_effect || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.sound_scene3_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene3_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene3_cue || '未入力'}</div>
+                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene3_volume || '未入力'}</div>
+                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene3_effect || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.sound_scene4_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene4_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene4_cue || '未入力'}</div>
+                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene4_volume || '未入力'}</div>
+                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene4_effect || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.sound_scene5_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene5_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene5_cue || '未入力'}</div>
+                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene5_volume || '未入力'}</div>
+                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene5_effect || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene1_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene1_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene1_cue || '未入力'}</div>
+                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene1_color || '未入力'}</div>
+                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene1_intensity || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene2_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene2_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene2_cue || '未入力'}</div>
+                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene2_color || '未入力'}</div>
+                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene2_intensity || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene3_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene3_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene3_cue || '未入力'}</div>
+                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene3_color || '未入力'}</div>
+                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene3_intensity || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene4_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene4_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene4_cue || '未入力'}</div>
+                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene4_color || '未入力'}</div>
+                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene4_intensity || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene5_instruction || '未入力'}</div>
+                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene5_time || '未入力'}</div>
+                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene5_cue || '未入力'}</div>
+                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene5_color || '未入力'}</div>
+                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene5_intensity || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
