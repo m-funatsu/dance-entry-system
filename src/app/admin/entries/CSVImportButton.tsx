@@ -15,10 +15,8 @@ export default function CSVImportButton() {
     if (!file) return
 
     // ファイル名でテンプレート形式を判定
-    if (!file.name.includes('basic_info_template') && 
-        !file.name.includes('preliminary_info_template') && 
-        !file.name.includes('semifinals_info_template')) {
-      alert('テンプレートファイル名が正しくありません。\nダウンロードしたテンプレートファイルを使用してください。')
+    if (!file.name.includes('basic_info_template')) {
+      alert('テンプレートファイル名が正しくありません。\n基本情報テンプレート（basic_info_template）を使用してください。')
       return
     }
 
@@ -52,50 +50,88 @@ export default function CSVImportButton() {
         return
       }
 
-      // 基本情報テンプレートの場合の処理例
+      // 基本情報テンプレート（7項目）の処理
       for (const rowData of dataRows) {
         try {
-          // サンプル: 基本情報のインポート処理
-          if (file.name.includes('basic_info_template')) {
-            const [userEmail, participantNames] = rowData
-            
-            if (!userEmail || !participantNames) {
-              failedCount++
-              continue
-            }
-            
-            // ユーザーを検索
-            const { data: targetUser } = await supabase
+          const [danceStyle, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
+          
+          if (!representativeEmail || !representativeName) {
+            console.error('必須項目が不足しています:', { representativeEmail, representativeName })
+            failedCount++
+            continue
+          }
+          
+          // ユーザーを検索または作成
+          let { data: targetUser } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', representativeEmail)
+            .single()
+          
+          if (!targetUser) {
+            // ユーザーが存在しない場合は新規作成
+            const { data: newUser, error: userError } = await supabase
               .from('users')
-              .select('id')
-              .eq('email', userEmail)
+              .insert({
+                email: representativeEmail,
+                name: representativeName,
+                role: 'participant'
+              })
+              .select()
               .single()
             
-            if (!targetUser) {
-              console.error('ユーザーが見つかりません:', userEmail)
+            if (userError) {
+              console.error('ユーザー作成エラー:', userError)
               failedCount++
               continue
             }
-            
-            // エントリーを作成または更新
-            const { error } = await supabase
-              .from('entries')
-              .upsert({
-                user_id: targetUser.id,
-                participant_names: participantNames,
-                status: 'pending'
-              })
-            
-            if (error) {
-              console.error('Import error:', error)
-              failedCount++
-            } else {
-              successCount++
-            }
-          } else {
-            // 他のテンプレート形式の場合
-            console.log('未対応のテンプレート形式:', file.name)
+            targetUser = newUser
+          }
+          
+          if (!targetUser) {
+            console.error('ユーザー情報が不正です')
             failedCount++
+            continue
+          }
+          
+          // エントリーを作成
+          const participantNames = partnerName ? `${representativeName} & ${partnerName}` : representativeName
+          
+          const { data: newEntry, error: entryError } = await supabase
+            .from('entries')
+            .insert({
+              user_id: targetUser.id,
+              participant_names: participantNames,
+              status: 'pending'
+            })
+            .select()
+            .single()
+          
+          if (entryError || !newEntry) {
+            console.error('エントリー作成エラー:', entryError)
+            failedCount++
+            continue
+          }
+          
+          // 基本情報を作成
+          const { error: basicInfoError } = await supabase
+            .from('basic_info')
+            .insert({
+              entry_id: newEntry.id,
+              dance_style: danceStyle,
+              representative_name: representativeName,
+              representative_furigana: representativeFurigana,
+              representative_email: representativeEmail,
+              phone_number: phoneNumber,
+              partner_name: partnerName || '',
+              partner_furigana: partnerFurigana || ''
+            })
+          
+          if (basicInfoError) {
+            console.error('基本情報作成エラー:', basicInfoError)
+            failedCount++
+          } else {
+            successCount++
           }
         } catch (error) {
           console.error('Import error:', error)
