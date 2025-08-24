@@ -125,28 +125,43 @@ export default async function BasicInfoListPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     エントリー名
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ダンスジャンル
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     カテゴリー
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     代表者情報
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     パートナー情報
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    緊急連絡先
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    連絡先
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    緊急連絡先1
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    緊急連絡先2
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    保護者情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    パートナー保護者
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    同意状況
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ファイル
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
                   </th>
                 </tr>
@@ -154,40 +169,87 @@ export default async function BasicInfoListPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {mappedBasicInfoList.map((basicInfo) => (
                   <tr key={basicInfo.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-900">
                         {basicInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-xs text-gray-500">
                         {basicInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{basicInfo.dance_style || '未入力'}</div>
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-900">{basicInfo.dance_style || '未入力'}</div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{basicInfo.category_division || '未入力'}</div>
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-900">{basicInfo.category_division || '未入力'}</div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{basicInfo.representative_name || '未入力'}</div>
                         <div className="text-gray-500">{basicInfo.representative_furigana || ''}</div>
                         <div className="text-gray-500">{basicInfo.representative_email || ''}</div>
+                        <div className="text-gray-500">生年月日: {basicInfo.representative_birthdate || '未入力'}</div>
+                        <div className="text-gray-500">ローマ字: {basicInfo.representative_romaji || '未入力'}</div>
+                        <div className="text-gray-500">本名: {basicInfo.real_name || '未入力'}</div>
+                        <div className="text-gray-500">本名カナ: {basicInfo.real_name_kana || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{basicInfo.partner_name || '未入力'}</div>
                         <div className="text-gray-500">{basicInfo.partner_furigana || ''}</div>
+                        <div className="text-gray-500">生年月日: {basicInfo.partner_birthdate || '未入力'}</div>
+                        <div className="text-gray-500">ローマ字: {basicInfo.partner_romaji || '未入力'}</div>
+                        <div className="text-gray-500">本名: {basicInfo.partner_real_name || '未入力'}</div>
+                        <div className="text-gray-500">本名カナ: {basicInfo.partner_real_name_kana || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
-                        <div>{basicInfo.emergency_contact_name_1 || '未入力'}</div>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">電話: {basicInfo.phone_number || '未入力'}</div>
+                        <div className="text-gray-500">メール: {basicInfo.representative_email || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{basicInfo.emergency_contact_name_1 || '未入力'}</div>
                         <div className="text-gray-500">{basicInfo.emergency_contact_phone_1 || ''}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{basicInfo.emergency_contact_name_2 || '未入力'}</div>
+                        <div className="text-gray-500">{basicInfo.emergency_contact_phone_2 || ''}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{basicInfo.guardian_name || '未入力'}</div>
+                        <div className="text-gray-500">{basicInfo.guardian_phone || ''}</div>
+                        <div className="text-gray-500">{basicInfo.guardian_email || ''}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{basicInfo.partner_guardian_name || '未入力'}</div>
+                        <div className="text-gray-500">{basicInfo.partner_guardian_phone || ''}</div>
+                        <div className="text-gray-500">{basicInfo.partner_guardian_email || ''}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className={basicInfo.agreement_checked ? 'text-green-600' : 'text-red-600'}>
+                          規約同意: {basicInfo.agreement_checked ? '✓' : '✗'}
+                        </div>
+                        <div className={basicInfo.privacy_policy_checked ? 'text-green-600' : 'text-red-600'}>
+                          個人情報: {basicInfo.privacy_policy_checked ? '✓' : '✗'}
+                        </div>
+                        <div className={basicInfo.media_consent_checked ? 'text-green-600' : 'text-red-600'}>
+                          メディア: {basicInfo.media_consent_checked ? '✓' : '✗'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
                       <div className="space-y-1">
                         {(basicInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
                           file.purpose === 'bank_slip'
@@ -208,7 +270,7 @@ export default async function BasicInfoListPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-2 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         basicInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
                         basicInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
