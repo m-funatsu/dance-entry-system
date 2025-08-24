@@ -249,9 +249,9 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {(semifinalsInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
-                          file.purpose.includes('semifinals')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && file.purpose.includes('semifinals')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -263,7 +263,7 @@ export default async function SemifinalsInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!(semifinalsInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => file.purpose.includes('semifinals')) && (
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { purpose?: string }) => file.purpose && file.purpose.includes('semifinals'))) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>

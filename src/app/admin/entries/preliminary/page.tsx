@@ -272,9 +272,9 @@ export default async function PreliminaryInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {(preliminaryInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
+                        {Array.isArray(preliminaryInfo.entry_files) && preliminaryInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
                           file.purpose === 'preliminary'
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -286,7 +286,7 @@ export default async function PreliminaryInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!(preliminaryInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => file.purpose === 'preliminary') && (
+                        {(!Array.isArray(preliminaryInfo.entry_files) || !preliminaryInfo.entry_files.some((file: { purpose?: string }) => file.purpose === 'preliminary')) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>

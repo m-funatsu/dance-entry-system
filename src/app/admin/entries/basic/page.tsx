@@ -285,9 +285,9 @@ export default async function BasicInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {(basicInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
+                        {Array.isArray(basicInfo.entry_files) && basicInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
                           file.purpose === 'bank_slip'
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -299,7 +299,7 @@ export default async function BasicInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!(basicInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => file.purpose === 'bank_slip') && (
+                        {(!Array.isArray(basicInfo.entry_files) || !basicInfo.entry_files.some((file: { purpose?: string }) => file.purpose === 'bank_slip')) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
