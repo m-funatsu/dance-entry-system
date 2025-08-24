@@ -107,9 +107,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         />
       </div>
 
-      {/* 振付変更詳細（常に表示） */}
+      {/* 振付変更（常に表示） */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">振付変更詳細</h4>
+        <h4 className="font-medium mb-4">振付変更</h4>
         <div className="bg-gray-50 p-4 rounded-lg space-y-4">
           <FormField
             label="振付変更部分（曲が始まってから何分何秒の部分か）"
