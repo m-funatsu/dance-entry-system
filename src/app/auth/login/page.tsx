@@ -135,14 +135,14 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div>
           <h1 className="mt-4 sm:mt-6 text-center font-extrabold leading-tight">
-            <div style={{color: '#FFD700', fontSize: '24px'}}>
+            <div style={{color: '#FFD700', fontSize: '36px'}}>
               2025バルカーカップ
             </div>
           </h1>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '24px'}}>
+          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '36px'}}>
             エントリーシステム
           </p>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '14px'}}>
+          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
             ログインしてください
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function LoginPage() {
                   window.location.href = '/auth/reset-password'
                 }}
                 className="bg-transparent border-none cursor-pointer underline"
-                style={{color: 'rgb(217,217,217)', fontSize: '11px'}}
+                style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
               >
                 パスワードを忘れた方はこちら
               </button>
@@ -212,7 +212,7 @@ export default function LoginPage() {
               <p>
                 <span 
                   className="block sm:inline"
-                  style={{color: '#FFD700', fontSize: '11px'}}
+                  style={{color: '#FFD700', fontSize: '16.5px'}}
                 >
                   アカウントをお持ちでない場合は、
                 </span>
@@ -223,7 +223,7 @@ export default function LoginPage() {
                     window.location.href = '/auth/register'
                   }}
                   className="cursor-pointer underline bg-transparent border-none"
-                  style={{color: 'rgb(217,217,217)', fontSize: '11px'}}
+                  style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
                 >
                   新規登録
                 </button>
