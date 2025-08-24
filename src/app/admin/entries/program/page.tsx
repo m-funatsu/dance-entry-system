@@ -115,10 +115,10 @@ export default async function ProgramInfoListPage() {
                   <tr key={programInfo.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {(programInfo.entries as Record<string, unknown>)?.users?.name || '不明なユーザー'}
+                        {(programInfo.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {(programInfo.entries as Record<string, unknown>)?.participant_names || 'エントリー名なし'}
+                        {(programInfo.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -164,11 +164,11 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="space-y-1">
-                        {(programInfo.entry_files as Record<string, unknown>[])?.filter(file => 
+                        {((programInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.filter(file => 
                           file.purpose?.includes('program') || 
                           file.purpose?.includes('semifinal') || 
                           file.purpose?.includes('final')
-                        ).map((file: Record<string, unknown>) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -180,7 +180,7 @@ export default async function ProgramInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!(programInfo.entry_files as Record<string, unknown>[])?.some(file => 
+                        {!((programInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.some(file => 
                           file.purpose?.includes('program') || 
                           file.purpose?.includes('semifinal') || 
                           file.purpose?.includes('final')
@@ -191,15 +191,15 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        (programInfo.entries as Record<string, unknown>)?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        (programInfo.entries as Record<string, unknown>)?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        (programInfo.entries as Record<string, unknown>)?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                        (programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' ? 'bg-green-100 text-green-800' :
+                        (programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        (programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {(programInfo.entries as Record<string, unknown>)?.status === 'pending' && '審査待ち'}
-                        {(programInfo.entries as Record<string, unknown>)?.status === 'submitted' && '提出済み'}
-                        {(programInfo.entries as Record<string, unknown>)?.status === 'selected' && '選考通過'}
-                        {(programInfo.entries as Record<string, unknown>)?.status === 'rejected' && '不選考'}
+                        {(programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'pending' && '審査待ち'}
+                        {(programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' && '提出済み'}
+                        {(programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' && '選考通過'}
+                        {(programInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' && '不選考'}
                       </span>
                     </td>
                   </tr>
