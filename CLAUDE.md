@@ -2,6 +2,15 @@
 
 This file contains important information for Claude Code when working on this dance entry management system.
 
+# ═══════════════════════════════════════════════════
+# SuperClaude Framework Components
+# ═══════════════════════════════════════════════════
+
+# Core Framework
+@FLAGS.md
+@PRINCIPLES.md
+@RULES.md
+
 ## 重要な指示 / Important Instructions
 
 1. **言語設定 / Language Setting**
