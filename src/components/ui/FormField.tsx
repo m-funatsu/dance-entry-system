@@ -21,7 +21,7 @@ export const FormField = memo<FormFieldProps>(({
   min,
   max
 }) => {
-  const baseInputClass = `w-full px-3 py-2 border rounded-md shadow-sm text-black font-medium focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+  const baseInputClass = `w-full px-3 py-2 border rounded-md shadow-sm text-black font-medium placeholder-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
     disabled ? 'bg-gray-300 cursor-not-allowed' : ''
   } ${error ? 'border-red-300' : 'border-gray-300'} ${className}`
 
