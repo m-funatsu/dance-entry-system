@@ -202,21 +202,28 @@ export default function LoginPage() {
                   console.log('🔸 [LOGIN] パスワード忘れリンククリック')
                   window.location.href = '/auth/reset-password'
                 }}
-                className="font-medium text-indigo-600 hover:text-indigo-500 bg-transparent border-none cursor-pointer underline"
+                className="bg-transparent border-none cursor-pointer underline"
+                style={{color: 'rgb(217,217,217)', fontSize: '11px'}}
               >
                 パスワードを忘れた方はこちら
               </button>
             </div>
             <div>
-              <p className="text-sm sm:text-sm text-gray-600">
-                <span className="block sm:inline">アカウントをお持ちでない場合は、</span>
+              <p>
+                <span 
+                  className="block sm:inline"
+                  style={{color: '#FFD700', fontSize: '11px'}}
+                >
+                  アカウントをお持ちでない場合は、
+                </span>
                 <button
                   type="button"
                   onClick={() => {
                     console.log('🔸 [LOGIN] 新規登録リンククリック')
                     window.location.href = '/auth/register'
                   }}
-                  className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer underline bg-transparent border-none"
+                  className="cursor-pointer underline bg-transparent border-none"
+                  style={{color: 'rgb(217,217,217)', fontSize: '11px'}}
                 >
                   新規登録
                 </button>
