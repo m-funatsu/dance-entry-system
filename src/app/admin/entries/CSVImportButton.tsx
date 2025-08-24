@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function CSVImportButton() {
@@ -39,82 +38,37 @@ export default function CSVImportButton() {
         return
       }
 
-      const supabase = createClient()
-      let successCount = 0
-      let failedCount = 0
-
-      // 現在のユーザーを取得（インポートしたエントリーに紐付けるため）
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        alert('ログインが必要です')
+      // APIエンドポイント経由でインポート
+      console.log('APIエンドポイント経由でインポート開始 - データ行数:', dataRows.length)
+      
+      const response = await fetch('/api/admin/csv-import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          csvData: dataRows
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        console.error('API error:', result)
+        alert(`インポート処理でエラーが発生しました: ${result.error}`)
         return
       }
-
-      // 基本情報テンプレート（7項目）の処理
-      console.log('処理開始 - データ行数:', dataRows.length)
       
-      for (let i = 0; i < dataRows.length; i++) {
-        const rowData = dataRows[i]
-        console.log(`行${i + 1}を処理中:`, rowData)
-        
-        try {
-          const [danceStyle, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
-          
-          console.log('抽出データ:', {
-            danceStyle,
-            representativeName,
-            representativeFurigana,
-            representativeEmail,
-            phoneNumber,
-            partnerName,
-            partnerFurigana
-          })
-          
-          if (!representativeEmail || !representativeName) {
-            console.error('必須項目が不足:', { representativeEmail, representativeName })
-            alert(`行${i + 1}: 代表者メールと代表者名は必須です`)
-            failedCount++
-            continue
-          }
-          
-          // 簡単なバリデーション
-          if (!representativeEmail.includes('@')) {
-            console.error('無効なメールアドレス:', representativeEmail)
-            alert(`行${i + 1}: 無効なメールアドレス形式です`)
-            failedCount++
-            continue
-          }
-          
-          // 基本情報のみを作成（簡素化）
-          console.log('基本情報作成中...')
-          const { error: basicInfoError } = await supabase
-            .from('basic_info')
-            .insert({
-              dance_style: danceStyle || '',
-              representative_name: representativeName,
-              representative_furigana: representativeFurigana || '',
-              representative_email: representativeEmail,
-              phone_number: phoneNumber || '',
-              partner_name: partnerName || '',
-              partner_furigana: partnerFurigana || ''
-            })
-          
-          if (basicInfoError) {
-            console.error('基本情報作成エラー:', basicInfoError)
-            alert(`行${i + 1}: 基本情報の作成に失敗しました - ${basicInfoError.message}`)
-            failedCount++
-          } else {
-            console.log(`行${i + 1}: 成功`)
-            successCount++
-          }
-        } catch (error) {
-          console.error(`行${i + 1}でエラー:`, error)
-          alert(`行${i + 1}: 処理中にエラーが発生しました`)
-          failedCount++
-        }
+      console.log('インポート結果:', result)
+      setImportResult({ success: result.success, failed: result.failed })
+      
+      // エラーがある場合は表示
+      if (result.errors && result.errors.length > 0) {
+        console.error('インポートエラー詳細:', result.errors)
+        alert(`インポート完了\n成功: ${result.success}件\n失敗: ${result.failed}件\n\nエラー詳細:\n${result.errors.slice(0, 5).join('\n')}`)
+      } else {
+        alert(`インポート完了\n成功: ${result.success}件\n失敗: ${result.failed}件`)
       }
-
-      setImportResult({ success: successCount, failed: failedCount })
       
       // データを再読み込み
       router.refresh()
