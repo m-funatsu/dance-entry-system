@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 export default async function FinalsInfoListPage() {
   const supabase = await createClient()
@@ -75,13 +76,38 @@ export default async function FinalsInfoListPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">決勝情報一覧</h1>
-          <p className="text-gray-600">エントリーの決勝情報をまとめて確認できます</p>
-        </div>
         <AdminLink href="/admin/entries">
-          エントリー一覧に戻る
+          ← エントリー一覧に戻る
         </AdminLink>
+        <div className="flex space-x-4">
+          <DownloadButton
+            data={(finalsInfoList || []).map(item => [
+              item.id,
+              item.entry_id,
+              ((item.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'),
+              ((item.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'),
+              item.work_title || '',
+              item.work_character_story || '',
+              item.music_title || '',
+              item.artist || '',
+              item.props_usage || '',
+              item.music_change ? 'あり' : 'なし',
+              item.sound_change_from_semifinals ? 'あり' : 'なし',
+              item.choreographer_name || '',
+              item.choreographer_furigana || '',
+              item.choreographer_change ? 'あり' : 'なし',
+              item.choreographer_attendance || '',
+              ((item.entries as Record<string, unknown> & { status?: string })?.status || '')
+            ])}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '小道具使用', '楽曲変更', '音響変更', '振付師名', '振付師フリガナ', '振付変更', '振付師出席', 'ステータス']}
+            filename="finals_info"
+          />
+        </div>
+      </div>
+      
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900">決勝情報一覧</h1>
+        <p className="text-gray-600">エントリーの決勝情報をまとめて確認できます（{finalsInfoList?.length || 0}件）</p>
       </div>
 
       {finalsInfoList && finalsInfoList.length > 0 ? (

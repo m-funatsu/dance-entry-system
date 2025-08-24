@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 export default async function ApplicationsInfoListPage() {
   const supabase = await createClient()
@@ -75,13 +76,37 @@ export default async function ApplicationsInfoListPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">各種申請一覧</h1>
-          <p className="text-gray-600">エントリーの各種申請情報をまとめて確認できます</p>
-        </div>
         <AdminLink href="/admin/entries">
-          エントリー一覧に戻る
+          ← エントリー一覧に戻る
         </AdminLink>
+        <div className="flex space-x-4">
+          <DownloadButton
+            data={(applicationsInfoList || []).map(item => [
+              item.id,
+              item.entry_id,
+              ((item.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'),
+              ((item.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'),
+              item.related_ticket_count?.toString() || '0',
+              item.related_ticket_total_amount?.toString() || '0',
+              item.related1_name || '',
+              item.related1_relationship || '',
+              item.companion_total_amount?.toString() || '0',
+              item.companion1_name || '',
+              item.companion1_purpose || '',
+              item.makeup_name || '',
+              item.makeup_name_final || '',
+              item.makeup_preferred_stylist || '',
+              ((item.entries as Record<string, unknown> & { status?: string })?.status || '')
+            ])}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', 'チケット枚数', 'チケット合計金額', '関係者1名前', '関係者1続柄', '同伴者合計金額', '同伴者1名前', '同伴者1目的', '準決勝メイク担当', '決勝メイク担当', 'メイク希望スタイリスト', 'ステータス']}
+            filename="applications_info"
+          />
+        </div>
+      </div>
+      
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900">各種申請一覧</h1>
+        <p className="text-gray-600">エントリーの各種申請情報をまとめて確認できます（{applicationsInfoList?.length || 0}件）</p>
       </div>
 
       {applicationsInfoList && applicationsInfoList.length > 0 ? (
