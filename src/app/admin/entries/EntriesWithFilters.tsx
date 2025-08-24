@@ -124,7 +124,15 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
       <div className="px-4 py-5 sm:p-6">
         {/* カテゴリー別情報一覧へのナビゲーション */}
         <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-900 mb-3">カテゴリー別情報一覧</h3>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-medium text-gray-900">カテゴリー別情報一覧</h3>
+            <Link
+              href="/admin/entries/debug"
+              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border"
+            >
+              🔍 データ確認
+            </Link>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
             <Link
               href="/admin/entries/basic"

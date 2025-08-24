@@ -54,6 +54,8 @@ export default async function BasicInfoListPage() {
   // 管理者クライアントで基本情報を取得
   const adminSupabase = createAdminClient()
   
+  console.log('[BASIC INFO DEBUG] === 基本情報一覧データ取得開始 ===')
+  
   const { data: basicInfoList, error } = await adminSupabase
     .from('basic_info')
     .select(`
@@ -77,6 +79,11 @@ export default async function BasicInfoListPage() {
       )
     `)
     .order('created_at', { ascending: false })
+
+  console.log('[BASIC INFO DEBUG] クエリ実行完了')
+  console.log('[BASIC INFO DEBUG] データ件数:', basicInfoList?.length || 0)
+  console.log('[BASIC INFO DEBUG] エラー:', error)
+  console.log('[BASIC INFO DEBUG] 取得データ:', JSON.stringify(basicInfoList, null, 2))
 
   if (error) {
     console.error('基本情報取得エラー:', error)

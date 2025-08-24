@@ -25,6 +25,8 @@ export default async function PreliminaryInfoListPage() {
   // 管理者クライアントで予選情報を取得
   const adminSupabase = createAdminClient()
   
+  console.log('[PRELIMINARY DEBUG] === 予選情報一覧データ取得開始 ===')
+  
   const { data: preliminaryInfoList, error } = await adminSupabase
     .from('preliminary_info')
     .select(`
@@ -48,6 +50,11 @@ export default async function PreliminaryInfoListPage() {
       )
     `)
     .order('created_at', { ascending: false })
+
+  console.log('[PRELIMINARY DEBUG] クエリ実行完了')
+  console.log('[PRELIMINARY DEBUG] データ件数:', preliminaryInfoList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] エラー:', error)
+  console.log('[PRELIMINARY DEBUG] 取得データ:', JSON.stringify(preliminaryInfoList, null, 2))
 
   if (error) {
     console.error('予選情報取得エラー:', error)
