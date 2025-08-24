@@ -468,6 +468,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 選考ステータス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                参加同意書
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 詳細
               </th>
             </tr>
@@ -511,6 +514,44 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(entry.status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-xs space-y-1">
+                      {(() => {
+                        // basic_infoから同意状況を取得
+                        let basicInfo = null
+                        if (entry.basic_info) {
+                          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+                            basicInfo = entry.basic_info[0]
+                          } else if (!Array.isArray(entry.basic_info)) {
+                            basicInfo = entry.basic_info
+                          }
+                        }
+                        
+                        const agreements = {
+                          agreement: (basicInfo as Record<string, unknown>)?.agreement_checked,
+                          privacy: (basicInfo as Record<string, unknown>)?.privacy_policy_checked,
+                          media: (basicInfo as Record<string, unknown>)?.media_consent_checked
+                        }
+                        
+                        return (
+                          <div className="space-y-1">
+                            <div className={`flex items-center ${agreements.agreement ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className="mr-1">{agreements.agreement ? '✓' : '✗'}</span>
+                              <span>規約同意</span>
+                            </div>
+                            <div className={`flex items-center ${agreements.privacy ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className="mr-1">{agreements.privacy ? '✓' : '✗'}</span>
+                              <span>個人情報</span>
+                            </div>
+                            <div className={`flex items-center ${agreements.media ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className="mr-1">{agreements.media ? '✓' : '✗'}</span>
+                              <span>メディア</span>
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
