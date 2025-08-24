@@ -112,12 +112,28 @@ export default async function AdminDashboardPage() {
     }
   }) || []
 
+  // 予選向け情報（基本情報＋予選情報）が完了しているエントリー数
+  const preliminarySubmitted = entriesWithUsers.filter(e => {
+    const hasBasicInfo = e.basic_info && checkBasicInfoComplete(e.basic_info)
+    const hasPreliminaryInfo = e.preliminary_info && checkPreliminaryInfoComplete(e.preliminary_info, e.entry_files.some((f: { file_type: string; purpose: string }) => f.file_type === 'video' && f.purpose === 'preliminary'))
+    return hasBasicInfo && hasPreliminaryInfo
+  }).length
+  
+  // 本選向け情報（準決勝以降の情報）が完了しているエントリー数
+  const finalsSubmitted = entriesWithUsers.filter(e => {
+    const hasSemifinalsInfo = e.semifinals_info
+    const hasFinalsInfo = e.finals_info
+    const hasApplicationsInfo = e.applications_info
+    const hasSnsInfo = e.sns_info
+    return !!(hasSemifinalsInfo && hasFinalsInfo && hasApplicationsInfo && hasSnsInfo)
+  }).length
+
   const stats = {
     total: entriesWithUsers.length,
-    pending: entriesWithUsers.filter(e => !e.isSubmitted).length,
-    submitted: entriesWithUsers.filter(e => e.isSubmitted).length,
+    preliminarySubmitted: preliminarySubmitted,
     selected: entriesWithUsers.filter(e => e.status === 'selected').length,
     rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
+    finalsSubmitted: finalsSubmitted,
   }
 
   // ダンスジャンル別統計を計算
@@ -195,39 +211,17 @@ export default async function AdminDashboardPage() {
               <div className="p-5">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">{stats.pending}</span>
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">{stats.preliminarySubmitted}</span>
                     </div>
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        未処理
+                        予選向け情報提出状況
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {stats.pending}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">{stats.submitted}</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        提出済み
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {stats.submitted}
+                        {stats.preliminarySubmitted} / {stats.total}
                       </dd>
                     </dl>
                   </div>
@@ -246,7 +240,7 @@ export default async function AdminDashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        選考通過
+                        予選通過数
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
                         {stats.selected}
@@ -268,10 +262,32 @@ export default async function AdminDashboardPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        不選考
+                        予選敗退数
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
                         {stats.rejected}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">{stats.finalsSubmitted}</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        本選向け情報提出状況
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {stats.finalsSubmitted} / {stats.total}
                       </dd>
                     </dl>
                   </div>
