@@ -111,6 +111,21 @@ export default function EntryTable({ entries }: EntryTableProps) {
     const hasFinalsInfo = entry.finals_info && (Array.isArray(entry.finals_info) ? entry.finals_info.length > 0 : !!entry.finals_info)
     const hasApplicationsInfo = entry.applications_info && (Array.isArray(entry.applications_info) ? entry.applications_info.length > 0 : !!entry.applications_info)
     const hasSnsInfo = entry.sns_info && (Array.isArray(entry.sns_info) ? entry.sns_info.length > 0 : !!entry.sns_info)
+    
+    // 参加同意書の状況を確認（基本情報の同意項目で判定）
+    const hasConsentForm = (() => {
+      if (!entry.basic_info) return false
+      let basicInfo = null
+      if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+        basicInfo = entry.basic_info[0]
+      } else if (!Array.isArray(entry.basic_info)) {
+        basicInfo = entry.basic_info
+      }
+      
+      if (!basicInfo) return false
+      const basicInfoRecord = basicInfo as Record<string, unknown>
+      return !!(basicInfoRecord.agreement_checked && basicInfoRecord.privacy_policy_checked && basicInfoRecord.media_consent_checked)
+    })()
 
     // デバッグログ（問題解決後は削除）
     const debugInfo = {
@@ -208,6 +223,11 @@ export default function EntryTable({ entries }: EntryTableProps) {
           hasSnsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
         }`}>
           SNS
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          hasConsentForm ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-400'
+        }`}>
+          同意書
         </span>
       </div>
     )
@@ -468,9 +488,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                 選考ステータス
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                参加同意書
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 詳細
               </th>
             </tr>
@@ -514,44 +531,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(entry.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-xs space-y-1">
-                      {(() => {
-                        // basic_infoから同意状況を取得
-                        let basicInfo = null
-                        if (entry.basic_info) {
-                          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-                            basicInfo = entry.basic_info[0]
-                          } else if (!Array.isArray(entry.basic_info)) {
-                            basicInfo = entry.basic_info
-                          }
-                        }
-                        
-                        const agreements = {
-                          agreement: (basicInfo as Record<string, unknown>)?.agreement_checked,
-                          privacy: (basicInfo as Record<string, unknown>)?.privacy_policy_checked,
-                          media: (basicInfo as Record<string, unknown>)?.media_consent_checked
-                        }
-                        
-                        return (
-                          <div className="space-y-1">
-                            <div className={`flex items-center ${agreements.agreement ? 'text-green-600' : 'text-red-600'}`}>
-                              <span className="mr-1">{agreements.agreement ? '✓' : '✗'}</span>
-                              <span>規約同意</span>
-                            </div>
-                            <div className={`flex items-center ${agreements.privacy ? 'text-green-600' : 'text-red-600'}`}>
-                              <span className="mr-1">{agreements.privacy ? '✓' : '✗'}</span>
-                              <span>個人情報</span>
-                            </div>
-                            <div className={`flex items-center ${agreements.media ? 'text-green-600' : 'text-red-600'}`}>
-                              <span className="mr-1">{agreements.media ? '✓' : '✗'}</span>
-                              <span>メディア</span>
-                            </div>
-                          </div>
-                        )
-                      })()}
-                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
