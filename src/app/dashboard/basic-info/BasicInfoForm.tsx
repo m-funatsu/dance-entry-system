@@ -221,7 +221,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         maxLength: 50,
         pattern: /^[\u30A0-\u30FF\s]+$/,
         custom: (value: unknown) => {
-          if (!value) return 'ペアフリガナは必須です'
+          if (!value) return 'パートナーエントリー名フリガナは必須です'
           const strValue = String(value)
           if (!/^[\u30A0-\u30FF\s]+$/.test(strValue)) {
             return 'カタカナで入力してください'
@@ -299,7 +299,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         required: true,
         custom: (value: unknown) => {
           const strValue = String(value || '')
-          if (!strValue) return 'ペア保護者の電話番号は必須です'
+          if (!strValue) return 'パートナー保護者の電話番号は必須です'
           if (!/^0\d{1,4}-?\d{1,4}-?\d{4}$/.test(strValue)) {
             return '正しい電話番号を入力してください'
           }
@@ -311,7 +311,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         custom: (value: unknown) => {
           const strValue = String(value || '')
-          if (!strValue) return 'ペア保護者のメールアドレスは必須です'
+          if (!strValue) return 'パートナー保護者のメールアドレスは必須です'
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(strValue)) {
             return '正しいメールアドレスを入力してください'
           }
@@ -619,7 +619,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.representative_romaji || errors.representative_romaji}
             />
             <FormField
-              label={`代表者生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
+              label={`生年月日${formData.representative_birthdate ? ` (大会時点: ${calculateAge(formData.representative_birthdate)}歳)` : ''}`}
               name="representative_birthdate"
               type="date"
               value={formData.representative_birthdate || ''}
@@ -630,7 +630,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.representative_birthdate || errors.representative_birthdate}
             />
             <FormField
-              label="ペア氏名"
+              label="パートナーエントリー名"
               name="partner_name"
               value={formData.partner_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_name', e.target.value)}
@@ -638,7 +638,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.partner_name || errors.partner_name}
             />
             <FormField
-              label="ペアフリガナ"
+              label="パートナーエントリー名フリガナ"
               name="partner_furigana"
               value={formData.partner_furigana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_furigana', e.target.value)}
@@ -647,7 +647,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
             <FormField
-              label="ペア氏名ローマ字"
+              label="パートナーエントリー名ローマ字"
               name="partner_romaji"
               value={formData.partner_romaji || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
@@ -656,7 +656,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               error={fieldErrors.partner_romaji || errors.partner_romaji}
             />
             <FormField
-              label={`ペア生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
+              label={`パートナー生年月日${formData.partner_birthdate ? ` (大会時点: ${calculateAge(formData.partner_birthdate)}歳)` : ''}`}
               name="partner_birthdate"
               type="date"
               value={formData.partner_birthdate || ''}
@@ -887,7 +887,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="代表者本名"
+              label="本名"
               name="real_name"
               value={formData.real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
@@ -896,7 +896,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             />
             
             <FormField
-              label="代表者本名カナ"
+              label="本名カナ"
               name="real_name_kana"
               value={formData.real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
@@ -905,7 +905,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             />
             
             <FormField
-              label="ペア本名"
+              label="パートナー本名"
               name="partner_real_name"
               value={formData.partner_real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
@@ -914,7 +914,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             />
             
             <FormField
-              label="ペア本名カナ"
+              label="パートナー本名カナ"
               name="partner_real_name_kana"
               value={formData.partner_real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
@@ -1027,7 +1027,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         {(formData.partner_birthdate && parseInt(calculateAge(formData.partner_birthdate)) < 18) && (
           <div className="border-t pt-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              ペア保護者情報
+              パートナー保護者情報
               <span className="text-sm text-red-500 ml-2">（18歳未満のため必須）</span>
             </h3>
             
@@ -1040,7 +1040,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="ペア保護者氏名"
+                label="パートナー保護者氏名"
                 name="partner_guardian_name"
                 value={formData.partner_guardian_name || ''}
                 onChange={(e) => handleFieldChangeWithValidation('partner_guardian_name', e.target.value)}
@@ -1049,7 +1049,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               />
               
               <FormField
-                label="ペア保護者電話番号"
+                label="パートナー保護者電話番号"
                 name="partner_guardian_phone"
                 type="tel"
                 value={formData.partner_guardian_phone || ''}
@@ -1060,7 +1060,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               />
               
               <FormField
-                label="ペア保護者メールアドレス"
+                label="パートナー保護者メールアドレス"
                 name="partner_guardian_email"
                 type="email"
                 value={formData.partner_guardian_email || ''}
