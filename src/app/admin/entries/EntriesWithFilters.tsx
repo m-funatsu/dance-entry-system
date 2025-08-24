@@ -183,55 +183,63 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
           <h2 className="text-lg leading-6 font-medium text-gray-900">
             全エントリー ({filteredEntries.length}件 / {entries.length}件)
           </h2>
-          <div className="flex items-center space-x-2 flex-wrap gap-2">
-            <div className="flex space-x-2">
-            <select 
-              className="rounded-md border-gray-300 text-sm"
-              value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
-            >
-              <option value="">全ジャンル</option>
-              {availableGenres.map(genre => (
-                <option key={genre} value={genre}>
-                  {genre}
-                </option>
-              ))}
-            </select>
-            <select 
-              className="rounded-md border-gray-300 text-sm"
-              value={formFilter}
-              onChange={(e) => setFormFilter(e.target.value)}
-            >
-              <option value="">全フォーム</option>
-              <optgroup label="提出済み">
-                <option value="has_basic">基本情報あり</option>
-                <option value="has_preliminary">予選情報あり</option>
-                <option value="has_program">プログラム情報あり</option>
-                <option value="has_semifinals">準決勝情報あり</option>
-                <option value="has_finals">決勝情報あり</option>
-                <option value="has_applications">申請情報あり</option>
-                <option value="has_sns">SNS情報あり</option>
-              </optgroup>
-              <optgroup label="未提出">
-                <option value="no_basic">基本情報なし</option>
-                <option value="no_preliminary">予選情報なし</option>
-                <option value="no_program">プログラム情報なし</option>
-                <option value="no_semifinals">準決勝情報なし</option>
-                <option value="no_finals">決勝情報なし</option>
-                <option value="no_applications">申請情報なし</option>
-                <option value="no_sns">SNS情報なし</option>
-              </optgroup>
-            </select>
-            <select 
-              className="rounded-md border-gray-300 text-sm"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">全ステータス</option>
-              <option value="pending">未処理</option>
-              <option value="selected">予選通過</option>
-              <option value="rejected">予選敗退</option>
-            </select>
+          <div className="flex items-center space-x-4 flex-wrap gap-4">
+            <div className="flex flex-col space-y-1">
+              <label className="text-xs font-medium text-gray-700">ジャンル</label>
+              <select 
+                className="rounded-md border-gray-300 text-sm"
+                value={genreFilter}
+                onChange={(e) => setGenreFilter(e.target.value)}
+              >
+                <option value="">全ジャンル</option>
+                {availableGenres.map(genre => (
+                  <option key={genre} value={genre}>
+                    {genre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <label className="text-xs font-medium text-gray-700">提出ステータス</label>
+              <select 
+                className="rounded-md border-gray-300 text-sm"
+                value={formFilter}
+                onChange={(e) => setFormFilter(e.target.value)}
+              >
+                <option value="">全フォーム</option>
+                <optgroup label="提出済み">
+                  <option value="has_basic">基本情報あり</option>
+                  <option value="has_preliminary">予選情報あり</option>
+                  <option value="has_program">プログラム情報あり</option>
+                  <option value="has_semifinals">準決勝情報あり</option>
+                  <option value="has_finals">決勝情報あり</option>
+                  <option value="has_applications">申請情報あり</option>
+                  <option value="has_sns">SNS情報あり</option>
+                </optgroup>
+                <optgroup label="未提出">
+                  <option value="no_basic">基本情報なし</option>
+                  <option value="no_preliminary">予選情報なし</option>
+                  <option value="no_program">プログラム情報なし</option>
+                  <option value="no_semifinals">準決勝情報なし</option>
+                  <option value="no_finals">決勝情報なし</option>
+                  <option value="no_applications">申請情報なし</option>
+                  <option value="no_sns">SNS情報なし</option>
+                </optgroup>
+              </select>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <label className="text-xs font-medium text-gray-700">選考ステータス</label>
+              <select 
+                className="rounded-md border-gray-300 text-sm"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="">全ステータス</option>
+                <option value="pending">未処理</option>
+                <option value="selected">予選通過</option>
+                <option value="rejected">予選敗退</option>
+              </select>
+            </div>
             {(statusFilter || genreFilter || formFilter) && (
               <button
                 onClick={() => {
@@ -244,7 +252,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                 フィルタをクリア
               </button>
             )}
-            </div>
             <div className="flex space-x-2">
               <CSVTemplateButton templateType="basic" />
               <CSVImportButton />
