@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
     finalsSubmitted: finalsSubmitted,
   }
 
-  // ダンスジャンル別統計を計算
+  // ダンスジャンル別統計を計算（エントリー数と予選通過数）
   const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
     let genre = '未分類'
     
@@ -144,14 +144,26 @@ export default async function AdminDashboardPage() {
       genre = entry.basic_info.dance_style as string
     }
     
-    acc[genre] = (acc[genre] || 0) + 1
+    if (!acc[genre]) {
+      acc[genre] = { total: 0, selected: 0 }
+    }
+    
+    acc[genre].total += 1
+    if (entry.status === 'selected') {
+      acc[genre].selected += 1
+    }
+    
     return acc
-  }, {} as Record<string, number>)
+  }, {} as Record<string, { total: number; selected: number }>)
 
   // ダンスジャンル統計を配列に変換してソート
   const danceGenreArray = Object.entries(danceGenreStats)
-    .map(([genre, count]) => ({ genre, count: Number(count) }))
-    .sort((a, b) => b.count - a.count)
+    .map(([genre, stats]) => ({ 
+      genre, 
+      totalCount: (stats as { total: number; selected: number }).total, 
+      selectedCount: (stats as { total: number; selected: number }).selected 
+    }))
+    .sort((a, b) => b.totalCount - a.totalCount)
 
   return (
     <>
@@ -298,25 +310,29 @@ export default async function AdminDashboardPage() {
 
           {/* ダンスジャンル別統計 */}
           <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">ダンスジャンル別エントリー数</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">ダンスジャンル別統計</h2>
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-6">
                 {danceGenreArray.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {danceGenreArray.map(({ genre, count }) => (
-                      <div key={genre} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 truncate" title={genre}>
-                            {genre}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {count}件のエントリー
-                          </div>
+                    {danceGenreArray.map(({ genre, totalCount, selectedCount }) => (
+                      <div key={genre} className="p-4 bg-gray-50 rounded-lg">
+                        <div className="text-sm font-medium text-gray-900 mb-3 truncate" title={genre}>
+                          {genre}
                         </div>
-                        <div className="ml-3 flex-shrink-0">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {count}
-                          </span>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-600">エントリー数：</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              {totalCount}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-600">予選通過数：</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              {selectedCount}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))}
