@@ -132,6 +132,8 @@ export default async function SemifinalsInfoListPage() {
             data={mappedSemifinalsInfoList.map(item => [
               item.id,
               item.entry_id,
+              item.entries?.users?.name || '不明なユーザー',
+              item.entries?.participant_names || 'エントリー名なし',
               item.work_title || '',
               item.work_character_story || '',
               item.music_title || '',
@@ -142,9 +144,18 @@ export default async function SemifinalsInfoListPage() {
               item.choreographer_furigana || '',
               item.bank_name || '',
               item.branch_name || '',
+              item.account_type || '',
+              item.account_number || '',
+              item.account_holder || '',
+              item.revenue_share_percentage_1 || '',
+              item.revenue_share_recipient_1 || '',
+              item.revenue_share_percentage_2 || '',
+              item.revenue_share_recipient_2 || '',
+              item.special_notes || '',
+              item.additional_info || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '収益配分比率1', '収益分配先1', '収益配分比率2', '収益分配先2', '特記事項', '追加情報', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -175,6 +186,12 @@ export default async function SemifinalsInfoListPage() {
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     銀行情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    収益分配情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    特記事項
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
@@ -243,8 +260,39 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">配分比率1: {semifinalsInfo.revenue_share_percentage_1 || '未入力'}%</div>
+                        <div className="text-gray-500">分配先1: {semifinalsInfo.revenue_share_recipient_1 || '未入力'}</div>
+                        {semifinalsInfo.revenue_share_percentage_2 && (
+                          <>
+                            <div className="text-gray-500">配分比率2: {semifinalsInfo.revenue_share_percentage_2}%</div>
+                            <div className="text-gray-500">分配先2: {semifinalsInfo.revenue_share_recipient_2 || ''}</div>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">特記事項:</div>
+                        <div>
+                          {semifinalsInfo.special_notes ? 
+                            `${semifinalsInfo.special_notes.slice(0, 100)}${semifinalsInfo.special_notes.length > 100 ? '...' : ''}` 
+                            : '未入力'}
+                        </div>
+                        {semifinalsInfo.additional_info && (
+                          <>
+                            <div className="text-gray-500 mt-1">追加情報:</div>
+                            <div>
+                              {semifinalsInfo.additional_info.slice(0, 50)}${semifinalsInfo.additional_info.length > 50 ? '...' : ''}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="text-gray-500 mt-1">作成日: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
                         <div className="text-gray-500">更新日: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">エントリーID: {semifinalsInfo.entry_id}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
