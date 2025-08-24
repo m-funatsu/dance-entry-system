@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
       console.log(`API処理 - 行${i + 1}:`, rowData)
       
       try {
-        const [danceGenre, categoryDivision, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
+        // 7項目のCSV（カテゴリー区分なし）に対応
+        const [danceGenre, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
         
-        console.log('API抽出データ:', {
+        console.log('API抽出データ（7項目）:', {
           danceGenre,
-          categoryDivision,
           representativeName,
           representativeFurigana,
           representativeEmail: `"${representativeEmail}"`,
@@ -58,17 +58,17 @@ export async function POST(request: NextRequest) {
         // 文字列のトリムとクリーンアップ
         const cleanEmail = String(representativeEmail || '').trim().replace(/["\r\n]/g, '')
         const cleanName = String(representativeName || '').trim().replace(/["\r\n]/g, '')
-        const cleanCategory = String(categoryDivision || '').trim().replace(/["\r\n]/g, '')
         const cleanGenre = String(danceGenre || '').trim().replace(/["\r\n]/g, '')
+        // カテゴリー区分は外部データにないため、空文字で設定
         
         console.log('クリーンアップ後:', {
           cleanEmail: `"${cleanEmail}"`,
           cleanName: `"${cleanName}"`,
-          cleanCategory: `"${cleanCategory}"`
+          cleanGenre: `"${cleanGenre}"`
         })
         
-        if (!cleanEmail || !cleanName || !cleanCategory) {
-          errors.push(`行${i + 1}: 代表者メール、代表者名、カテゴリー区分は必須です`)
+        if (!cleanEmail || !cleanName) {
+          errors.push(`行${i + 1}: 代表者メール、代表者名は必須です`)
           failedCount++
           continue
         }
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
           .insert({
             entry_id: newEntry.id,
             dance_style: cleanGenre,
-            category_division: cleanCategory,
+            category_division: '',
             representative_name: cleanName,
             representative_furigana: String(representativeFurigana || '').trim().replace(/["\r\n]/g, ''),
             representative_email: cleanEmail,
