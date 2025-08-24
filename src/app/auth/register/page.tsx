@@ -135,34 +135,35 @@ export default function RegisterPage() {
           userMetadata: data.user.user_metadata
         })
         
-        console.log('[REGISTER] プロフィール作成試行開始')
-        // プロフィールをusersテーブルに作成
+        console.log('[REGISTER] プロフィール作成API呼び出し開始')
+        // APIエンドポイント経由でプロフィールを作成
         try {
-          const { data: profileData, error: profileError } = await supabase
-            .from('users')
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                name: name.trim(),
-                role: 'participant',
-              },
-            ])
-            .select()
-          
-          console.log('[REGISTER] プロフィール作成結果:', {
-            profileData,
-            profileError,
-            hasProfileData: !!profileData
+          const profileResponse = await fetch('/api/auth/create-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: data.user.id,
+              email: data.user.email,
+              name: name.trim()
+            })
           })
           
-          if (profileError) {
-            console.error('[REGISTER] プロフィール作成エラー:', profileError)
+          const profileResult = await profileResponse.json()
+          
+          console.log('[REGISTER] プロフィール作成API結果:', {
+            status: profileResponse.status,
+            result: profileResult
+          })
+          
+          if (!profileResponse.ok) {
+            console.error('[REGISTER] プロフィール作成APIエラー:', profileResult)
           } else {
             console.log('[REGISTER] プロフィール作成成功')
           }
         } catch (profileCreateError) {
-          console.error('[REGISTER] プロフィール作成で例外:', profileCreateError)
+          console.error('[REGISTER] プロフィール作成APIで例外:', profileCreateError)
         }
         
         console.log('[REGISTER] 登録完了 - ログインページにリダイレクト')
