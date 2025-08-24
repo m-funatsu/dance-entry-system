@@ -22,7 +22,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 }) => {
   return (
     <div className="space-y-6">
-      <h4 className="font-medium">振付変更情報</h4>
+      <h4 className="font-medium">振付師情報</h4>
       
       {validationErrors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -35,6 +35,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         </div>
       )}
       
+      {/* 振付師の変更選択を最上部に配置 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           振付師の変更 <span className="text-red-500">*</span>
@@ -65,47 +66,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         </div>
       </div>
 
-      {/* 振付変更の詳細情報 */}
-      {choreographerChangeOption === 'different' && (
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-          <h5 className="font-medium text-gray-900">振付変更詳細</h5>
-          
-          <FormField
-            label="振付変更部分（曲が始まってから何分何秒の部分か）"
-            name="choreography_change_timing"
-            value={finalsInfo.choreography_change_timing || ''}
-            onChange={(e) => onChange({ choreography_change_timing: e.target.value })}
-            required
-            placeholder="例：1分30秒〜2分15秒"
-          />
-
-          <FormField
-            label="変更前（準決勝振付）"
-            name="choreography_before_change"
-            type="textarea"
-            value={finalsInfo.choreography_before_change || ''}
-            onChange={(e) => onChange({ choreography_before_change: e.target.value })}
-            required
-            rows={3}
-            placeholder="準決勝での振付内容を記載"
-          />
-
-          <FormField
-            label="変更後（決勝振付）"
-            name="choreography_after_change"
-            type="textarea"
-            value={finalsInfo.choreography_after_change || ''}
-            onChange={(e) => onChange({ choreography_after_change: e.target.value })}
-            required
-            rows={3}
-            placeholder="決勝での振付内容を記載"
-          />
-        </div>
-      )}
-
       {/* 振付師情報セクション */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">振付師情報</h4>
+        <h4 className="font-medium mb-4">振付師詳細情報</h4>
         
         <FormField
           label="振付師 氏名①"
@@ -142,6 +105,43 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           disabled={choreographerChangeOption === 'same'}
           placeholder="ひらがなで入力"
         />
+      </div>
+
+      {/* 振付変更詳細（常に表示） */}
+      <div className="border-t pt-6">
+        <h4 className="font-medium mb-4">振付変更詳細</h4>
+        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+          <FormField
+            label="振付変更部分（曲が始まってから何分何秒の部分か）"
+            name="choreography_change_timing"
+            value={finalsInfo.choreography_change_timing || ''}
+            onChange={(e) => onChange({ choreography_change_timing: e.target.value })}
+            required={choreographerChangeOption === 'different'}
+            placeholder="例：1分30秒〜2分15秒"
+          />
+
+          <FormField
+            label="変更前（準決勝振付）"
+            name="choreography_before_change"
+            type="textarea"
+            value={finalsInfo.choreography_before_change || ''}
+            onChange={(e) => onChange({ choreography_before_change: e.target.value })}
+            required={choreographerChangeOption === 'different'}
+            rows={3}
+            placeholder="準決勝での振付内容を記載"
+          />
+
+          <FormField
+            label="変更後（決勝振付）"
+            name="choreography_after_change"
+            type="textarea"
+            value={finalsInfo.choreography_after_change || ''}
+            onChange={(e) => onChange({ choreography_after_change: e.target.value })}
+            required={choreographerChangeOption === 'different'}
+            rows={3}
+            placeholder="決勝での振付内容を記載"
+          />
+        </div>
       </div>
 
       {/* 小道具セクション */}
