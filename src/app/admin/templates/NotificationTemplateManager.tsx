@@ -290,36 +290,37 @@ export default function NotificationTemplateManager() {
                       )}
                     </div>
                   </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {template.subject}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    template.is_active 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {template.is_active ? 'アクティブ' : '無効'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => handleEdit(template)}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium"
-                    >
-                      編集
-                    </button>
-                    <button
-                      onClick={() => handleDelete(template.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
-                    >
-                      削除
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )})}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {template.subject}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      template.is_active 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {template.is_active ? 'アクティブ' : '無効'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => handleEdit(template)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium"
+                      >
+                        編集
+                      </button>
+                      <button
+                        onClick={() => handleDelete(template.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
+                      >
+                        削除
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
 
