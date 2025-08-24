@@ -376,12 +376,23 @@ export default function EntryTable({ entries }: EntryTableProps) {
               </button>
               <button
                 onClick={async () => {
+                  const selectedUsersWithEmails = localEntries
+                    .filter(entry => selectedEntries.includes(entry.id))
+                    .map(entry => ({ email: entry.users.email, name: entry.users.name }))
+                  
+                  // 送信前の確認ポップアップ
+                  const confirmed = confirm(
+                    `選択された ${selectedUsersWithEmails.length} 件のエントリーにウェルカムメールを送信します。\n\n` +
+                    `送信先:\n${selectedUsersWithEmails.map(user => `• ${user.name} (${user.email})`).join('\n')}\n\n` +
+                    `この操作は取り消せません。送信してもよろしいですか？`
+                  )
+                  
+                  if (!confirmed) {
+                    return
+                  }
+                  
                   setLoading(true)
                   try {
-                    const selectedUsersWithEmails = localEntries
-                      .filter(entry => selectedEntries.includes(entry.id))
-                      .map(entry => ({ email: entry.users.email, name: entry.users.name }))
-                    
                     for (const user of selectedUsersWithEmails) {
                       const response = await fetch('/api/admin/send-welcome-email', {
                         method: 'POST',
@@ -396,15 +407,15 @@ export default function EntryTable({ entries }: EntryTableProps) {
                         throw new Error(errorData.error || 'ウェルカムメールの送信に失敗しました')
                       }
                     }
-                    alert(`${selectedUsersWithEmails.length}件のウェルカムメールを送信しました`)
+                    alert(`✅ ${selectedUsersWithEmails.length}件のウェルカムメールを送信しました`)
                   } catch (error) {
                     console.error('Bulk welcome email error:', error)
-                    alert('ウェルカムメールの送信に失敗しました')
+                    alert('❌ ウェルカムメールの送信に失敗しました')
                   } finally {
                     setLoading(false)
                   }
                 }}
-                disabled={loading}
+                disabled={loading || selectedEntries.length === 0}
                 className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
               >
                 ウェルカムメール
