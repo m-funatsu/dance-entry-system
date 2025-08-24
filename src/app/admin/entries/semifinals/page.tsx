@@ -108,18 +108,6 @@ export default async function SemifinalsInfoListPage() {
     return data.publicUrl
   }
 
-  const getFileIcon = (fileType: string, fileName: string) => {
-    if (fileType === 'video' || fileName.includes('.mp4') || fileName.includes('.mov')) {
-      return '🎬'
-    } else if (fileType === 'music' || fileType === 'audio') {
-      return '🎵'
-    } else if (fileType === 'photo') {
-      return '📸'
-    } else if (fileType === 'pdf') {
-      return '📄'
-    }
-    return '📎'
-  }
 
   return (
     <div className="space-y-6">
@@ -147,9 +135,15 @@ export default async function SemifinalsInfoListPage() {
               item.account_type || '',
               item.account_number || '',
               item.account_holder || '',
+              item.revenue_share_percentage_1 || '',
+              item.revenue_share_recipient_1 || '',
+              item.revenue_share_percentage_2 || '',
+              item.revenue_share_recipient_2 || '',
+              item.special_notes || '',
+              item.additional_info || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '収益配分比率1', '収益分配先1', '収益配分比率2', '収益分配先2', '特記事項', '追加情報', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -182,10 +176,25 @@ export default async function SemifinalsInfoListPage() {
                     銀行情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    収益分配情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     音源ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他ファイル
+                    動画ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    画像ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PDFファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    特記事項
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
@@ -247,9 +256,28 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {semifinalsInfo.revenue_share_percentage_1 && (
+                          <div className="text-gray-500">配分1: {semifinalsInfo.revenue_share_percentage_1}%</div>
+                        )}
+                        {semifinalsInfo.revenue_share_recipient_1 && (
+                          <div className="text-gray-500">分配先1: {semifinalsInfo.revenue_share_recipient_1}</div>
+                        )}
+                        {semifinalsInfo.revenue_share_percentage_2 && (
+                          <div className="text-gray-500">配分2: {semifinalsInfo.revenue_share_percentage_2}%</div>
+                        )}
+                        {semifinalsInfo.revenue_share_recipient_2 && (
+                          <div className="text-gray-500">分配先2: {semifinalsInfo.revenue_share_recipient_2}</div>
+                        )}
+                        {!semifinalsInfo.revenue_share_percentage_1 && (
+                          <span className="text-xs text-gray-400">収益分配なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'music' || file.file_type === 'audio' || (file.purpose && file.purpose.includes('music'))
+                          file.file_type === 'music' || file.file_type === 'audio'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -263,17 +291,17 @@ export default async function SemifinalsInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'music' || file.file_type === 'audio' || (file.purpose && file.purpose.includes('music'))
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string }) => 
+                          file.file_type === 'music' || file.file_type === 'audio'
                         )) && (
-                          <span className="text-xs text-gray-400">音源ファイルなし</span>
+                          <span className="text-xs text-gray-400">音源なし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && file.purpose.includes('semifinals') && file.file_type !== 'music' && file.file_type !== 'audio'
+                          file.file_type === 'video'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -282,14 +310,76 @@ export default async function SemifinalsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                              🎬 {file.file_name}
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { purpose?: string; file_type?: string }) => 
-                          file.purpose && file.purpose.includes('semifinals') && file.file_type !== 'music' && file.file_type !== 'audio'
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string }) => 
+                          file.file_type === 'video'
                         )) && (
-                          <span className="text-xs text-gray-400">ファイルなし</span>
+                          <span className="text-xs text-gray-400">動画なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo'
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📸 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string }) => 
+                          file.file_type === 'photo'
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'pdf'
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📄 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string }) => 
+                          file.file_type === 'pdf'
+                        )) && (
+                          <span className="text-xs text-gray-400">PDFなし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {semifinalsInfo.special_notes ? 
+                          `${semifinalsInfo.special_notes.slice(0, 100)}${semifinalsInfo.special_notes.length > 100 ? '...' : ''}` 
+                          : '未入力'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">作成: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">更新: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        {semifinalsInfo.additional_info && (
+                          <div className="text-gray-500 mt-1">追加: {semifinalsInfo.additional_info.slice(0, 30)}...</div>
                         )}
                       </div>
                     </td>
