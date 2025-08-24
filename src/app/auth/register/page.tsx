@@ -88,6 +88,13 @@ export default function RegisterPage() {
       }
       
       console.log('[REGISTER] Supabase認証サインアップ開始')
+      console.log('[REGISTER] サインアップリクエストデータ:', {
+        email: email.trim(),
+        passwordLength: password.length,
+        name: name.trim(),
+        emailValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      })
+      
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -104,11 +111,17 @@ export default function RegisterPage() {
         userId: data?.user?.id,
         hasError: !!error,
         errorMessage: error?.message,
-        errorCode: error?.code || error?.status
+        errorCode: error?.code || error?.status,
+        fullError: error
       })
 
       if (error) {
-        console.error('[REGISTER] Supabase認証エラー:', error)
+        console.error('[REGISTER] Supabase認証エラー詳細:', {
+          message: error.message,
+          code: error.code,
+          status: error.status,
+          fullError: error
+        })
         // エラーメッセージを日本語化
         let errorMessage = '登録に失敗しました'
         if (error.message.includes('User already registered')) {
