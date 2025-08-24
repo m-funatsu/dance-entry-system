@@ -239,11 +239,13 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {(programInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
-                          file.purpose.includes('program') || 
-                          file.purpose.includes('semifinal') || 
-                          file.purpose.includes('final')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
+                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && (
+                            file.purpose.includes('program') || 
+                            file.purpose.includes('semifinal') || 
+                            file.purpose.includes('final')
+                          )
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -255,11 +257,13 @@ export default async function ProgramInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!(programInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => 
-                          file.purpose.includes('program') || 
-                          file.purpose.includes('semifinal') || 
-                          file.purpose.includes('final')
-                        ) && (
+                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && (
+                            file.purpose.includes('program') || 
+                            file.purpose.includes('semifinal') || 
+                            file.purpose.includes('final')
+                          )
+                        )) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
