@@ -35,20 +35,45 @@ export async function POST(request: NextRequest) {
     const errors: string[] = []
 
     // データを処理
+    console.log('受信したCSVデータ:', csvData)
+    
     for (let i = 0; i < csvData.length; i++) {
       const rowData = csvData[i]
+      console.log(`API処理 - 行${i + 1}:`, rowData)
       
       try {
         const [danceStyle, categoryDivision, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
         
-        if (!representativeEmail || !representativeName || !categoryDivision) {
+        console.log('API抽出データ:', {
+          danceStyle,
+          categoryDivision,
+          representativeName,
+          representativeFurigana,
+          representativeEmail: `"${representativeEmail}"`,
+          phoneNumber,
+          partnerName,
+          partnerFurigana
+        })
+        
+        // 文字列のトリムとクリーンアップ
+        const cleanEmail = String(representativeEmail || '').trim().replace(/["\r\n]/g, '')
+        const cleanName = String(representativeName || '').trim().replace(/["\r\n]/g, '')
+        const cleanCategory = String(categoryDivision || '').trim().replace(/["\r\n]/g, '')
+        
+        console.log('クリーンアップ後:', {
+          cleanEmail: `"${cleanEmail}"`,
+          cleanName: `"${cleanName}"`,
+          cleanCategory: `"${cleanCategory}"`
+        })
+        
+        if (!cleanEmail || !cleanName || !cleanCategory) {
           errors.push(`行${i + 1}: 代表者メール、代表者名、カテゴリー区分は必須です`)
           failedCount++
           continue
         }
         
-        if (!representativeEmail.includes('@')) {
-          errors.push(`行${i + 1}: 無効なメールアドレス形式です`)
+        if (!cleanEmail.includes('@')) {
+          errors.push(`行${i + 1}: 無効なメールアドレス形式です (受信値: "${cleanEmail}")`)
           failedCount++
           continue
         }
@@ -57,7 +82,7 @@ export async function POST(request: NextRequest) {
         let { data: targetUser } = await adminSupabase
           .from('users')
           .select('id')
-          .eq('email', representativeEmail)
+          .eq('email', cleanEmail)
           .single()
         
         if (!targetUser) {
@@ -65,8 +90,8 @@ export async function POST(request: NextRequest) {
           const { data: newUser, error: userError } = await adminSupabase
             .from('users')
             .insert({
-              email: representativeEmail,
-              name: representativeName,
+              email: cleanEmail,
+              name: cleanName,
               role: 'participant'
             })
             .select()
@@ -86,8 +111,9 @@ export async function POST(request: NextRequest) {
           continue
         }
         
-        // エントリーを作成
-        const participantNames = partnerName ? `${representativeName} & ${partnerName}` : representativeName
+        // エントリーを作成  
+        const cleanPartnerName = String(partnerName || '').trim().replace(/["\r\n]/g, '')
+        const participantNames = cleanPartnerName ? `${cleanName} & ${cleanPartnerName}` : cleanName
         
         const { data: newEntry, error: entryError } = await adminSupabase
           .from('entries')
@@ -110,14 +136,14 @@ export async function POST(request: NextRequest) {
           .from('basic_info')
           .insert({
             entry_id: newEntry.id,
-            dance_style: danceStyle || '',
-            category_division: categoryDivision,
-            representative_name: representativeName,
-            representative_furigana: representativeFurigana || '',
-            representative_email: representativeEmail,
-            phone_number: phoneNumber || '',
-            partner_name: partnerName || '',
-            partner_furigana: partnerFurigana || ''
+            dance_style: String(danceStyle || '').trim().replace(/["\r\n]/g, ''),
+            category_division: cleanCategory,
+            representative_name: cleanName,
+            representative_furigana: String(representativeFurigana || '').trim().replace(/["\r\n]/g, ''),
+            representative_email: cleanEmail,
+            phone_number: String(phoneNumber || '').trim().replace(/["\r\n]/g, ''),
+            partner_name: cleanPartnerName,
+            partner_furigana: String(partnerFurigana || '').trim().replace(/["\r\n]/g, '')
           })
         
         if (basicInfoError) {
