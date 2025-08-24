@@ -24,14 +24,42 @@ export default function CSVImportButton() {
 
     try {
       const text = await file.text()
-      const rows = text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()))
+      console.log('読み込んだCSVテキスト:', text)
       
-      if (rows.length < 2) {
+      // より正確なCSV解析
+      const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0)
+      console.log('分割された行:', lines)
+      
+      if (lines.length < 2) {
         alert('有効なデータが見つかりませんでした。\nヘッダー行とデータ行が必要です。')
         return
       }
 
-      const dataRows = rows.slice(1).filter(row => row.some(cell => cell.length > 0))
+      const headers = lines[0].split(',').map(cell => cell.replace(/"/g, '').trim())
+      const dataRows = lines.slice(1).map(line => {
+        // CSVの正確な解析（カンマ区切り、引用符処理）
+        const cells = []
+        let current = ''
+        let inQuotes = false
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i]
+          if (char === '"') {
+            inQuotes = !inQuotes
+          } else if (char === ',' && !inQuotes) {
+            cells.push(current.trim())
+            current = ''
+          } else {
+            current += char
+          }
+        }
+        cells.push(current.trim())
+        
+        return cells
+      })
+      
+      console.log('ヘッダー:', headers)
+      console.log('データ行:', dataRows)
       
       if (dataRows.length === 0) {
         alert('データ行が見つかりませんでした')
