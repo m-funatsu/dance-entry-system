@@ -10,6 +10,7 @@ const templates = {
     filename: 'basic_info_template',
     headers: [
       'ダンススタイル',
+      'カテゴリー区分',
       '代表者名',
       '代表者フリガナ',
       '代表者メール',
@@ -19,6 +20,7 @@ const templates = {
     ],
     sampleData: [
       'バレエ',
+      'ジュニア',
       '山田太郎',
       'ヤマダタロウ',
       'yamada@example.com',

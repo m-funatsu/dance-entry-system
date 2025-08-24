@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
       const rowData = csvData[i]
       
       try {
-        const [danceStyle, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
+        const [danceStyle, categoryDivision, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
         
-        if (!representativeEmail || !representativeName) {
-          errors.push(`行${i + 1}: 代表者メールと代表者名は必須です`)
+        if (!representativeEmail || !representativeName || !categoryDivision) {
+          errors.push(`行${i + 1}: 代表者メール、代表者名、カテゴリー区分は必須です`)
           failedCount++
           continue
         }
@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
           .insert({
             entry_id: newEntry.id,
             dance_style: danceStyle || '',
+            category_division: categoryDivision,
             representative_name: representativeName,
             representative_furigana: representativeFurigana || '',
             representative_email: representativeEmail,
