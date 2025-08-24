@@ -166,13 +166,25 @@ export default function RegisterPage() {
         }
         
         console.log('[REGISTER] 登録完了 - ログインページにリダイレクト')
+        
+        // デバッグ用：リダイレクト前にログを確認できるよう一時停止
+        alert('✅ 登録が完了しました！\nコンソールログを確認してから「OK」を押してください。\n\n確認メールをお送りしましたので、メール内のリンクをクリックしてアカウントを有効化してください。')
+        
+        console.log('[REGISTER] === 登録処理完了サマリー ===')
+        console.log('ユーザーID:', data.user.id)
+        console.log('メールアドレス:', data.user.email)
+        console.log('名前:', name.trim())
+        console.log('=================================')
+        
         window.location.href = '/auth/login?message=登録が完了しました。ログインしてください。'
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
+        alert('❌ 登録処理でエラーが発生しました\nコンソールログを確認してください')
         setError('登録処理でエラーが発生しました')
       }
     } catch (error) {
       console.error('[REGISTER] 登録処理で例外発生:', error)
+      alert('❌ 登録に失敗しました\nコンソールログでエラー詳細を確認してください')
       setError('登録に失敗しました')
     } finally {
       console.log('[REGISTER] 登録処理終了')
