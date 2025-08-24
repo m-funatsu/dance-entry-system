@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import EntryTable from './EntryTable'
 import CSVExportButton from './CSVExportButton'
 import CSVImportButton from './CSVImportButton'
@@ -121,6 +122,55 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   return (
     <div className="bg-white shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
+        {/* カテゴリー別情報一覧へのナビゲーション */}
+        <div className="mb-6 bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-900 mb-3">カテゴリー別情報一覧</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+            <Link
+              href="/admin/entries/basic"
+              className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              基本情報
+            </Link>
+            <Link
+              href="/admin/entries/preliminary"
+              className="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              予選情報
+            </Link>
+            <Link
+              href="/admin/entries/program"
+              className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              プログラム
+            </Link>
+            <Link
+              href="/admin/entries/semifinals"
+              className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              準決勝
+            </Link>
+            <Link
+              href="/admin/entries/finals"
+              className="text-xs bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              決勝情報
+            </Link>
+            <Link
+              href="/admin/entries/sns"
+              className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              SNS情報
+            </Link>
+            <Link
+              href="/admin/entries/applications"
+              className="text-xs bg-pink-100 hover:bg-pink-200 text-pink-800 px-3 py-2 rounded-md text-center transition-colors"
+            >
+              各種申請
+            </Link>
+          </div>
+        </div>
+
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
           <h2 className="text-lg leading-6 font-medium text-gray-900">
             全エントリー ({filteredEntries.length}件 / {entries.length}件)
