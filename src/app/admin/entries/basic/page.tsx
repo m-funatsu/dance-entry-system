@@ -3,34 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 
-interface BasicInfoWithEntries {
-  id: string
-  entries: {
-    id: string
-    participant_names: string
-    status: string
-    users: {
-      name: string
-      email: string
-    }
-  }
-  entry_files: Array<{
-    id: string
-    file_type: string
-    file_name: string
-    file_path: string
-    purpose: string
-  }>
-  dance_style?: string
-  category_division?: string
-  representative_name?: string
-  representative_furigana?: string
-  representative_email?: string
-  partner_name?: string
-  partner_furigana?: string
-  emergency_contact_name_1?: string
-  emergency_contact_phone_1?: string
-}
 
 export default async function BasicInfoListPage() {
   const supabase = await createClient()
@@ -56,38 +28,67 @@ export default async function BasicInfoListPage() {
   
   console.log('[BASIC INFO DEBUG] === 基本情報一覧データ取得開始 ===')
   
-  const { data: basicInfoList, error } = await adminSupabase
+  // 基本情報とエントリー情報を取得
+  const { data: basicInfoList, error: basicError } = await adminSupabase
     .from('basic_info')
-    .select(`
-      *,
-      entries!inner (
-        id,
-        participant_names,
-        status,
-        user_id,
-        users (
-          name,
-          email
-        )
-      ),
-      entry_files (
-        id,
-        file_type,
-        file_name,
-        file_path,
-        purpose
-      )
-    `)
+    .select('*')
     .order('created_at', { ascending: false })
 
-  console.log('[BASIC INFO DEBUG] クエリ実行完了')
-  console.log('[BASIC INFO DEBUG] データ件数:', basicInfoList?.length || 0)
-  console.log('[BASIC INFO DEBUG] エラー:', error)
-  console.log('[BASIC INFO DEBUG] 取得データ:', JSON.stringify(basicInfoList, null, 2))
+  console.log('[BASIC INFO DEBUG] 基本情報取得完了')
+  console.log('[BASIC INFO DEBUG] 基本情報件数:', basicInfoList?.length || 0)
+  console.log('[BASIC INFO DEBUG] 基本情報エラー:', basicError)
 
-  if (error) {
-    console.error('基本情報取得エラー:', error)
+  if (basicError) {
+    console.error('基本情報取得エラー:', basicError)
+    return <div>基本情報の取得に失敗しました</div>
   }
+
+  // エントリー情報を取得
+  const { data: entriesList, error: entriesError } = await adminSupabase
+    .from('entries')
+    .select('*')
+
+  console.log('[BASIC INFO DEBUG] エントリー情報取得完了')
+  console.log('[BASIC INFO DEBUG] エントリー件数:', entriesList?.length || 0)
+  console.log('[BASIC INFO DEBUG] エントリーエラー:', entriesError)
+
+  // ユーザー情報を取得
+  const { data: usersList, error: usersError } = await adminSupabase
+    .from('users')
+    .select('*')
+
+  console.log('[BASIC INFO DEBUG] ユーザー情報取得完了')
+  console.log('[BASIC INFO DEBUG] ユーザー件数:', usersList?.length || 0)
+  console.log('[BASIC INFO DEBUG] ユーザーエラー:', usersError)
+
+  // ファイル情報を取得
+  const { data: filesList, error: filesError } = await adminSupabase
+    .from('entry_files')
+    .select('*')
+
+  console.log('[BASIC INFO DEBUG] ファイル情報取得完了')
+  console.log('[BASIC INFO DEBUG] ファイル件数:', filesList?.length || 0)
+  console.log('[BASIC INFO DEBUG] ファイルエラー:', filesError)
+
+  // データをマッピング
+  const mappedBasicInfoList = basicInfoList?.map(basicInfo => {
+    const relatedEntry = entriesList?.find(entry => entry.id === basicInfo.entry_id)
+    const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
+    const relatedFiles = filesList?.filter(file => file.entry_id === basicInfo.entry_id)
+    
+    return {
+      ...basicInfo,
+      entries: relatedEntry ? {
+        ...relatedEntry,
+        users: relatedUser
+      } : null,
+      entry_files: relatedFiles || []
+    }
+  })
+
+  console.log('[BASIC INFO DEBUG] マッピング完了')
+  console.log('[BASIC INFO DEBUG] マッピング後データ件数:', mappedBasicInfoList?.length || 0)
+  console.log('[BASIC INFO DEBUG] マッピング後データ:', JSON.stringify(mappedBasicInfoList, null, 2))
 
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
@@ -107,7 +108,7 @@ export default async function BasicInfoListPage() {
         </AdminLink>
       </div>
 
-      {basicInfoList && basicInfoList.length > 0 ? (
+      {mappedBasicInfoList && mappedBasicInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -140,7 +141,7 @@ export default async function BasicInfoListPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {(basicInfoList as BasicInfoWithEntries[]).map((basicInfo) => (
+                {mappedBasicInfoList.map((basicInfo) => (
                   <tr key={basicInfo.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -177,9 +178,9 @@ export default async function BasicInfoListPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="space-y-1">
-                        {basicInfo.entry_files?.filter(file => 
+                        {(basicInfo.entry_files as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose: string }>)?.filter((file: { purpose: string }) => 
                           file.purpose === 'bank_slip'
-                        ).map((file) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -191,7 +192,7 @@ export default async function BasicInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {!basicInfo.entry_files?.some(file => file.purpose === 'bank_slip') && (
+                        {!(basicInfo.entry_files as Array<{ purpose: string }>)?.some((file: { purpose: string }) => file.purpose === 'bank_slip') && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
