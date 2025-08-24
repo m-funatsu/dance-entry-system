@@ -26,51 +26,84 @@ export default async function FinalsInfoListPage() {
   // 管理者クライアントで決勝情報を取得
   const adminSupabase = createAdminClient()
   
-  const { data: finalsInfoList, error } = await adminSupabase
+  console.log('[FINALS DEBUG] === 決勝情報一覧データ取得開始 ===')
+  
+  // 決勝情報を取得
+  const { data: finalsInfoList, error: finalsError } = await adminSupabase
     .from('finals_info')
-    .select(`
-      *,
-      entries!inner (
-        id,
-        participant_names,
-        status,
-        user_id,
-        users (
-          name,
-          email
-        )
-      ),
-      entry_files (
-        id,
-        file_type,
-        file_name,
-        file_path,
-        purpose
-      )
-    `)
+    .select('*')
     .order('created_at', { ascending: false })
 
-  if (error) {
-    console.error('決勝情報取得エラー:', error)
+  console.log('[FINALS DEBUG] 決勝情報取得完了')
+  console.log('[FINALS DEBUG] 決勝情報件数:', finalsInfoList?.length || 0)
+  console.log('[FINALS DEBUG] 決勝情報エラー:', finalsError)
+
+  if (finalsError) {
+    console.error('決勝情報取得エラー:', finalsError)
+    return <div>決勝情報の取得に失敗しました</div>
   }
+
+  // エントリー情報を取得
+  const { data: entriesList, error: entriesError } = await adminSupabase
+    .from('entries')
+    .select('*')
+
+  console.log('[FINALS DEBUG] エントリー情報取得完了')
+  console.log('[FINALS DEBUG] エントリー件数:', entriesList?.length || 0)
+  console.log('[FINALS DEBUG] エントリーエラー:', entriesError)
+
+  // ユーザー情報を取得
+  const { data: usersList, error: usersError } = await adminSupabase
+    .from('users')
+    .select('*')
+
+  console.log('[FINALS DEBUG] ユーザー情報取得完了')
+  console.log('[FINALS DEBUG] ユーザー件数:', usersList?.length || 0)
+  console.log('[FINALS DEBUG] ユーザーエラー:', usersError)
+
+  // ファイル情報を取得
+  const { data: filesList, error: filesError } = await adminSupabase
+    .from('entry_files')
+    .select('*')
+
+  console.log('[FINALS DEBUG] ファイル情報取得完了')
+  console.log('[FINALS DEBUG] ファイル件数:', filesList?.length || 0)
+  console.log('[FINALS DEBUG] ファイルエラー:', filesError)
+
+  // データをマッピング（全データを表示）
+  const mappedFinalsInfoList = finalsInfoList?.map(finalsInfo => {
+    const relatedEntry = entriesList?.find(entry => entry.id === finalsInfo.entry_id)
+    const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
+    const relatedFiles = filesList?.filter(file => file.entry_id === finalsInfo.entry_id)
+    
+    console.log(`[FINALS DEBUG] エントリーID ${finalsInfo.entry_id}:`, {
+      hasEntry: !!relatedEntry,
+      hasUser: !!relatedUser,
+      fileCount: relatedFiles?.length || 0
+    })
+    
+    return {
+      ...finalsInfo,
+      entries: relatedEntry ? {
+        ...relatedEntry,
+        users: relatedUser || { name: '不明なユーザー', email: '不明' }
+      } : { 
+        id: '', 
+        participant_names: 'エントリー情報なし', 
+        status: 'unknown',
+        users: { name: '不明なユーザー', email: '不明' }
+      },
+      entry_files: relatedFiles || []
+    }
+  }) || []
+
+  console.log('[FINALS DEBUG] マッピング完了')
+  console.log('[FINALS DEBUG] マッピング後データ件数:', mappedFinalsInfoList?.length || 0)
 
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
     const { data } = adminSupabase.storage.from('files').getPublicUrl(filePath)
     return data.publicUrl
-  }
-
-  const getFileIcon = (fileType: string, fileName: string) => {
-    if (fileType === 'video' || fileName.includes('.mp4') || fileName.includes('.mov')) {
-      return '🎬'
-    } else if (fileType === 'music' || fileType === 'audio') {
-      return '🎵'
-    } else if (fileType === 'photo') {
-      return '📸'
-    } else if (fileType === 'pdf') {
-      return '📄'
-    }
-    return '📎'
   }
 
   return (
@@ -81,11 +114,11 @@ export default async function FinalsInfoListPage() {
         </AdminLink>
         <div className="flex space-x-4">
           <DownloadButton
-            data={(finalsInfoList || []).map(item => [
+            data={mappedFinalsInfoList.map(item => [
               item.id,
               item.entry_id,
-              ((item.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'),
-              ((item.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'),
+              item.entries?.users?.name || '不明なユーザー',
+              item.entries?.participant_names || 'エントリー名なし',
               item.work_title || '',
               item.work_character_story || '',
               item.music_title || '',
@@ -97,7 +130,7 @@ export default async function FinalsInfoListPage() {
               item.choreographer_furigana || '',
               item.choreographer_change ? 'あり' : 'なし',
               item.choreographer_attendance || '',
-              ((item.entries as Record<string, unknown> & { status?: string })?.status || '')
+              item.entries?.status || ''
             ])}
             headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '小道具使用', '楽曲変更', '音響変更', '振付師名', '振付師フリガナ', '振付変更', '振付師出席', 'ステータス']}
             filename="finals_info"
@@ -107,87 +140,127 @@ export default async function FinalsInfoListPage() {
       
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">決勝情報一覧</h1>
-        <p className="text-gray-600">エントリーの決勝情報をまとめて確認できます（{finalsInfoList?.length || 0}件）</p>
+        <p className="text-gray-600">エントリーの決勝情報をまとめて確認できます（{mappedFinalsInfoList?.length || 0}件）</p>
       </div>
 
-      {finalsInfoList && finalsInfoList.length > 0 ? (
+      {mappedFinalsInfoList && mappedFinalsInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto" style={{maxWidth: '100vw'}}>
+            <table className="divide-y divide-gray-200" style={{minWidth: '1200px', width: 'max-content'}}>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     エントリー名
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     作品情報
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    楽曲・音響情報
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    楽曲情報
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    小道具使用
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    楽曲・音響変更
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     振付師情報
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ファイル
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    音源ファイル
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    動画ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    画像ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PDFファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    その他詳細
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {finalsInfoList.map((finalsInfo) => (
+                {mappedFinalsInfoList.map((finalsInfo) => (
                   <tr key={finalsInfo.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {(finalsInfo.entries as Record<string, unknown> & { users?: { name?: string } })?.users?.name || '不明なユーザー'}
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-900">
+                        {finalsInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {(finalsInfo.entries as Record<string, unknown> & { participant_names?: string })?.participant_names || 'エントリー名なし'}
+                      <div className="text-xs text-gray-500">
+                        {finalsInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{finalsInfo.work_title || '未入力'}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-gray-500 mt-1">
                           {finalsInfo.work_character_story ? 
                             `${finalsInfo.work_character_story.slice(0, 50)}${finalsInfo.work_character_story.length > 50 ? '...' : ''}` 
                             : '未入力'}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          小道具: {finalsInfo.props_usage || '未選択'}
-                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{finalsInfo.music_title || '未入力'}</div>
                         <div className="text-gray-500">{finalsInfo.artist || ''}</div>
-                        <div className="text-xs text-gray-500">
-                          楽曲変更: {finalsInfo.music_change ? 'あり' : 'なし'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          音響変更: {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}
-                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">{finalsInfo.props_usage || '未選択'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">楽曲変更: {finalsInfo.music_change ? 'あり' : 'なし'}</div>
+                        <div className="text-gray-500">音響変更: {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{finalsInfo.choreographer_name || '未入力'}</div>
                         <div className="text-gray-500">{finalsInfo.choreographer_furigana || ''}</div>
-                        <div className="text-xs text-gray-500">
-                          振付変更: {finalsInfo.choreographer_change ? 'あり' : 'なし'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          出席: {finalsInfo.choreographer_attendance || '未選択'}
-                        </div>
+                        <div className="text-gray-500">変更: {finalsInfo.choreographer_change ? 'あり' : 'なし'}</div>
+                        <div className="text-gray-500">出席: {finalsInfo.choreographer_attendance || '未選択'}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {((finalsInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.filter(file => 
-                          file.purpose?.includes('finals')
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                              download
+                            >
+                              🎵 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                        )) && (
+                          <span className="text-xs text-gray-400">音源なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('finals')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -196,26 +269,80 @@ export default async function FinalsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                              🎬 {file.file_name}
                             </a>
                           </div>
                         ))}
-                        {!((finalsInfo.entry_files || []) as Array<{ id: string; file_name: string; file_path: string; file_type: string; purpose?: string }>)?.some(file => file.purpose?.includes('finals')) && (
-                          <span className="text-xs text-gray-400">ファイルなし</span>
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('finals')
+                        )) && (
+                          <span className="text-xs text-gray-400">動画なし</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('finals')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📸 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('finals')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('finals')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📄 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('finals')
+                        )) && (
+                          <span className="text-xs text-gray-400">PDFなし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">作成: {finalsInfo.created_at ? new Date(finalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">更新: {finalsInfo.updated_at ? new Date(finalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        (finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        (finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        (finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                        finalsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
+                        finalsInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        finalsInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {(finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'pending' && '審査待ち'}
-                        {(finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'submitted' && '提出済み'}
-                        {(finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'selected' && '選考通過'}
-                        {(finalsInfo.entries as Record<string, unknown> & { status?: string })?.status === 'rejected' && '不選考'}
+                        {finalsInfo.entries?.status === 'pending' && '審査待ち'}
+                        {finalsInfo.entries?.status === 'submitted' && '提出済み'}
+                        {finalsInfo.entries?.status === 'selected' && '選考通過'}
+                        {finalsInfo.entries?.status === 'rejected' && '不選考'}
                       </span>
                     </td>
                   </tr>
