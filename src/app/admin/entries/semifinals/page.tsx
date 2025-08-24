@@ -142,6 +142,8 @@ export default async function SemifinalsInfoListPage() {
               item.sound_scene2_time || '',
               item.sound_scene3_instruction || '',
               item.sound_scene3_time || '',
+              item.sound_scene4_instruction || '',
+              item.sound_scene4_time || '',
               item.lighting_instruction || '',
               item.lighting_scene1_instruction || '',
               item.lighting_scene1_time || '',
@@ -149,9 +151,11 @@ export default async function SemifinalsInfoListPage() {
               item.lighting_scene2_time || '',
               item.lighting_scene3_instruction || '',
               item.lighting_scene3_time || '',
+              item.lighting_scene4_instruction || '',
+              item.lighting_scene4_time || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響指示全般', '音響シーン1指示', '音響シーン1時間', '音響シーン2指示', '音響シーン2時間', '音響シーン3指示', '音響シーン3時間', '照明指示全般', '照明シーン1指示', '照明シーン1時間', '照明シーン2指示', '照明シーン2時間', '照明シーン3指示', '照明シーン3時間', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響指示全般', '音響シーン1指示', '音響シーン1時間', '音響シーン2指示', '音響シーン2時間', '音響シーン3指示', '音響シーン3時間', '音響シーン4指示', '音響シーン4時間', '照明指示全般', '照明シーン1指示', '照明シーン1時間', '照明シーン2指示', '照明シーン2時間', '照明シーン3指示', '照明シーン3時間', '照明シーン4指示', '照明シーン4時間', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -164,8 +168,8 @@ export default async function SemifinalsInfoListPage() {
 
       {mappedSemifinalsInfoList && mappedSemifinalsInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto" style={{maxWidth: '100vw'}}>
+            <table className="divide-y divide-gray-200" style={{minWidth: '1500px', width: 'max-content'}}>
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -183,11 +187,35 @@ export default async function SemifinalsInfoListPage() {
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     銀行情報
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響指示情報
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    音響全般
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明指示情報
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    音響シーン1
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    音響シーン2
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    音響シーン3
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    音響シーン4
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    照明全般
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    照明シーン1
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    照明シーン2
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    照明シーン3
+                  </th>
+                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    照明シーン4
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     音源ファイル
@@ -263,34 +291,62 @@ export default async function SemifinalsInfoListPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    <td className="px-1 py-2">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">全般指示:</div>
                         <div>{semifinalsInfo.sound_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン1:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.sound_scene1_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.sound_scene1_time || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン2:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.sound_scene2_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.sound_scene2_time || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン3:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.sound_scene3_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.sound_scene3_time || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    <td className="px-1 py-2">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">全般指示:</div>
+                        <div>指示: {semifinalsInfo.sound_scene4_instruction || '未入力'}</div>
+                        <div>時間: {semifinalsInfo.sound_scene4_time || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>{semifinalsInfo.lighting_instruction || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン1:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.lighting_scene1_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.lighting_scene1_time || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン2:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.lighting_scene2_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.lighting_scene2_time || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">シーン3:</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
                         <div>指示: {semifinalsInfo.lighting_scene3_instruction || '未入力'}</div>
                         <div>時間: {semifinalsInfo.lighting_scene3_time || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-1 py-2">
+                      <div className="text-xs text-gray-900">
+                        <div>指示: {semifinalsInfo.lighting_scene4_instruction || '未入力'}</div>
+                        <div>時間: {semifinalsInfo.lighting_scene4_time || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
