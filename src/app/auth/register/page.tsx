@@ -37,47 +37,78 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('[REGISTER] 新規登録開始', { email, name, passwordLength: password.length })
     setLoading(true)
     setError('')
 
+    console.log('[REGISTER] パスワード検証開始')
     // パスワード検証
     const errors = validatePassword(password)
     if (errors.length > 0) {
+      console.log('[REGISTER] パスワード検証エラー:', errors)
       setValidationErrors(errors)
       setLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
+      console.log('[REGISTER] パスワード不一致エラー')
       setError('パスワードが一致しません')
       setLoading(false)
       return
     }
 
     try {
+      console.log('[REGISTER] メール重複チェック開始')
       // メール重複チェック
-      const { data: existingUsers } = await supabase
+      const { data: existingUsers, error: checkError } = await supabase
         .from('users')
         .select('email')
         .eq('email', email.trim())
         .limit(1)
 
+      console.log('[REGISTER] メール重複チェック結果:', { 
+        existingUsers, 
+        checkError,
+        existingCount: existingUsers?.length || 0 
+      })
+
+      if (checkError) {
+        console.error('[REGISTER] メール重複チェックでエラー:', checkError)
+        setError('メール確認中にエラーが発生しました')
+        setLoading(false)
+        return
+      }
+
       if (existingUsers && existingUsers.length > 0) {
+        console.log('[REGISTER] 既存メールアドレス検出')
         setError('このメールアドレスは既に登録されています')
         setLoading(false)
         return
       }
+      
+      console.log('[REGISTER] Supabase認証サインアップ開始')
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
-            name: name,
+            name: name.trim(),
           }
         }
       })
 
+      console.log('[REGISTER] Supabase認証サインアップ結果:', { 
+        hasData: !!data, 
+        hasUser: !!data?.user,
+        userId: data?.user?.id,
+        hasError: !!error,
+        errorMessage: error?.message,
+        errorCode: error?.code || error?.status
+      })
+
       if (error) {
+        console.error('[REGISTER] Supabase認証エラー:', error)
         // エラーメッセージを日本語化
         let errorMessage = '登録に失敗しました'
         if (error.message.includes('User already registered')) {
@@ -91,18 +122,60 @@ export default function RegisterPage() {
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
         }
+        console.log('[REGISTER] 日本語エラーメッセージ:', errorMessage)
         setError(errorMessage)
         return
       }
 
       if (data.user) {
-        // トリガーによってプロフィールが自動作成されるか、
-        // メール確認後にログイン時に作成される
+        console.log('[REGISTER] ユーザー作成成功:', {
+          userId: data.user.id,
+          email: data.user.email,
+          emailConfirmed: data.user.email_confirmed_at,
+          userMetadata: data.user.user_metadata
+        })
+        
+        console.log('[REGISTER] プロフィール作成試行開始')
+        // プロフィールをusersテーブルに作成
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('users')
+            .insert([
+              {
+                id: data.user.id,
+                email: data.user.email,
+                name: name.trim(),
+                role: 'participant',
+              },
+            ])
+            .select()
+          
+          console.log('[REGISTER] プロフィール作成結果:', {
+            profileData,
+            profileError,
+            hasProfileData: !!profileData
+          })
+          
+          if (profileError) {
+            console.error('[REGISTER] プロフィール作成エラー:', profileError)
+          } else {
+            console.log('[REGISTER] プロフィール作成成功')
+          }
+        } catch (profileCreateError) {
+          console.error('[REGISTER] プロフィール作成で例外:', profileCreateError)
+        }
+        
+        console.log('[REGISTER] 登録完了 - ログインページにリダイレクト')
         window.location.href = '/auth/login?message=登録が完了しました。ログインしてください。'
+      } else {
+        console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
+        setError('登録処理でエラーが発生しました')
       }
-    } catch {
+    } catch (error) {
+      console.error('[REGISTER] 登録処理で例外発生:', error)
       setError('登録に失敗しました')
     } finally {
+      console.log('[REGISTER] 登録処理終了')
       setLoading(false)
     }
   }
