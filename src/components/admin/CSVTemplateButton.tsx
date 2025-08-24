@@ -9,7 +9,7 @@ const templates = {
   basic: {
     filename: 'basic_info_template',
     headers: [
-      'ダンススタイル',
+      'ダンスジャンル',
       'カテゴリー区分',
       '代表者名',
       '代表者フリガナ',

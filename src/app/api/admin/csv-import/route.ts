@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
       console.log(`API処理 - 行${i + 1}:`, rowData)
       
       try {
-        const [danceStyle, categoryDivision, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
+        const [danceGenre, categoryDivision, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
         
         console.log('API抽出データ:', {
-          danceStyle,
+          danceGenre,
           categoryDivision,
           representativeName,
           representativeFurigana,
@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
         const cleanEmail = String(representativeEmail || '').trim().replace(/["\r\n]/g, '')
         const cleanName = String(representativeName || '').trim().replace(/["\r\n]/g, '')
         const cleanCategory = String(categoryDivision || '').trim().replace(/["\r\n]/g, '')
+        const cleanGenre = String(danceGenre || '').trim().replace(/["\r\n]/g, '')
         
         console.log('クリーンアップ後:', {
           cleanEmail: `"${cleanEmail}"`,
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
           .from('basic_info')
           .insert({
             entry_id: newEntry.id,
-            dance_style: String(danceStyle || '').trim().replace(/["\r\n]/g, ''),
+            dance_style: cleanGenre,
             category_division: cleanCategory,
             representative_name: cleanName,
             representative_furigana: String(representativeFurigana || '').trim().replace(/["\r\n]/g, ''),
