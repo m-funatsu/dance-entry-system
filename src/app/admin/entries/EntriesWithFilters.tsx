@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import EntryTable from './EntryTable'
-import CSVExportButton from './CSVExportButton'
 import CSVImportButton from './CSVImportButton'
 
 interface EntryWithDetails {
@@ -245,7 +244,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               </button>
             )}
             </div>
-            <CSVExportButton entries={filteredEntries} />
             <CSVImportButton />
           </div>
         </div>
