@@ -151,13 +151,16 @@ export default async function SnsInfoListPage() {
                     SNS備考
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    動画ファイル
+                    練習風景動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    画像ファイル
+                    選手紹介動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PDFファイル
+                    SNS用画像
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    SNS用資料PDF
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
@@ -200,7 +203,7 @@ export default async function SnsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('sns')
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('practice')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -214,9 +217,32 @@ export default async function SnsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('sns')
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('practice')
                         )) && (
-                          <span className="text-xs text-gray-400">動画なし</span>
+                          <span className="text-xs text-gray-400">練習風景動画なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('introduction')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🎬 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          file.file_type === 'video' && file.purpose && file.purpose.includes('introduction')
+                        )) && (
+                          <span className="text-xs text-gray-400">選手紹介動画なし</span>
                         )}
                       </div>
                     </td>
@@ -239,7 +265,7 @@ export default async function SnsInfoListPage() {
                         {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
                           file.file_type === 'photo' && file.purpose && file.purpose.includes('sns')
                         )) && (
-                          <span className="text-xs text-gray-400">画像なし</span>
+                          <span className="text-xs text-gray-400">SNS用画像なし</span>
                         )}
                       </div>
                     </td>
@@ -262,7 +288,7 @@ export default async function SnsInfoListPage() {
                         {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
                           file.file_type === 'pdf' && file.purpose && file.purpose.includes('sns')
                         )) && (
-                          <span className="text-xs text-gray-400">PDFなし</span>
+                          <span className="text-xs text-gray-400">SNS用資料なし</span>
                         )}
                       </div>
                     </td>

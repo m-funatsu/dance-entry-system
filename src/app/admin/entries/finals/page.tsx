@@ -168,16 +168,22 @@ export default async function FinalsInfoListPage() {
                     振付師情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音源ファイル
+                    決勝用音源
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    動画ファイル
+                    決勝用動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    画像ファイル
+                    決勝用画像
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PDFファイル
+                    決勝用資料PDF
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    小道具関連ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    振付師関連ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
@@ -253,7 +259,7 @@ export default async function FinalsInfoListPage() {
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
                           (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
                         )) && (
-                          <span className="text-xs text-gray-400">音源なし</span>
+                          <span className="text-xs text-gray-400">決勝用音源なし</span>
                         )}
                       </div>
                     </td>
@@ -276,7 +282,7 @@ export default async function FinalsInfoListPage() {
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
                           file.file_type === 'video' && file.purpose && file.purpose.includes('finals')
                         )) && (
-                          <span className="text-xs text-gray-400">動画なし</span>
+                          <span className="text-xs text-gray-400">決勝用動画なし</span>
                         )}
                       </div>
                     </td>
@@ -299,14 +305,14 @@ export default async function FinalsInfoListPage() {
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
                           file.file_type === 'photo' && file.purpose && file.purpose.includes('finals')
                         )) && (
-                          <span className="text-xs text-gray-400">画像なし</span>
+                          <span className="text-xs text-gray-400">決勝用画像なし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('finals')
+                          file.file_type === 'pdf' && file.purpose && (file.purpose.includes('finals') && !file.purpose.includes('props') && !file.purpose.includes('choreographer'))
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -320,9 +326,55 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('finals')
+                          file.file_type === 'pdf' && file.purpose && (file.purpose.includes('finals') && !file.purpose.includes('props') && !file.purpose.includes('choreographer'))
                         )) && (
-                          <span className="text-xs text-gray-400">PDFなし</span>
+                          <span className="text-xs text-gray-400">決勝用資料なし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && file.purpose.includes('props')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🎭 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && file.purpose.includes('props')
+                        )) && (
+                          <span className="text-xs text-gray-400">小道具ファイルなし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && file.purpose.includes('choreographer')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              💃 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && file.purpose.includes('choreographer')
+                        )) && (
+                          <span className="text-xs text-gray-400">振付師ファイルなし</span>
                         )}
                       </div>
                     </td>

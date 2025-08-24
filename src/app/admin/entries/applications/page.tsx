@@ -161,13 +161,13 @@ export default async function ApplicationsInfoListPage() {
                     メイク申請
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    動画ファイル
+                    支払い証明書
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    画像ファイル
+                    メイク関連画像
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PDFファイル
+                    申請書類PDF
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
@@ -223,7 +223,7 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                          file.purpose && file.purpose.includes('payment')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -232,21 +232,21 @@ export default async function ApplicationsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              🎬 {file.file_name}
+                              💰 {file.file_name}
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                        {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && file.purpose.includes('payment')
                         )) && (
-                          <span className="text-xs text-gray-400">動画なし</span>
+                          <span className="text-xs text-gray-400">支払い証明書なし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('makeup')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -255,21 +255,21 @@ export default async function ApplicationsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              📸 {file.file_name}
+                              💄 {file.file_name}
                             </a>
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('makeup')
                         )) && (
-                          <span className="text-xs text-gray-400">画像なし</span>
+                          <span className="text-xs text-gray-400">メイク関連画像なし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('applications')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -283,9 +283,9 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && (file.purpose.includes('payment') || file.purpose.includes('makeup') || file.purpose.includes('applications'))
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('applications')
                         )) && (
-                          <span className="text-xs text-gray-400">PDFなし</span>
+                          <span className="text-xs text-gray-400">申請書類なし</span>
                         )}
                       </div>
                     </td>
