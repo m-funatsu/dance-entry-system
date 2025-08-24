@@ -51,90 +51,65 @@ export default function CSVImportButton() {
       }
 
       // 基本情報テンプレート（7項目）の処理
-      for (const rowData of dataRows) {
+      console.log('処理開始 - データ行数:', dataRows.length)
+      
+      for (let i = 0; i < dataRows.length; i++) {
+        const rowData = dataRows[i]
+        console.log(`行${i + 1}を処理中:`, rowData)
+        
         try {
           const [danceStyle, representativeName, representativeFurigana, representativeEmail, phoneNumber, partnerName, partnerFurigana] = rowData
           
+          console.log('抽出データ:', {
+            danceStyle,
+            representativeName,
+            representativeFurigana,
+            representativeEmail,
+            phoneNumber,
+            partnerName,
+            partnerFurigana
+          })
+          
           if (!representativeEmail || !representativeName) {
-            console.error('必須項目が不足しています:', { representativeEmail, representativeName })
+            console.error('必須項目が不足:', { representativeEmail, representativeName })
+            alert(`行${i + 1}: 代表者メールと代表者名は必須です`)
             failedCount++
             continue
           }
           
-          // ユーザーを検索または作成
-          let { data: targetUser } = await supabase
-            .from('users')
-            .select('id')
-            .eq('email', representativeEmail)
-            .single()
-          
-          if (!targetUser) {
-            // ユーザーが存在しない場合は新規作成
-            const { data: newUser, error: userError } = await supabase
-              .from('users')
-              .insert({
-                email: representativeEmail,
-                name: representativeName,
-                role: 'participant'
-              })
-              .select()
-              .single()
-            
-            if (userError) {
-              console.error('ユーザー作成エラー:', userError)
-              failedCount++
-              continue
-            }
-            targetUser = newUser
-          }
-          
-          if (!targetUser) {
-            console.error('ユーザー情報が不正です')
+          // 簡単なバリデーション
+          if (!representativeEmail.includes('@')) {
+            console.error('無効なメールアドレス:', representativeEmail)
+            alert(`行${i + 1}: 無効なメールアドレス形式です`)
             failedCount++
             continue
           }
           
-          // エントリーを作成
-          const participantNames = partnerName ? `${representativeName} & ${partnerName}` : representativeName
-          
-          const { data: newEntry, error: entryError } = await supabase
-            .from('entries')
-            .insert({
-              user_id: targetUser.id,
-              participant_names: participantNames,
-              status: 'pending'
-            })
-            .select()
-            .single()
-          
-          if (entryError || !newEntry) {
-            console.error('エントリー作成エラー:', entryError)
-            failedCount++
-            continue
-          }
-          
-          // 基本情報を作成
+          // 基本情報のみを作成（簡素化）
+          console.log('基本情報作成中...')
           const { error: basicInfoError } = await supabase
             .from('basic_info')
             .insert({
-              entry_id: newEntry.id,
-              dance_style: danceStyle,
+              dance_style: danceStyle || '',
               representative_name: representativeName,
-              representative_furigana: representativeFurigana,
+              representative_furigana: representativeFurigana || '',
               representative_email: representativeEmail,
-              phone_number: phoneNumber,
+              phone_number: phoneNumber || '',
               partner_name: partnerName || '',
               partner_furigana: partnerFurigana || ''
             })
           
           if (basicInfoError) {
             console.error('基本情報作成エラー:', basicInfoError)
+            alert(`行${i + 1}: 基本情報の作成に失敗しました - ${basicInfoError.message}`)
             failedCount++
           } else {
+            console.log(`行${i + 1}: 成功`)
             successCount++
           }
         } catch (error) {
-          console.error('Import error:', error)
+          console.error(`行${i + 1}でエラー:`, error)
+          alert(`行${i + 1}: 処理中にエラーが発生しました`)
           failedCount++
         }
       }
