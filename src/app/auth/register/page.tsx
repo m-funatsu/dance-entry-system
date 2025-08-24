@@ -130,10 +130,12 @@ export default function RegisterPage() {
           errorMessage = 'メールアドレスの確認が完了していません'
         } else if (error.message.includes('Password should be at least')) {
           errorMessage = 'パスワードは8文字以上である必要があります'
-        } else if (error.message.includes('Invalid email')) {
-          errorMessage = '有効なメールアドレスを入力してください'
+        } else if (error.message.includes('Invalid email') || error.message.includes('email_address_invalid') || error.code === 'email_address_invalid') {
+          errorMessage = `無効なメールアドレスです。正しいメールアドレス形式で入力してください。\n入力値: ${email.trim()}`
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+        } else {
+          errorMessage = `登録に失敗しました。\nエラー詳細: ${error.message}`
         }
         console.log('[REGISTER] 日本語エラーメッセージ:', errorMessage)
         setError(errorMessage)
