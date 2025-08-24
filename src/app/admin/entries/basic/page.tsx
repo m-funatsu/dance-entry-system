@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 
 export default async function BasicInfoListPage() {
@@ -114,48 +115,36 @@ export default async function BasicInfoListPage() {
           ← エントリー一覧に戻る
         </AdminLink>
         <div className="flex space-x-4">
-          <button
-            onClick={() => {
-              const csvContent = [
-                ['ID', 'エントリーID', 'ダンスジャンル', 'カテゴリー', '代表者名', '代表者フリガナ', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナー生年月日', '電話番号', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', 'パートナー保護者名', 'パートナー保護者電話', '規約同意', '個人情報同意', 'メディア同意', 'ステータス'],
-                ...mappedBasicInfoList.map(item => [
-                  item.id,
-                  item.entry_id,
-                  item.dance_style || '',
-                  item.category_division || '',
-                  item.representative_name || '',
-                  item.representative_furigana || '',
-                  item.representative_email || '',
-                  item.representative_birthdate || '',
-                  item.partner_name || '',
-                  item.partner_furigana || '',
-                  item.partner_birthdate || '',
-                  item.phone_number || '',
-                  item.emergency_contact_name_1 || '',
-                  item.emergency_contact_phone_1 || '',
-                  item.emergency_contact_name_2 || '',
-                  item.emergency_contact_phone_2 || '',
-                  item.guardian_name || '',
-                  item.guardian_phone || '',
-                  item.partner_guardian_name || '',
-                  item.partner_guardian_phone || '',
-                  item.agreement_checked ? 'Yes' : 'No',
-                  item.privacy_policy_checked ? 'Yes' : 'No',
-                  item.media_consent_checked ? 'Yes' : 'No',
-                  item.entries?.status || ''
-                ])
-              ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = `basic_info_${new Date().toISOString().split('T')[0]}.csv`
-              link.click()
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            📥 CSV ダウンロード
-          </button>
+          <DownloadButton
+            data={mappedBasicInfoList.map(item => [
+              item.id,
+              item.entry_id,
+              item.dance_style || '',
+              item.category_division || '',
+              item.representative_name || '',
+              item.representative_furigana || '',
+              item.representative_email || '',
+              item.representative_birthdate || '',
+              item.partner_name || '',
+              item.partner_furigana || '',
+              item.partner_birthdate || '',
+              item.phone_number || '',
+              item.emergency_contact_name_1 || '',
+              item.emergency_contact_phone_1 || '',
+              item.emergency_contact_name_2 || '',
+              item.emergency_contact_phone_2 || '',
+              item.guardian_name || '',
+              item.guardian_phone || '',
+              item.partner_guardian_name || '',
+              item.partner_guardian_phone || '',
+              item.agreement_checked ? 'Yes' : 'No',
+              item.privacy_policy_checked ? 'Yes' : 'No',
+              item.media_consent_checked ? 'Yes' : 'No',
+              item.entries?.status || ''
+            ])}
+            headers={['ID', 'エントリーID', 'ダンスジャンル', 'カテゴリー', '代表者名', '代表者フリガナ', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナー生年月日', '電話番号', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', 'パートナー保護者名', 'パートナー保護者電話', '規約同意', '個人情報同意', 'メディア同意', 'ステータス']}
+            filename="basic_info"
+          />
         </div>
       </div>
       
