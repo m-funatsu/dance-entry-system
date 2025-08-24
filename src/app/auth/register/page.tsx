@@ -112,14 +112,14 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h1 className="mt-6 text-center font-extrabold leading-tight">
-            <div style={{color: '#FFD700', fontSize: '36px'}}>
+            <div style={{color: 'black', fontSize: '36px'}}>
               2025バルカーカップ
             </div>
           </h1>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '36px'}}>
+          <p className="mt-2 text-center" style={{color: 'black', fontSize: '36px'}}>
             エントリーシステム
           </p>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
+          <p className="mt-2 text-center" style={{color: 'black', fontSize: '21px'}}>
             新規アカウント登録
           </p>
         </div>
