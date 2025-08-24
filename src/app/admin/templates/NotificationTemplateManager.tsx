@@ -24,14 +24,21 @@ export default function NotificationTemplateManager() {
 
   const fetchTemplates = async () => {
     try {
+      console.log('通知テンプレート取得開始...')
       const response = await fetch('/api/admin/notification-templates')
+      console.log('API レスポンス:', response.status, response.statusText)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('取得したテンプレートデータ:', data)
+        console.log('テンプレート件数:', data?.length || 0)
         setTemplates(data)
       } else {
+        console.error('API エラー:', response.status)
         setError('テンプレートの取得に失敗しました')
       }
-    } catch {
+    } catch (error) {
+      console.error('フェッチエラー:', error)
       setError('テンプレートの取得に失敗しました')
     } finally {
       setLoading(false)
@@ -271,16 +278,18 @@ export default function NotificationTemplateManager() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {templates.map((template) => (
-              <tr key={template.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{template.name}</div>
-                    {template.description && (
-                      <div className="text-sm text-gray-500">{template.description}</div>
-                    )}
-                  </div>
-                </td>
+            {templates.map((template) => {
+              console.log('テンプレート描画中:', template.id, template.name)
+              return (
+                <tr key={template.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{template.name}</div>
+                      {template.description && (
+                        <div className="text-sm text-gray-500">{template.description}</div>
+                      )}
+                    </div>
+                  </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {template.subject}
                 </td>
@@ -310,7 +319,8 @@ export default function NotificationTemplateManager() {
                   </div>
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
 
