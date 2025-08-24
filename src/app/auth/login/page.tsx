@@ -86,23 +86,32 @@ export default function LoginPage() {
 
         // プロフィールが存在しない場合は作成
         if (!profile && profileError?.code === 'PGRST116') {
-          console.log('[LOGIN] Creating user profile...')
+          console.log('[LOGIN] Creating user profile via API...')
           const userName = data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'ユーザー'
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                name: userName,
-                role: 'participant',
-              },
-            ])
           
-          if (insertError) {
-            console.log('[LOGIN] Profile creation error:', insertError)
-          } else {
-            console.log('[LOGIN] Profile created successfully')
+          try {
+            const profileResponse = await fetch('/api/auth/create-profile', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: data.user.id,
+                email: data.user.email,
+                name: userName
+              })
+            })
+            
+            const profileResult = await profileResponse.json()
+            console.log('[LOGIN] Profile creation API result:', profileResult)
+            
+            if (!profileResponse.ok) {
+              console.error('[LOGIN] Profile creation API error:', profileResult)
+            } else {
+              console.log('[LOGIN] Profile created successfully via API')
+            }
+          } catch (apiError) {
+            console.error('[LOGIN] Profile creation API exception:', apiError)
           }
         }
 
