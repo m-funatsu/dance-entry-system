@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 
 export default async function SemifinalsInfoListPage() {
@@ -127,37 +128,25 @@ export default async function SemifinalsInfoListPage() {
           ← エントリー一覧に戻る
         </AdminLink>
         <div className="flex space-x-4">
-          <button
-            onClick={() => {
-              const csvContent = [
-                ['ID', 'エントリーID', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', 'ステータス'],
-                ...mappedSemifinalsInfoList.map(item => [
-                  item.id,
-                  item.entry_id,
-                  item.work_title || '',
-                  item.work_character_story || '',
-                  item.music_title || '',
-                  item.artist || '',
-                  item.music_type || '',
-                  item.jasrac_code || '',
-                  item.choreographer_name || '',
-                  item.choreographer_furigana || '',
-                  item.bank_name || '',
-                  item.branch_name || '',
-                  item.entries?.status || ''
-                ])
-              ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = `semifinals_info_${new Date().toISOString().split('T')[0]}.csv`
-              link.click()
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            📥 CSV ダウンロード
-          </button>
+          <DownloadButton
+            data={mappedSemifinalsInfoList.map(item => [
+              item.id,
+              item.entry_id,
+              item.work_title || '',
+              item.work_character_story || '',
+              item.music_title || '',
+              item.artist || '',
+              item.music_type || '',
+              item.jasrac_code || '',
+              item.choreographer_name || '',
+              item.choreographer_furigana || '',
+              item.bank_name || '',
+              item.branch_name || '',
+              item.entries?.status || ''
+            ])}
+            headers={['ID', 'エントリーID', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', 'ステータス']}
+            filename="semifinals_info"
+          />
         </div>
       </div>
       

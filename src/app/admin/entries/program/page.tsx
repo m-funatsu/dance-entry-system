@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 
 export default async function ProgramInfoListPage() {
@@ -127,32 +128,20 @@ export default async function ProgramInfoListPage() {
           ← エントリー一覧に戻る
         </AdminLink>
         <div className="flex space-x-4">
-          <button
-            onClick={() => {
-              const csvContent = [
-                ['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', 'ステータス'],
-                ...mappedProgramInfoList.map(item => [
-                  item.id,
-                  item.entry_id,
-                  item.song_count || '',
-                  item.semifinal_story || '',
-                  item.semifinal_highlight || '',
-                  item.final_story || '',
-                  item.final_highlight || '',
-                  item.entries?.status || ''
-                ])
-              ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = `program_info_${new Date().toISOString().split('T')[0]}.csv`
-              link.click()
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            📥 CSV ダウンロード
-          </button>
+          <DownloadButton
+            data={mappedProgramInfoList.map(item => [
+              item.id,
+              item.entry_id,
+              item.song_count || '',
+              item.semifinal_story || '',
+              item.semifinal_highlight || '',
+              item.final_story || '',
+              item.final_highlight || '',
+              item.entries?.status || ''
+            ])}
+            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', 'ステータス']}
+            filename="program_info"
+          />
         </div>
       </div>
       

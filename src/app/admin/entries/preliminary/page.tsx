@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 
 export default async function PreliminaryInfoListPage() {
@@ -127,43 +128,31 @@ export default async function PreliminaryInfoListPage() {
           ← エントリー一覧に戻る
         </AdminLink>
         <div className="flex space-x-4">
-          <button
-            onClick={() => {
-              const csvContent = [
-                ['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', 'ステータス'],
-                ...mappedPreliminaryInfoList.map(item => [
-                  item.id,
-                  item.entry_id,
-                  item.work_title || '',
-                  item.work_title_kana || '',
-                  item.work_story || '',
-                  item.music_title || '',
-                  item.artist || '',
-                  item.cd_title || '',
-                  item.jasrac_code || '',
-                  item.copyright_permission || '',
-                  item.lyricist || '',
-                  item.composer || '',
-                  item.choreographer1_name || '',
-                  item.choreographer1_furigana || '',
-                  item.choreographer1_copyright || '',
-                  item.choreographer2_name || '',
-                  item.choreographer2_furigana || '',
-                  item.choreographer2_copyright || '',
-                  item.entries?.status || ''
-                ])
-              ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = `preliminary_info_${new Date().toISOString().split('T')[0]}.csv`
-              link.click()
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            📥 CSV ダウンロード
-          </button>
+          <DownloadButton
+            data={mappedPreliminaryInfoList.map(item => [
+              item.id,
+              item.entry_id,
+              item.work_title || '',
+              item.work_title_kana || '',
+              item.work_story || '',
+              item.music_title || '',
+              item.artist || '',
+              item.cd_title || '',
+              item.jasrac_code || '',
+              item.copyright_permission || '',
+              item.lyricist || '',
+              item.composer || '',
+              item.choreographer1_name || '',
+              item.choreographer1_furigana || '',
+              item.choreographer1_copyright || '',
+              item.choreographer2_name || '',
+              item.choreographer2_furigana || '',
+              item.choreographer2_copyright || '',
+              item.entries?.status || ''
+            ])}
+            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', 'ステータス']}
+            filename="preliminary_info"
+          />
         </div>
       </div>
       
