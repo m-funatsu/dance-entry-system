@@ -138,10 +138,14 @@ export default function RegisterPage() {
         console.log('[REGISTER] プロフィール作成API呼び出し開始')
         // APIエンドポイント経由でプロフィールを作成
         try {
+          const session = data.session
+          console.log('[REGISTER] セッション情報:', { hasSession: !!session, accessToken: session?.access_token ? 'あり' : 'なし' })
+          
           const profileResponse = await fetch('/api/auth/create-profile', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': session?.access_token ? `Bearer ${session.access_token}` : '',
             },
             body: JSON.stringify({
               userId: data.user.id,

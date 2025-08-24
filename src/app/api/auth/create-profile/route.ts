@@ -1,15 +1,48 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
     const { userId, email, name } = await request.json()
     
+    console.log('[API] プロフィール作成リクエスト受信:', { userId, email, name })
+    
     if (!userId || !email || !name) {
+      console.log('[API] 必須パラメータ不足')
       return NextResponse.json({ error: '必須パラメータが不足しています' }, { status: 400 })
     }
 
+    // 認証ヘッダーを確認
+    const authHeader = request.headers.get('authorization')
+    console.log('[API] 認証ヘッダー:', authHeader ? 'あり' : 'なし')
+    
+    // 管理者権限または新規登録セッションの確認
+    let hasValidAuth = false
+    
+    if (authHeader) {
+      // セッションがある場合は通常の認証チェック
+      const supabase = await createClient()
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      console.log('[API] セッション認証結果:', { hasUser: !!user, authError, userId: user?.id })
+      
+      if (user && user.id === userId) {
+        hasValidAuth = true
+        console.log('[API] セッション認証成功')
+      }
+    } else {
+      // 新規登録時は管理者権限で直接作成
+      console.log('[API] セッションなし - 管理者権限で直接作成')
+      hasValidAuth = true
+    }
+    
+    if (!hasValidAuth) {
+      console.log('[API] 認証失敗')
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+    }
+
     const adminSupabase = createAdminClient()
+    console.log('[API] 管理者クライアント作成完了')
     
     console.log('[API] プロフィール作成開始:', { userId, email, name })
     
