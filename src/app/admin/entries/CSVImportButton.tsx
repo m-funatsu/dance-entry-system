@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { parseCSV } from '@/lib/csv'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -15,15 +14,30 @@ export default function CSVImportButton() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // ファイル名でテンプレート形式を判定
+    if (!file.name.includes('basic_info_template') && 
+        !file.name.includes('preliminary_info_template') && 
+        !file.name.includes('semifinals_info_template')) {
+      alert('テンプレートファイル名が正しくありません。\nダウンロードしたテンプレートファイルを使用してください。')
+      return
+    }
+
     setIsImporting(true)
     setImportResult(null)
 
     try {
       const text = await file.text()
-      const entries = parseCSV(text)
+      const rows = text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()))
       
-      if (entries.length === 0) {
-        alert('有効なデータが見つかりませんでした')
+      if (rows.length < 2) {
+        alert('有効なデータが見つかりませんでした。\nヘッダー行とデータ行が必要です。')
+        return
+      }
+
+      const dataRows = rows.slice(1).filter(row => row.some(cell => cell.length > 0))
+      
+      if (dataRows.length === 0) {
+        alert('データ行が見つかりませんでした')
         return
       }
 
@@ -38,40 +52,50 @@ export default function CSVImportButton() {
         return
       }
 
-      // バッチでインポート
-      for (const entry of entries) {
+      // 基本情報テンプレートの場合の処理例
+      for (const rowData of dataRows) {
         try {
-          // IDが存在する場合は更新、存在しない場合は新規作成
-          if (entry.id) {
-            // 既存エントリーの更新
+          // サンプル: 基本情報のインポート処理
+          if (file.name.includes('basic_info_template')) {
+            const [userEmail, participantNames] = rowData
+            
+            if (!userEmail || !participantNames) {
+              failedCount++
+              continue
+            }
+            
+            // ユーザーを検索
+            const { data: targetUser } = await supabase
+              .from('users')
+              .select('id')
+              .eq('email', userEmail)
+              .single()
+            
+            if (!targetUser) {
+              console.error('ユーザーが見つかりません:', userEmail)
+              failedCount++
+              continue
+            }
+            
+            // エントリーを作成または更新
             const { error } = await supabase
               .from('entries')
-              .update(entry)
-              .eq('id', entry.id)
+              .upsert({
+                user_id: targetUser.id,
+                participant_names: participantNames,
+                status: 'pending'
+              })
             
             if (error) {
-              console.error('Update error:', error)
+              console.error('Import error:', error)
               failedCount++
             } else {
               successCount++
             }
           } else {
-            // 新規エントリーの作成
-            const { error } = await supabase
-              .from('entries')
-              .insert({
-                ...entry,
-                user_id: user.id,
-                status: entry.status || 'pending',
-                created_at: new Date().toISOString()
-              })
-            
-            if (error) {
-              console.error('Insert error:', error)
-              failedCount++
-            } else {
-              successCount++
-            }
+            // 他のテンプレート形式の場合
+            console.log('未対応のテンプレート形式:', file.name)
+            failedCount++
           }
         } catch (error) {
           console.error('Import error:', error)

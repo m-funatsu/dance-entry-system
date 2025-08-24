@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import EntryTable from './EntryTable'
 import CSVImportButton from './CSVImportButton'
+import CSVTemplateButton from '@/components/admin/CSVTemplateButton'
 
 interface EntryWithDetails {
   id: string
@@ -244,7 +245,10 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               </button>
             )}
             </div>
-            <CSVImportButton />
+            <div className="flex space-x-2">
+              <CSVTemplateButton templateType="basic" />
+              <CSVImportButton />
+            </div>
           </div>
         </div>
         
