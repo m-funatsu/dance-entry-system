@@ -140,16 +140,6 @@ export default async function SemifinalsInfoListPage() {
               item.artist || '',
               item.music_type || '',
               item.jasrac_code || '',
-              item.music_duration || '',
-              item.music_bpm || '',
-              item.music_key || '',
-              item.music_start_time || '',
-              item.music_end_time || '',
-              item.music_fade_in_duration || '',
-              item.music_fade_out_duration || '',
-              item.music_volume_level || '',
-              item.music_equalizer_settings || '',
-              item.music_sound_effects ? 'あり' : 'なし',
               item.choreographer_name || '',
               item.choreographer_furigana || '',
               item.bank_name || '',
@@ -157,59 +147,9 @@ export default async function SemifinalsInfoListPage() {
               item.account_type || '',
               item.account_number || '',
               item.account_holder || '',
-              item.sound_scene1_instruction || '',
-              item.sound_scene1_time || '',
-              item.sound_scene1_cue || '',
-              item.sound_scene1_volume || '',
-              item.sound_scene1_effect || '',
-              item.sound_scene2_instruction || '',
-              item.sound_scene2_time || '',
-              item.sound_scene2_cue || '',
-              item.sound_scene2_volume || '',
-              item.sound_scene2_effect || '',
-              item.sound_scene3_instruction || '',
-              item.sound_scene3_time || '',
-              item.sound_scene3_cue || '',
-              item.sound_scene3_volume || '',
-              item.sound_scene3_effect || '',
-              item.sound_scene4_instruction || '',
-              item.sound_scene4_time || '',
-              item.sound_scene4_cue || '',
-              item.sound_scene4_volume || '',
-              item.sound_scene4_effect || '',
-              item.sound_scene5_instruction || '',
-              item.sound_scene5_time || '',
-              item.sound_scene5_cue || '',
-              item.sound_scene5_volume || '',
-              item.sound_scene5_effect || '',
-              item.lighting_scene1_instruction || '',
-              item.lighting_scene1_time || '',
-              item.lighting_scene1_cue || '',
-              item.lighting_scene1_color || '',
-              item.lighting_scene1_intensity || '',
-              item.lighting_scene2_instruction || '',
-              item.lighting_scene2_time || '',
-              item.lighting_scene2_cue || '',
-              item.lighting_scene2_color || '',
-              item.lighting_scene2_intensity || '',
-              item.lighting_scene3_instruction || '',
-              item.lighting_scene3_time || '',
-              item.lighting_scene3_cue || '',
-              item.lighting_scene3_color || '',
-              item.lighting_scene3_intensity || '',
-              item.lighting_scene4_instruction || '',
-              item.lighting_scene4_time || '',
-              item.lighting_scene4_cue || '',
-              item.lighting_scene4_color || '',
-              item.lighting_scene4_intensity || '',
-              item.lighting_scene5_instruction || '',
-              item.lighting_scene5_time || '',
-              item.lighting_scene5_cue || '',
-              item.lighting_scene5_color || '',
-              item.lighting_scene5_intensity || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '楽曲長', 'BPM', 'キー', '開始時間', '終了時間', 'フェードイン時間', 'フェードアウト時間', '音量レベル', 'イコライザー設定', '効果音', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響シーン1指示', '音響シーン1時間', '音響シーン1きっかけ', '音響シーン1音量', '音響シーン1効果', '音響シーン2指示', '音響シーン2時間', '音響シーン2きっかけ', '音響シーン2音量', '音響シーン2効果', '音響シーン3指示', '音響シーン3時間', '音響シーン3きっかけ', '音響シーン3音量', '音響シーン3効果', '音響シーン4指示', '音響シーン4時間', '音響シーン4きっかけ', '音響シーン4音量', '音響シーン4効果', '音響シーン5指示', '音響シーン5時間', '音響シーン5きっかけ', '音響シーン5音量', '音響シーン5効果', '照明シーン1指示', '照明シーン1時間', '照明シーン1きっかけ', '照明シーン1色', '照明シーン1強度', '照明シーン2指示', '照明シーン2時間', '照明シーン2きっかけ', '照明シーン2色', '照明シーン2強度', '照明シーン3指示', '照明シーン3時間', '照明シーン3きっかけ', '照明シーン3色', '照明シーン3強度', '照明シーン4指示', '照明シーン4時間', '照明シーン4きっかけ', '照明シーン4色', '照明シーン4強度', '照明シーン5指示', '照明シーン5時間', '照明シーン5きっかけ', '照明シーン5色', '照明シーン5強度', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -236,49 +176,16 @@ export default async function SemifinalsInfoListPage() {
                     楽曲情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    楽曲データ詳細
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     振付師情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     銀行情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響シーン1
+                    音源ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響シーン2
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響シーン3
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響シーン4
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音響シーン5
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明シーン1
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明シーン2
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明シーン3
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明シーン4
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    照明シーン5
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ファイル
+                    その他ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
@@ -317,20 +224,6 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">楽曲長: {semifinalsInfo.music_duration || '未入力'}</div>
-                        <div className="text-gray-500">BPM: {semifinalsInfo.music_bpm || '未入力'}</div>
-                        <div className="text-gray-500">キー: {semifinalsInfo.music_key || '未入力'}</div>
-                        <div className="text-gray-500">開始時間: {semifinalsInfo.music_start_time || '未入力'}</div>
-                        <div className="text-gray-500">終了時間: {semifinalsInfo.music_end_time || '未入力'}</div>
-                        <div className="text-gray-500">フェードイン: {semifinalsInfo.music_fade_in_duration || '未入力'}</div>
-                        <div className="text-gray-500">フェードアウト: {semifinalsInfo.music_fade_out_duration || '未入力'}</div>
-                        <div className="text-gray-500">音量レベル: {semifinalsInfo.music_volume_level || '未入力'}</div>
-                        <div className="text-gray-500">イコライザー: {semifinalsInfo.music_equalizer_settings || '未入力'}</div>
-                        <div className="text-gray-500">効果音: {semifinalsInfo.music_sound_effects ? 'あり' : 'なし'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
                         <div className="font-medium">{semifinalsInfo.choreographer_name || '未入力'}</div>
                         <div className="text-gray-500">{semifinalsInfo.choreographer_furigana || ''}</div>
                       </div>
@@ -354,106 +247,33 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.sound_scene1_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene1_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene1_cue || '未入力'}</div>
-                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene1_volume || '未入力'}</div>
-                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene1_effect || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.sound_scene2_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene2_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene2_cue || '未入力'}</div>
-                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene2_volume || '未入力'}</div>
-                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene2_effect || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.sound_scene3_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene3_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene3_cue || '未入力'}</div>
-                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene3_volume || '未入力'}</div>
-                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene3_effect || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.sound_scene4_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene4_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene4_cue || '未入力'}</div>
-                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene4_volume || '未入力'}</div>
-                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene4_effect || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.sound_scene5_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.sound_scene5_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.sound_scene5_cue || '未入力'}</div>
-                        <div className="text-gray-500">音量: {semifinalsInfo.sound_scene5_volume || '未入力'}</div>
-                        <div className="text-gray-500">効果: {semifinalsInfo.sound_scene5_effect || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene1_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene1_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene1_cue || '未入力'}</div>
-                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene1_color || '未入力'}</div>
-                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene1_intensity || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene2_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene2_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene2_cue || '未入力'}</div>
-                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene2_color || '未入力'}</div>
-                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene2_intensity || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene3_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene3_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene3_cue || '未入力'}</div>
-                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene3_color || '未入力'}</div>
-                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene3_intensity || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene4_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene4_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene4_cue || '未入力'}</div>
-                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene4_color || '未入力'}</div>
-                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene4_intensity || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">指示: {semifinalsInfo.lighting_scene5_instruction || '未入力'}</div>
-                        <div className="text-gray-500">時間: {semifinalsInfo.lighting_scene5_time || '未入力'}</div>
-                        <div className="text-gray-500">きっかけ: {semifinalsInfo.lighting_scene5_cue || '未入力'}</div>
-                        <div className="text-gray-500">色: {semifinalsInfo.lighting_scene5_color || '未入力'}</div>
-                        <div className="text-gray-500">強度: {semifinalsInfo.lighting_scene5_intensity || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">作成日: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新日: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">エントリーID: {semifinalsInfo.entry_id}</div>
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'music' || file.file_type === 'audio' || (file.purpose && file.purpose.includes('music'))
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                              download
+                            >
+                              🎵 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
+                          file.file_type === 'music' || file.file_type === 'audio' || (file.purpose && file.purpose.includes('music'))
+                        )) && (
+                          <span className="text-xs text-gray-400">音源ファイルなし</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && file.purpose.includes('semifinals')
+                          file.purpose && file.purpose.includes('semifinals') && file.file_type !== 'music' && file.file_type !== 'audio'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -466,7 +286,9 @@ export default async function SemifinalsInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { purpose?: string }) => file.purpose && file.purpose.includes('semifinals'))) && (
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { purpose?: string; file_type?: string }) => 
+                          file.purpose && file.purpose.includes('semifinals') && file.file_type !== 'music' && file.file_type !== 'audio'
+                        )) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
