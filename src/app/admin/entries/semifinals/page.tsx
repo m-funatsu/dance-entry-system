@@ -149,13 +149,23 @@ export default async function SemifinalsInfoListPage() {
               item.account_holder || '',
               item.revenue_share_percentage_1 || '',
               item.revenue_share_recipient_1 || '',
-              item.revenue_share_percentage_2 || '',
-              item.revenue_share_recipient_2 || '',
+              item.sound_instructions || '',
+              item.sound_cue_sheet || '',
+              item.microphone_requirements || '',
+              item.lighting_instructions || '',
+              item.lighting_cue_sheet || '',
+              item.special_lighting_requirements || '',
+              item.music_duration || '',
+              item.music_bpm || '',
+              item.music_key || '',
+              item.music_tempo_changes ? 'あり' : 'なし',
+              item.music_fade_in ? 'あり' : 'なし',
+              item.music_fade_out ? 'あり' : 'なし',
               item.special_notes || '',
               item.additional_info || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '収益配分比率1', '収益分配先1', '収益配分比率2', '収益分配先2', '特記事項', '追加情報', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '収益配分比率1', '収益分配先1', '収益配分比率2', '収益分配先2', '音響指示', '音響キューシート', 'マイク要件', '照明指示', '照明キューシート', '特殊照明要件', '楽曲長', 'BPM', 'キー', 'テンポ変更', 'フェードイン', 'フェードアウト', '特記事項', '追加情報', 'ステータス']}
             filename="semifinals_info"
           />
         </div>
@@ -188,13 +198,19 @@ export default async function SemifinalsInfoListPage() {
                     銀行情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    音響指示情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    照明指示情報
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    楽曲データ
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     収益分配情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    特記事項
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
+                    特記事項・その他
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ファイル
@@ -260,6 +276,69 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">音響指示:</div>
+                        <div>
+                          {semifinalsInfo.sound_instructions ? 
+                            `${semifinalsInfo.sound_instructions.slice(0, 80)}${semifinalsInfo.sound_instructions.length > 80 ? '...' : ''}` 
+                            : '未入力'}
+                        </div>
+                        {semifinalsInfo.sound_cue_sheet && (
+                          <>
+                            <div className="text-gray-500 mt-1">音響キューシート:</div>
+                            <div>
+                              {semifinalsInfo.sound_cue_sheet.slice(0, 50)}${semifinalsInfo.sound_cue_sheet.length > 50 ? '...' : ''}
+                            </div>
+                          </>
+                        )}
+                        {semifinalsInfo.microphone_requirements && (
+                          <div className="text-gray-500">マイク要件: {semifinalsInfo.microphone_requirements}</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">照明指示:</div>
+                        <div>
+                          {semifinalsInfo.lighting_instructions ? 
+                            `${semifinalsInfo.lighting_instructions.slice(0, 80)}${semifinalsInfo.lighting_instructions.length > 80 ? '...' : ''}` 
+                            : '未入力'}
+                        </div>
+                        {semifinalsInfo.lighting_cue_sheet && (
+                          <>
+                            <div className="text-gray-500 mt-1">照明キューシート:</div>
+                            <div>
+                              {semifinalsInfo.lighting_cue_sheet.slice(0, 50)}${semifinalsInfo.lighting_cue_sheet.length > 50 ? '...' : ''}
+                            </div>
+                          </>
+                        )}
+                        {semifinalsInfo.special_lighting_requirements && (
+                          <div className="text-gray-500">特殊照明: {semifinalsInfo.special_lighting_requirements}</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="text-gray-500">楽曲長:</div>
+                        <div>{semifinalsInfo.music_duration || '未入力'}</div>
+                        {semifinalsInfo.music_bpm && (
+                          <div className="text-gray-500">BPM: {semifinalsInfo.music_bpm}</div>
+                        )}
+                        {semifinalsInfo.music_key && (
+                          <div className="text-gray-500">キー: {semifinalsInfo.music_key}</div>
+                        )}
+                        {semifinalsInfo.music_tempo_changes && (
+                          <div className="text-gray-500">テンポ変更: あり</div>
+                        )}
+                        {semifinalsInfo.music_fade_in && (
+                          <div className="text-gray-500">フェードイン: あり</div>
+                        )}
+                        {semifinalsInfo.music_fade_out && (
+                          <div className="text-gray-500">フェードアウト: あり</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
                         <div className="text-gray-500">配分比率1: {semifinalsInfo.revenue_share_percentage_1 || '未入力'}%</div>
                         <div className="text-gray-500">分配先1: {semifinalsInfo.revenue_share_recipient_1 || '未入力'}</div>
                         {semifinalsInfo.revenue_share_percentage_2 && (
@@ -275,24 +354,19 @@ export default async function SemifinalsInfoListPage() {
                         <div className="text-gray-500">特記事項:</div>
                         <div>
                           {semifinalsInfo.special_notes ? 
-                            `${semifinalsInfo.special_notes.slice(0, 100)}${semifinalsInfo.special_notes.length > 100 ? '...' : ''}` 
+                            `${semifinalsInfo.special_notes.slice(0, 60)}${semifinalsInfo.special_notes.length > 60 ? '...' : ''}` 
                             : '未入力'}
                         </div>
                         {semifinalsInfo.additional_info && (
                           <>
                             <div className="text-gray-500 mt-1">追加情報:</div>
                             <div>
-                              {semifinalsInfo.additional_info.slice(0, 50)}${semifinalsInfo.additional_info.length > 50 ? '...' : ''}
+                              {semifinalsInfo.additional_info.slice(0, 40)}${semifinalsInfo.additional_info.length > 40 ? '...' : ''}
                             </div>
                           </>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500 mt-1">作成日: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新日: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">エントリーID: {semifinalsInfo.entry_id}</div>
+                        <div className="text-gray-500 mt-1">作成: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">更新: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
