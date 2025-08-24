@@ -111,13 +111,15 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            2025 バルカーカップ•ジャパンオープン•ショーダンス選手権
-          </h2>
-          <p className="mt-2 text-center text-lg text-gray-600">
+          <h1 className="mt-6 text-center font-extrabold leading-tight">
+            <div style={{color: '#FFD700', fontSize: '36px'}}>
+              2025バルカーカップ
+            </div>
+          </h1>
+          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '36px'}}>
             エントリーシステム
           </p>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
             新規アカウント登録
           </p>
         </div>
