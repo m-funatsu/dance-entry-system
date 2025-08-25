@@ -150,7 +150,7 @@ export default async function PreliminaryInfoListPage() {
               item.choreographer2_copyright || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', 'ステータス']}
+            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', '選考ステータス']}
             filename="preliminary_info"
           />
         </div>
@@ -168,7 +168,7 @@ export default async function PreliminaryInfoListPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリー名
+                    システム利用者名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     作品情報
@@ -189,10 +189,10 @@ export default async function PreliminaryInfoListPage() {
                     その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ファイル
+                    振込確認用紙
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ステータス
+                    選考ステータス
                   </th>
                 </tr>
               </thead>
