@@ -150,36 +150,23 @@ export default function RegisterPage() {
           userMetadata: data.user.user_metadata
         })
         
-        console.log('[REGISTER] プロフィール作成をスキップ - ログイン時に作成されます')
-        // 新規登録時はプロフィール作成をスキップ
-        // ログイン時にプロフィールが存在しない場合に自動作成される仕組みを利用
-        
         console.log('[REGISTER] 登録完了 - メール確認画面にリダイレクト')
+        console.log('[REGISTER] ⚠️ 警告: Supabaseでメール送信が動作していません')
         
         console.log('[REGISTER] === 登録処理完了サマリー ===')
         console.log('ユーザーID:', data.user.id)
         console.log('メールアドレス:', data.user.email)
         console.log('名前:', name.trim())
+        console.log('email_confirmed_at:', data.user.email_confirmed_at)
         console.log('=================================')
         
-        // リダイレクトURL構築
-        const redirectEmail = data.user.email || email.trim()
-        const redirectUrl = `/auth/confirm-email?email=${encodeURIComponent(redirectEmail)}`
-        console.log('[REGISTER] リダイレクト先URL:', redirectUrl)
-        console.log('[REGISTER] エンコード前email:', redirectEmail)
-        console.log('[REGISTER] エンコード後email:', encodeURIComponent(redirectEmail))
+        // メール確認画面に移動（メール送信問題の説明付き）
+        const redirectUrl = `/auth/confirm-email?email=${encodeURIComponent(data.user.email || email.trim())}`
         
-        // デバッグ用：リダイレクト前にログを確認できるよう一時停止
-        alert(`✅ 登録が完了しました！\nコンソールログを確認してから「OK」を押してください。\n\n確認メールをお送りしましたので、メール確認画面に移動します。\n\nリダイレクト先: ${redirectUrl}`)
+        alert(`✅ 登録が完了しました！\n\n⚠️ 注意: 現在メール送信に問題があります。\nメール確認画面で詳細をご確認ください。`)
         
-        console.log('[REGISTER] window.location.hrefでリダイレクト実行中...')
-        try {
-          window.location.href = redirectUrl
-          console.log('[REGISTER] リダイレクト実行完了')
-        } catch (redirectError) {
-          console.error('[REGISTER] リダイレクトエラー:', redirectError)
-          alert('❌ リダイレクトに失敗しました\n手動で /auth/confirm-email にアクセスしてください')
-        }
+        console.log('[REGISTER] confirm-emailページへリダイレクト')
+        window.location.href = redirectUrl
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
         alert('❌ 登録処理でエラーが発生しました\nコンソールログを確認してください')

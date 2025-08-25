@@ -76,12 +76,22 @@ function ConfirmEmailContent() {
                 </ol>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
-                <p className="text-xs text-gray-600">
-                  <strong>メールが届かない場合：</strong><br />
-                  • スパム・迷惑メールフォルダをご確認ください<br />
-                  • 5-10分程度お待ちください<br />
-                  • それでも届かない場合は、再度新規登録をお試しください
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-xs text-red-600">
+                  <strong>⚠️ 現在メール送信に技術的問題が発生しています</strong><br />
+                  • Supabaseのメール配信設定を調整中です<br />
+                  • <strong>緊急対策：</strong> 登録したメールアドレス・パスワードで<br />
+                    <strong>ログインページから直接ログイン可能です</strong><br />
+                  • ご不便をおかけして申し訳ございません
+                </p>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                <p className="text-xs text-blue-800">
+                  <strong>📋 当面の利用方法：</strong><br />
+                  1. 下の「ログインページに戻る」をクリック<br />
+                  2. 登録したメールアドレスとパスワードでログイン<br />
+                  3. システムを正常にご利用いただけます
                 </p>
               </div>
             </div>
