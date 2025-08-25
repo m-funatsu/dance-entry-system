@@ -207,9 +207,6 @@ export default async function BasicInfoListPage() {
                       <div className="text-xs font-medium text-gray-900">
                         {basicInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
-                      <div className="text-xs text-gray-500">
-                        {basicInfo.entries?.participant_names || 'エントリー名なし'}
-                      </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
                       <div className="text-xs text-gray-900">{basicInfo.dance_style || '未入力'}</div>
@@ -221,7 +218,6 @@ export default async function BasicInfoListPage() {
                       <div className="text-xs text-gray-900">
                         <div className="font-medium">{basicInfo.representative_name || '未入力'}</div>
                         <div className="text-gray-500">{basicInfo.representative_furigana || ''}</div>
-                        <div className="text-gray-500">{basicInfo.representative_email || ''}</div>
                         <div className="text-gray-500">生年月日: {basicInfo.representative_birthdate || '未入力'}</div>
                         <div className="text-gray-500">ローマ字: {basicInfo.representative_romaji || '未入力'}</div>
                         <div className="text-gray-500">本名: {basicInfo.real_name || '未入力'}</div>
