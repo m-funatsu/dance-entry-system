@@ -101,7 +101,14 @@ export default function ResetPasswordPage() {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <div className="text-yellow-800 text-sm">
+                <p className="font-medium">※ 重要なお知らせ</p>
+                <p>パスワードの再発行メールは「noreply@mail.app.supabase」から送信されます。もしメールが受信されない場合は迷惑メールフォルダに自動分類されている可能性があるためご注意ください。</p>
+              </div>
+            </div>
+            
             <button
               onClick={() => {
                 console.log('🔸 [RESET_PASSWORD] ログインページに戻るクリック')
