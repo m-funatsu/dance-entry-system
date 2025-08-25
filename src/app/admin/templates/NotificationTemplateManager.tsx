@@ -224,40 +224,6 @@ export default function NotificationTemplateManager() {
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   placeholder="メール本文を入力してください..."
                 />
-                <div className="mt-2 text-xs text-gray-500 space-y-1">
-                  <p><strong>リンクの挿入方法:</strong></p>
-                  <p>• プレーンテキスト: https://example.com （自動的にリンクになります）</p>
-                  <p>• HTMLリンク: &lt;a href=&quot;https://example.com&quot;&gt;リンクテキスト&lt;/a&gt;</p>
-                  <p>• よく使用するリンク:</p>
-                  <div className="ml-2 space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loginUrl = 'https://dance-entry-system.vercel.app/auth/login'
-                        setFormData(prev => ({
-                          ...prev,
-                          body: prev.body + `\n\nログインページ:\n${loginUrl}\n`
-                        }))
-                      }}
-                      className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
-                    >
-                      ログインページ追加
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const dashboardUrl = 'https://dance-entry-system.vercel.app/dashboard'
-                        setFormData(prev => ({
-                          ...prev,
-                          body: prev.body + `\n\nダッシュボード:\n${dashboardUrl}\n`
-                        }))
-                      }}
-                      className="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200"
-                    >
-                      ダッシュボード追加
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
 
