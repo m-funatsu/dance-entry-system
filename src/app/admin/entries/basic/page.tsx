@@ -123,26 +123,34 @@ export default async function BasicInfoListPage() {
               item.category_division || '',
               item.representative_name || '',
               item.representative_furigana || '',
+              item.representative_romaji || '',
               item.representative_email || '',
               item.representative_birthdate || '',
               item.partner_name || '',
               item.partner_furigana || '',
+              item.partner_romaji || '',
               item.partner_birthdate || '',
               item.phone_number || '',
+              item.real_name || '',
+              item.real_name_kana || '',
+              item.partner_real_name || '',
+              item.partner_real_name_kana || '',
               item.emergency_contact_name_1 || '',
               item.emergency_contact_phone_1 || '',
               item.emergency_contact_name_2 || '',
               item.emergency_contact_phone_2 || '',
               item.guardian_name || '',
               item.guardian_phone || '',
+              item.guardian_email || '',
               item.partner_guardian_name || '',
               item.partner_guardian_phone || '',
+              item.partner_guardian_email || '',
               item.agreement_checked ? 'Yes' : 'No',
               item.privacy_policy_checked ? 'Yes' : 'No',
               item.media_consent_checked ? 'Yes' : 'No',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ダンスジャンル', 'アマプロ区分', '代表者名', '代表者フリガナ', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナー生年月日', '電話番号', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', 'パートナー保護者名', 'パートナー保護者電話', '規約同意', '個人情報同意', 'メディア同意', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ダンスジャンル', 'アマプロ区分', '代表者名', '代表者フリガナ', '代表者ローマ字', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナーローマ字', 'パートナー生年月日', '電話番号', '代表者本名', '代表者本名カナ', 'パートナー本名', 'パートナー本名カナ', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', '保護者メール', 'パートナー保護者名', 'パートナー保護者電話', 'パートナー保護者メール', '規約同意', '個人情報同意', 'メディア同意', 'ステータス']}
             filename="basic_info"
           />
         </div>
