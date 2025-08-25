@@ -139,7 +139,7 @@ export default async function ProgramInfoListPage() {
               item.final_highlight || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', 'ステータス']}
+            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '選考ステータス']}
             filename="program_info"
           />
         </div>

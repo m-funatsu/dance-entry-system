@@ -124,7 +124,7 @@ export default async function SnsInfoListPage() {
               item.sns_notes || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '練習風景動画', '選手紹介動画', 'SNS備考', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '練習風景動画', '選手紹介動画', 'SNS備考', '選考ステータス']}
             filename="sns_info"
           />
         </div>
