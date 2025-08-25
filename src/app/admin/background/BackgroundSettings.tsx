@@ -12,8 +12,6 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
   const [settings, setSettings] = useState(() => ({
     login_background_image: initialSettings.login_background_image || '',
     dashboard_background_image: initialSettings.dashboard_background_image || '',
-    entry_background_image: initialSettings.entry_background_image || '',
-    music_background_image: initialSettings.music_background_image || '',
   }))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -63,12 +61,6 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       if (settings.dashboard_background_image) {
         root.style.setProperty('--dashboard-bg-image', `url(${settings.dashboard_background_image})`)
       }
-      if (settings.entry_background_image) {
-        root.style.setProperty('--entry-bg-image', `url(${settings.entry_background_image})`)
-      }
-      if (settings.music_background_image) {
-        root.style.setProperty('--music-bg-image', `url(${settings.music_background_image})`)
-      }
     }
   }
 
@@ -77,9 +69,7 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
       const root = document.documentElement
       const cssVarMap: Record<string, string> = {
         'login_background_image': '--login-bg-image',
-        'dashboard_background_image': '--dashboard-bg-image',
-        'entry_background_image': '--entry-bg-image',
-        'music_background_image': '--music-bg-image'
+        'dashboard_background_image': '--dashboard-bg-image'
       }
       
       const cssVar = cssVarMap[settingKey]
@@ -172,8 +162,6 @@ export default function BackgroundSettings({ initialSettings }: BackgroundSettin
   const backgroundPages = [
     { key: 'login_background_image', label: 'ログイン画面', description: 'ログインページの背景画像' },
     { key: 'dashboard_background_image', label: 'ダッシュボード画面', description: 'ダッシュボードページの背景画像' },
-    { key: 'entry_background_image', label: 'エントリー画面', description: '基本情報入力ページの背景画像' },
-    { key: 'music_background_image', label: '楽曲情報画面', description: '楽曲情報入力ページの背景画像' },
   ]
 
   return (
