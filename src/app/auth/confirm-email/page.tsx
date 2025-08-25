@@ -2,8 +2,9 @@
 
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
-export default function ConfirmEmailPage() {
+function ConfirmEmailContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
 
@@ -89,5 +90,17 @@ export default function ConfirmEmailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ConfirmEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-lg text-gray-600">読み込み中...</div>
+      </div>
+    }>
+      <ConfirmEmailContent />
+    </Suspense>
   )
 }
