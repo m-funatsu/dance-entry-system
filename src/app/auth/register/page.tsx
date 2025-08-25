@@ -152,75 +152,9 @@ export default function RegisterPage() {
           userMetadata: data.user.user_metadata
         })
         
-        console.log('[REGISTER] 登録完了 - メール確認画面にリダイレクト')
-        console.log('[REGISTER] ⚠️ 警告: Supabaseでメール送信が動作していません')
-        
-        console.log('[REGISTER] === 登録処理完了サマリー ===')
-        console.log('ユーザーID:', data.user.id)
-        console.log('メールアドレス:', data.user.email)
-        console.log('名前:', name.trim())
-        console.log('email_confirmed_at:', data.user.email_confirmed_at)
-        console.log('=================================')
-        
-        // メール確認画面に移動（メール送信問題の説明付き）
+        // メール確認画面にリダイレクト
         const redirectUrl = `/auth/confirm-email?email=${encodeURIComponent(data.user.email || email.trim())}`
-        
-        console.log('[REGISTER] リダイレクト前の現在URL:', window.location.href)
-        console.log('[REGISTER] 構築されたリダイレクトURL:', redirectUrl)
-        
-        alert(`✅ 登録が完了しました！\n\n⚠️ 注意: 現在メール送信に問題があります。\nメール確認画面で詳細をご確認ください。\n\nリダイレクト先: ${redirectUrl}`)
-        
-        console.log('[REGISTER] window.location.href実行直前')
-        console.log('[REGISTER] 実行するURL:', redirectUrl)
-        
-        // 段階的アラートでデバッグ
-        if (confirm(`🔍 デバッグ1: リダイレクト処理を開始します\n\nリダイレクト先: ${redirectUrl}\n\n続行しますか？`)) {
-          console.log('[REGISTER] ユーザーがリダイレクト実行を許可')
-          
-          try {
-            console.log('[REGISTER] リダイレクト実行中...')
-            console.log('[REGISTER] 複数の手法を試します')
-            
-            // 手法1: window.location.href
-            console.log('[REGISTER] 手法1: window.location.href')
-            window.location.href = redirectUrl
-            
-            // 少し待って確認
-            setTimeout(() => {
-              console.log('[REGISTER] 手法1が失敗、手法2を試行')
-              
-              // 手法2: window.location.assign
-              try {
-                console.log('[REGISTER] 手法2: window.location.assign')
-                window.location.assign(redirectUrl)
-                
-                setTimeout(() => {
-                  console.log('[REGISTER] 手法2が失敗、手法3を試行')
-                  
-                  // 手法3: window.location.replace
-                  try {
-                    console.log('[REGISTER] 手法3: window.location.replace')
-                    window.location.replace(redirectUrl)
-                    
-                    setTimeout(() => {
-                      alert('❌ 全てのリダイレクト手法が失敗しました\n\n手動で /auth/confirm-email にアクセスしてください')
-                    }, 1000)
-                  } catch (err) {
-                    console.error('[REGISTER] 手法3エラー:', err)
-                  }
-                }, 1000)
-              } catch (err) {
-                console.error('[REGISTER] 手法2エラー:', err)
-              }
-            }, 1000)
-            
-          } catch (error) {
-            console.error('[REGISTER] リダイレクト初期エラー:', error)
-            alert(`❌ リダイレクト初期エラー: ${error instanceof Error ? error.message : String(error)}`)
-          }
-        } else {
-          alert('❌ デバッグ: リダイレクトをキャンセルしました')
-        }
+        window.location.href = redirectUrl
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
         alert('❌ 登録処理でエラーが発生しました\nコンソールログを確認してください')
