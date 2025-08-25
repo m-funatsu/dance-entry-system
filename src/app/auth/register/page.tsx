@@ -179,17 +179,44 @@ export default function RegisterPage() {
           
           try {
             console.log('[REGISTER] リダイレクト実行中...')
+            console.log('[REGISTER] 複数の手法を試します')
             
-            // 実際にリダイレクト実行
+            // 手法1: window.location.href
+            console.log('[REGISTER] 手法1: window.location.href')
             window.location.href = redirectUrl
             
-            // ここは実行されないはず
-            alert('⚠️ この画面が表示された場合、リダイレクトが失敗しています')
-            console.log('[REGISTER] リダイレクト実行完了（表示されたらおかしい）')
+            // 少し待って確認
+            setTimeout(() => {
+              console.log('[REGISTER] 手法1が失敗、手法2を試行')
+              
+              // 手法2: window.location.assign
+              try {
+                console.log('[REGISTER] 手法2: window.location.assign')
+                window.location.assign(redirectUrl)
+                
+                setTimeout(() => {
+                  console.log('[REGISTER] 手法2が失敗、手法3を試行')
+                  
+                  // 手法3: window.location.replace
+                  try {
+                    console.log('[REGISTER] 手法3: window.location.replace')
+                    window.location.replace(redirectUrl)
+                    
+                    setTimeout(() => {
+                      alert('❌ 全てのリダイレクト手法が失敗しました\n\n手動で /auth/confirm-email にアクセスしてください')
+                    }, 1000)
+                  } catch (err) {
+                    console.error('[REGISTER] 手法3エラー:', err)
+                  }
+                }, 1000)
+              } catch (err) {
+                console.error('[REGISTER] 手法2エラー:', err)
+              }
+            }, 1000)
             
           } catch (error) {
-            console.error('[REGISTER] リダイレクトでエラー:', error)
-            alert(`❌ リダイレクトエラー: ${error instanceof Error ? error.message : String(error)}`)
+            console.error('[REGISTER] リダイレクト初期エラー:', error)
+            alert(`❌ リダイレクト初期エラー: ${error instanceof Error ? error.message : String(error)}`)
           }
         } else {
           alert('❌ デバッグ: リダイレクトをキャンセルしました')
