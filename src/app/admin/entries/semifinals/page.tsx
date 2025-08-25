@@ -173,7 +173,7 @@ export default async function SemifinalsInfoListPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリー名
+                    システム利用者名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     作品情報
