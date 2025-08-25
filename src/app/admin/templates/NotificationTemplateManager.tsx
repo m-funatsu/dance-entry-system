@@ -274,7 +274,7 @@ export default function NotificationTemplateManager() {
                     dangerouslySetInnerHTML={{
                       __html: formData.body
                         .replace(/\n/g, '<br>')
-                        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>')
+                        .replace(/(https?:\/\/[^\s<>()[\]{}]+)(?=[\s<>()[\]{}]|$)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>')
                         .replace(/<a href="([^"]+)">([^<]+)<\/a>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$2</a>')
                     }}
                   />
