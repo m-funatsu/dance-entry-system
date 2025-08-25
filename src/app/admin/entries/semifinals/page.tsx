@@ -120,42 +120,117 @@ export default async function SemifinalsInfoListPage() {
             data={mappedSemifinalsInfoList.map(item => [
               item.id,
               item.entry_id,
-              item.entries?.users?.name || '不明なユーザー',
-              item.entries?.participant_names || 'エントリー名なし',
+              item.entries?.status || '',
+              // 作品情報
+              item.music_change_from_preliminary ? 'Yes' : 'No',
               item.work_title || '',
+              item.work_title_kana || '',
               item.work_character_story || '',
+              // 楽曲著作権関連情報
+              item.copyright_permission || '',
               item.music_title || '',
-              item.artist || '',
-              item.music_type || '',
+              item.cd_title || '',
+              item.record_number || '',
               item.jasrac_code || '',
+              item.music_type || '',
+              item.artist || '',
+              // 音響情報
+              item.music_usage_method || '',
+              item.chaser_song_designation || '',
+              item.fade_out_start_time || '',
+              item.fade_out_complete_time || '',
+              item.dance_start_timing || '',
+              // 照明シーン1
+              item.scene1_time || '',
+              item.scene1_trigger || '',
+              item.scene1_color_type || '',
+              item.scene1_color_other || '',
+              item.scene1_image || '',
+              item.scene1_notes || '',
+              // 照明シーン2
+              item.scene2_time || '',
+              item.scene2_trigger || '',
+              item.scene2_color_type || '',
+              item.scene2_color_other || '',
+              item.scene2_image || '',
+              item.scene2_notes || '',
+              // 照明シーン3
+              item.scene3_time || '',
+              item.scene3_trigger || '',
+              item.scene3_color_type || '',
+              item.scene3_color_other || '',
+              item.scene3_image || '',
+              item.scene3_notes || '',
+              // 振付師情報
               item.choreographer_name || '',
               item.choreographer_furigana || '',
+              // 小道具情報
+              item.props_usage || '',
+              item.props_details || '',
+              // 賞金振込先情報
               item.bank_name || '',
               item.branch_name || '',
               item.account_type || '',
               item.account_number || '',
-              item.account_holder || '',
-              item.sound_instruction || '',
-              item.sound_scene1_instruction || '',
-              item.sound_scene1_time || '',
-              item.sound_scene2_instruction || '',
-              item.sound_scene2_time || '',
-              item.sound_scene3_instruction || '',
-              item.sound_scene3_time || '',
-              item.sound_scene4_instruction || '',
-              item.sound_scene4_time || '',
-              item.lighting_instruction || '',
-              item.lighting_scene1_instruction || '',
-              item.lighting_scene1_time || '',
-              item.lighting_scene2_instruction || '',
-              item.lighting_scene2_time || '',
-              item.lighting_scene3_instruction || '',
-              item.lighting_scene3_time || '',
-              item.lighting_scene4_instruction || '',
-              item.lighting_scene4_time || '',
-              item.entries?.status || ''
+              item.account_holder || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '作品タイトル', '作品ストーリー', '楽曲タイトル', 'アーティスト', '楽曲種別', 'JASRAC作品コード', '振付師名', '振付師フリガナ', '銀行名', '支店名', '口座種別', '口座番号', '口座名義', '音響指示全般', '音響シーン1指示', '音響シーン1時間', '音響シーン2指示', '音響シーン2時間', '音響シーン3指示', '音響シーン3時間', '音響シーン4指示', '音響シーン4時間', '照明指示全般', '照明シーン1指示', '照明シーン1時間', '照明シーン2指示', '照明シーン2時間', '照明シーン3指示', '照明シーン3時間', '照明シーン4指示', '照明シーン4時間', '選考ステータス']}
+            headers={[
+              'ID', 
+              'エントリーID', 
+              '選考ステータス',
+              // 作品情報
+              '予選との楽曲情報の変更',
+              '作品タイトル',
+              '作品タイトル(ふりがな)',
+              '作品キャラクター・ストーリー等',
+              // 楽曲著作権関連情報
+              '楽曲著作権許諾',
+              '使用楽曲タイトル',
+              '収録CDタイトル', 
+              'レコード番号',
+              'JASRAC作品コード',
+              '楽曲種類',
+              'アーティスト',
+              // 音響情報
+              '音楽使用方法',
+              'チェイサー（退場）曲の指定',
+              'フェードアウト開始時間',
+              'フェードアウト完了時間',
+              '踊り出しタイミング',
+              // 照明シーン1
+              '照明シーン1時間',
+              '照明シーン1きっかけ',
+              '照明シーン1色・系統',
+              '照明シーン1色・系統その他',
+              '照明シーン1イメージ',
+              '照明シーン1備考',
+              // 照明シーン2
+              '照明シーン2時間',
+              '照明シーン2きっかけ',
+              '照明シーン2色・系統',
+              '照明シーン2色・系統その他',
+              '照明シーン2イメージ',
+              '照明シーン2備考',
+              // 照明シーン3
+              '照明シーン3時間',
+              '照明シーン3きっかけ',
+              '照明シーン3色・系統',
+              '照明シーン3色・系統その他',
+              '照明シーン3イメージ',
+              '照明シーン3備考',
+              // 振付師情報
+              '振付師名',
+              '振付師フリガナ',
+              // 小道具情報
+              '使用する小道具',
+              '小道具詳細',
+              // 賞金振込先情報
+              '銀行名',
+              '支店名',
+              '口座種類',
+              '口座番号',
+              '口座名義'
+            ]}
             filename="semifinals_info"
           />
         </div>
