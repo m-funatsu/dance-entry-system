@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 
 function ConfirmEmailContent() {
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email') || ''
+  try {
+    const searchParams = useSearchParams()
+    const email = searchParams?.get('email') || ''
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -91,6 +92,22 @@ function ConfirmEmailContent() {
       </div>
     </div>
   )
+  } catch (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-red-600">エラーが発生しました</h2>
+          <p className="mt-2 text-gray-600">ページの読み込み中にエラーが発生しました。</p>
+          <Link
+            href="/auth/register"
+            className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            新規登録に戻る
+          </Link>
+        </div>
+      </div>
+    )
+  }
 }
 
 export default function ConfirmEmailPage() {
