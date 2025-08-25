@@ -269,13 +269,13 @@ export default async function BasicInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
                         <div className={basicInfo.agreement_checked ? 'text-green-600' : 'text-red-600'}>
-                          規約同意: {basicInfo.agreement_checked ? '✓' : '✗'}
+                          参加資格: {basicInfo.agreement_checked ? '✓' : '✗'}
                         </div>
                         <div className={basicInfo.privacy_policy_checked ? 'text-green-600' : 'text-red-600'}>
-                          個人情報: {basicInfo.privacy_policy_checked ? '✓' : '✗'}
+                          プライバシーポリシー: {basicInfo.privacy_policy_checked ? '✓' : '✗'}
                         </div>
                         <div className={basicInfo.media_consent_checked ? 'text-green-600' : 'text-red-600'}>
-                          メディア: {basicInfo.media_consent_checked ? '✓' : '✗'}
+                          写真・映像使用許諾: {basicInfo.media_consent_checked ? '✓' : '✗'}
                         </div>
                       </div>
                     </td>
