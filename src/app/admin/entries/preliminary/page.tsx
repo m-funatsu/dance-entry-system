@@ -177,9 +177,6 @@ export default async function PreliminaryInfoListPage() {
                     楽曲情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    著作権情報
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     振付師1
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -224,17 +221,9 @@ export default async function PreliminaryInfoListPage() {
                         <div className="text-gray-500">{preliminaryInfo.artist || ''}</div>
                         <div className="text-gray-500">{preliminaryInfo.cd_title || ''}</div>
                         <div className="text-gray-500">JASRAC: {preliminaryInfo.jasrac_code || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">{preliminaryInfo.copyright_permission || '未入力'}</div>
-                        {preliminaryInfo.lyricist && (
-                          <div className="text-gray-500 mt-1">作詞者: {preliminaryInfo.lyricist}</div>
-                        )}
-                        {preliminaryInfo.composer && (
-                          <div className="text-gray-500">作曲者: {preliminaryInfo.composer}</div>
-                        )}
+                        <div className="text-gray-500">楽曲著作権許諾: {preliminaryInfo.music_rights_cleared || '未入力'}</div>
+                        <div className="text-gray-500">レコード番号: {preliminaryInfo.record_number || '未入力'}</div>
+                        <div className="text-gray-500">楽曲種類: {preliminaryInfo.music_type || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
