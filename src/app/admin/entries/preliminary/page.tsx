@@ -139,18 +139,16 @@ export default async function PreliminaryInfoListPage() {
               item.artist || '',
               item.cd_title || '',
               item.jasrac_code || '',
-              item.copyright_permission || '',
-              item.lyricist || '',
-              item.composer || '',
+              item.music_rights_cleared || '',
+              item.record_number || '',
+              item.music_type || '',
               item.choreographer1_name || '',
               item.choreographer1_furigana || '',
-              item.choreographer1_copyright || '',
               item.choreographer2_name || '',
               item.choreographer2_furigana || '',
-              item.choreographer2_copyright || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '著作権有無', '作詞者', '作曲者', '振付師1名前', '振付師1フリガナ', '振付師1著作権', '振付師2名前', '振付師2フリガナ', '振付師2著作権', '選考ステータス']}
+            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '楽曲著作権許諾', 'レコード番号', '楽曲種類', '振付師1名前', '振付師1フリガナ', '振付師2名前', '振付師2フリガナ', '選考ステータス']}
             filename="preliminary_info"
           />
         </div>
