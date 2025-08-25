@@ -173,20 +173,26 @@ export default function RegisterPage() {
         console.log('[REGISTER] window.location.href実行直前')
         console.log('[REGISTER] 実行するURL:', redirectUrl)
         
-        try {
-          console.log('[REGISTER] リダイレクト実行中...')
-          console.log('[REGISTER] 5秒後にリダイレクトします（デバッグのため）')
+        // 段階的アラートでデバッグ
+        if (confirm(`🔍 デバッグ1: リダイレクト処理を開始します\n\nリダイレクト先: ${redirectUrl}\n\n続行しますか？`)) {
+          console.log('[REGISTER] ユーザーがリダイレクト実行を許可')
           
-          // デバッグのため5秒待機
-          setTimeout(() => {
-            console.log('[REGISTER] 遅延リダイレクト実行:', redirectUrl)
+          try {
+            console.log('[REGISTER] リダイレクト実行中...')
+            
+            // 実際にリダイレクト実行
             window.location.href = redirectUrl
-            console.log('[REGISTER] リダイレクト実行完了')
-          }, 5000)
-          
-        } catch (error) {
-          console.error('[REGISTER] リダイレクトでエラー:', error)
-          alert('❌ リダイレクトに失敗しました')
+            
+            // ここは実行されないはず
+            alert('⚠️ この画面が表示された場合、リダイレクトが失敗しています')
+            console.log('[REGISTER] リダイレクト実行完了（表示されたらおかしい）')
+            
+          } catch (error) {
+            console.error('[REGISTER] リダイレクトでエラー:', error)
+            alert(`❌ リダイレクトエラー: ${error.message}`)
+          }
+        } else {
+          alert('❌ デバッグ: リダイレクトをキャンセルしました')
         }
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
