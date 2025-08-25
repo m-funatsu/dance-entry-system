@@ -118,120 +118,105 @@ export default async function SemifinalsInfoListPage() {
         <div className="flex space-x-4">
           <DownloadButton
             data={mappedSemifinalsInfoList.map(item => [
-              item.id,
-              item.entry_id,
-              item.entries?.status || '',
+              item.entries?.users?.name || '不明なユーザー',
               // 作品情報
-              item.music_change_from_preliminary ? 'Yes' : 'No',
-              item.work_title || '',
-              item.work_title_kana || '',
-              item.work_character_story || '',
-              // 楽曲著作権関連情報
-              item.copyright_permission || '',
-              item.music_title || '',
-              item.cd_title || '',
-              item.record_number || '',
-              item.jasrac_code || '',
-              item.music_type || '',
-              item.artist || '',
+              item.music_change_from_preliminary ? 'あり' : 'なし',
+              item.work_title || '未入力',
+              item.work_title_kana || '未入力',
+              item.work_character_story || '未入力',
+              // 楽曲著作関連情報
+              item.copyright_permission || '未入力',
+              item.music_title || '未入力',
+              item.cd_title || '未入力',
+              item.artist || '未入力',
+              item.record_number || '未入力',
+              item.jasrac_code || '未入力',
+              item.music_type || '未入力',
+              // 楽曲データ添付
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 音響情報
-              item.music_usage_method || '',
-              item.chaser_song_designation || '',
-              item.fade_out_start_time || '',
-              item.fade_out_complete_time || '',
-              item.dance_start_timing || '',
+              item.music_usage_method || '未入力',
+              item.chaser_song_designation || '未入力',
+              item.fade_out_start_time || '未入力',
+              item.fade_out_complete_time || '未入力',
+              // 音響データ添付
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              // 踊り出し
+              item.dance_start_timing || '未入力',
               // 照明シーン1
-              item.scene1_time || '',
-              item.scene1_trigger || '',
-              item.scene1_color_type || '',
-              item.scene1_color_other || '',
-              item.scene1_image || '',
-              item.scene1_notes || '',
+              `時間:${item.scene1_time || '未入力'} きっかけ:${item.scene1_trigger || '未入力'} 色:${item.scene1_color_type || '未入力'} イメージ:${item.scene1_image || '未入力'} 備考:${item.scene1_notes || '未入力'}`,
+              // 照明シーン1イメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン2
-              item.scene2_time || '',
-              item.scene2_trigger || '',
-              item.scene2_color_type || '',
-              item.scene2_color_other || '',
-              item.scene2_image || '',
-              item.scene2_notes || '',
+              `時間:${item.scene2_time || '未入力'} きっかけ:${item.scene2_trigger || '未入力'} 色:${item.scene2_color_type || '未入力'} イメージ:${item.scene2_image || '未入力'} 備考:${item.scene2_notes || '未入力'}`,
+              // 照明シーン2イメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン3
-              item.scene3_time || '',
-              item.scene3_trigger || '',
-              item.scene3_color_type || '',
-              item.scene3_color_other || '',
-              item.scene3_image || '',
-              item.scene3_notes || '',
+              `時間:${item.scene3_time || '未入力'} きっかけ:${item.scene3_trigger || '未入力'} 色:${item.scene3_color_type || '未入力'} イメージ:${item.scene3_image || '未入力'} 備考:${item.scene3_notes || '未入力'}`,
+              // 照明シーン3イメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              // 照明シーン4
+              `時間:${item.scene4_time || '未入力'} きっかけ:${item.scene4_trigger || '未入力'} 色:${item.scene4_color_type || '未入力'} イメージ:${item.scene4_image || '未入力'} 備考:${item.scene4_notes || '未入力'}`,
+              // 照明シーン4イメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              // 照明シーン5
+              `時間:${item.scene5_time || '未入力'} きっかけ:${item.scene5_trigger || '未入力'} 色:${item.scene5_color_type || '未入力'} イメージ:${item.scene5_image || '未入力'} 備考:${item.scene5_notes || '未入力'}`,
+              // 照明シーン5イメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              // 照明シーン チェイサー
+              `時間:${item.chaser_time || '未入力'} きっかけ:${item.chaser_trigger || '未入力'} 色:${item.chaser_color_type || '未入力'} イメージ:${item.chaser_image || '未入力'} 備考:${item.chaser_notes || '未入力'}`,
               // 振付師情報
-              item.choreographer_name || '',
-              item.choreographer_furigana || '',
+              `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer_name2 || '未入力'} (${item.choreographer_furigana2 || '未入力'})`,
               // 小道具情報
-              item.props_usage || '',
-              item.props_details || '',
+              `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
+              // 振込確認
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 賞金振込先情報
-              item.bank_name || '',
-              item.branch_name || '',
-              item.account_type || '',
-              item.account_number || '',
-              item.account_holder || ''
+              `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
+              // 選考ステータス
+              item.entries?.status === 'pending' ? '審査待ち' :
+              item.entries?.status === 'submitted' ? '提出済み' :
+              item.entries?.status === 'selected' ? '選考通過' :
+              item.entries?.status === 'rejected' ? '不選考' : '不明'
             ])}
             headers={[
-              'ID', 
-              'エントリーID', 
-              '選考ステータス',
-              // 作品情報
-              '予選との楽曲情報の変更',
-              '作品タイトル',
-              '作品タイトル(ふりがな)',
-              '作品キャラクター・ストーリー等',
-              // 楽曲著作権関連情報
-              '楽曲著作権許諾',
-              '使用楽曲タイトル',
-              '収録CDタイトル', 
-              'レコード番号',
-              'JASRAC作品コード',
-              '楽曲種類',
-              'アーティスト',
-              // 音響情報
-              '音楽使用方法',
-              'チェイサー（退場）曲の指定',
-              'フェードアウト開始時間',
-              'フェードアウト完了時間',
-              '踊り出しタイミング',
-              // 照明シーン1
-              '照明シーン1時間',
-              '照明シーン1きっかけ',
-              '照明シーン1色・系統',
-              '照明シーン1色・系統その他',
-              '照明シーン1イメージ',
-              '照明シーン1備考',
-              // 照明シーン2
-              '照明シーン2時間',
-              '照明シーン2きっかけ',
-              '照明シーン2色・系統',
-              '照明シーン2色・系統その他',
-              '照明シーン2イメージ',
-              '照明シーン2備考',
-              // 照明シーン3
-              '照明シーン3時間',
-              '照明シーン3きっかけ',
-              '照明シーン3色・系統',
-              '照明シーン3色・系統その他',
-              '照明シーン3イメージ',
-              '照明シーン3備考',
-              // 振付師情報
-              '振付師名',
-              '振付師フリガナ',
-              // 小道具情報
-              '使用する小道具',
-              '小道具詳細',
-              // 賞金振込先情報
-              '銀行名',
-              '支店名',
-              '口座種類',
-              '口座番号',
-              '口座名義'
+              '1. システム利用者名',
+              '2. 作品情報 - 予選との楽曲変更',
+              '2. 作品情報 - 作品タイトル',
+              '2. 作品情報 - 作品タイトル(ふりがな)',
+              '2. 作品情報 - 作品キャラクター・ストーリー等',
+              '3. 楽曲著作関連情報 - 楽曲著作権許諾',
+              '3. 楽曲著作関連情報 - 使用楽曲タイトル',
+              '3. 楽曲著作関連情報 - 収録CDタイトル',
+              '3. 楽曲著作関連情報 - アーティスト',
+              '3. 楽曲著作関連情報 - レコード番号',
+              '3. 楽曲著作関連情報 - JASRAC作品コード',
+              '3. 楽曲著作関連情報 - 楽曲種類',
+              '4. 楽曲データ添付',
+              '5. 音響情報 - 音楽スタートのタイミング',
+              '5. 音響情報 - チェイサー曲の指定',
+              '5. 音響情報 - フェードアウト開始時間',
+              '5. 音響情報 - フェードアウト完了時間',
+              '6. 音響データ添付',
+              '7. 踊り出し - 準決勝 踊り出しタイミング',
+              '8. 照明シーン1',
+              '9. 照明シーン1イメージ画像',
+              '10. 照明シーン2',
+              '11. 照明シーン2イメージ画像',
+              '12. 照明シーン3',
+              '13. 照明シーン3イメージ画像',
+              '14. 照明シーン4',
+              '15. 照明シーン4イメージ画像',
+              '16. 照明シーン5',
+              '17. 照明シーン5イメージ画像',
+              '18. 照明シーン チェイサー',
+              '19. 振付師情報',
+              '20. 小道具情報',
+              '21. 振込確認',
+              '22. 賞金振込先情報',
+              '23. 選考ステータス'
             ]}
-            filename="semifinals_info"
+            filename="semifinals_info_23columns"
           />
         </div>
       </div>
@@ -244,78 +229,85 @@ export default async function SemifinalsInfoListPage() {
       {mappedSemifinalsInfoList && mappedSemifinalsInfoList.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="overflow-x-auto" style={{maxWidth: '100vw'}}>
-            <table className="divide-y divide-gray-200" style={{minWidth: '1500px', width: 'max-content'}}>
+            <table className="divide-y divide-gray-200" style={{minWidth: '4200px', width: 'max-content'}}>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    システム利用者名
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    1. システム利用者名
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    作品情報
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-60">
+                    2. 作品情報
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    楽曲情報
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-72">
+                    3. 楽曲著作関連情報
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    振付師情報
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    4. 楽曲データ添付
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    銀行情報
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    5. 音響情報
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    音響全般
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    6. 音響データ添付
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    音響シーン1
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    7. 踊り出し
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    音響シーン2
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    8. 照明シーン1
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    音響シーン3
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    9. 照明シーン1イメージ画像
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    音響シーン4
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    10. 照明シーン2
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    照明全般
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    11. 照明シーン2イメージ画像
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    照明シーン1
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    12. 照明シーン3
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    照明シーン2
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    13. 照明シーン3イメージ画像
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    照明シーン3
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    14. 照明シーン4
                   </th>
-                  <th className="px-1 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    照明シーン4
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    15. 照明シーン4イメージ画像
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    音源ファイル
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    16. 照明シーン5
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    動画ファイル
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    17. 照明シーン5イメージ画像
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    画像ファイル
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    18. 照明シーン チェイサー
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PDFファイル
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    19. 振付師情報
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-36">
+                    20. 小道具情報
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ステータス
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    21. 振込確認
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    22. 賞金振込先情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    23. 選考ステータス
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {mappedSemifinalsInfoList.map((semifinalsInfo) => (
                   <tr key={semifinalsInfo.id} className="hover:bg-gray-50">
-                    <td className="px-2 py-3 whitespace-nowrap">
+                    {/* 1. システム利用者名 */}
+                    <td className="px-3 py-3 whitespace-nowrap">
                       <div className="text-xs font-medium text-gray-900">
                         {semifinalsInfo.entries?.users?.name || '不明なユーザー'}
                       </div>
@@ -323,111 +315,40 @@ export default async function SemifinalsInfoListPage() {
                         {semifinalsInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 2. 作品情報 */}
+                    <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="font-medium">{semifinalsInfo.work_title || '未入力'}</div>
-                        <div className="text-gray-500">ふりがな: {semifinalsInfo.work_title_kana || '未入力'}</div>
-                        <div className="text-gray-500">楽曲: {semifinalsInfo.music_title || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">
+                        <div className="mb-1"><strong>予選との楽曲変更:</strong> {semifinalsInfo.music_change_from_preliminary ? 'あり' : 'なし'}</div>
+                        <div className="mb-1"><strong>作品タイトル:</strong> {semifinalsInfo.work_title || '未入力'}</div>
+                        <div className="mb-1"><strong>タイトル(ふりがな):</strong> {semifinalsInfo.work_title_kana || '未入力'}</div>
+                        <div className="text-gray-500">
+                          <strong>キャラクター・ストーリー:</strong><br/>
                           {semifinalsInfo.work_character_story ? 
-                            `${semifinalsInfo.work_character_story.slice(0, 50)}${semifinalsInfo.work_character_story.length > 50 ? '...' : ''}` 
+                            `${semifinalsInfo.work_character_story.slice(0, 80)}${semifinalsInfo.work_character_story.length > 80 ? '...' : ''}` 
                             : '未入力'}
                         </div>
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 3. 楽曲著作関連情報 */}
+                    <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="font-medium">アーティスト: {semifinalsInfo.artist || '未入力'}</div>
-                        <div className="text-gray-500">楽曲種類: {semifinalsInfo.music_type || '未入力'}</div>
-                        <div className="text-gray-500">JASRAC: {semifinalsInfo.jasrac_code || '未入力'}</div>
+                        <div className="mb-1"><strong>楽曲著作権許諾:</strong> {semifinalsInfo.copyright_permission || '未入力'}</div>
+                        <div className="mb-1"><strong>使用楽曲タイトル:</strong> {semifinalsInfo.music_title || '未入力'}</div>
+                        <div className="mb-1"><strong>収録CDタイトル:</strong> {semifinalsInfo.cd_title || '未入力'}</div>
+                        <div className="mb-1"><strong>アーティスト:</strong> {semifinalsInfo.artist || '未入力'}</div>
+                        <div className="mb-1"><strong>レコード番号:</strong> {semifinalsInfo.record_number || '未入力'}</div>
+                        <div className="mb-1"><strong>JASRAC作品コード:</strong> {semifinalsInfo.jasrac_code || '未入力'}</div>
+                        <div><strong>楽曲種類:</strong> {semifinalsInfo.music_type || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">{semifinalsInfo.choreographer_name || '未入力'}</div>
-                        <div className="text-gray-500">{semifinalsInfo.choreographer_furigana || ''}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">
-                          {semifinalsInfo.bank_name ? 
-                            `${semifinalsInfo.bank_name} ${semifinalsInfo.branch_name || ''}`
-                            : '未入力'}
-                        </div>
-                        {semifinalsInfo.account_type && (
-                          <div className="text-gray-500">{semifinalsInfo.account_type}</div>
-                        )}
-                        {semifinalsInfo.account_number && (
-                          <div className="text-gray-500">口座番号: {semifinalsInfo.account_number}</div>
-                        )}
-                        {semifinalsInfo.account_holder && (
-                          <div className="text-gray-500">名義: {semifinalsInfo.account_holder}</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>{semifinalsInfo.sound_instruction || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.sound_scene1_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.sound_scene1_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.sound_scene2_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.sound_scene2_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.sound_scene3_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.sound_scene3_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.sound_scene4_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.sound_scene4_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>{semifinalsInfo.lighting_instruction || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.lighting_scene1_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.lighting_scene1_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.lighting_scene2_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.lighting_scene2_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.lighting_scene3_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.lighting_scene3_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-1 py-2">
-                      <div className="text-xs text-gray-900">
-                        <div>指示: {semifinalsInfo.lighting_scene4_instruction || '未入力'}</div>
-                        <div>時間: {semifinalsInfo.lighting_scene4_time || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 4. 楽曲データ添付 */}
+                    <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('semifinals')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -441,17 +362,75 @@ export default async function SemifinalsInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('semifinals')
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')
                         )) && (
-                          <span className="text-xs text-gray-400">音源なし</span>
+                          <span className="text-xs text-gray-400">楽曲データなし</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 5. 音響情報 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>音楽スタートのタイミング:</strong> {semifinalsInfo.music_usage_method || '未入力'}</div>
+                        <div className="mb-1"><strong>チェイサー曲の指定:</strong> {semifinalsInfo.chaser_song_designation || '未入力'}</div>
+                        <div className="mb-1"><strong>フェードアウト開始時間:</strong> {semifinalsInfo.fade_out_start_time || '未入力'}</div>
+                        <div><strong>フェードアウト完了時間:</strong> {semifinalsInfo.fade_out_complete_time || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 6. 音響データ添付 */}
+                    <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('semifinals')
+                          file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                              download
+                            >
+                              🔊 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')
+                        )) && (
+                          <span className="text-xs text-gray-400">音響データなし</span>
+                        )}
+                      </div>
+                    </td>
+                    
+                    {/* 7. 踊り出し */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <strong>準決勝 踊り出しタイミング:</strong><br/>
+                        {semifinalsInfo.dance_start_timing || '未入力'}
+                      </div>
+                    </td>
+                    
+                    {/* 8. 照明シーン1 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.scene1_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.scene1_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.scene1_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.scene1_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.scene1_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.scene1_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 9. 照明シーン1イメージ画像 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -460,44 +439,201 @@ export default async function SemifinalsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              🎬 {file.file_name}
+                              🖼️ {file.file_name}
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('semifinals')
-                        )) && (
-                          <span className="text-xs text-gray-400">動画なし</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('semifinals')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              📸 {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('semifinals')
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 10. 照明シーン2 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.scene2_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.scene2_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.scene2_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.scene2_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.scene2_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.scene2_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 11. 照明シーン2イメージ画像 */}
+                    <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('semifinals')
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    
+                    {/* 12. 照明シーン3 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.scene3_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.scene3_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.scene3_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.scene3_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.scene3_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.scene3_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 13. 照明シーン3イメージ画像 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    
+                    {/* 14. 照明シーン4 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.scene4_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.scene4_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.scene4_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.scene4_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.scene4_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.scene4_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 15. 照明シーン4イメージ画像 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    
+                    {/* 16. 照明シーン5 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.scene5_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.scene5_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.scene5_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.scene5_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.scene5_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.scene5_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 17. 照明シーン5イメージ画像 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
+                    </td>
+                    
+                    {/* 18. 照明シーン チェイサー */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.chaser_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.chaser_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.chaser_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.chaser_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.chaser_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.chaser_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 19. 振付師情報 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>振付師氏名①:</strong> {semifinalsInfo.choreographer_name || '未入力'}</div>
+                        <div className="mb-1"><strong>振付師氏名フリガナ①:</strong> {semifinalsInfo.choreographer_furigana || '未入力'}</div>
+                        <div className="mb-1"><strong>振付師氏名②:</strong> {semifinalsInfo.choreographer_name2 || '未入力'}</div>
+                        <div><strong>振付師氏名フリガナ②:</strong> {semifinalsInfo.choreographer_furigana2 || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 20. 小道具情報 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="mb-1"><strong>小道具の有無:</strong> {semifinalsInfo.props_usage || '未入力'}</div>
+                        <div><strong>利用する小道具:</strong><br/>{semifinalsInfo.props_details || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 21. 振込確認 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -510,30 +646,27 @@ export default async function SemifinalsInfoListPage() {
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('semifinals')
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')
                         )) && (
-                          <span className="text-xs text-gray-400">PDFなし</span>
+                          <span className="text-xs text-gray-400">振込確認書なし</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
+                    
+                    {/* 22. 賞金振込先情報 */}
+                    <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        {semifinalsInfo.special_notes ? 
-                          `${semifinalsInfo.special_notes.slice(0, 100)}${semifinalsInfo.special_notes.length > 100 ? '...' : ''}` 
-                          : '未入力'}
+                        <div className="mb-1"><strong>銀行名:</strong> {semifinalsInfo.bank_name || '未入力'}</div>
+                        <div className="mb-1"><strong>支店名:</strong> {semifinalsInfo.branch_name || '未入力'}</div>
+                        <div className="mb-1"><strong>口座種類:</strong> {semifinalsInfo.account_type || '未入力'}</div>
+                        <div className="mb-1"><strong>口座番号:</strong> {semifinalsInfo.account_number || '未入力'}</div>
+                        <div><strong>口座名義:</strong> {semifinalsInfo.account_holder || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">作成: {semifinalsInfo.created_at ? new Date(semifinalsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新: {semifinalsInfo.updated_at ? new Date(semifinalsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        {semifinalsInfo.additional_info && (
-                          <div className="text-gray-500 mt-1">追加: {semifinalsInfo.additional_info.slice(0, 30)}...</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3 whitespace-nowrap">
+                    
+                    {/* 23. 選考ステータス */}
+                    <td className="px-3 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         semifinalsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
                         semifinalsInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
