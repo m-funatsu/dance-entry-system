@@ -157,16 +157,10 @@ export default async function SnsInfoListPage() {
                     選手紹介動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    SNS用画像
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    SNS用資料PDF
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ステータス
+                    選考ステータス
                   </th>
                 </tr>
               </thead>
@@ -243,52 +237,6 @@ export default async function SnsInfoListPage() {
                           file.file_type === 'video' && file.purpose && file.purpose.includes('introduction')
                         )) && (
                           <span className="text-xs text-gray-400">選手紹介動画なし</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('sns')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              📸 {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('sns')
-                        )) && (
-                          <span className="text-xs text-gray-400">SNS用画像なし</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('sns')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              📄 {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('sns')
-                        )) && (
-                          <span className="text-xs text-gray-400">SNS用資料なし</span>
                         )}
                       </div>
                     </td>
