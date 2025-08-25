@@ -145,9 +145,6 @@ export default async function SnsInfoListPage() {
                     エントリー名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    動画情報
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     SNS備考
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -173,18 +170,6 @@ export default async function SnsInfoListPage() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {snsInfo.entries?.participant_names || 'エントリー名なし'}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">練習風景:</div>
-                        <div className={snsInfo.practice_video_path ? 'text-green-600' : 'text-red-600'}>
-                          {snsInfo.practice_video_path ? '✓ あり' : '✗ なし'}
-                        </div>
-                        <div className="text-gray-500 mt-1">選手紹介:</div>
-                        <div className={snsInfo.introduction_highlight_path ? 'text-green-600' : 'text-red-600'}>
-                          {snsInfo.introduction_highlight_path ? '✓ あり' : '✗ なし'}
-                        </div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
