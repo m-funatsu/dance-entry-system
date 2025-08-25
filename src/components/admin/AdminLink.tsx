@@ -77,7 +77,7 @@ export default function AdminLink({ href, children, className = "" }: AdminLinkP
     <button 
       onClick={handleClick}
       disabled={isNavigating}
-      className={`${isNavigating ? 'opacity-50' : ''} ${className}`}
+      className={`cursor-pointer ${isNavigating ? 'opacity-50 cursor-wait' : ''} ${className}`}
     >
       {children}
     </button>

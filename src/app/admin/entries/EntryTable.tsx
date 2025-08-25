@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import EmailComposer from '@/components/EmailComposer'
+import AdminLink from '@/components/admin/AdminLink'
 
 interface EntryWithDetails {
   id: string
@@ -540,12 +540,12 @@ export default function EntryTable({ entries }: EntryTableProps) {
                     {getStatusBadge(entry.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link
+                    <AdminLink
                       href={`/admin/entries/${entry.id}`}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
                       詳細
-                    </Link>
+                    </AdminLink>
                   </td>
                 </tr>
             ))}
