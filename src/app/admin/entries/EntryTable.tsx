@@ -261,7 +261,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
       return
     }
 
-    const statusText = newStatus === 'selected' ? '予選通過' : newStatus === 'rejected' ? '予選敗退' : newStatus
+    const statusText = newStatus === 'selected' ? '予選通過' : newStatus === 'rejected' ? '予選敗退' : newStatus === 'pending' ? '未処理' : newStatus
     if (!confirm(`選択したエントリーのステータスを「${statusText}」に変更しますか？`)) {
       return
     }
@@ -373,6 +373,13 @@ export default function EntryTable({ entries }: EntryTableProps) {
               {selectedEntries.length}件のエントリーが選択されています
             </span>
             <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => bulkUpdateStatus('pending')}
+                disabled={loading}
+                className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 disabled:opacity-50"
+              >
+                未処理に変更
+              </button>
               <button
                 onClick={() => bulkUpdateStatus('selected')}
                 disabled={loading}
