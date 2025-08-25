@@ -165,10 +165,27 @@ export default function RegisterPage() {
         // メール確認画面に移動（メール送信問題の説明付き）
         const redirectUrl = `/auth/confirm-email?email=${encodeURIComponent(data.user.email || email.trim())}`
         
-        alert(`✅ 登録が完了しました！\n\n⚠️ 注意: 現在メール送信に問題があります。\nメール確認画面で詳細をご確認ください。`)
+        console.log('[REGISTER] リダイレクト前の現在URL:', window.location.href)
+        console.log('[REGISTER] 構築されたリダイレクトURL:', redirectUrl)
         
-        console.log('[REGISTER] confirm-emailページへリダイレクト')
-        window.location.href = redirectUrl
+        alert(`✅ 登録が完了しました！\n\n⚠️ 注意: 現在メール送信に問題があります。\nメール確認画面で詳細をご確認ください。\n\nリダイレクト先: ${redirectUrl}`)
+        
+        console.log('[REGISTER] window.location.href実行直前')
+        console.log('[REGISTER] 実行するURL:', redirectUrl)
+        
+        try {
+          console.log('[REGISTER] リダイレクト実行中...')
+          window.location.href = redirectUrl
+          console.log('[REGISTER] リダイレクト実行完了')
+          
+          // 念のため少し待って確認
+          setTimeout(() => {
+            console.log('[REGISTER] 2秒後の現在URL:', window.location.href)
+          }, 2000)
+        } catch (error) {
+          console.error('[REGISTER] リダイレクトでエラー:', error)
+          alert('❌ リダイレクトに失敗しました')
+        }
       } else {
         console.error('[REGISTER] ユーザーデータが返されませんでした:', data)
         alert('❌ 登録処理でエラーが発生しました\nコンソールログを確認してください')
