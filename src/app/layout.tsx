@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClientProviders from "@/components/ClientProviders";
 import FaviconLoader from "@/components/FaviconLoader";
+import DynamicTitle from "@/components/DynamicTitle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,6 +46,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientProviders>
+          <DynamicTitle />
           <FaviconLoader />
           {children}
         </ClientProviders>
