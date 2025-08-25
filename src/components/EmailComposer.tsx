@@ -264,17 +264,6 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
                 />
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">利用可能な変数</h4>
-                <div className="grid grid-cols-1 gap-1 text-xs">
-                  {getVariableHelp().map(help => (
-                    <div key={help.variable} className="flex justify-between">
-                      <code className="text-blue-700 font-mono">{help.variable}</code>
-                      <span className="text-blue-600">{help.description}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* 右側：送信先一覧とプレビュー */}
