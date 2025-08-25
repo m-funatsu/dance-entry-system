@@ -372,14 +372,9 @@ export default async function AdminDashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  <div className="space-y-2">
-                    <AdminLink href="/admin/entries" className="block font-medium text-indigo-600 hover:text-indigo-500">
-                      エントリー一覧を表示 →
-                    </AdminLink>
-                    <AdminLink href="/admin/test-data" className="block text-sm text-gray-600 hover:text-gray-800">
-                      🔧 テストデータ確認
-                    </AdminLink>
-                  </div>
+                  <AdminLink href="/admin/entries" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    エントリー一覧を表示 →
+                  </AdminLink>
                 </div>
               </div>
             </div>
