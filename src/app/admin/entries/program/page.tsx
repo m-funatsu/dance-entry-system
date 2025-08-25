@@ -137,9 +137,11 @@ export default async function ProgramInfoListPage() {
               item.semifinal_highlight || '',
               item.final_story || '',
               item.final_highlight || '',
+              item.affiliation || '',
+              item.final_affiliation || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '選考ステータス']}
+            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '準決勝所属', '決勝所属', '選考ステータス']}
             filename="program_info"
           />
         </div>
@@ -172,7 +174,13 @@ export default async function ProgramInfoListPage() {
                     その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    所属教室または所属
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     準決勝用添付ファイル
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    決勝用添付ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     選考ステータス
@@ -235,6 +243,58 @@ export default async function ProgramInfoListPage() {
                       <div className="text-xs text-gray-900">
                         <div className="text-gray-500 mt-1">作成日: {programInfo.created_at ? new Date(programInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
                         <div className="text-gray-500">更新日: {programInfo.updated_at ? new Date(programInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div className="font-medium">準決勝: {programInfo.affiliation || '未入力'}</div>
+                        <div className="text-gray-500 mt-1">決勝: {programInfo.final_affiliation || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && (file.purpose.includes('semifinal') || file.purpose.includes('program'))
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && (file.purpose.includes('semifinal') || file.purpose.includes('program'))
+                        )) && (
+                          <span className="text-xs text-gray-400">ファイルなし</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.purpose && (file.purpose.includes('final') || file.purpose.includes('finals'))
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
+                          file.purpose && (file.purpose.includes('final') || file.purpose.includes('finals'))
+                        )) && (
+                          <span className="text-xs text-gray-400">ファイルなし</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
