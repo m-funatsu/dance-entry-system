@@ -189,7 +189,7 @@ export default function RegisterPage() {
             
           } catch (error) {
             console.error('[REGISTER] リダイレクトでエラー:', error)
-            alert(`❌ リダイレクトエラー: ${error.message}`)
+            alert(`❌ リダイレクトエラー: ${error instanceof Error ? error.message : String(error)}`)
           }
         } else {
           alert('❌ デバッグ: リダイレクトをキャンセルしました')
