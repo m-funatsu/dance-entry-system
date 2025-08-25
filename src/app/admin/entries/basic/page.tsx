@@ -142,7 +142,7 @@ export default async function BasicInfoListPage() {
               item.media_consent_checked ? 'Yes' : 'No',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', 'ダンスジャンル', 'カテゴリー', '代表者名', '代表者フリガナ', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナー生年月日', '電話番号', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', 'パートナー保護者名', 'パートナー保護者電話', '規約同意', '個人情報同意', 'メディア同意', 'ステータス']}
+            headers={['ID', 'エントリーID', 'ダンスジャンル', 'アマプロ区分', '代表者名', '代表者フリガナ', '代表者メール', '代表者生年月日', 'パートナー名', 'パートナーフリガナ', 'パートナー生年月日', '電話番号', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', 'パートナー保護者名', 'パートナー保護者電話', '規約同意', '個人情報同意', 'メディア同意', 'ステータス']}
             filename="basic_info"
           />
         </div>
@@ -160,13 +160,13 @@ export default async function BasicInfoListPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリー名
+                    システム利用者名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ダンスジャンル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    カテゴリー
+                    アマプロ区分
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     代表者情報
@@ -193,7 +193,7 @@ export default async function BasicInfoListPage() {
                     同意状況
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ファイル
+                    振込確認用紙
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
