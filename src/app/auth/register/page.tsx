@@ -134,6 +134,8 @@ export default function RegisterPage() {
           errorMessage = `無効なメールアドレスです。正しいメールアドレス形式で入力してください。\n入力値: ${email.trim()}`
         } else if (error.message.includes('Too many requests') || error.message.includes('email rate limit exceeded') || error.code === 'over_email_send_rate_limit') {
           errorMessage = '⚠️ メール送信回数の上限に達しました。\n15-30分お待ちいただいてから再度お試しください。\n\nまたは別のメールアドレスでお試しください。'
+        } else if (error.message.includes('Error sending confirmation email') || error.code === 'unexpected_failure') {
+          errorMessage = '🚨 メール送信システムに障害が発生しています。\n\n管理者に連絡してメール認証を一時的に無効化してもらってください。\n\nまたは時間をおいて再度お試しください。'
         } else {
           errorMessage = `登録に失敗しました。\nエラー詳細: ${error.message}`
         }
