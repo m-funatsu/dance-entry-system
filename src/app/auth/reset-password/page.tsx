@@ -23,7 +23,7 @@ export default function ResetPasswordPage() {
         : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${baseUrl}/auth/update-password`,
+        redirectTo: `${baseUrl}/auth/confirm-email`,
       })
 
       if (error) {
