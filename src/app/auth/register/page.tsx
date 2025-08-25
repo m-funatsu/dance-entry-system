@@ -175,13 +175,15 @@ export default function RegisterPage() {
         
         try {
           console.log('[REGISTER] リダイレクト実行中...')
-          window.location.href = redirectUrl
-          console.log('[REGISTER] リダイレクト実行完了')
+          console.log('[REGISTER] 5秒後にリダイレクトします（デバッグのため）')
           
-          // 念のため少し待って確認
+          // デバッグのため5秒待機
           setTimeout(() => {
-            console.log('[REGISTER] 2秒後の現在URL:', window.location.href)
-          }, 2000)
+            console.log('[REGISTER] 遅延リダイレクト実行:', redirectUrl)
+            window.location.href = redirectUrl
+            console.log('[REGISTER] リダイレクト実行完了')
+          }, 5000)
+          
         } catch (error) {
           console.error('[REGISTER] リダイレクトでエラー:', error)
           alert('❌ リダイレクトに失敗しました')
