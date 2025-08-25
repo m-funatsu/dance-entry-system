@@ -8,8 +8,8 @@ export default function DynamicTitle() {
     const updateTitle = async () => {
       console.log('[DYNAMIC TITLE] タイトル更新開始')
       try {
-        console.log('[DYNAMIC TITLE] API呼び出し中...')
-        const response = await fetch('/api/admin/settings', {
+        console.log('[DYNAMIC TITLE] 公開API呼び出し中...')
+        const response = await fetch('/api/public/site-title', {
           cache: 'no-store'
         })
         
@@ -18,7 +18,7 @@ export default function DynamicTitle() {
         if (response.ok) {
           const data = await response.json()
           console.log('[DYNAMIC TITLE] 取得データ:', data)
-          const siteTitle = data.settings?.site_title || "2025 バルカーカップ ダンスエントリーシステム"
+          const siteTitle = data.title || "2025 バルカーカップ ダンスエントリーシステム"
           console.log('[DYNAMIC TITLE] 設定するタイトル:', siteTitle)
           document.title = siteTitle
           console.log('[DYNAMIC TITLE] タイトル設定完了:', document.title)
