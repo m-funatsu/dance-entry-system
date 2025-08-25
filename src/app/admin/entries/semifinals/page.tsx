@@ -251,6 +251,8 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
                         <div className="font-medium">{semifinalsInfo.work_title || '未入力'}</div>
+                        <div className="text-gray-500">ふりがな: {semifinalsInfo.work_title_kana || '未入力'}</div>
+                        <div className="text-gray-500">楽曲: {semifinalsInfo.music_title || '未入力'}</div>
                         <div className="text-gray-500 mt-1">
                           {semifinalsInfo.work_character_story ? 
                             `${semifinalsInfo.work_character_story.slice(0, 50)}${semifinalsInfo.work_character_story.length > 50 ? '...' : ''}` 
@@ -260,11 +262,9 @@ export default async function SemifinalsInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="font-medium">{semifinalsInfo.music_title || '未入力'}</div>
-                        <div className="text-gray-500">{semifinalsInfo.artist || ''}</div>
-                        <div className="text-gray-500">
-                          {semifinalsInfo.music_type || ''} | JASRAC: {semifinalsInfo.jasrac_code || '未入力'}
-                        </div>
+                        <div className="font-medium">アーティスト: {semifinalsInfo.artist || '未入力'}</div>
+                        <div className="text-gray-500">楽曲種類: {semifinalsInfo.music_type || '未入力'}</div>
+                        <div className="text-gray-500">JASRAC: {semifinalsInfo.jasrac_code || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
