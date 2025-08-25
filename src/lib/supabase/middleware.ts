@@ -44,6 +44,8 @@ export async function updateSession(request: NextRequest) {
     '/auth/logout',
     '/auth/reset-password',
     '/auth/update-password',
+    '/auth/confirm-email', // メール確認画面を公開ルートに追加
+    '/auth/callback', // 認証コールバックも公開ルートに追加
     '/api/admin/favicon', // ファビコン取得は公開
     '/api/admin/background' // 背景画像取得は公開
   ]
