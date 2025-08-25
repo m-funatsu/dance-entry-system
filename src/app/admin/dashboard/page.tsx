@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
-import DataExportManager from '@/components/DataExportManager'
 import NavigationLogger from '@/components/NavigationLogger'
 
 export default async function AdminDashboardPage() {
@@ -508,13 +507,6 @@ export default async function AdminDashboardPage() {
 
           </div>
 
-          {/* データエクスポート機能 */}
-          <div className="mt-8">
-            <DataExportManager 
-              totalEntries={stats.total}
-              totalFiles={allFiles?.length || 0}
-            />
-          </div>
         </div>
       </main>
       </div>
