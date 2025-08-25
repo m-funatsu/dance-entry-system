@@ -263,10 +263,7 @@ export default async function PreliminaryInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        {preliminaryInfo.work_title_kana && (
-                          <div className="text-gray-500">タイトルカナ: {preliminaryInfo.work_title_kana}</div>
-                        )}
-                        <div className="text-gray-500 mt-1">作成日: {preliminaryInfo.created_at ? new Date(preliminaryInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
+                        <div className="text-gray-500">作成日: {preliminaryInfo.created_at ? new Date(preliminaryInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
                         <div className="text-gray-500">更新日: {preliminaryInfo.updated_at ? new Date(preliminaryInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
                       </div>
                     </td>
