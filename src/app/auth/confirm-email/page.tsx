@@ -5,9 +5,20 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 
 function ConfirmEmailContent() {
+  console.log('[CONFIRM-EMAIL] コンポーネント開始')
   try {
+    console.log('[CONFIRM-EMAIL] useSearchParams取得開始')
     const searchParams = useSearchParams()
+    console.log('[CONFIRM-EMAIL] searchParams:', searchParams)
+    
     const email = searchParams?.get('email') || ''
+    console.log('[CONFIRM-EMAIL] 取得したemail:', email)
+    
+    // URLパラメータのデバッグ
+    if (typeof window !== 'undefined') {
+      console.log('[CONFIRM-EMAIL] 現在のURL:', window.location.href)
+      console.log('[CONFIRM-EMAIL] URLSearchParams:', new URLSearchParams(window.location.search).get('email'))
+    }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -92,12 +103,26 @@ function ConfirmEmailContent() {
       </div>
     </div>
   )
-  } catch {
+  } catch (error) {
+    console.error('[CONFIRM-EMAIL] エラーキャッチ:', error)
+    console.error('[CONFIRM-EMAIL] エラー詳細:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      type: typeof error,
+      error: error
+    })
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h2 className="text-xl font-bold text-red-600">エラーが発生しました</h2>
           <p className="mt-2 text-gray-600">ページの読み込み中にエラーが発生しました。</p>
+          <div className="mt-4 p-4 bg-gray-100 rounded-md">
+            <p className="text-xs text-gray-600">デバッグ情報:</p>
+            <p className="text-xs text-red-600 font-mono">
+              {error instanceof Error ? error.message : String(error)}
+            </p>
+          </div>
           <Link
             href="/auth/register"
             className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
