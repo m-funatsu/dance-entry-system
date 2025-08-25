@@ -1557,7 +1557,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, premium_seats: parseInt(e.target.value) || 0 }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500 mt-1">最前列中央エリア</p>
               </div>
 
               <div>
@@ -1572,7 +1571,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, ss_seats: parseInt(e.target.value) || 0 }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500 mt-1">前方席</p>
               </div>
 
               <div>
@@ -1587,7 +1585,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, s_seats: parseInt(e.target.value) || 0 }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500 mt-1">中央エリア</p>
               </div>
 
               <div>
@@ -1602,7 +1599,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, a_seats: parseInt(e.target.value) || 0 }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500 mt-1">サイド・後方席</p>
               </div>
 
               <div>
@@ -1617,7 +1613,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, b_seats: parseInt(e.target.value) || 0 }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500 mt-1">最後方席</p>
               </div>
             </div>
 
