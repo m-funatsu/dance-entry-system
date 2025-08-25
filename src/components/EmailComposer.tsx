@@ -143,20 +143,6 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     }
   }
 
-  const getVariableHelp = () => {
-    return [
-      { variable: '{{name}}', description: '参加者名' },
-      { variable: '{{email}}', description: 'メールアドレス' },
-      { variable: '{{dance_style}}', description: 'ダンススタイル' },
-      { variable: '{{representative_name}}', description: '代表者名' },
-      { variable: '{{partner_name}}', description: 'パートナ名' },
-      { variable: '{{team_name}}', description: 'チーム名（個人参加の場合は「個人参加」）' },
-      { variable: '{{participant_names}}', description: '参加者名一覧' },
-      { variable: '{{status}}', description: '現在のステータス' },
-      { variable: '{{competition_name}}', description: 'コンペティション名' },
-      { variable: '{{organization_name}}', description: '主催者名' }
-    ]
-  }
 
 
   const handleSendEmails = () => {
