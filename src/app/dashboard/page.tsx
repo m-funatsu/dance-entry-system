@@ -1168,13 +1168,13 @@ export default async function DashboardPage() {
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-600">
             <p className="mb-2">問い合わせ</p>
-            <p className="font-medium">バルカーカップ事務局</p>
+            <p className="font-medium">2025バルカーカップエントリー事務局</p>
             <p>
               <a 
-                href="mailto:c-cloud01@valqua.com" 
+                href="mailto:entry_vqcup@valqua.com" 
                 className="text-indigo-600 hover:text-indigo-500"
               >
-                c-cloud01@valqua.com
+                Mail:entry_vqcup@valqua.com
               </a>
             </p>
           </div>
