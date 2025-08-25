@@ -137,11 +137,10 @@ export default async function ProgramInfoListPage() {
               item.semifinal_highlight || '',
               item.final_story || '',
               item.final_highlight || '',
-              item.affiliation || '',
-              item.final_affiliation || '',
+              `準決勝: ${item.affiliation || '未入力'} / 決勝: ${item.final_affiliation || '未入力'}`,
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '準決勝所属', '決勝所属', '選考ステータス']}
+            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '所属教室または所属', '選考ステータス']}
             filename="program_info"
           />
         </div>
