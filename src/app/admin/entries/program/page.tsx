@@ -297,37 +297,6 @@ export default async function ProgramInfoListPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && (
-                            file.purpose.includes('program') || 
-                            file.purpose.includes('semifinal') || 
-                            file.purpose.includes('final')
-                          )
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
-                          file.purpose && (
-                            file.purpose.includes('program') || 
-                            file.purpose.includes('semifinal') || 
-                            file.purpose.includes('final')
-                          )
-                        )) && (
-                          <span className="text-xs text-gray-400">ファイルなし</span>
-                        )}
-                      </div>
-                    </td>
                     <td className="px-2 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         programInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
