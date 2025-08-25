@@ -6,9 +6,12 @@ import { Suspense } from 'react'
 
 function ConfirmEmailContent() {
   console.log('[CONFIRM-EMAIL] コンポーネント開始')
+  
+  // React Hooksは必ず最初に呼ぶ
+  const searchParams = useSearchParams()
+  
   try {
-    console.log('[CONFIRM-EMAIL] useSearchParams取得開始')
-    const searchParams = useSearchParams()
+    console.log('[CONFIRM-EMAIL] useSearchParams取得完了')
     console.log('[CONFIRM-EMAIL] searchParams:', searchParams)
     
     const email = searchParams?.get('email') || ''
