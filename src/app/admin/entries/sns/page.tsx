@@ -2,7 +2,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
-import DownloadButton from '@/components/admin/DownloadButton'
 
 export default async function SnsInfoListPage() {
   const supabase = await createClient()
@@ -112,22 +111,6 @@ export default async function SnsInfoListPage() {
         <AdminLink href="/admin/entries">
           ← エントリー一覧に戻る
         </AdminLink>
-        <div className="flex space-x-4">
-          <DownloadButton
-            data={mappedSnsInfoList.map(item => [
-              item.id,
-              item.entry_id,
-              item.entries?.users?.name || '不明なユーザー',
-              item.entries?.participant_names || 'エントリー名なし',
-              item.practice_video_path ? 'あり' : 'なし',
-              item.introduction_highlight_path ? 'あり' : 'なし',
-              item.sns_notes || '',
-              item.entries?.status || ''
-            ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', '練習風景動画', '選手紹介動画', 'SNS備考', '選考ステータス']}
-            filename="sns_info"
-          />
-        </div>
       </div>
       
       <div className="text-center">
