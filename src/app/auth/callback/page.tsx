@@ -12,43 +12,63 @@ function CallbackContent() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      console.log('[CALLBACK] === 認証コールバック処理開始 ===')
+      console.log('[CALLBACK] 現在のURL:', typeof window !== 'undefined' ? window.location.href : 'N/A')
+      console.log('[CALLBACK] searchParams:', searchParams)
+      
       try {
         // URLパラメータをチェック
         const type = searchParams.get('type')
+        console.log('[CALLBACK] URLパラメータ type:', type)
         
         // パスワードリセット用のコールバックの場合
         if (type === 'recovery') {
+          console.log('[CALLBACK] パスワードリセット処理開始')
           const { data, error } = await supabase.auth.getSession()
           
           if (error) {
-            console.error('パスワードリセット認証エラー:', error)
+            console.error('[CALLBACK] パスワードリセット認証エラー:', error)
             setError('パスワードリセットの認証に失敗しました')
             return
           }
 
           if (data.session) {
-            // パスワード変更画面に遷移
+            console.log('[CALLBACK] パスワードリセット → update-passwordへリダイレクト')
             window.location.href = '/auth/update-password'
             return
           } else {
+            console.log('[CALLBACK] パスワードリセットセッション無効')
             setError('パスワードリセットのセッションが無効です')
             return
           }
         }
 
         // 通常のメール確認コールバック処理
+        console.log('[CALLBACK] 通常のメール確認処理開始')
         const { data, error } = await supabase.auth.getSession()
         
+        console.log('[CALLBACK] セッション取得結果:', {
+          hasData: !!data,
+          hasSession: !!data?.session,
+          hasUser: !!data?.session?.user,
+          userId: data?.session?.user?.id,
+          error: error
+        })
+        
         if (error) {
-          console.error('認証エラー:', error)
+          console.error('[CALLBACK] 認証エラー:', error)
           setError('認証に失敗しました')
           return
         }
 
         const welcome = searchParams.get('welcome') === 'true'
         const name = searchParams.get('name') || ''
+        
+        console.log('[CALLBACK] URLパラメータ welcome:', welcome)
+        console.log('[CALLBACK] URLパラメータ name:', name)
 
         if (data.session) {
+          console.log('[CALLBACK] セッション有効 → ダッシュボードへリダイレクト')
           // URLから認証情報をクリア（セキュリティ対策）
           window.history.replaceState({}, document.title, '/auth/callback')
           
@@ -56,12 +76,16 @@ function CallbackContent() {
           if (welcome) {
             // ウェルカムメッセージを表示してダッシュボードへ
             alert(`${name ? `${decodeURIComponent(name)}さん、` : ''}バルカーカップへようこそ！アカウントが有効化されました。`)
+            console.log('[CALLBACK] ウェルカムメッセージ後 → dashboardへ')
             window.location.href = '/dashboard'
           } else {
             // 通常の確認完了
+            console.log('[CALLBACK] 通常確認完了 → dashboardへ')
             window.location.href = '/dashboard'
           }
         } else {
+          console.log('[CALLBACK] ⚠️ セッション無効 → loginへリダイレクト')
+          console.log('[CALLBACK] これが原因でloginに飛ばされている')
           // セッションがない場合は確認待ち状態
           if (welcome) {
             alert(`${name ? `${decodeURIComponent(name)}さん、` : ''}ウェルカムメールを確認してください。メール内のリンクをクリックしてアカウントを有効化してください。`)
