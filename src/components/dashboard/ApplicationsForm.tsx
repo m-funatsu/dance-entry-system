@@ -824,7 +824,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       setApplicationsInfo(prev => ({ ...prev, [`related${num}_relationship`]: e.target.value }))
                       setTimeout(calculateTicketTotal, 0)
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   >
                     <option value="">選択してください</option>
                     {relationshipOptions.map(option => (
@@ -844,7 +844,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       setApplicationsInfo(prev => ({ ...prev, [`related${num}_name`]: e.target.value }))
                       setTimeout(calculateTicketTotal, 0)
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
 
@@ -856,7 +856,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     type="text"
                     value={applicationsInfo[`related${num}_furigana` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`related${num}_furigana`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
               </div>
@@ -914,7 +914,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     type="text"
                     value={applicationsInfo[`companion${num}_name` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_name`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
 
@@ -926,7 +926,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     type="text"
                     value={applicationsInfo[`companion${num}_furigana` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_furigana`]: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
 
@@ -939,7 +939,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     value={applicationsInfo[`companion${num}_purpose` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_purpose`]: e.target.value }))}
                     placeholder="例：付き添い、撮影、介助など"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
               </div>
@@ -988,7 +988,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 type="text"
                 value={applicationsInfo.makeup_preferred_stylist || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="希望がある場合は美容師名を入力してください"
               />
             </div>
@@ -1032,7 +1032,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   }))
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               required
             >
               <option value="">選択してください</option>
@@ -1055,7 +1055,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               type="email"
               value={applicationsInfo.makeup_email || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="example@email.com"
               required
             />
@@ -1069,7 +1069,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               type="tel"
               value={applicationsInfo.makeup_phone || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="例: 090-1234-5678"
               required
             />
@@ -1112,7 +1112,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       }
                     }}
                     disabled={uploadingMakeupFile}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                   {uploadingMakeupFile && (
                     <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
@@ -1160,7 +1160,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                       }
                     }}
                     disabled={uploadingMakeupFile}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                   {uploadingMakeupFile && (
                     <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
@@ -1181,7 +1181,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 value={applicationsInfo.makeup_notes || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="その他、ご要望や注意事項があればご記入ください"
               />
             </div>
@@ -1200,7 +1200,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 type="text"
                 value={applicationsInfo.makeup_preferred_stylist_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist_final: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="希望がある場合は美容師名を入力してください"
               />
             </div>
@@ -1238,7 +1238,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                     }))
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               >
                 <option value="">選択してください</option>
                 <option value="representative">
@@ -1260,7 +1260,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 type="email"
                 value={applicationsInfo.makeup_email_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email_final: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="example@email.com"
               />
             </div>
@@ -1273,7 +1273,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 type="tel"
                 value={applicationsInfo.makeup_phone_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone_final: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="090-1234-5678"
               />
             </div>
@@ -1315,7 +1315,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                         }
                       }}
                       disabled={uploadingMakeupFile}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                     />
                     {uploadingMakeupFile && (
                       <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
@@ -1363,7 +1363,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                         }
                       }}
                       disabled={uploadingMakeupFile}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                     />
                     {uploadingMakeupFile && (
                       <p className="mt-2 text-sm text-blue-600">アップロード中...</p>
@@ -1384,7 +1384,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                 value={applicationsInfo.makeup_notes_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes_final: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="その他、ご要望や注意事項があればご記入ください"
               />
             </div>
@@ -1521,7 +1521,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               value={applicationsInfo.applications_notes || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, applications_notes: e.target.value }))}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="その他、申請に関する注意事項や要望があれば記入してください"
             />
           </div>
@@ -1555,7 +1555,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   max="10"
                   value={seatRequest.premium_seats || 0}
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, premium_seats: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 />
               </div>
 
@@ -1569,7 +1569,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   max="10"
                   value={seatRequest.ss_seats || 0}
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, ss_seats: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 />
               </div>
 
@@ -1583,7 +1583,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   max="10"
                   value={seatRequest.s_seats || 0}
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, s_seats: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 />
               </div>
 
@@ -1597,7 +1597,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   max="10"
                   value={seatRequest.a_seats || 0}
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, a_seats: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 />
               </div>
 
@@ -1611,7 +1611,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
                   max="10"
                   value={seatRequest.b_seats || 0}
                   onChange={(e) => setSeatRequest(prev => ({ ...prev, b_seats: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 />
               </div>
             </div>

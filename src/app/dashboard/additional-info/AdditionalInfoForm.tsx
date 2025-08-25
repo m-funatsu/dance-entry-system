@@ -73,7 +73,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
           value={formData.sponsor}
           onChange={(e) => setFormData({ ...formData, sponsor: e.target.value })}
           rows={3}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="協賛企業名や提供品がある場合は記入してください"
         />
       </div>
@@ -87,7 +87,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
           value={formData.remarks}
           onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
           rows={3}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="その他の連絡事項があれば記入してください"
         />
       </div>
@@ -105,7 +105,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
               value={formData.sound_semifinal}
               onChange={(e) => setFormData({ ...formData, sound_semifinal: e.target.value })}
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="準決勝での音響に関する指示を記入してください"
             />
           </div>
@@ -118,7 +118,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
               value={formData.sound_final}
               onChange={(e) => setFormData({ ...formData, sound_final: e.target.value })}
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="決勝での音響に関する指示を記入してください"
             />
           </div>
@@ -138,7 +138,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
               value={formData.lighting_semifinal}
               onChange={(e) => setFormData({ ...formData, lighting_semifinal: e.target.value })}
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="準決勝での照明に関する指示を記入してください"
             />
           </div>
@@ -151,7 +151,7 @@ export default function AdditionalInfoForm({ entry }: AdditionalInfoFormProps) {
               value={formData.lighting_final}
               onChange={(e) => setFormData({ ...formData, lighting_final: e.target.value })}
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="決勝での照明に関する指示を記入してください"
             />
           </div>

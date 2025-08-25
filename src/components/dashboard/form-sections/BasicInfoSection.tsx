@@ -32,7 +32,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         <select
           value={formData.dance_style}
           onChange={(e) => onChange('dance_style', e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
         >
           <option value="">選択してください</option>
           <option value="JAZZ">JAZZ</option>
@@ -52,7 +52,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             type="text"
             value={formData.representative_name}
             onChange={(e) => onChange('representative_name', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
         <div>
@@ -63,7 +63,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             type="text"
             value={formData.representative_furigana}
             onChange={(e) => onChange('representative_furigana', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
       </div>
@@ -77,7 +77,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             type="text"
             value={formData.partner_name}
             onChange={(e) => onChange('partner_name', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
         <div>
@@ -88,7 +88,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             type="text"
             value={formData.partner_furigana}
             onChange={(e) => onChange('partner_furigana', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
       </div>
@@ -101,7 +101,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           type="tel"
           value={formData.phone_number}
           onChange={(e) => onChange('phone_number', e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           placeholder="例: 090-1234-5678"
         />
         {errors.phone_number && <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>}

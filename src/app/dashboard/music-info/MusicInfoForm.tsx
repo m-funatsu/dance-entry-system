@@ -165,7 +165,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
               value={formData.music_title}
               onChange={(e) => setFormData({ ...formData, music_title: e.target.value })}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
               value={formData.original_artist}
               onChange={(e) => setFormData({ ...formData, original_artist: e.target.value })}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
                 value={formData.final_music_title}
                 onChange={(e) => setFormData({ ...formData, final_music_title: e.target.value })}
                 required={formData.use_different_songs}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
@@ -214,7 +214,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
                 value={formData.final_original_artist}
                 onChange={(e) => setFormData({ ...formData, final_original_artist: e.target.value })}
                 required={formData.use_different_songs}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
           </div>

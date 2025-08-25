@@ -29,7 +29,7 @@ export const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
             type="text"
             value={formData.choreographer}
             onChange={(e) => onChange('choreographer', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
         <div>
@@ -40,7 +40,7 @@ export const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
             type="text"
             value={formData.choreographer_furigana}
             onChange={(e) => onChange('choreographer_furigana', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
       </div>

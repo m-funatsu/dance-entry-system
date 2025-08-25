@@ -458,7 +458,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
             value={snsInfo.sns_notes || ''}
             onChange={(e) => setSnsInfo(prev => ({ ...prev, sns_notes: e.target.value }))}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
             placeholder="その他、SNS掲載に関する要望や注意事項があれば記入してください"
           />
         </div>
