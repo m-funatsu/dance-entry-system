@@ -1,7 +1,6 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { Suspense } from 'react'
 
 function ConfirmEmailContent() {
@@ -87,12 +86,21 @@ function ConfirmEmailContent() {
             </div>
 
             <div className="mt-6">
-              <Link
-                href="/auth/login"
+              <button
+                onClick={() => {
+                  console.log('[CONFIRM-EMAIL] ログインページボタンクリック')
+                  
+                  // 強制的なページ遷移
+                  const form = document.createElement('form')
+                  form.method = 'GET'
+                  form.action = '/auth/login'
+                  document.body.appendChild(form)
+                  form.submit()
+                }}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 ログインページに戻る
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -119,12 +127,21 @@ function ConfirmEmailContent() {
               {error instanceof Error ? error.message : String(error)}
             </p>
           </div>
-          <Link
-            href="/auth/register"
+          <button
+            onClick={() => {
+              console.log('[CONFIRM-EMAIL] エラー時ログインページボタンクリック')
+              
+              // 強制的なページ遷移
+              const form = document.createElement('form')
+              form.method = 'GET'
+              form.action = '/auth/login'
+              document.body.appendChild(form)
+              form.submit()
+            }}
             className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
           >
-            新規登録に戻る
-          </Link>
+            ログインページに戻る
+          </button>
         </div>
       </div>
     )
