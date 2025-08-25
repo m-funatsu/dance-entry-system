@@ -157,7 +157,7 @@ export default async function ProgramInfoListPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリー名
+                    システム利用者名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     楽曲数
@@ -172,10 +172,10 @@ export default async function ProgramInfoListPage() {
                     その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ファイル
+                    準決勝用添付ファイル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ステータス
+                    選考ステータス
                   </th>
                 </tr>
               </thead>
