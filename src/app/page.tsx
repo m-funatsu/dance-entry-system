@@ -17,7 +17,26 @@ export default async function HomePage() {
     .maybeSingle()
 
   if (!userProfile) {
-    redirect('/auth/login')
+    console.log('新規認証ユーザー - プロフィール作成が必要:', user.id)
+    
+    // 新規ユーザーのプロフィール作成
+    const { error: createError } = await supabase
+      .from('users')
+      .insert({
+        id: user.id,
+        email: user.email || '',
+        name: user.user_metadata?.name || user.email?.split('@')[0] || 'ユーザー',
+        role: 'participant'
+      })
+    
+    if (createError) {
+      console.error('プロフィール作成エラー:', createError)
+      redirect('/auth/login')
+    } else {
+      console.log('プロフィール作成完了 - ダッシュボードへ')
+      redirect('/dashboard')
+    }
+    return
   }
 
   if (userProfile.role === 'admin') {
