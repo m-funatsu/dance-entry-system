@@ -70,16 +70,27 @@ export default async function ApplicationsInfoListPage() {
   console.log('[APPLICATIONS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[APPLICATIONS DEBUG] ファイルエラー:', filesError)
 
+  // 観覧席希望情報を取得
+  const { data: seatRequestsList, error: seatRequestsError } = await adminSupabase
+    .from('seat_request')
+    .select('*')
+
+  console.log('[APPLICATIONS DEBUG] 観覧席希望情報取得完了')
+  console.log('[APPLICATIONS DEBUG] 観覧席希望件数:', seatRequestsList?.length || 0)
+  console.log('[APPLICATIONS DEBUG] 観覧席希望エラー:', seatRequestsError)
+
   // データをマッピング（全データを表示）
   const mappedApplicationsInfoList = applicationsInfoList?.map(applicationsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === applicationsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === applicationsInfo.entry_id)
+    const relatedSeatRequest = seatRequestsList?.find(seat => seat.entry_id === applicationsInfo.entry_id)
     
     console.log(`[APPLICATIONS DEBUG] エントリーID ${applicationsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
       hasUser: !!relatedUser,
-      fileCount: relatedFiles?.length || 0
+      fileCount: relatedFiles?.length || 0,
+      hasSeatRequest: !!relatedSeatRequest
     })
     
     return {
@@ -93,7 +104,14 @@ export default async function ApplicationsInfoListPage() {
         status: 'unknown',
         users: { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || []
+      entry_files: relatedFiles || [],
+      seat_request: relatedSeatRequest || {
+        premium_seats: 0,
+        ss_seats: 0,
+        s_seats: 0,
+        a_seats: 0,
+        b_seats: 0
+      }
     }
   }) || []
 
@@ -156,24 +174,24 @@ export default async function ApplicationsInfoListPage() {
               // 選手同伴合計
               item.companion_total_amount || '0',
               // メイク(準決勝)
-              item.makeup_stylist_semifinal || '',
-              item.makeup_applicant_name_semifinal || '',
-              item.makeup_email_semifinal || '',
-              item.makeup_phone_semifinal || '',
-              item.makeup_notes_semifinal || '',
+              item.makeup_preferred_stylist || '',
+              item.makeup_name || '',
+              item.makeup_email || '',
+              item.makeup_phone || '',
+              item.makeup_notes || '',
               // メイク(決勝)
-              item.makeup_stylist_final || '',
-              item.makeup_applicant_name_final || '',
+              item.makeup_preferred_stylist_final || '',
+              item.makeup_name_final || '',
               item.makeup_email_final || '',
               item.makeup_phone_final || '',
               item.makeup_notes_final || '',
               // 観覧席希望
-              item.premium_seats || '0',
-              item.ss_seats || '0',
-              item.s_seats || '0',
-              item.a_seats || '0',
-              item.b_seats || '0',
-              ((parseInt(item.premium_seats || '0') + parseInt(item.ss_seats || '0') + parseInt(item.s_seats || '0') + parseInt(item.a_seats || '0') + parseInt(item.b_seats || '0'))).toString()
+              item.seat_request?.premium_seats?.toString() || '0',
+              item.seat_request?.ss_seats?.toString() || '0',
+              item.seat_request?.s_seats?.toString() || '0',
+              item.seat_request?.a_seats?.toString() || '0',
+              item.seat_request?.b_seats?.toString() || '0',
+              ((parseInt(item.seat_request?.premium_seats?.toString() || '0') + parseInt(item.seat_request?.ss_seats?.toString() || '0') + parseInt(item.seat_request?.s_seats?.toString() || '0') + parseInt(item.seat_request?.a_seats?.toString() || '0') + parseInt(item.seat_request?.b_seats?.toString() || '0'))).toString()
             ])}
             headers={['ID', 'エントリーID', '提出ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考', 'プレミアム席', 'SS席', 'S席', 'A席', 'B席', '合計希望枚数']}
             filename="applications_info"
@@ -373,11 +391,11 @@ export default async function ApplicationsInfoListPage() {
                     {/* メイク(準決勝) */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div><strong>希望美容師:</strong> {applicationsInfo.makeup_stylist_semifinal || '未入力'}</div>
-                        <div><strong>申請者氏名:</strong> {applicationsInfo.makeup_applicant_name_semifinal || '未入力'}</div>
-                        <div><strong>メールアドレス:</strong> {applicationsInfo.makeup_email_semifinal || '未入力'}</div>
-                        <div><strong>電話番号:</strong> {applicationsInfo.makeup_phone_semifinal || '未入力'}</div>
-                        <div><strong>備考:</strong> {applicationsInfo.makeup_notes_semifinal || '未入力'}</div>
+                        <div><strong>希望美容師:</strong> {applicationsInfo.makeup_preferred_stylist || '未入力'}</div>
+                        <div><strong>申請者氏名:</strong> {applicationsInfo.makeup_name || '未入力'}</div>
+                        <div><strong>メールアドレス:</strong> {applicationsInfo.makeup_email || '未入力'}</div>
+                        <div><strong>電話番号:</strong> {applicationsInfo.makeup_phone || '未入力'}</div>
+                        <div><strong>備考:</strong> {applicationsInfo.makeup_notes || '未入力'}</div>
                       </div>
                     </td>
                     
@@ -385,7 +403,7 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_semifinal_style1') || file.purpose.includes('makeup_semifinal_style2'))
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1') || file.purpose.includes('makeup_style2'))
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -399,7 +417,7 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_semifinal_style1') || file.purpose.includes('makeup_semifinal_style2'))
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1') || file.purpose.includes('makeup_style2'))
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -409,8 +427,8 @@ export default async function ApplicationsInfoListPage() {
                     {/* メイク(決勝) */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div><strong>希望美容師:</strong> {applicationsInfo.makeup_stylist_final || '未入力'}</div>
-                        <div><strong>申請者氏名:</strong> {applicationsInfo.makeup_applicant_name_final || '未入力'}</div>
+                        <div><strong>希望美容師:</strong> {applicationsInfo.makeup_preferred_stylist_final || '未入力'}</div>
+                        <div><strong>申請者氏名:</strong> {applicationsInfo.makeup_name_final || '未入力'}</div>
                         <div><strong>メールアドレス:</strong> {applicationsInfo.makeup_email_final || '未入力'}</div>
                         <div><strong>電話番号:</strong> {applicationsInfo.makeup_phone_final || '未入力'}</div>
                         <div><strong>備考:</strong> {applicationsInfo.makeup_notes_final || '未入力'}</div>
@@ -421,7 +439,7 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_final_style1') || file.purpose.includes('makeup_final_style2'))
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1_final') || file.purpose.includes('makeup_style2_final'))
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -435,7 +453,7 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_final_style1') || file.purpose.includes('makeup_final_style2'))
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1_final') || file.purpose.includes('makeup_style2_final'))
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -445,12 +463,12 @@ export default async function ApplicationsInfoListPage() {
                     {/* 観覧席希望 */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div><strong>プレミアム席:</strong> {applicationsInfo.premium_seats || '0'}枚</div>
-                        <div><strong>SS席:</strong> {applicationsInfo.ss_seats || '0'}枚</div>
-                        <div><strong>S席:</strong> {applicationsInfo.s_seats || '0'}枚</div>
-                        <div><strong>A席:</strong> {applicationsInfo.a_seats || '0'}枚</div>
-                        <div><strong>B席:</strong> {applicationsInfo.b_seats || '0'}枚</div>
-                        <div className="mt-1 font-medium"><strong>合計:</strong> {(parseInt(applicationsInfo.premium_seats || '0') + parseInt(applicationsInfo.ss_seats || '0') + parseInt(applicationsInfo.s_seats || '0') + parseInt(applicationsInfo.a_seats || '0') + parseInt(applicationsInfo.b_seats || '0'))}枚</div>
+                        <div><strong>プレミアム席:</strong> {applicationsInfo.seat_request?.premium_seats || '0'}枚</div>
+                        <div><strong>SS席:</strong> {applicationsInfo.seat_request?.ss_seats || '0'}枚</div>
+                        <div><strong>S席:</strong> {applicationsInfo.seat_request?.s_seats || '0'}枚</div>
+                        <div><strong>A席:</strong> {applicationsInfo.seat_request?.a_seats || '0'}枚</div>
+                        <div><strong>B席:</strong> {applicationsInfo.seat_request?.b_seats || '0'}枚</div>
+                        <div className="mt-1 font-medium"><strong>合計:</strong> {(parseInt(applicationsInfo.seat_request?.premium_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.ss_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.s_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.a_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.b_seats?.toString() || '0'))}枚</div>
                       </div>
                     </td>
                   </tr>
