@@ -12,10 +12,9 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       if (!data.work_character_story) errors.push('作品キャラクター・ストーリー等')
       if (!data.copyright_permission) errors.push('楽曲著作権許諾')
       if (!data.music_title) errors.push('使用楽曲タイトル')
-      if (!data.cd_title) errors.push('収録CDタイトル')
-      if (!data.artist) errors.push('アーティスト')
-      if (!data.record_number) errors.push('レコード番号')
-      if (!data.jasrac_code) errors.push('JASRAC作品コード')
+      // 収録CDタイトル、アーティスト、レコード番号は必須から外す
+      // JASRAC作品コードは市販楽曲(A)選択時のみ必須
+      if (data.copyright_permission === 'A' && !data.jasrac_code) errors.push('JASRAC作品コード')
       if (!data.music_type) errors.push('楽曲種類')
       if (!data.music_data_path) errors.push('楽曲データ')
       break

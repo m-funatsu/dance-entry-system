@@ -47,10 +47,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     work_title_kana: { required: true },
     work_story: { required: true, maxLength: 50 },
     music_title: { required: true },
-    cd_title: { required: true },
-    artist: { required: true },
-    record_number: { required: true },
-    jasrac_code: { required: true },
+    cd_title: { required: false }, // 必須を外す
+    artist: { required: false }, // 必須を外す
+    record_number: { required: false }, // 必須を外す
+    jasrac_code: { 
+      required: formData.music_rights_cleared === 'A' // A.市販の楽曲を使用する場合のみ必須
+    },
     music_type: { required: true },
     music_rights_cleared: { required: true },
     choreographer1_name: { required: true },
@@ -641,7 +643,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="cd_title"
               value={formData.cd_title}
               onChange={(e) => handleFieldChange('cd_title', e.target.value)}
-              required
               placeholder="CD/アルバム名"
               error={errors.cd_title}
             />
@@ -651,7 +652,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="artist"
               value={formData.artist}
               onChange={(e) => handleFieldChange('artist', e.target.value)}
-              required
               placeholder="アーティスト名"
               error={errors.artist}
             />
@@ -661,7 +661,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="record_number"
               value={formData.record_number}
               onChange={(e) => handleFieldChange('record_number', e.target.value)}
-              required
               placeholder="例：ABCD-12345"
               error={errors.record_number}
             />
@@ -671,7 +670,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="jasrac_code"
               value={formData.jasrac_code}
               onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
-              required
+              required={formData.music_rights_cleared === 'A'}
               placeholder="例：123-4567-8"
               error={errors.jasrac_code}
             />

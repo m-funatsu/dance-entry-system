@@ -274,7 +274,6 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         value={semifinalsInfo.cd_title || ''}
         onChange={(e) => onChange({ cd_title: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
-        required
       />
 
       <FormField
@@ -283,7 +282,6 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         value={semifinalsInfo.artist || ''}
         onChange={(e) => onChange({ artist: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
-        required
       />
 
       <FormField
@@ -292,7 +290,6 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         value={semifinalsInfo.record_number || ''}
         onChange={(e) => onChange({ record_number: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
-        required
       />
 
       <FormField
@@ -301,7 +298,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         value={semifinalsInfo.jasrac_code || ''}
         onChange={(e) => onChange({ jasrac_code: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
-        required
+        required={semifinalsInfo.copyright_permission === 'A'}
       />
 
       <FormField
