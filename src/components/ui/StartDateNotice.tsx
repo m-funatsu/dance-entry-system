@@ -26,14 +26,7 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
           onAvailabilityChange(result.isAvailable)
         }
         
-        // 入力不可の場合、フォーム要素を無効化
-        if (!result.isAvailable) {
-          const formElements = document.querySelectorAll('input, textarea, select, button')
-          formElements.forEach(element => {
-            (element as HTMLElement).style.pointerEvents = 'none'
-            element.setAttribute('disabled', 'true')
-          })
-        }
+        // 入力不可の場合の処理（DOM操作は削除、オーバーレイのみで制御）
       } catch (error) {
         console.error('入力開始日チェックエラー:', error)
         setIsAvailable(true) // エラー時は利用可能として扱う
@@ -100,24 +93,29 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
         </div>
       )}
       
-      {/* フォーム無効化オーバーレイ */}
+      {/* 入力制限時は警告のみ表示（物理的制限なし） */}
       {!isAvailable && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 z-40 pointer-events-none">
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50 max-w-md">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
-                <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">⏳ このセクションは入力開始前です</h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>{message}</p>
+                <p className="mt-1 font-medium">現在は基本情報、予選情報、プログラム情報のみ入力可能です。</p>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">入力開始日前です</h3>
-              <p className="text-sm text-gray-600 mb-4">{message}</p>
-              <button
-                onClick={() => window.history.back()}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                戻る
-              </button>
+              <div className="mt-3">
+                <button
+                  onClick={() => window.history.back()}
+                  className="inline-flex items-center px-3 py-1 border border-yellow-600 text-xs font-medium rounded text-yellow-800 bg-yellow-50 hover:bg-yellow-100"
+                >
+                  ← ダッシュボードに戻る
+                </button>
+              </div>
             </div>
           </div>
         </div>
