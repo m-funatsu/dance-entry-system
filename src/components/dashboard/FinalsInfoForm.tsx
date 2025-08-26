@@ -24,6 +24,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
   
   // オプション管理のステート
   const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('')
@@ -698,20 +699,27 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">決勝情報</h3>
 
-      <StartDateNotice section="finals" />
-      <DeadlineNoticeAsync deadlineKey="finals_deadline" />
-
-      {error && <Alert type="error" message={error} />}
-      {success && <Alert type="success" message={success} />}
-
-      {/* セクションタブ */}
-      <TabNavigation
-        tabs={tabs}
-        activeTab={activeSection}
-        onTabChange={handleSectionChange}
+      <StartDateNotice 
+        section="finals"
+        onAvailabilityChange={setIsStartDateAvailable}
       />
 
-      {/* 各セクションのコンテンツ */}
+      {/* 入力開始日後のみフォーム表示 */}
+      {isStartDateAvailable && (
+        <>
+          <DeadlineNoticeAsync deadlineKey="finals_deadline" />
+
+          {error && <Alert type="error" message={error} />}
+          {success && <Alert type="success" message={success} />}
+
+          {/* セクションタブ */}
+          <TabNavigation
+            tabs={tabs}
+            activeTab={activeSection}
+            onTabChange={handleSectionChange}
+          />
+
+          {/* 各セクションのコンテンツ */}
       {activeSection === 'music' && (
         <FinalsMusicSection
           finalsInfo={finalsInfo}
@@ -760,20 +768,35 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         />
       )}
 
-      <div className="flex justify-between pt-6">
-        <button
-          type="button"
-          onClick={() => window.location.href = '/dashboard'}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-        >
-          ダッシュボードに戻る
-        </button>
-        <SaveButton
-          onClick={handleSave}
-          disabled={saving}
-          loading={saving}
-        />
-      </div>
+          <div className="flex justify-between pt-6">
+            <button
+              type="button"
+              onClick={() => window.location.href = '/dashboard'}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            >
+              ダッシュボードに戻る
+            </button>
+            <SaveButton
+              onClick={handleSave}
+              disabled={saving}
+              loading={saving}
+            />
+          </div>
+        </>
+      )}
+
+      {/* 入力開始日前は戻るボタンのみ表示 */}
+      {!isStartDateAvailable && (
+        <div className="flex justify-between pt-6">
+          <button
+            type="button"
+            onClick={() => window.location.href = '/dashboard'}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+          >
+            ダッシュボードに戻る
+          </button>
+        </div>
+      )}
     </div>
   )
 }

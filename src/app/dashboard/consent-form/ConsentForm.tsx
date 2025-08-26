@@ -19,6 +19,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
   
   const [consentChecked, setConsentChecked] = useState(initialData?.consent_form_submitted || false)
   const [saving, setSaving] = useState(false)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,9 +61,14 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <StartDateNotice section="consent_form" />
+      <StartDateNotice 
+        section="consent_form"
+        onAvailabilityChange={setIsStartDateAvailable}
+      />
       
-      <div className="space-y-6">
+      {/* 入力開始日後のみフォーム表示 */}
+      {isStartDateAvailable && (
+        <div className="space-y-6">
         <div className="bg-gray-50 p-6 rounded-md">
           <h3 className="text-lg font-medium text-gray-900 mb-4">参加同意書</h3>
           
@@ -132,30 +138,44 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
             </div>
           </div>
         )}
-      </div>
+        </div>
 
-      <div className="flex justify-between">
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard')}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          戻る
-        </button>
-        {!initialData?.consent_form_submitted && (
+        <div className="flex justify-between">
           <button
-            type="submit"
-            disabled={saving || !consentChecked}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
-              saving || !consentChecked
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
-            }`}
+            type="button"
+            onClick={() => router.push('/dashboard')}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
-            {saving ? '提出中...' : '同意して提出'}
+            戻る
           </button>
-        )}
-      </div>
+          {!initialData?.consent_form_submitted && (
+            <button
+              type="submit"
+              disabled={saving || !consentChecked}
+              className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
+                saving || !consentChecked
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-indigo-600 hover:bg-indigo-700'
+              }`}
+            >
+              {saving ? '提出中...' : '同意して提出'}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 入力開始日前は戻るボタンのみ表示 */}
+      {!isStartDateAvailable && (
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+          >
+            戻る
+          </button>
+        </div>
+      )}
     </form>
   )
 }

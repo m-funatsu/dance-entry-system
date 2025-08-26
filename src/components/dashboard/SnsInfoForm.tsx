@@ -18,6 +18,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [uploadingPracticeVideo, setUploadingPracticeVideo] = useState(false)
   const [uploadingIntroductionVideo, setUploadingIntroductionVideo] = useState(false)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
   const [snsInfo, setSnsInfo] = useState<Partial<SnsInfo>>({
     entry_id: entry.id,
     sns_notes: ''
@@ -251,21 +252,27 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
         </p>
       </div>
 
-      <StartDateNotice section="sns" />
+      <StartDateNotice 
+        section="sns"
+        onAvailabilityChange={setIsStartDateAvailable}
+      />
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md">
-          {error}
-        </div>
-      )}
+      {/* 入力開始日後のみフォーム表示 */}
+      {isStartDateAvailable && (
+        <>
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-md">
+              {error}
+            </div>
+          )}
 
-      {success && (
-        <div className="bg-green-50 text-green-600 p-4 rounded-md">
-          {success}
-        </div>
-      )}
+          {success && (
+            <div className="bg-green-50 text-green-600 p-4 rounded-md">
+              {success}
+            </div>
+          )}
 
-      <div className="space-y-6">
+          <div className="space-y-6">
         {/* 練習動画 */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h4 className="text-base font-medium text-gray-900 mb-4">練習動画（約30秒）横長動画 <span className="text-red-500">*</span></h4>
@@ -465,28 +472,43 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
             placeholder="その他、SNS掲載に関する要望や注意事項があれば記入してください"
           />
         </div>
-      </div>
+          </div>
 
-      <div className="flex justify-between pt-6">
-        <button
-          type="button"
-          onClick={() => window.location.href = '/dashboard'}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-        >
-          ダッシュボードに戻る
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={`px-6 py-2 rounded-md text-white cursor-pointer ${
-            saving
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {saving ? '保存中...' : '保存'}
-        </button>
-      </div>
+          <div className="flex justify-between pt-6">
+            <button
+              type="button"
+              onClick={() => window.location.href = '/dashboard'}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            >
+              ダッシュボードに戻る
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className={`px-6 py-2 rounded-md text-white cursor-pointer ${
+                saving
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {saving ? '保存中...' : '保存'}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* 入力開始日前は戻るボタンのみ表示 */}
+      {!isStartDateAvailable && (
+        <div className="flex justify-between pt-6">
+          <button
+            type="button"
+            onClick={() => window.location.href = '/dashboard'}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+          >
+            ダッシュボードに戻る
+          </button>
+        </div>
+      )}
     </div>
   )
 }
