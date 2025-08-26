@@ -117,21 +117,35 @@ export default async function ApplicationsInfoListPage() {
             data={mappedApplicationsInfoList.map(item => [
               item.id,
               item.entry_id,
-              item.entries?.users?.name || '不明なユーザー',
-              item.entries?.participant_names || 'エントリー名なし',
-              item.related_ticket_count?.toString() || '0',
-              item.related_ticket_total_amount?.toString() || '0',
-              item.related1_name || '',
+              item.entries?.status || '',
+              // 関係者チケット1
               item.related1_relationship || '',
-              item.companion_total_amount?.toString() || '0',
-              item.companion1_name || '',
-              item.companion1_purpose || '',
-              item.makeup_name || '',
-              item.makeup_name_final || '',
-              item.makeup_preferred_stylist || '',
-              item.entries?.status || ''
+              item.related1_name || '',
+              item.related1_furigana || '',
+              // 関係者チケット2
+              item.related2_relationship || '',
+              item.related2_name || '',
+              item.related2_furigana || '',
+              // 関係者チケット3
+              item.related3_relationship || '',
+              item.related3_name || '',
+              item.related3_furigana || '',
+              // 関係者チケット4
+              item.related4_relationship || '',
+              item.related4_name || '',
+              item.related4_furigana || '',
+              // 観覧席希望
+              item.premium_seats || '0',
+              item.ss_seats || '0',
+              item.s_seats || '0',
+              item.a_seats || '0',
+              item.b_seats || '0',
+              ((parseInt(item.premium_seats || '0') + parseInt(item.ss_seats || '0') + parseInt(item.s_seats || '0') + parseInt(item.a_seats || '0') + parseInt(item.b_seats || '0'))).toString(),
+              // 関係者チケット5
+              item.related5_relationship || '',
+              item.related5_name || ''
             ])}
-            headers={['ID', 'エントリーID', 'ユーザー名', 'エントリー名', 'チケット枚数', 'チケット合計金額', '関係者1名前', '関係者1続柄', '同伴者合計金額', '同伴者1名前', '同伴者1目的', '準決勝メイク担当', '決勝メイク担当', 'メイク希望スタイリスト', '選考ステータス']}
+            headers={['ID', 'エントリーID', '提出ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', 'プレミアム席', 'SS席', 'S席', 'A席', 'B席', '合計希望枚数', '関係者5関係', '関係者5氏名']}
             filename="applications_info"
           />
         </div>
@@ -149,37 +163,35 @@ export default async function ApplicationsInfoListPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリー名
+                    システム利用者名
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    関係者チケット
+                    関係者チケット1
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    同伴者情報
+                    関係者チケット2
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    メイク申請
+                    関係者チケット3
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    支払い証明書
+                    関係者チケット4
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    メイク関連画像
+                    観覧席希望
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    申請書類PDF
+                    関係者チケット5
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ステータス
+                    希望スタイル画像
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {mappedApplicationsInfoList.map((applicationsInfo) => (
                   <tr key={applicationsInfo.id} className="hover:bg-gray-50">
+                    {/* システム利用者名 */}
                     <td className="px-2 py-3 whitespace-nowrap">
                       <div className="text-xs font-medium text-gray-900">
                         {applicationsInfo.entries?.users?.name || '不明なユーザー'}
@@ -188,42 +200,68 @@ export default async function ApplicationsInfoListPage() {
                         {applicationsInfo.entries?.participant_names || 'エントリー名なし'}
                       </div>
                     </td>
+                    
+                    {/* 関係者チケット1 */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">枚数: {applicationsInfo.related_ticket_count || 0}枚</div>
-                        <div className="text-gray-500">合計: ¥{(applicationsInfo.related_ticket_total_amount || 0).toLocaleString()}</div>
-                        <div className="text-gray-500 mt-1">
-                          {applicationsInfo.related1_name && `${applicationsInfo.related1_name} (${applicationsInfo.related1_relationship})`}
-                        </div>
+                        <div><strong>関係:</strong> {applicationsInfo.related1_relationship || '未入力'}</div>
+                        <div><strong>氏名:</strong> {applicationsInfo.related1_name || '未入力'}</div>
+                        <div><strong>フリガナ:</strong> {applicationsInfo.related1_furigana || '未入力'}</div>
                       </div>
                     </td>
+                    
+                    {/* 関係者チケット2 */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">合計: ¥{(applicationsInfo.companion_total_amount || 0).toLocaleString()}</div>
-                        <div className="text-gray-500 mt-1">
-                          {applicationsInfo.companion1_name && `${applicationsInfo.companion1_name} (${applicationsInfo.companion1_purpose})`}
-                        </div>
+                        <div><strong>関係:</strong> {applicationsInfo.related2_relationship || '未入力'}</div>
+                        <div><strong>氏名:</strong> {applicationsInfo.related2_name || '未入力'}</div>
+                        <div><strong>フリガナ:</strong> {applicationsInfo.related2_furigana || '未入力'}</div>
                       </div>
                     </td>
+                    
+                    {/* 関係者チケット3 */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">準決勝:</div>
-                        <div className={applicationsInfo.makeup_name ? 'text-green-600' : 'text-gray-400'}>
-                          {applicationsInfo.makeup_name ? ` ${applicationsInfo.makeup_name}` : ' 申請なし'}
-                        </div>
-                        <div className="text-gray-500 mt-1">決勝:</div>
-                        <div className={applicationsInfo.makeup_name_final ? 'text-green-600' : 'text-gray-400'}>
-                          {applicationsInfo.makeup_name_final ? ` ${applicationsInfo.makeup_name_final}` : ' 申請なし'}
-                        </div>
-                        {applicationsInfo.makeup_preferred_stylist && (
-                          <div className="text-gray-500">希望: {applicationsInfo.makeup_preferred_stylist}</div>
-                        )}
+                        <div><strong>関係:</strong> {applicationsInfo.related3_relationship || '未入力'}</div>
+                        <div><strong>氏名:</strong> {applicationsInfo.related3_name || '未入力'}</div>
+                        <div><strong>フリガナ:</strong> {applicationsInfo.related3_furigana || '未入力'}</div>
                       </div>
                     </td>
+                    
+                    {/* 関係者チケット4 */}
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div><strong>関係:</strong> {applicationsInfo.related4_relationship || '未入力'}</div>
+                        <div><strong>氏名:</strong> {applicationsInfo.related4_name || '未入力'}</div>
+                        <div><strong>フリガナ:</strong> {applicationsInfo.related4_furigana || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 観覧席希望 */}
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div><strong>プレミアム席:</strong> {applicationsInfo.premium_seats || '0'}枚</div>
+                        <div><strong>SS席:</strong> {applicationsInfo.ss_seats || '0'}枚</div>
+                        <div><strong>S席:</strong> {applicationsInfo.s_seats || '0'}枚</div>
+                        <div><strong>A席:</strong> {applicationsInfo.a_seats || '0'}枚</div>
+                        <div><strong>B席:</strong> {applicationsInfo.b_seats || '0'}枚</div>
+                        <div className="mt-1 font-medium"><strong>合計:</strong> {(parseInt(applicationsInfo.premium_seats || '0') + parseInt(applicationsInfo.ss_seats || '0') + parseInt(applicationsInfo.s_seats || '0') + parseInt(applicationsInfo.a_seats || '0') + parseInt(applicationsInfo.b_seats || '0'))}枚</div>
+                      </div>
+                    </td>
+                    
+                    {/* 関係者チケット5 */}
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        <div><strong>関係:</strong> {applicationsInfo.related5_relationship || '未入力'}</div>
+                        <div><strong>氏名:</strong> {applicationsInfo.related5_name || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 希望スタイル画像 */}
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && file.purpose.includes('payment')
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('style1') || file.purpose.includes('style2'))
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -232,81 +270,16 @@ export default async function ApplicationsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              💰 {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { purpose?: string }) => 
-                          file.purpose && file.purpose.includes('payment')
-                        )) && (
-                          <span className="text-xs text-gray-400">支払い証明書なし</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('makeup')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              💄 {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('makeup')
-                        )) && (
-                          <span className="text-xs text-gray-400">メイク関連画像なし</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('applications')
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              📄 {file.file_name}
+                              📸 {file.purpose?.includes('style1') ? '希望スタイル①' : '希望スタイル②'}
                             </a>
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('applications')
+                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('style1') || file.purpose.includes('style2'))
                         )) && (
-                          <span className="text-xs text-gray-400">申請書類なし</span>
+                          <span className="text-xs text-gray-400">画像なし</span>
                         )}
                       </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">作成: {applicationsInfo.created_at ? new Date(applicationsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新: {applicationsInfo.updated_at ? new Date(applicationsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        applicationsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        applicationsInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        applicationsInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {applicationsInfo.entries?.status === 'pending' && '審査待ち'}
-                        {applicationsInfo.entries?.status === 'submitted' && '提出済み'}
-                        {applicationsInfo.entries?.status === 'selected' && '選考通過'}
-                        {applicationsInfo.entries?.status === 'rejected' && '不選考'}
-                      </span>
                     </td>
                   </tr>
                 ))}
