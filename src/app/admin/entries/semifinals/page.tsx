@@ -102,6 +102,33 @@ export default async function SemifinalsInfoListPage() {
   console.log('[SEMIFINALS DEBUG] マッピング後データ件数:', mappedSemifinalsInfoList?.length || 0)
   console.log('[SEMIFINALS DEBUG] マッピング後データ:', JSON.stringify(mappedSemifinalsInfoList, null, 2))
 
+  // コード値を名称に変換する関数
+  const getMusicRightsLabel = (code: string) => {
+    switch (code) {
+      case 'A': return 'A.市販の楽曲を使用する'
+      case 'B': return 'B.権利者から楽曲使用許諾を受けている楽曲を使用する'
+      case 'C': return 'C.自作楽曲を使用する'
+      default: return code || '未入力'
+    }
+  }
+
+  const getMusicTypeLabel = (code: string) => {
+    switch (code) {
+      case 'cd': return 'CD楽曲'
+      case 'download': return 'データダウンロード楽曲'
+      case 'other': return 'その他（オリジナル曲）'
+      default: return code || '未入力'
+    }
+  }
+
+  const getChaserDesignationLabel = (code: string) => {
+    switch (code) {
+      case 'required': return '必要'
+      case 'not_required': return '不要'
+      default: return code || '未入力'
+    }
+  }
+
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
     const { data } = adminSupabase.storage.from('files').getPublicUrl(filePath)
@@ -125,18 +152,18 @@ export default async function SemifinalsInfoListPage() {
               item.work_title_kana || '未入力',
               item.work_character_story || '未入力',
               // 楽曲著作関連情報
-              item.copyright_permission || '未入力',
+              getMusicRightsLabel(item.copyright_permission || ''),
               item.music_title || '未入力',
               item.cd_title || '未入力',
               item.artist || '未入力',
               item.record_number || '未入力',
               item.jasrac_code || '未入力',
-              item.music_type || '未入力',
+              getMusicTypeLabel(item.music_type || ''),
               // 楽曲データ添付
               item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 音響情報
               item.music_usage_method || '未入力',
-              item.chaser_song_designation || '未入力',
+              getChaserDesignationLabel(item.chaser_song_designation || ''),
               item.fade_out_start_time || '未入力',
               item.fade_out_complete_time || '未入力',
               // 音響データ添付
@@ -334,13 +361,13 @@ export default async function SemifinalsInfoListPage() {
                     {/* 3. 楽曲著作関連情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="mb-1"><strong>楽曲著作権許諾:</strong> {semifinalsInfo.copyright_permission || '未入力'}</div>
+                        <div className="mb-1"><strong>楽曲著作権許諾:</strong> {getMusicRightsLabel(semifinalsInfo.copyright_permission || '')}</div>
                         <div className="mb-1"><strong>使用楽曲タイトル:</strong> {semifinalsInfo.music_title || '未入力'}</div>
                         <div className="mb-1"><strong>収録CDタイトル:</strong> {semifinalsInfo.cd_title || '未入力'}</div>
                         <div className="mb-1"><strong>アーティスト:</strong> {semifinalsInfo.artist || '未入力'}</div>
                         <div className="mb-1"><strong>レコード番号:</strong> {semifinalsInfo.record_number || '未入力'}</div>
                         <div className="mb-1"><strong>JASRAC作品コード:</strong> {semifinalsInfo.jasrac_code || '未入力'}</div>
-                        <div><strong>楽曲種類:</strong> {semifinalsInfo.music_type || '未入力'}</div>
+                        <div><strong>楽曲種類:</strong> {getMusicTypeLabel(semifinalsInfo.music_type || '')}</div>
                       </div>
                     </td>
                     
@@ -374,7 +401,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
                         <div className="mb-1"><strong>音楽スタートのタイミング:</strong> {semifinalsInfo.music_usage_method || '未入力'}</div>
-                        <div className="mb-1"><strong>チェイサー曲の指定:</strong> {semifinalsInfo.chaser_song_designation || '未入力'}</div>
+                        <div className="mb-1"><strong>チェイサー曲の指定:</strong> {getChaserDesignationLabel(semifinalsInfo.chaser_song_designation || '')}</div>
                         <div className="mb-1"><strong>フェードアウト開始時間:</strong> {semifinalsInfo.fade_out_start_time || '未入力'}</div>
                         <div><strong>フェードアウト完了時間:</strong> {semifinalsInfo.fade_out_complete_time || '未入力'}</div>
                       </div>
