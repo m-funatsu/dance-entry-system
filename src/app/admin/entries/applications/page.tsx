@@ -32,25 +32,25 @@ export default async function ApplicationsInfoListPage() {
   const { data: applicationsInfoList, error: applicationsError } = await adminSupabase
     .from('applications_info')
     .select('*')
-    .order('created_at', { ascending: false })
 
   console.log('[APPLICATIONS DEBUG] 各種申請情報取得完了')
   console.log('[APPLICATIONS DEBUG] 各種申請情報件数:', applicationsInfoList?.length || 0)
   console.log('[APPLICATIONS DEBUG] 各種申請情報エラー:', applicationsError)
 
-  if (applicationsError) {
-    console.error('各種申請情報取得エラー:', applicationsError)
-    return <div>各種申請情報の取得に失敗しました</div>
-  }
-
-  // エントリー情報を取得
+  // エントリー情報を取得（全エントリーを基準とする）
   const { data: entriesList, error: entriesError } = await adminSupabase
     .from('entries')
     .select('*')
+    .order('created_at', { ascending: false })
 
   console.log('[APPLICATIONS DEBUG] エントリー情報取得完了')
   console.log('[APPLICATIONS DEBUG] エントリー件数:', entriesList?.length || 0)
   console.log('[APPLICATIONS DEBUG] エントリーエラー:', entriesError)
+
+  if (entriesError) {
+    console.error('エントリー情報取得エラー:', entriesError)
+    return <div>エントリー情報の取得に失敗しました</div>
+  }
 
   // ユーザー情報を取得
   const { data: usersList, error: usersError } = await adminSupabase
@@ -79,30 +79,68 @@ export default async function ApplicationsInfoListPage() {
   console.log('[APPLICATIONS DEBUG] 観覧席希望件数:', seatRequestsList?.length || 0)
   console.log('[APPLICATIONS DEBUG] 観覧席希望エラー:', seatRequestsError)
 
-  // データをマッピング（全データを表示）
-  const mappedApplicationsInfoList = applicationsInfoList?.map(applicationsInfo => {
-    const relatedEntry = entriesList?.find(entry => entry.id === applicationsInfo.entry_id)
-    const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
-    const relatedFiles = filesList?.filter(file => file.entry_id === applicationsInfo.entry_id)
-    const relatedSeatRequest = seatRequestsList?.find(seat => seat.entry_id === applicationsInfo.entry_id)
+  // データをマッピング（全エントリーを基準として表示）
+  const mappedApplicationsInfoList = entriesList?.map(entry => {
+    const relatedUser = usersList?.find(user => user.id === entry.user_id)
+    const relatedApplicationsInfo = applicationsInfoList?.find(app => app.entry_id === entry.id)
+    const relatedFiles = filesList?.filter(file => file.entry_id === entry.id)
+    const relatedSeatRequest = seatRequestsList?.find(seat => seat.entry_id === entry.id)
     
-    console.log(`[APPLICATIONS DEBUG] エントリーID ${applicationsInfo.entry_id}:`, {
-      hasEntry: !!relatedEntry,
+    console.log(`[APPLICATIONS DEBUG] エントリーID ${entry.id}:`, {
       hasUser: !!relatedUser,
+      hasApplicationsInfo: !!relatedApplicationsInfo,
       fileCount: relatedFiles?.length || 0,
       hasSeatRequest: !!relatedSeatRequest
     })
     
     return {
-      ...applicationsInfo,
-      entries: relatedEntry ? {
-        ...relatedEntry,
+      // applications_info のデータ、または空のデフォルト値
+      id: relatedApplicationsInfo?.id || `dummy-${entry.id}`,
+      entry_id: entry.id,
+      // 関係者チケット情報
+      related_ticket_count: relatedApplicationsInfo?.related_ticket_count || 0,
+      related1_relationship: relatedApplicationsInfo?.related1_relationship || '',
+      related1_name: relatedApplicationsInfo?.related1_name || '',
+      related1_furigana: relatedApplicationsInfo?.related1_furigana || '',
+      related2_relationship: relatedApplicationsInfo?.related2_relationship || '',
+      related2_name: relatedApplicationsInfo?.related2_name || '',
+      related2_furigana: relatedApplicationsInfo?.related2_furigana || '',
+      related3_relationship: relatedApplicationsInfo?.related3_relationship || '',
+      related3_name: relatedApplicationsInfo?.related3_name || '',
+      related3_furigana: relatedApplicationsInfo?.related3_furigana || '',
+      related4_relationship: relatedApplicationsInfo?.related4_relationship || '',
+      related4_name: relatedApplicationsInfo?.related4_name || '',
+      related4_furigana: relatedApplicationsInfo?.related4_furigana || '',
+      related5_relationship: relatedApplicationsInfo?.related5_relationship || '',
+      related5_name: relatedApplicationsInfo?.related5_name || '',
+      related5_furigana: relatedApplicationsInfo?.related5_furigana || '',
+      related_ticket_total_amount: relatedApplicationsInfo?.related_ticket_total_amount || 0,
+      // 選手同伴情報
+      companion1_name: relatedApplicationsInfo?.companion1_name || '',
+      companion1_furigana: relatedApplicationsInfo?.companion1_furigana || '',
+      companion1_purpose: relatedApplicationsInfo?.companion1_purpose || '',
+      companion2_name: relatedApplicationsInfo?.companion2_name || '',
+      companion2_furigana: relatedApplicationsInfo?.companion2_furigana || '',
+      companion2_purpose: relatedApplicationsInfo?.companion2_purpose || '',
+      companion3_name: relatedApplicationsInfo?.companion3_name || '',
+      companion3_furigana: relatedApplicationsInfo?.companion3_furigana || '',
+      companion3_purpose: relatedApplicationsInfo?.companion3_purpose || '',
+      companion_total_amount: relatedApplicationsInfo?.companion_total_amount || 0,
+      // メイク情報
+      makeup_preferred_stylist: relatedApplicationsInfo?.makeup_preferred_stylist || '',
+      makeup_name: relatedApplicationsInfo?.makeup_name || '',
+      makeup_email: relatedApplicationsInfo?.makeup_email || '',
+      makeup_phone: relatedApplicationsInfo?.makeup_phone || '',
+      makeup_notes: relatedApplicationsInfo?.makeup_notes || '',
+      makeup_preferred_stylist_final: relatedApplicationsInfo?.makeup_preferred_stylist_final || '',
+      makeup_name_final: relatedApplicationsInfo?.makeup_name_final || '',
+      makeup_email_final: relatedApplicationsInfo?.makeup_email_final || '',
+      makeup_phone_final: relatedApplicationsInfo?.makeup_phone_final || '',
+      makeup_notes_final: relatedApplicationsInfo?.makeup_notes_final || '',
+      // エントリー情報
+      entries: {
+        ...entry,
         users: relatedUser || { name: '不明なユーザー', email: '不明' }
-      } : { 
-        id: '', 
-        participant_names: 'エントリー情報なし', 
-        status: 'unknown',
-        users: { name: '不明なユーザー', email: '不明' }
       },
       entry_files: relatedFiles || [],
       seat_request: relatedSeatRequest || {

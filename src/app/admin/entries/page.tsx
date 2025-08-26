@@ -92,33 +92,59 @@ export default async function AdminEntriesPage() {
     }
     console.log('================================')
 
-    // 手動でユーザーデータをマッピング（安全な処理）
-    const entriesWithUsers = entries?.map(entry => {
-      const user = allUsers?.find(u => u.id === entry.user_id)
+    // 全ユーザーを基準にしてエントリー情報をマッピング（ログインのみのユーザーも表示）
+    const entriesWithUsers = allUsers?.filter(user => user.role === 'participant').map(user => {
+      const entry = entries?.find(e => e.user_id === user.id)
       
-      // 基本情報からdance_styleを取得
-      let dance_style = '未分類'
-      if (entry.basic_info) {
-        if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-          const basicInfo = entry.basic_info[0] as { dance_style?: string }
-          dance_style = basicInfo?.dance_style || '未分類'
-        } else if (!Array.isArray(entry.basic_info)) {
-          const basicInfo = entry.basic_info as { dance_style?: string }
-          dance_style = basicInfo.dance_style || '未分類'
+      if (entry) {
+        // エントリーが存在する場合：既存のロジック
+        let dance_style = '未分類'
+        if (entry.basic_info) {
+          if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
+            const basicInfo = entry.basic_info[0] as { dance_style?: string }
+            dance_style = basicInfo?.dance_style || '未分類'
+          } else if (!Array.isArray(entry.basic_info)) {
+            const basicInfo = entry.basic_info as { dance_style?: string }
+            dance_style = basicInfo.dance_style || '未分類'
+          }
+        }
+        
+        return {
+          ...entry,
+          dance_style,
+          users: { 
+            name: user.name || '不明なユーザー', 
+            email: user.email || 'メールアドレス不明' 
+          }
+        }
+      } else {
+        // エントリーが存在しない場合：ダミーエントリーを作成
+        return {
+          id: `dummy-${user.id}`,
+          user_id: user.id,
+          participant_names: user.name || '未入力',
+          status: 'pending' as const,
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+          dance_style: '未分類',
+          entry_files: [],
+          selections: [],
+          basic_info: undefined,
+          preliminary_info: undefined,
+          program_info: undefined,
+          semifinals_info: undefined,
+          finals_info: undefined,
+          applications_info: undefined,
+          sns_info: undefined,
+          users: { 
+            name: user.name || '不明なユーザー', 
+            email: user.email || 'メールアドレス不明' 
+          }
         }
       }
-      
-      return {
-        ...entry,
-        dance_style, // 基本情報から取得したdance_styleを追加
-        users: user ? { 
-          name: user.name || '不明なユーザー', 
-          email: user.email || 'メールアドレス不明' 
-        } : { 
-          name: '不明なユーザー', 
-          email: 'メールアドレス不明' 
-        }
-      }
+    }).sort((a, b) => {
+      // 作成日時で降順ソート（新しいものが上）
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     }) || []
 
     return (
