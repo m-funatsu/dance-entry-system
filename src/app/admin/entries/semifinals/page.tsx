@@ -162,12 +162,12 @@ export default async function SemifinalsInfoListPage() {
               // 楽曲データ添付
               item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 音響情報
-              item.music_usage_method || '未入力',
+              item.sound_start_timing || '未入力',
               getChaserDesignationLabel(item.chaser_song_designation || ''),
               item.fade_out_start_time || '未入力',
               item.fade_out_complete_time || '未入力',
-              // 音響データ添付
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              // チェイサー（退場）曲音源
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'audio' && file.purpose === 'chaser_song').map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 踊り出し
               item.dance_start_timing || '未入力',
               // 照明シーン1
@@ -224,7 +224,7 @@ export default async function SemifinalsInfoListPage() {
               '5. 音響情報 - チェイサー曲の指定',
               '5. 音響情報 - フェードアウト開始時間',
               '5. 音響情報 - フェードアウト完了時間',
-              '6. 音響データ添付',
+              '6. チェイサー（退場）曲音源',
               '7. 踊り出し - 準決勝 踊り出しタイミング',
               '8. 照明シーン1',
               '9. 照明シーン1イメージ画像',
@@ -275,7 +275,7 @@ export default async function SemifinalsInfoListPage() {
                     5. 音響情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    6. 音響データ添付
+                    6. チェイサー（退場）曲音源
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
                     7. 踊り出し
@@ -402,18 +402,18 @@ export default async function SemifinalsInfoListPage() {
                     {/* 5. 音響情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="mb-1"><strong>音楽スタートのタイミング:</strong> {semifinalsInfo.music_usage_method || '未入力'}</div>
+                        <div className="mb-1"><strong>音楽スタートのタイミング:</strong> {semifinalsInfo.sound_start_timing || '未入力'}</div>
                         <div className="mb-1"><strong>チェイサー曲の指定:</strong> {getChaserDesignationLabel(semifinalsInfo.chaser_song_designation || '')}</div>
                         <div className="mb-1"><strong>フェードアウト開始時間:</strong> {semifinalsInfo.fade_out_start_time || '未入力'}</div>
                         <div><strong>フェードアウト完了時間:</strong> {semifinalsInfo.fade_out_complete_time || '未入力'}</div>
                       </div>
                     </td>
                     
-                    {/* 6. 音響データ添付 */}
+                    {/* 6. チェイサー（退場）曲音源 */}
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')
+                          file.file_type === 'audio' && file.purpose === 'chaser_song'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -428,9 +428,9 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'audio' && file.purpose && file.purpose.includes('sound_data')
+                          file.file_type === 'audio' && file.purpose === 'chaser_song'
                         )) && (
-                          <span className="text-xs text-gray-400">音響データなし</span>
+                          <span className="text-xs text-gray-400">チェイサー音源なし</span>
                         )}
                       </div>
                     </td>
