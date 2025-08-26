@@ -35,16 +35,31 @@ export async function getDeadline(key: DeadlineKey): Promise<string | null> {
     return null
   }
 
-  // ISO 8601形式の日付を日本語形式に変換
+  // ISO 8601形式の日付を日本時間で日本語形式に変換
   try {
     const date = new Date(data.value)
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
     
-    return `${year}年${month}月${day}日 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    // 日本時間で表示するためにtoLocaleString()を使用
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }
+    
+    const japanTime = date.toLocaleString('ja-JP', options)
+    
+    // "2025/11/14 23:59" の形式から "2025年11月14日 23:59" の形式に変換
+    const match = japanTime.match(/(\d{4})\/(\d{1,2})\/(\d{1,2}) (\d{2}):(\d{2})/)
+    if (match) {
+      const [, year, month, day, hours, minutes] = match
+      return `${year}年${month}月${day}日 ${hours}:${minutes}`
+    }
+    
+    return japanTime
   } catch {
     return data.value // 変換できない場合はそのまま返す
   }
