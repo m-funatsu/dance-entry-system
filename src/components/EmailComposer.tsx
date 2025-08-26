@@ -151,20 +151,31 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
 
-    // 全選択されたエントリーのメールアドレスを収集（BCC用）
+    // 全選択されたエントリーのメールアドレスを収集
     const emailAddresses = selectedEntriesData
       .filter(entry => entry?.users?.email)
       .map(entry => entry.users.email)
-      .join(',')
+      .join(', ')
     
     if (!emailAddresses) {
       alert('有効なメールアドレスが見つかりません')
       return
     }
     
-    // mailtoリンクを作成（TO: 固定アドレス、BCC: 参加者アドレス）
+    // メールアドレスをクリップボードにコピー
+    navigator.clipboard.writeText(emailAddresses).then(() => {
+      alert(`メールアドレス（${selectedEntriesData.length}名分）をクリップボードにコピーしました。\n\nメーラーでBCCに貼り付けてください。`)
+    }).catch(() => {
+      // クリップボードAPIが使えない場合の代替手段
+      prompt('以下のメールアドレスをコピーしてBCCに貼り付けてください:', emailAddresses)
+    })
+    
+    // 短縮したmailtoリンクを作成（長さ制限対応）
     const toAddress = 'entry_vqcup@valqua.com'
-    const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const shortSubject = subject.length > 50 ? subject.substring(0, 50) + '...' : subject
+    const shortBody = body.length > 200 ? body.substring(0, 200) + '\n\n（続きは元のメールテンプレートを参照してください）' : body
+    
+    const mailtoLink = `mailto:${toAddress}?subject=${encodeURIComponent(shortSubject)}&body=${encodeURIComponent(shortBody)}`
     
     // メーラーを開く
     window.location.href = mailtoLink
