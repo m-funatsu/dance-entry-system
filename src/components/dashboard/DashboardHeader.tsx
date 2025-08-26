@@ -33,7 +33,7 @@ export function DashboardHeader({ user, children, showDefaultTitle = false }: Da
                     <h1 className={`font-bold text-gray-900 transition-all duration-300 ease-in-out transform ${
                       scrolled ? 'text-xl scale-90' : 'text-2xl scale-100'
                     }`}>
-                      <SiteTitle fallback="WDF エントリーシステム" />
+                      <SiteTitle fallback="WDF エントリーシステム" splitMode="single" />
                     </h1>
                     {user?.email && (
                       <span className={`ml-4 text-gray-600 transition-all duration-300 ease-in-out opacity-100 ${
