@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkBasicInfoCompletion } from '@/lib/status-utils'
@@ -17,7 +16,6 @@ interface BasicInfoFormProps {
 }
 
 export default function BasicInfoForm({ userId, entryId, initialData }: BasicInfoFormProps) {
-  const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
   const [checkboxes, setCheckboxes] = useState({
@@ -1153,7 +1151,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/dashboard')}
+            onClick={() => {
+              window.location.href = '/dashboard'
+            }}
           >
             キャンセル
           </Button>
