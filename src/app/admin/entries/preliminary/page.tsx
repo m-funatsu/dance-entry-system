@@ -114,8 +114,9 @@ export default async function PreliminaryInfoListPage() {
 
   const getMusicTypeLabel = (code: string) => {
     switch (code) {
-      case 'cd': return 'CD音源'
-      case 'original': return 'オリジナル音源'
+      case 'cd': return 'CD楽曲'
+      case 'download': return 'データダウンロード楽曲'
+      case 'other': return 'その他（オリジナル曲）'
       default: return code || '未入力'
     }
   }
