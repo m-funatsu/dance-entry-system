@@ -47,7 +47,8 @@ export async function updateSession(request: NextRequest) {
     '/auth/confirm-email', // メール確認画面を公開ルートに追加
     '/auth/callback', // 認証コールバックも公開ルートに追加
     '/api/admin/favicon', // ファビコン取得は公開
-    '/api/admin/background' // 背景画像取得は公開
+    '/api/admin/background', // 背景画像取得は公開
+    '/api/public/site-title' // サイトタイトル取得は公開
   ]
 
   // 管理者専用ルート
