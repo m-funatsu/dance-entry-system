@@ -330,8 +330,9 @@ export default async function DashboardPage() {
     const diffTime = deadlineDate.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
-    // 期限をフォーマット
+    // 期限をフォーマット（日本時間で表示）
     const formattedDate = deadlineDate.toLocaleDateString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
