@@ -8,6 +8,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
 import SiteTitle from '@/components/SiteTitle'
+import { StartDateStatus } from '@/components/dashboard/StartDateStatus'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -390,6 +391,8 @@ export default async function DashboardPage() {
           <Suspense fallback={null}>
             <MessageAlert />
           </Suspense>
+          
+          <StartDateStatus />
           
           {/* 選考状況セクション（スリム版） */}
           {!userProfile.has_seed && entry && (
