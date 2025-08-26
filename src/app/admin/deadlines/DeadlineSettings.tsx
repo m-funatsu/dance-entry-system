@@ -132,55 +132,12 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
 
   return (
     <div className="space-y-6">
-      {/* 入力締め切り日のみ設定 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">📅 入力締め切り日</h3>
-        <p className="text-sm text-blue-800 mb-4">以下のセクションは常に入力可能で、締切日のみ設定します。</p>
-        <div className="space-y-4">
-          {['basic_info_deadline', 'music_info_deadline', 'program_info_deadline'].map((key) => (
-            <div key={key} className="bg-white rounded p-4">
-              <div className="mb-2">
-                <h4 className="text-base font-medium text-gray-900">
-                  {sectionLabels[key]}
-                </h4>
-                <p className="text-sm text-gray-500 mt-1">
-                  {sectionDescriptions[key]}
-                </p>
-              </div>
-              <div>
-                <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
-                  ⏰ 入力締め切り日
-                </label>
-                <input
-                  type="date"
-                  id={`deadline-${key}`}
-                  value={formatDateForInput(deadlines[key])}
-                  onChange={(e) => handleDeadlineChange(key, formatDateTimeForDatabase(e.target.value))}
-                  className="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-                {!deadlines[key] && (
-                  <p className="mt-1 text-sm text-gray-500">締切なし</p>
-                )}
-                {deadlines[key] && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    締切: {new Date(deadlines[key]).toLocaleDateString('ja-JP', {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric'
-                    })} 23:59
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 入力開始日と締め切り日の両方を設定 */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-yellow-900 mb-3">📅 入力開始日 + 入力締め切り日</h3>
-        <p className="text-sm text-yellow-800 mb-4">以下のセクションは入力開始日を設定し、その日以降に入力可能になります。</p>
-        <div className="bg-white rounded p-4 mb-4">
+      {/* 入力開始日セクション */}
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-green-900 mb-3">📅 入力開始日</h3>
+        <p className="text-sm text-green-800 mb-4">各セクションがいつから入力可能になるかを設定します。</p>
+        
+        <div className="bg-white rounded p-4">
           <div className="mb-2">
             <h4 className="text-base font-medium text-gray-900">
               {sectionLabels['advanced_start_date']}
@@ -191,7 +148,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
           </div>
           <div>
             <label htmlFor="deadline-advanced_start_date" className="block text-sm font-medium text-gray-700">
-              📅 入力開始日（共通設定）
+              📅 入力開始日
             </label>
             <input
               type="date"
@@ -214,10 +171,15 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
             )}
           </div>
         </div>
+      </div>
 
-        {/* 入力開始日が適用されるセクションの締切設定 */}
+      {/* 入力締切日セクション */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">⏰ 入力締切日</h3>
+        <p className="text-sm text-blue-800 mb-4">各セクションの入力締切日を設定します。</p>
+        
         <div className="space-y-4">
-          {['consent_form_deadline', 'semifinals_deadline', 'finals_deadline', 'sns_deadline', 'optional_request_deadline'].map((key) => (
+          {['basic_info_deadline', 'music_info_deadline', 'program_info_deadline', 'consent_form_deadline', 'semifinals_deadline', 'finals_deadline', 'sns_deadline', 'optional_request_deadline'].map((key) => (
             <div key={key} className="bg-white rounded p-4">
               <div className="mb-2">
                 <h4 className="text-base font-medium text-gray-900">
