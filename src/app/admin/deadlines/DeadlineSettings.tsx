@@ -25,7 +25,7 @@ const sectionLabels: Record<string, string> = {
   sns_deadline: 'SNS情報',
   optional_request_deadline: '各種申請',
   // 入力開始日
-  advanced_start_date: '準決勝・決勝・SNS・各種申請の入力開始日'
+  advanced_start_date: '準決勝・決勝・SNS・参加同意書・各種申請の入力開始日'
 }
 
 const sectionDescriptions: Record<string, string> = {
@@ -37,7 +37,7 @@ const sectionDescriptions: Record<string, string> = {
   finals_deadline: '決勝用楽曲情報、音響・照明指示書',
   sns_deadline: 'Instagram、Twitter、Facebook情報',
   optional_request_deadline: '関係者チケット、同伴申請、楽曲使用許諾申請などの各種申請',
-  advanced_start_date: '準決勝、決勝、参加同意書、SNS、各種申請フォームの入力が可能になる日'
+  advanced_start_date: '準決勝、決勝、SNS、参加同意書、各種申請フォームの入力が可能になる日'
 }
 
 export default function DeadlineSettings({ initialSettings }: DeadlineSettingsProps) {
