@@ -191,7 +191,7 @@ export default async function SemifinalsInfoListPage() {
               // 照明シーン5イメージ画像
               item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン チェイサー
-              `時間:${item.chaser_time || '未入力'} きっかけ:${item.chaser_trigger || '未入力'} 色:${item.chaser_color_type || '未入力'} イメージ:${item.chaser_image || '未入力'} 備考:${item.chaser_notes || '未入力'}`,
+              `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
               // 振付師情報
               `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer_name2 || '未入力'} (${item.choreographer_furigana2 || '未入力'})`,
               // 小道具情報
@@ -631,12 +631,12 @@ export default async function SemifinalsInfoListPage() {
                     {/* 18. 照明シーン チェイサー */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.chaser_time || '未入力'}</div>
-                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.chaser_trigger || '未入力'}</div>
-                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.chaser_color_type || '未入力'}</div>
-                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.chaser_color_other || '未入力'}</div>
-                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.chaser_image || '未入力'}</div>
-                        <div><strong>備考:</strong> {semifinalsInfo.chaser_notes || '未入力'}</div>
+                        <div className="mb-1"><strong>時間:</strong> {semifinalsInfo.chaser_exit_time || '未入力'}</div>
+                        <div className="mb-1"><strong>きっかけ:</strong> {semifinalsInfo.chaser_exit_trigger || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統:</strong> {semifinalsInfo.chaser_exit_color_type || '未入力'}</div>
+                        <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.chaser_exit_color_other || '未入力'}</div>
+                        <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.chaser_exit_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {semifinalsInfo.chaser_exit_notes || '未入力'}</div>
                       </div>
                     </td>
                     
