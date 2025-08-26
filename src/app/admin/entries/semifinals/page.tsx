@@ -105,9 +105,9 @@ export default async function SemifinalsInfoListPage() {
   // コード値を名称に変換する関数
   const getMusicRightsLabel = (code: string) => {
     switch (code) {
-      case 'A': return 'A.市販の楽曲を使用する'
-      case 'B': return 'B.権利者から楽曲使用許諾を受けている楽曲を使用する'
-      case 'C': return 'C.自作楽曲を使用する'
+      case 'commercial': return 'A.市販の楽曲を使用する'
+      case 'licensed': return 'B.自身で著作権に対し許諾を取った楽曲を使用する'
+      case 'original': return 'C.独自に製作されたオリジナル楽曲を使用する'
       default: return code || '未入力'
     }
   }

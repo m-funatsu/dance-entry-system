@@ -16,8 +16,8 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
         if (!data.copyright_permission) errors.push('楽曲著作権許諾')
         if (!data.music_title) errors.push('使用楽曲タイトル')
         // 収録CDタイトル、アーティスト、レコード番号は必須から外す
-        // JASRAC作品コードは市販楽曲(A)選択時のみ必須
-        if (data.copyright_permission === 'A' && !data.jasrac_code) errors.push('JASRAC作品コード')
+        // JASRAC作品コードは市販楽曲(commercial)選択時のみ必須
+        if (data.copyright_permission === 'commercial' && !data.jasrac_code) errors.push('JASRAC作品コード')
         if (!data.music_type) errors.push('楽曲種類')
         if (!data.music_data_path) errors.push('楽曲データ')
       }

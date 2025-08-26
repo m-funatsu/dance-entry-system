@@ -298,7 +298,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         value={semifinalsInfo.jasrac_code || ''}
         onChange={(e) => onChange({ jasrac_code: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary}
-        required={semifinalsInfo.copyright_permission === 'A'}
+        required={semifinalsInfo.copyright_permission === 'commercial'}
       />
 
       <FormField
