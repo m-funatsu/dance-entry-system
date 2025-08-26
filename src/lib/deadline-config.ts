@@ -13,15 +13,15 @@ export type DeadlineKey =
   | 'optional_request_deadline'
 
 export const deadlineConfig: Record<DeadlineKey, string> = {
-  basic_info_deadline: '2025年3月31日 23:59',
-  music_info_deadline: '2025年3月31日 23:59',
-  consent_form_deadline: '2025年3月31日 23:59',
-  program_info_deadline: '2025年3月31日 23:59',
-  preliminary_deadline: '2025年3月31日 23:59',
-  semifinals_deadline: '2025年4月30日 23:59',
-  finals_deadline: '2025年5月31日 23:59',
-  sns_deadline: '2025年3月31日 23:59',
-  optional_request_deadline: '2025年3月31日 23:59'
+  basic_info_deadline: '2025年11月14日 23:59',
+  music_info_deadline: '2025年11月14日 23:59',
+  consent_form_deadline: '2025年11月14日 23:59',
+  program_info_deadline: '2025年11月14日 23:59',
+  preliminary_deadline: '2025年11月14日 23:59',
+  semifinals_deadline: '2025年11月14日 23:59',
+  finals_deadline: '2025年11月14日 23:59',
+  sns_deadline: '2025年11月14日 23:59',
+  optional_request_deadline: '2025年11月14日 23:59'
 }
 
 export function getDeadlineFromConfig(key: DeadlineKey): string {
