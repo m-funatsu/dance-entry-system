@@ -9,6 +9,7 @@ import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
 import SiteTitle from '@/components/SiteTitle'
 import { StartDateStatus } from '@/components/dashboard/StartDateStatus'
+import { StartDateInline } from '@/components/dashboard/StartDateInline'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -392,8 +393,6 @@ export default async function DashboardPage() {
             <MessageAlert />
           </Suspense>
           
-          <StartDateStatus />
-          
           {/* 選考状況セクション（スリム版） */}
           {!userProfile.has_seed && entry && (
             <div className="mb-6">
@@ -627,6 +626,7 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {entry && entry.consent_form_submitted ? '提出済み' : '未提出'}
                       </dd>
+                      <StartDateInline section="consent_form" />
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.consent_form_deadline)
                         if (!deadline) return null
@@ -679,8 +679,9 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {checkSemifinalsInfoComplete(semifinalsInfo) ? '登録済み' : semifinalsInfo ? '入力中' : '未登録'}
                       </dd>
+                      <StartDateInline section="semifinals" />
                       {(() => {
-                        const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
+                        const deadline = getDeadlineInfo(settingsMap.semifinals_deadline)
                         if (!deadline) return null
                         return (
                           <dd className={`text-xs mt-1 ${
@@ -731,6 +732,7 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {checkFinalsInfoComplete(finalsInfo) ? '登録済み' : finalsInfo ? '入力中' : '未登録'}
                       </dd>
+                      <StartDateInline section="finals" />
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.finals_deadline)
                         if (!deadline) return null
@@ -783,6 +785,7 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {checkSnsInfoComplete(snsInfo, snsVideoFiles) ? '登録済み' : '未登録'}
                       </dd>
+                      <StartDateInline section="sns" />
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.sns_deadline)
                         if (!deadline) return null
@@ -836,6 +839,7 @@ export default async function DashboardPage() {
                       <dd className="text-lg font-medium text-gray-900">
                         {checkApplicationsInfoComplete(applicationsInfo) ? '申請済み' : '申請可能'}
                       </dd>
+                      <StartDateInline section="optional_request" />
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.optional_request_deadline)
                         if (!deadline) return null
