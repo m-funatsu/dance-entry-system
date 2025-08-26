@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import type { Entry } from '@/lib/types'
 
 interface ConsentFormProps {
@@ -59,6 +60,8 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <StartDateNotice section="consent_form" />
+      
       <div className="space-y-6">
         <div className="bg-gray-50 p-6 rounded-md">
           <h3 className="text-lg font-medium text-gray-900 mb-4">参加同意書</h3>

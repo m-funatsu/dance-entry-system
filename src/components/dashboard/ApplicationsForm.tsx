@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
+import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import Image from 'next/image'
 import type { Entry, ApplicationsInfo, EntryFile, SeatRequest, BasicInfo } from '@/lib/types'
@@ -710,6 +711,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">各種申請</h3>
 
+      <StartDateNotice section="optional_request" />
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
 
       {error && (

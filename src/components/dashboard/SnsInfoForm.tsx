@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
+import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import type { Entry, SnsInfo } from '@/lib/types'
 
 interface SnsInfoFormProps {
@@ -249,6 +250,8 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
           <span className="text-red-500">*</span> は必須項目です
         </p>
       </div>
+
+      <StartDateNotice section="sns" />
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">

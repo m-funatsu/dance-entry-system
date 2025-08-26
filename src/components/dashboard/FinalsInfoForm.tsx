@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
+import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { updateFormStatus, checkFinalsInfoCompletion } from '@/lib/status-utils'
 import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
@@ -697,6 +698,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">決勝情報</h3>
 
+      <StartDateNotice section="finals" />
       <DeadlineNoticeAsync deadlineKey="finals_deadline" />
 
       {error && <Alert type="error" message={error} />}
