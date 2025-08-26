@@ -980,7 +980,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           {/* 準決勝用 */}
           <div className="border rounded-lg p-6 space-y-4">
-            <h5 className="font-medium text-lg border-b pb-2">準決勝用</h5>
+            <h5 className="font-medium text-lg border-b pb-2 text-gray-900">準決勝用</h5>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1191,7 +1191,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           {/* 決勝用 */}
           <div className="border rounded-lg p-6 space-y-4">
-            <h5 className="font-medium text-lg border-b pb-2">決勝用</h5>
+            <h5 className="font-medium text-lg border-b pb-2 text-gray-900">決勝用</h5>
             <p className="text-sm text-gray-600">※決勝でメイク・ヘアメイクを変更される場合はご記入ください。</p>
             
             <div>

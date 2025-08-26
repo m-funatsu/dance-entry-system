@@ -701,7 +701,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">決勝情報</h3>
+      <h3 className="text-lg font-semibold text-gray-900">決勝情報</h3>
 
       <StartDateNotice 
         section="finals"
