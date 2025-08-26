@@ -24,7 +24,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
-  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)

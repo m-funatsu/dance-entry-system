@@ -44,7 +44,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
-  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)

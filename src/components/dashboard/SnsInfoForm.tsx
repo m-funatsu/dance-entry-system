@@ -18,7 +18,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
   const [success, setSuccess] = useState<string | null>(null)
   const [uploadingPracticeVideo, setUploadingPracticeVideo] = useState(false)
   const [uploadingIntroductionVideo, setUploadingIntroductionVideo] = useState(false)
-  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)

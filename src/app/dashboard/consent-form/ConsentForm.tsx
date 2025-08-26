@@ -19,7 +19,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
   
   const [consentChecked, setConsentChecked] = useState(initialData?.consent_form_submitted || false)
   const [saving, setSaving] = useState(false)
-  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)
