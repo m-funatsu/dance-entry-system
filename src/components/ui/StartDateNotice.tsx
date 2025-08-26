@@ -66,7 +66,7 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
     console.log('[START DATE NOTICE] → 入力制限画面表示')
     console.log('[START DATE NOTICE] 表示メッセージ:', message)
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
         <div className="max-w-md w-full">
           <div className="bg-white shadow rounded-lg p-6">
             <div className="text-center">
