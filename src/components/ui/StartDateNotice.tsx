@@ -16,22 +16,30 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
 
   useEffect(() => {
     async function checkAvailability() {
+      console.log('[START DATE NOTICE] === コンポーネント開始 ===')
+      console.log('[START DATE NOTICE] section:', section)
       try {
         const result = await checkStartDateAvailability()
+        console.log('[START DATE NOTICE] チェック結果:', result)
         setIsAvailable(result.isAvailable)
         setMessage(result.message)
         
+        console.log('[START DATE NOTICE] State更新:', {
+          isAvailable: result.isAvailable,
+          message: result.message
+        })
+        
         // 親コンポーネントに利用可能状況を通知
         if (onAvailabilityChange) {
+          console.log('[START DATE NOTICE] 親コンポーネントに通知:', result.isAvailable)
           onAvailabilityChange(result.isAvailable)
         }
-        
-        // 入力不可の場合の処理（DOM操作は削除、オーバーレイのみで制御）
       } catch (error) {
-        console.error('入力開始日チェックエラー:', error)
+        console.error('[START DATE NOTICE] エラー:', error)
         setIsAvailable(true) // エラー時は利用可能として扱う
         setMessage('入力開始日の確認に失敗しました。')
       } finally {
+        console.log('[START DATE NOTICE] loading終了')
         setLoading(false)
       }
     }
@@ -39,7 +47,13 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
     checkAvailability()
   }, [section, onAvailabilityChange])
 
+  console.log('[START DATE NOTICE] === レンダリング判定 ===')
+  console.log('[START DATE NOTICE] loading:', loading)
+  console.log('[START DATE NOTICE] isAvailable:', isAvailable)
+  console.log('[START DATE NOTICE] message:', message)
+
   if (loading) {
+    console.log('[START DATE NOTICE] → loading画面表示')
     return (
       <div className={`bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 animate-pulse ${className}`}>
         <div className="h-12 bg-gray-100 rounded"></div>
@@ -49,6 +63,8 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
 
   // 入力不可の場合は、警告と戻るボタンのみ表示（フォーム自体を非表示にする）
   if (!isAvailable) {
+    console.log('[START DATE NOTICE] → 入力制限画面表示')
+    console.log('[START DATE NOTICE] 表示メッセージ:', message)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md w-full">
@@ -87,10 +103,12 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
 
   // 利用可能で特にメッセージがない場合は表示しない
   if (isAvailable && !message) {
+    console.log('[START DATE NOTICE] → 利用可能、メッセージなし（非表示）')
     return null
   }
 
   // 利用可能だがメッセージがある場合（確認メッセージなど）
+  console.log('[START DATE NOTICE] → 利用可能、メッセージあり（確認表示）')
   return (
     <div className={`bg-green-50 border border-green-200 rounded-lg p-4 mb-6 ${className}`}>
       <div className="flex items-center">
