@@ -349,11 +349,13 @@ export default async function SemifinalsInfoListPage() {
                         <div className="mb-1"><strong>予選との楽曲変更:</strong> {semifinalsInfo.music_change_from_preliminary ? 'あり' : 'なし'}</div>
                         <div className="mb-1"><strong>作品タイトル:</strong> {semifinalsInfo.work_title || '未入力'}</div>
                         <div className="mb-1"><strong>タイトル(ふりがな):</strong> {semifinalsInfo.work_title_kana || '未入力'}</div>
-                        <div className="text-gray-500">
+                        <div className="mb-1">
                           <strong>キャラクター・ストーリー:</strong><br/>
-                          {semifinalsInfo.work_character_story ? 
-                            `${semifinalsInfo.work_character_story.slice(0, 80)}${semifinalsInfo.work_character_story.length > 80 ? '...' : ''}` 
-                            : '未入力'}
+                          <span className="text-gray-500">
+                            {semifinalsInfo.work_character_story ? 
+                              `${semifinalsInfo.work_character_story.slice(0, 80)}${semifinalsInfo.work_character_story.length > 80 ? '...' : ''}` 
+                              : '未入力'}
+                          </span>
                         </div>
                       </div>
                     </td>
