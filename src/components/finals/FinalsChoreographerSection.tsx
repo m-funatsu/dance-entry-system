@@ -41,7 +41,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           振付師の変更 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="choreographer_change_option"
@@ -52,7 +52,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
             />
             準決勝と同じ振付師
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="choreographer_change_option"
@@ -153,7 +153,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
             小道具の有無 <span className="text-red-500">*</span>
           </label>
           <div className="space-y-2">
-            <label className="flex items-center">
+            <label className="flex items-center text-gray-900">
               <input
                 type="radio"
                 name="props_usage"
@@ -164,7 +164,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               />
               あり
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center text-gray-900">
               <input
                 type="radio"
                 name="props_usage"
@@ -219,11 +219,11 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           </FormField>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
               作品振付師写真掲載 <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
-              <label className="flex items-center">
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   name="choreographer_photo_permission"
@@ -234,7 +234,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
                 />
                 希望する
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   name="choreographer_photo_permission"

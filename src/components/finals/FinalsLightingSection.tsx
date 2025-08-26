@@ -41,7 +41,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           準決勝との照明指示変更の有無 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="lighting_change_option"
@@ -52,7 +52,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             />
             準決勝と同じ照明指示
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="lighting_change_option"
