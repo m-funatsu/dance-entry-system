@@ -108,18 +108,6 @@ export default async function ProgramInfoListPage() {
     return data.publicUrl
   }
 
-  const getFileIcon = (fileType: string, fileName: string) => {
-    if (fileType === 'video' || fileName.includes('.mp4') || fileName.includes('.mov')) {
-      return '🎬'
-    } else if (fileType === 'music' || fileType === 'audio') {
-      return '🎵'
-    } else if (fileType === 'photo') {
-      return '📸'
-    } else if (fileType === 'pdf') {
-      return '📄'
-    }
-    return '📎'
-  }
 
   return (
     <div className="space-y-6">
@@ -252,8 +240,9 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
+                        {/* 選手紹介画像 */}
                         {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && (file.purpose.includes('semifinal') || file.purpose.includes('program'))
+                          file.file_path === programInfo.player_photo_path
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -262,37 +251,92 @@ export default async function ProgramInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                              📸 選手紹介画像
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
-                          file.purpose && (file.purpose.includes('semifinal') || file.purpose.includes('program'))
-                        )) && (
+                        
+                        {/* 作品イメージ①～④ */}
+                        {[1, 2, 3, 4].map((num) => {
+                          const imagePath = programInfo[`semifinal_image${num}_path` as keyof typeof programInfo] as string
+                          const file = Array.isArray(programInfo.entry_files) ? 
+                            programInfo.entry_files.find((f: { file_path: string }) => f.file_path === imagePath) : null
+                          
+                          return file ? (
+                            <div key={`image${num}`}>
+                              <a
+                                href={getFileUrl(file.file_path)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                              >
+                                📸 作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}
+                              </a>
+                            </div>
+                          ) : null
+                        })}
+                        
+                        {/* ファイルなしの場合 */}
+                        {(!programInfo.player_photo_path && 
+                          !programInfo.semifinal_image1_path && 
+                          !programInfo.semifinal_image2_path && 
+                          !programInfo.semifinal_image3_path && 
+                          !programInfo.semifinal_image4_path) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose && (file.purpose.includes('final') || file.purpose.includes('finals'))
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
-                            <a
-                              href={getFileUrl(file.file_path)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                            >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
-                            </a>
-                          </div>
-                        ))}
-                        {(!Array.isArray(programInfo.entry_files) || !programInfo.entry_files.some((file: { purpose?: string }) => 
-                          file.purpose && (file.purpose.includes('final') || file.purpose.includes('finals'))
-                        )) && (
-                          <span className="text-xs text-gray-400">ファイルなし</span>
+                        {programInfo.song_count === '2曲' ? (
+                          <>
+                            {/* 決勝用選手紹介画像 */}
+                            {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                              file.file_path === programInfo.final_player_photo_path
+                            ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                              <div key={file.id}>
+                                <a
+                                  href={getFileUrl(file.file_path)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                                >
+                                  📸 選手紹介画像
+                                </a>
+                              </div>
+                            ))}
+                            
+                            {/* 決勝用作品イメージ①～④ */}
+                            {[1, 2, 3, 4].map((num) => {
+                              const imagePath = programInfo[`final_image${num}_path` as keyof typeof programInfo] as string
+                              const file = Array.isArray(programInfo.entry_files) ? 
+                                programInfo.entry_files.find((f: { file_path: string }) => f.file_path === imagePath) : null
+                              
+                              return file ? (
+                                <div key={`final_image${num}`}>
+                                  <a
+                                    href={getFileUrl(file.file_path)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                                  >
+                                    📸 作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}
+                                  </a>
+                                </div>
+                              ) : null
+                            })}
+                            
+                            {/* ファイルなしの場合 */}
+                            {(!programInfo.final_player_photo_path && 
+                              !programInfo.final_image1_path && 
+                              !programInfo.final_image2_path && 
+                              !programInfo.final_image3_path && 
+                              !programInfo.final_image4_path) && (
+                              <span className="text-xs text-gray-400">ファイルなし</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-xs text-gray-400">1曲のため不要</span>
                         )}
                       </div>
                     </td>
