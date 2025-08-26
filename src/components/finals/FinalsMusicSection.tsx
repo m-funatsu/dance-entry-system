@@ -30,7 +30,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
   console.log('[FINALS MUSIC SECTION DEBUG] finalsInfo.music_data_path:', finalsInfo.music_data_path)
   return (
     <div className="space-y-4">
-      <h4 className="font-medium">楽曲情報</h4>
+      <h4 className="font-medium text-gray-900">楽曲情報</h4>
       
       {validationErrors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -44,7 +44,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       )}
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           楽曲情報の変更 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
@@ -105,7 +105,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           楽曲著作権許諾 {musicChangeOption === 'changed' && <span className="text-red-500">*</span>}
         </label>
         <div className="space-y-2">

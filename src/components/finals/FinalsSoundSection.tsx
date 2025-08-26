@@ -29,7 +29,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.chaser_song:', audioFiles?.chaser_song)
   return (
     <div className="space-y-4">
-      <h4 className="font-medium">音響指示情報</h4>
+      <h4 className="font-medium text-gray-900">音響指示情報</h4>
       
       {validationErrors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -43,7 +43,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
       )}
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           準決勝との音響指示 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">

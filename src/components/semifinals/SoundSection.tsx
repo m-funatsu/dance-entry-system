@@ -23,7 +23,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">音響指示情報</h4>
+        <h4 className="font-medium text-gray-900">音響指示情報</h4>
         <p className="text-sm text-gray-500">
           <span className="text-red-500">*</span> は必須項目です
         </p>
@@ -49,7 +49,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           チェイサー（退場）曲の指定 <span className="text-red-500">*</span>
         </label>
         <select

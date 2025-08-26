@@ -22,7 +22,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">照明指示情報</h4>
+        <h4 className="font-medium text-gray-900">照明指示情報</h4>
         <p className="text-sm text-gray-500">
           <span className="text-red-500">*</span> は必須項目です
         </p>
@@ -55,7 +55,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
       {/* シーン1-5 */}
       {[1, 2, 3, 4, 5].map((sceneNum) => (
         <div key={`scene${sceneNum}`} className="border-t pt-4">
-          <h5 className="font-medium mb-3">シーン{sceneNum}</h5>
+          <h5 className="font-medium mb-3 text-gray-900">シーン{sceneNum}</h5>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
@@ -134,7 +134,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
 
       {/* チェイサー/退場 */}
       <div className="border-t pt-4">
-        <h5 className="font-medium mb-3">チェイサー/退場</h5>
+        <h5 className="font-medium mb-3 text-gray-900">チェイサー/退場</h5>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField

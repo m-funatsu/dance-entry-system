@@ -74,7 +74,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">楽曲情報</h4>
+        <h4 className="font-medium text-gray-900">楽曲情報</h4>
         <p className="text-sm text-gray-500">
           <span className="text-red-500">*</span> は必須項目です
         </p>
@@ -92,7 +92,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       )}
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           予選との楽曲情報の変更 <span className="text-red-500">*</span>
         </label>
         <select
@@ -164,7 +164,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           楽曲著作権許諾 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">

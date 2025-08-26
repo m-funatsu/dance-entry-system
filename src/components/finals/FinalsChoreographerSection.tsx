@@ -22,7 +22,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 }) => {
   return (
     <div className="space-y-6">
-      <h4 className="font-medium">振付師情報</h4>
+      <h4 className="font-medium text-gray-900">振付師情報</h4>
       
       {validationErrors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -37,7 +37,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
       
       {/* 振付師の変更選択を最上部に配置 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           振付師の変更 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
@@ -68,7 +68,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 
       {/* 振付師情報セクション */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">振付師詳細情報</h4>
+        <h4 className="font-medium mb-4 text-gray-900">振付師詳細情報</h4>
         
         <FormField
           label="振付師 氏名①"
@@ -109,7 +109,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 
       {/* 振付変更（常に表示） */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">振付変更</h4>
+        <h4 className="font-medium mb-4 text-gray-900">振付変更</h4>
         <div className="bg-gray-50 p-4 rounded-lg space-y-4">
           <FormField
             label="振付変更部分（曲が始まってから何分何秒の部分か）"
@@ -146,10 +146,10 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
 
       {/* 小道具セクション */}
       <div className="border-t pt-6">
-        <h4 className="font-medium mb-4">小道具</h4>
+        <h4 className="font-medium mb-4 text-gray-900">小道具</h4>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-900 mb-2">
             小道具の有無 <span className="text-red-500">*</span>
           </label>
           <div className="space-y-2">
@@ -191,7 +191,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
       </div>
 
       <div className="border-t pt-4">
-        <h4 className="font-medium mb-3">作品振付師出席情報</h4>
+        <h4 className="font-medium mb-3 text-gray-900">作品振付師出席情報</h4>
         
         <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
           <p className="text-sm text-blue-800">

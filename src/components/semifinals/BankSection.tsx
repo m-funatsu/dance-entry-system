@@ -163,7 +163,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
     <div className="space-y-4">
       {/* 振込確認用紙アップロードセクション */}
       <div className="border-b pb-6 mb-6">
-        <h4 className="font-medium mb-4">振込確認用紙アップロード</h4>
+        <h4 className="font-medium mb-4 text-gray-900">振込確認用紙アップロード</h4>
         
         <div className="bg-gray-50 p-4 rounded-md mb-4">
           <div className="text-sm text-gray-700 space-y-2">
@@ -274,7 +274,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
       </div>
 
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">本大会エントリー料振込確認 / 賞金振込先情報</h4>
+        <h4 className="font-medium text-gray-900">本大会エントリー料振込確認 / 賞金振込先情報</h4>
         <p className="text-sm text-gray-500">
           <span className="text-red-500">*</span> は必須項目です
         </p>

@@ -38,7 +38,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium">振付情報</h4>
+      <h4 className="font-medium text-gray-900">振付情報</h4>
       
       <div>
         <label className="flex items-center">
@@ -101,7 +101,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       </div>
       
       <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           小道具の有無 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">

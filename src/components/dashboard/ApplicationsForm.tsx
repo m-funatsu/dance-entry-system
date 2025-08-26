@@ -709,7 +709,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">各種申請</h3>
+      <h3 className="text-lg font-semibold text-gray-900">各種申請</h3>
 
       <StartDateNotice section="optional_request" />
       <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
@@ -785,7 +785,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {/* 関係者チケット注文申請 */}
       {activeTab === 'ticket' && (
         <div className="space-y-6">
-          <h4 className="font-medium">関係者チケット注文申請</h4>
+          <h4 className="font-medium text-gray-900">関係者チケット注文申請</h4>
           <p className="text-sm text-gray-600">
             関係者チケット（1枚 {TICKET_PRICE.toLocaleString()}円）を購入される方の情報を入力してください。
           </p>
@@ -883,7 +883,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {/* 選手同伴申請 */}
       {activeTab === 'companion' && (
         <div className="space-y-6">
-          <h4 className="font-medium">選手同伴申請</h4>
+          <h4 className="font-medium text-gray-900">選手同伴申請</h4>
           <p className="text-sm text-gray-600">
             選手と同伴される方の情報を入力してください。（1名につき {COMPANION_FEE.toLocaleString()}円）
           </p>
@@ -962,7 +962,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {/* メイク・ヘアメイク予約申請 */}
       {activeTab === 'makeup' && (
         <div className="space-y-8">
-          <h4 className="font-medium">メイク・ヘアメイク予約申請</h4>
+          <h4 className="font-medium text-gray-900">メイク・ヘアメイク予約申請</h4>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="text-sm text-blue-800 space-y-2">
@@ -1397,7 +1397,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {/* 払込用紙 */}
       {activeTab === 'payment' && (
         <div className="space-y-6">
-          <h4 className="font-medium">払込用紙</h4>
+          <h4 className="font-medium text-gray-900">払込用紙</h4>
           <p className="text-sm text-gray-600">
             関係者チケットまたは選手同伴申請をされた場合は、払込用紙をアップロードしてください。
           </p>
@@ -1534,7 +1534,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
       {/* 観覧席希望申請 */}
       {activeTab === 'seat' && (
         <div className="space-y-6">
-          <h4 className="font-medium">観覧席希望申請</h4>
+          <h4 className="font-medium text-gray-900">観覧席希望申請</h4>
           <p className="text-sm text-gray-600">
             観覧席のご希望を申請してください。座席種別ごとに希望枚数を入力してください。
           </p>

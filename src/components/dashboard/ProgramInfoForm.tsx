@@ -322,7 +322,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">プログラム掲載用情報</h3>
+      <h3 className="text-lg font-semibold text-gray-900">プログラム掲載用情報</h3>
 
       <DeadlineNoticeAsync deadlineKey="program_info_deadline" />
 
@@ -345,7 +345,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">
-          <h4 className="font-medium mb-3">
+          <h4 className="font-medium mb-3 text-gray-900">
             {programInfo.song_count === '1曲' ? '決勝・準決勝用情報' : '準決勝用情報'}
           </h4>
           
@@ -441,7 +441,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         {/* 決勝用情報（2曲の場合のみ表示） */}
         {programInfo.song_count === '2曲' && (
           <div className="border-t pt-4">
-            <h4 className="font-medium mb-3">決勝用情報</h4>
+            <h4 className="font-medium mb-3 text-gray-900">決勝用情報</h4>
             
             {/* 所属教室または所属 */}
             <FormField
