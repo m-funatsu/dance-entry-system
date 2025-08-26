@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { FormField, FileUploadField, Alert, SaveButton, CancelButton, DeadlineNoticeAsync } from '@/components/ui'
+import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { ValidationPresets } from '@/lib/validation'
@@ -21,6 +22,13 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
+  
+  // 入力開始日制御
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
+
+  const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
+    setIsStartDateAvailable(isAvailable)
+  }, [])
   
   // 動画ファイル状態管理
   const [practiceVideoFile, setPracticeVideoFile] = useState<EntryFile | null>(null)
@@ -315,13 +323,21 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
   }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      {error && <Alert type="error" message={error} />}
-      {success && <Alert type="success" message={success} />}
+    <>
+      <StartDateNotice 
+        section="sns"
+        onAvailabilityChange={handleAvailabilityChange}
+      />
+      
+      {/* 入力開始日後のみフォーム表示 */}
+      {isStartDateAvailable && (
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+          {error && <Alert type="error" message={error} />}
+          {success && <Alert type="success" message={success} />}
 
-      <DeadlineNoticeAsync deadlineKey="sns_deadline" />
+          <DeadlineNoticeAsync deadlineKey="sns_deadline" />
 
-      <div>
+          <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           SNS掲載情報の登録
         </h3>
@@ -593,8 +609,10 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
               loading={saving}
             />
           </div>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+      )}
+    </>
   )
 }
