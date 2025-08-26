@@ -7,6 +7,7 @@ import BackgroundLoader from '@/components/BackgroundLoader'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
+import SiteTitle from '@/components/SiteTitle'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -1168,7 +1169,9 @@ export default async function DashboardPage() {
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-600">
             <p className="mb-2">問い合わせ</p>
-            <p className="font-medium">2025バルカーカップエントリー事務局</p>
+            <p className="font-medium">
+              <SiteTitle fallback="2025バルカーカップ" />エントリー事務局
+            </p>
             <p>
               <a 
                 href="mailto:entry_vqcup@valqua.com" 

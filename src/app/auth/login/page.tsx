@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import NavigationLogger from '@/components/NavigationLogger'
 import BackgroundLoader from '@/components/BackgroundLoader'
+import SiteTitle from '@/components/SiteTitle'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -144,13 +145,11 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div>
           <h1 className="mt-4 sm:mt-6 text-center font-extrabold leading-tight">
-            <div style={{color: '#FFD700', fontSize: '36px'}}>
-              2025バルカーカップ
-            </div>
+            <SiteTitle 
+              fallback="2025バルカーカップ ダンスエントリーシステム"
+              style={{color: '#FFD700', fontSize: '36px', lineHeight: '1.2'}}
+            />
           </h1>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '36px'}}>
-            エントリーシステム
-          </p>
           <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
             ログインしてください
           </p>

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import SiteTitle from '@/components/SiteTitle'
 
 function ConfirmEmailContent() {
   console.log('[CONFIRM-EMAIL] コンポーネント開始')
@@ -27,13 +28,11 @@ function ConfirmEmailContent() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="mt-6 text-center font-extrabold leading-tight">
-            <div style={{color: 'black', fontSize: '36px'}}>
-              2025バルカーカップ
-            </div>
+            <SiteTitle 
+              fallback="2025バルカーカップ ダンスエントリーシステム"
+              style={{color: 'black', fontSize: '36px', lineHeight: '1.2'}}
+            />
           </h1>
-          <p className="mt-2 text-center" style={{color: 'black', fontSize: '36px'}}>
-            エントリーシステム
-          </p>
         </div>
 
         <div className="bg-white shadow rounded-lg p-8">
