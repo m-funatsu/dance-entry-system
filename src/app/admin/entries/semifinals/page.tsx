@@ -192,6 +192,8 @@ export default async function SemifinalsInfoListPage() {
               item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン チェイサー
               `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
+              // 照明シーン チェイサーイメージ画像
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 振付師情報
               `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer2_name || '未入力'} (${item.choreographer2_furigana || '未入力'})`,
               // 小道具情報
@@ -237,13 +239,14 @@ export default async function SemifinalsInfoListPage() {
               '16. 照明シーン5',
               '17. 照明シーン5イメージ画像',
               '18. 照明シーン チェイサー',
+              '18-2. 照明シーン チェイサーイメージ画像',
               '19. 振付師情報',
               '20. 小道具情報',
               '21. 振込確認',
               '22. 賞金振込先情報',
               '23. 選考ステータス'
             ]}
-            filename="semifinals_info_23columns"
+            filename="semifinals_info_24columns"
           />
         </div>
       </div>
@@ -312,6 +315,9 @@ export default async function SemifinalsInfoListPage() {
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     18. 照明シーン チェイサー
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    18-2. 照明シーン チェイサーイメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     19. 振付師情報
@@ -637,6 +643,31 @@ export default async function SemifinalsInfoListPage() {
                         <div className="mb-1"><strong>色・系統その他:</strong> {semifinalsInfo.chaser_exit_color_other || '未入力'}</div>
                         <div className="mb-1"><strong>イメージ:</strong> {semifinalsInfo.chaser_exit_image || '未入力'}</div>
                         <div><strong>備考:</strong> {semifinalsInfo.chaser_exit_notes || '未入力'}</div>
+                      </div>
+                    </td>
+                    
+                    {/* 18-2. 照明シーン チェイサーイメージ画像 */}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={getFileUrl(file.file_path)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📸 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')
+                        )) && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
                       </div>
                     </td>
                     
