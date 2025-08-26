@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -19,7 +19,11 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
   
   const [consentChecked, setConsentChecked] = useState(initialData?.consent_form_submitted || false)
   const [saving, setSaving] = useState(false)
-  const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+
+  const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
+    setIsStartDateAvailable(isAvailable)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,7 +67,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
     <>
       <StartDateNotice 
         section="consent_form"
-        onAvailabilityChange={setIsStartDateAvailable}
+        onAvailabilityChange={handleAvailabilityChange}
       />
       
       {/* 入力開始日後のみフォーム表示 */}

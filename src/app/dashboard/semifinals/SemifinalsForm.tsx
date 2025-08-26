@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
@@ -45,6 +45,10 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+
+  const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
+    setIsStartDateAvailable(isAvailable)
+  }, [])
   
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
@@ -747,7 +751,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
 
       <StartDateNotice 
         section="semifinals" 
-        onAvailabilityChange={setIsStartDateAvailable}
+        onAvailabilityChange={handleAvailabilityChange}
       />
 
       {/* 入力開始日後のみフォーム表示 */}

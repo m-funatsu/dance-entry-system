@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
@@ -25,6 +25,10 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+
+  const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
+    setIsStartDateAvailable(isAvailable)
+  }, [])
   
   // オプション管理のステート
   const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('')
@@ -701,7 +705,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
 
       <StartDateNotice 
         section="finals"
-        onAvailabilityChange={setIsStartDateAvailable}
+        onAvailabilityChange={handleAvailabilityChange}
       />
 
       {/* 入力開始日後のみフォーム表示 */}

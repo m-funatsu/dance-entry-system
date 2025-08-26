@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
@@ -19,6 +19,10 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
   const [uploadingPracticeVideo, setUploadingPracticeVideo] = useState(false)
   const [uploadingIntroductionVideo, setUploadingIntroductionVideo] = useState(false)
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
+
+  const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
+    setIsStartDateAvailable(isAvailable)
+  }, [])
   const [snsInfo, setSnsInfo] = useState<Partial<SnsInfo>>({
     entry_id: entry.id,
     sns_notes: ''
@@ -254,7 +258,7 @@ export default function SnsInfoForm({ entry }: SnsInfoFormProps) {
 
       <StartDateNotice 
         section="sns"
-        onAvailabilityChange={setIsStartDateAvailable}
+        onAvailabilityChange={handleAvailabilityChange}
       />
 
       {/* 入力開始日後のみフォーム表示 */}
