@@ -16,7 +16,7 @@ export type AdvancedSection = typeof advancedSections[number]
 /**
  * 入力開始日が設定されているかを確認し、現在時刻と比較
  */
-export async function checkStartDateAvailability(_section: AdvancedSection): Promise<{
+export async function checkStartDateAvailability(): Promise<{
   isAvailable: boolean
   startDate: string | null
   message: string

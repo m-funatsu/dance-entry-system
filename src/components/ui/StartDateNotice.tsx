@@ -17,7 +17,7 @@ export function StartDateNotice({ section, className = '', onAvailabilityChange 
   useEffect(() => {
     async function checkAvailability() {
       try {
-        const result = await checkStartDateAvailability(section)
+        const result = await checkStartDateAvailability()
         setIsAvailable(result.isAvailable)
         setMessage(result.message)
         
