@@ -241,12 +241,10 @@ export default async function ProgramInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {/* 選手紹介画像 */}
-                        {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_path === programInfo.player_photo_path
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                          <div key={file.id}>
+                        {programInfo.player_photo_path && (
+                          <div>
                             <a
-                              href={getFileUrl(file.file_path)}
+                              href={getFileUrl(programInfo.player_photo_path)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
@@ -254,18 +252,16 @@ export default async function ProgramInfoListPage() {
                               📸 選手紹介画像
                             </a>
                           </div>
-                        ))}
+                        )}
                         
                         {/* 作品イメージ①～④ */}
                         {[1, 2, 3, 4].map((num) => {
                           const imagePath = programInfo[`semifinal_image${num}_path` as keyof typeof programInfo] as string
-                          const file = Array.isArray(programInfo.entry_files) ? 
-                            programInfo.entry_files.find((f: { file_path: string }) => f.file_path === imagePath) : null
                           
-                          return file ? (
+                          return imagePath ? (
                             <div key={`image${num}`}>
                               <a
-                                href={getFileUrl(file.file_path)}
+                                href={getFileUrl(imagePath)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
@@ -291,12 +287,10 @@ export default async function ProgramInfoListPage() {
                         {programInfo.song_count === '2曲' ? (
                           <>
                             {/* 決勝用選手紹介画像 */}
-                            {Array.isArray(programInfo.entry_files) && programInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                              file.file_path === programInfo.final_player_photo_path
-                            ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
-                              <div key={file.id}>
+                            {programInfo.final_player_photo_path && (
+                              <div>
                                 <a
-                                  href={getFileUrl(file.file_path)}
+                                  href={getFileUrl(programInfo.final_player_photo_path)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
@@ -304,18 +298,16 @@ export default async function ProgramInfoListPage() {
                                   📸 選手紹介画像
                                 </a>
                               </div>
-                            ))}
+                            )}
                             
                             {/* 決勝用作品イメージ①～④ */}
                             {[1, 2, 3, 4].map((num) => {
                               const imagePath = programInfo[`final_image${num}_path` as keyof typeof programInfo] as string
-                              const file = Array.isArray(programInfo.entry_files) ? 
-                                programInfo.entry_files.find((f: { file_path: string }) => f.file_path === imagePath) : null
                               
-                              return file ? (
+                              return imagePath ? (
                                 <div key={`final_image${num}`}>
                                   <a
-                                    href={getFileUrl(file.file_path)}
+                                    href={getFileUrl(imagePath)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
