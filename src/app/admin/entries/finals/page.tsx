@@ -116,9 +116,7 @@ export default async function FinalsInfoListPage() {
           <DownloadButton
             data={mappedFinalsInfoList.map(item => [
               // 基本項目
-              item.id,
-              item.entry_id,
-              item.entries?.status || '',
+              item.entries?.users?.name || '不明なユーザー',
               // 作品情報
               item.music_change ? 'あり' : 'なし',
               item.work_title || '',
@@ -201,7 +199,7 @@ export default async function FinalsInfoListPage() {
             ])}
             headers={[
               // 基本項目
-              'ID', 'エントリーID', '選考ステータス',
+              'システム利用者名',
               // 作品情報
               '楽曲情報の変更', '作品タイトル', '作品タイトル(ふりがな)', '作品キャラクター・ストーリー等',
               // 楽曲著作関連情報
@@ -248,13 +246,7 @@ export default async function FinalsInfoListPage() {
                 <tr>
                   {/* 基本項目 */}
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    エントリーID
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    選考ステータス
+                    システム利用者名
                   </th>
                   {/* 作品情報 */}
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
@@ -503,25 +495,9 @@ export default async function FinalsInfoListPage() {
                 {mappedFinalsInfoList.map((finalsInfo) => (
                   <tr key={finalsInfo.id} className="hover:bg-gray-50">
                     {/* 基本項目 */}
-                    <td className="px-2 py-3 whitespace-nowrap text-xs font-medium text-gray-900">
-                      {finalsInfo.id}
-                    </td>
                     <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-                      <div>{finalsInfo.entry_id}</div>
+                      <div className="font-medium">{finalsInfo.entries?.users?.name || '不明なユーザー'}</div>
                       <div className="text-gray-500">{finalsInfo.entries?.participant_names || 'エントリー名なし'}</div>
-                    </td>
-                    <td className="px-2 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        finalsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        finalsInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        finalsInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {finalsInfo.entries?.status === 'pending' && '審査待ち'}
-                        {finalsInfo.entries?.status === 'submitted' && '提出済み'}
-                        {finalsInfo.entries?.status === 'selected' && '選考通過'}
-                        {finalsInfo.entries?.status === 'rejected' && '不選考'}
-                      </span>
                     </td>
                     {/* 作品情報 */}
                     <td className="px-2 py-3 text-xs text-gray-900 bg-blue-25">
