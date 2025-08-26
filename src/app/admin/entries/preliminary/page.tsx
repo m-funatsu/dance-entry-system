@@ -184,7 +184,7 @@ export default async function PreliminaryInfoListPage() {
                     その他詳細
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    振込確認用紙
+                    予選提出動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     選考ステータス
