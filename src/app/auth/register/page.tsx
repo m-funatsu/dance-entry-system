@@ -179,6 +179,7 @@ export default function RegisterPage() {
             <SiteTitle 
               fallback="2025バルカーカップ ダンスエントリーシステム"
               style={{color: 'black', fontSize: '36px', lineHeight: '1.2'}}
+              splitMode="double"
             />
           </h1>
           <p className="mt-2 text-center" style={{color: 'black', fontSize: '21px'}}>

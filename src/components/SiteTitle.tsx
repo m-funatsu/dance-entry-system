@@ -6,12 +6,14 @@ interface SiteTitleProps {
   fallback?: string
   className?: string
   style?: React.CSSProperties
+  splitMode?: 'single' | 'double' // single: 1行表示, double: 2行表示
 }
 
 export default function SiteTitle({ 
   fallback = "2025 バルカーカップ ダンスエントリーシステム", 
   className = "",
-  style 
+  style,
+  splitMode = 'single'
 }: SiteTitleProps) {
   const [title, setTitle] = useState(fallback)
 
@@ -34,6 +36,19 @@ export default function SiteTitle({
 
     fetchTitle()
   }, [fallback])
+
+  if (splitMode === 'double') {
+    // 2行表示モード
+    const parts = title.split(' ')
+    if (parts.length >= 2) {
+      return (
+        <div className={className} style={style}>
+          <div>{parts[0]}</div>
+          <div>{parts.slice(1).join(' ')}</div>
+        </div>
+      )
+    }
+  }
 
   return <span className={className} style={style}>{title}</span>
 }
