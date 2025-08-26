@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { checkStartDateAvailability, isAdvancedSection, type AdvancedSection } from '@/lib/start-date-utils'
+import { checkStartDateAvailability, isAdvancedSection } from '@/lib/start-date-utils'
 
 interface StartDateInlineProps {
   section: string

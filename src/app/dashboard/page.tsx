@@ -8,7 +8,6 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
 import SiteTitle from '@/components/SiteTitle'
-import { StartDateStatus } from '@/components/dashboard/StartDateStatus'
 import { StartDateInline } from '@/components/dashboard/StartDateInline'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
