@@ -102,6 +102,24 @@ export default async function PreliminaryInfoListPage() {
   console.log('[PRELIMINARY DEBUG] マッピング後データ件数:', mappedPreliminaryInfoList?.length || 0)
   console.log('[PRELIMINARY DEBUG] マッピング後データ:', JSON.stringify(mappedPreliminaryInfoList, null, 2))
 
+  // コード値を名称に変換する関数
+  const getMusicRightsLabel = (code: string) => {
+    switch (code) {
+      case 'A': return 'A.市販の楽曲を使用する'
+      case 'B': return 'B.権利者から楽曲使用許諾を受けている楽曲を使用する'
+      case 'C': return 'C.自作楽曲を使用する'
+      default: return code || '未入力'
+    }
+  }
+
+  const getMusicTypeLabel = (code: string) => {
+    switch (code) {
+      case 'cd': return 'CD音源'
+      case 'original': return 'オリジナル音源'
+      default: return code || '未入力'
+    }
+  }
+
   // ファイルダウンロード用のパブリックURL生成
   const getFileUrl = (filePath: string) => {
     const { data } = adminSupabase.storage.from('files').getPublicUrl(filePath)
@@ -139,9 +157,9 @@ export default async function PreliminaryInfoListPage() {
               item.artist || '',
               item.cd_title || '',
               item.jasrac_code || '',
-              item.music_rights_cleared || '',
+              getMusicRightsLabel(item.music_rights_cleared || ''),
               item.record_number || '',
-              item.music_type || '',
+              getMusicTypeLabel(item.music_type || ''),
               item.choreographer1_name || '',
               item.choreographer1_furigana || '',
               item.choreographer2_name || '',
@@ -219,9 +237,9 @@ export default async function PreliminaryInfoListPage() {
                         <div className="text-gray-500">{preliminaryInfo.artist || ''}</div>
                         <div className="text-gray-500">{preliminaryInfo.cd_title || ''}</div>
                         <div className="text-gray-500">JASRAC: {preliminaryInfo.jasrac_code || '未入力'}</div>
-                        <div className="text-gray-500">楽曲著作権許諾: {preliminaryInfo.music_rights_cleared || '未入力'}</div>
+                        <div className="text-gray-500">楽曲著作権許諾: {getMusicRightsLabel(preliminaryInfo.music_rights_cleared)}</div>
                         <div className="text-gray-500">レコード番号: {preliminaryInfo.record_number || '未入力'}</div>
-                        <div className="text-gray-500">楽曲種類: {preliminaryInfo.music_type || '未入力'}</div>
+                        <div className="text-gray-500">楽曲種類: {getMusicTypeLabel(preliminaryInfo.music_type)}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
