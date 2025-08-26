@@ -155,34 +155,61 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     const emailAddresses = selectedEntriesData
       .filter(entry => entry?.users?.email)
       .map(entry => entry.users.email)
-      .join(', ')
     
-    if (!emailAddresses) {
+    if (emailAddresses.length === 0) {
       alert('有効なメールアドレスが見つかりません')
       return
     }
     
-    // メールアドレスをクリップボードにコピー
-    navigator.clipboard.writeText(emailAddresses).then(() => {
-      alert(`メールアドレス（${selectedEntriesData.length}名分）をクリップボードにコピーしました。\n\nメーラーでBCCに貼り付けてください。`)
-    }).catch(() => {
-      // クリップボードAPIが使えない場合の代替手段
-      prompt('以下のメールアドレスをコピーしてBCCに貼り付けてください:', emailAddresses)
-    })
-    
-    // 短縮したmailtoリンクを作成（長さ制限対応）
     const toAddress = 'entry_vqcup@valqua.com'
-    const shortSubject = subject.length > 50 ? subject.substring(0, 50) + '...' : subject
-    const shortBody = body.length > 200 ? body.substring(0, 200) + '\n\n（続きは元のメールテンプレートを参照してください）' : body
     
-    const mailtoLink = `mailto:${toAddress}?subject=${encodeURIComponent(shortSubject)}&body=${encodeURIComponent(shortBody)}`
+    // 文字数制限とエンコーディング最適化
+    const maxSubjectLength = 78  // RFC推奨値
+    const maxBodyLength = 1900   // 安全な長さ
     
-    // メーラーを開く
-    window.location.href = mailtoLink
+    const cleanSubject = subject.trim().substring(0, maxSubjectLength)
+    const cleanBody = body.trim().substring(0, maxBodyLength)
+    
+    // BCCの代わりにTO部分にメールアドレスを追加（少数の場合）
+    let mailtoLink = ''
+    
+    if (emailAddresses.length <= 5) {
+      // 5名以下の場合：TO部分に直接指定
+      const allAddresses = [toAddress, ...emailAddresses].join(',')
+      mailtoLink = `mailto:${encodeURIComponent(allAddresses)}?subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
+    } else {
+      // 6名以上の場合：基本情報のみでメーラーを開き、BCC情報を別途表示
+      mailtoLink = `mailto:${encodeURIComponent(toAddress)}?subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
+      
+      // BCC用メールアドレス一覧を表示
+      const bccAddresses = emailAddresses.join('; ')
+      alert(`メーラーを開きます。\n\n以下のメールアドレスをBCCに追加してください：\n\n${bccAddresses}`)
+    }
+    
+    // メーラーを確実に開く（複数の方法を試行）
+    try {
+      // 方法1: window.location.hrefで直接開く
+      window.location.href = mailtoLink
+    } catch {
+      try {
+        // 方法2: window.openで新しいウィンドウとして開く
+        window.open(mailtoLink, '_self')
+      } catch {
+        // 方法3: リンク要素を作成してクリック
+        const link = document.createElement('a')
+        link.href = mailtoLink
+        link.target = '_self'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    }
     
     // コンポーザーを閉じる
-    onSent()
-    onClose()
+    setTimeout(() => {
+      onSent()
+      onClose()
+    }, 500)
   }
 
   return (
