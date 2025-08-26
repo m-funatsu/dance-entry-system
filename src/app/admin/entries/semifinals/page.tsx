@@ -193,7 +193,7 @@ export default async function SemifinalsInfoListPage() {
               // 照明シーン チェイサー
               `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
               // 振付師情報
-              `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer_name2 || '未入力'} (${item.choreographer_furigana2 || '未入力'})`,
+              `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer2_name || '未入力'} (${item.choreographer2_furigana || '未入力'})`,
               // 小道具情報
               `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
               // 振込確認
@@ -645,8 +645,8 @@ export default async function SemifinalsInfoListPage() {
                       <div className="text-xs text-gray-900">
                         <div className="mb-1"><strong>振付師氏名①:</strong> {semifinalsInfo.choreographer_name || '未入力'}</div>
                         <div className="mb-1"><strong>振付師氏名フリガナ①:</strong> {semifinalsInfo.choreographer_furigana || '未入力'}</div>
-                        <div className="mb-1"><strong>振付師氏名②:</strong> {semifinalsInfo.choreographer_name2 || '未入力'}</div>
-                        <div><strong>振付師氏名フリガナ②:</strong> {semifinalsInfo.choreographer_furigana2 || '未入力'}</div>
+                        <div className="mb-1"><strong>振付師氏名②:</strong> {semifinalsInfo.choreographer2_name || '未入力'}</div>
+                        <div><strong>振付師氏名フリガナ②:</strong> {semifinalsInfo.choreographer2_furigana || '未入力'}</div>
                       </div>
                     </td>
                     
