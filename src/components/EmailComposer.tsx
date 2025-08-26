@@ -151,65 +151,42 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
 
-    // 全選択されたエントリーのメールアドレスを収集
+    // 全選択されたエントリーのメールアドレスを収集（BCC用）
     const emailAddresses = selectedEntriesData
       .filter(entry => entry?.users?.email)
       .map(entry => entry.users.email)
+      .join(',')
     
-    if (emailAddresses.length === 0) {
+    if (!emailAddresses) {
       alert('有効なメールアドレスが見つかりません')
       return
     }
     
     const toAddress = 'entry_vqcup@valqua.com'
     
-    // 文字数制限とエンコーディング最適化
-    const maxSubjectLength = 78  // RFC推奨値
-    const maxBodyLength = 1900   // 安全な長さ
+    // 文字数制限でmailtoリンクの長さを制御
+    const maxSubjectLength = 60   // 安全な件名長さ
+    const maxBodyLength = 800     // 安全な本文長さ
     
-    const cleanSubject = subject.trim().substring(0, maxSubjectLength)
-    const cleanBody = body.trim().substring(0, maxBodyLength)
+    const cleanSubject = subject.trim().length > maxSubjectLength 
+      ? subject.trim().substring(0, maxSubjectLength) + '...' 
+      : subject.trim()
     
-    // BCCの代わりにTO部分にメールアドレスを追加（少数の場合）
-    let mailtoLink = ''
+    const cleanBody = body.trim().length > maxBodyLength 
+      ? body.trim().substring(0, maxBodyLength) + '\n\n（以下省略）' 
+      : body.trim()
     
-    if (emailAddresses.length <= 5) {
-      // 5名以下の場合：TO部分に直接指定
-      const allAddresses = [toAddress, ...emailAddresses].join(',')
-      mailtoLink = `mailto:${encodeURIComponent(allAddresses)}?subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
-    } else {
-      // 6名以上の場合：基本情報のみでメーラーを開き、BCC情報を別途表示
-      mailtoLink = `mailto:${encodeURIComponent(toAddress)}?subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
-      
-      // BCC用メールアドレス一覧を表示
-      const bccAddresses = emailAddresses.join('; ')
-      alert(`メーラーを開きます。\n\n以下のメールアドレスをBCCに追加してください：\n\n${bccAddresses}`)
-    }
+    // mailtoリンクを作成（すべてBCC送信）
+    const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
     
-    // メーラーを確実に開く（複数の方法を試行）
-    try {
-      // 方法1: window.location.hrefで直接開く
-      window.location.href = mailtoLink
-    } catch {
-      try {
-        // 方法2: window.openで新しいウィンドウとして開く
-        window.open(mailtoLink, '_self')
-      } catch {
-        // 方法3: リンク要素を作成してクリック
-        const link = document.createElement('a')
-        link.href = mailtoLink
-        link.target = '_self'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      }
-    }
+    console.log('mailto link length:', mailtoLink.length)
+    
+    // メーラーを開く
+    window.location.href = mailtoLink
     
     // コンポーザーを閉じる
-    setTimeout(() => {
-      onSent()
-      onClose()
-    }, 500)
+    onSent()
+    onClose()
   }
 
   return (
