@@ -132,9 +132,10 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
 
   return (
     <div className="space-y-6">
-      {/* 常に入力可能なセクション */}
+      {/* 入力締め切り日のみ設定 */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">常に入力可能なセクション</h3>
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">📅 入力締め切り日</h3>
+        <p className="text-sm text-blue-800 mb-4">以下のセクションは常に入力可能で、締切日のみ設定します。</p>
         <div className="space-y-4">
           {['basic_info_deadline', 'music_info_deadline', 'program_info_deadline'].map((key) => (
             <div key={key} className="bg-white rounded p-4">
@@ -148,7 +149,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
               </div>
               <div>
                 <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
-                  締切日
+                  ⏰ 入力締め切り日
                 </label>
                 <input
                   type="date"
@@ -175,9 +176,10 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
         </div>
       </div>
 
-      {/* 入力開始日の設定 */}
+      {/* 入力開始日と締め切り日の両方を設定 */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-yellow-900 mb-3">入力開始日が必要なセクション</h3>
+        <h3 className="text-lg font-semibold text-yellow-900 mb-3">📅 入力開始日 + 入力締め切り日</h3>
+        <p className="text-sm text-yellow-800 mb-4">以下のセクションは入力開始日を設定し、その日以降に入力可能になります。</p>
         <div className="bg-white rounded p-4 mb-4">
           <div className="mb-2">
             <h4 className="text-base font-medium text-gray-900">
@@ -189,7 +191,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
           </div>
           <div>
             <label htmlFor="deadline-advanced_start_date" className="block text-sm font-medium text-gray-700">
-              入力開始日
+              📅 入力開始日（共通設定）
             </label>
             <input
               type="date"
@@ -227,7 +229,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
               </div>
               <div>
                 <label htmlFor={`deadline-${key}`} className="block text-sm font-medium text-gray-700">
-                  締切日
+                  ⏰ 入力締め切り日
                 </label>
                 <input
                   type="date"
