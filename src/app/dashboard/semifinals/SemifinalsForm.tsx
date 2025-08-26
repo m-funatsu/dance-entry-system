@@ -44,6 +44,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
+  const [isStartDateAvailable, setIsStartDateAvailable] = useState(true)
   
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
@@ -744,9 +745,15 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
 
-      <StartDateNotice section="semifinals" />
+      <StartDateNotice 
+        section="semifinals" 
+        onAvailabilityChange={setIsStartDateAvailable}
+      />
 
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+      {/* 入力開始日後のみフォーム表示 */}
+      {isStartDateAvailable && (
+        <>
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <p className="text-sm text-blue-800">
           準決勝に進出された場合の詳細情報をご記入ください。
         </p>
@@ -832,6 +839,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             基本情報を先に保存してください。
           </p>
         </div>
+      )}
+        </>
       )}
     </div>
   )
