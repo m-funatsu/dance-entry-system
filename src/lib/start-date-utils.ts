@@ -22,6 +22,9 @@ export async function checkStartDateAvailability(): Promise<{
   message: string
 }> {
   try {
+    console.log('[START DATE] === 入力開始日チェック開始 ===')
+    console.log('[START DATE] 現在時刻:', new Date().toISOString())
+    
     const supabase = createClient()
     
     // advanced_start_dateを取得
@@ -31,8 +34,10 @@ export async function checkStartDateAvailability(): Promise<{
       .eq('key', 'advanced_start_date')
       .maybeSingle()
 
+    console.log('[START DATE] データベース取得結果:', { data, error })
+
     if (error) {
-      console.error('入力開始日取得エラー:', error)
+      console.error('[START DATE] 入力開始日取得エラー:', error)
       return {
         isAvailable: true,
         startDate: null,
@@ -42,6 +47,7 @@ export async function checkStartDateAvailability(): Promise<{
 
     // 入力開始日が設定されていない場合は常に利用可能
     if (!data?.value) {
+      console.log('[START DATE] 入力開始日未設定 → 常に利用可能')
       return {
         isAvailable: true,
         startDate: null,
@@ -51,9 +57,14 @@ export async function checkStartDateAvailability(): Promise<{
 
     const startDate = new Date(data.value)
     const now = new Date()
+    
+    console.log('[START DATE] 設定された開始日:', startDate.toISOString())
+    console.log('[START DATE] 現在時刻:', now.toISOString())
+    console.log('[START DATE] 比較結果 (now >= startDate):', now >= startDate)
 
     if (now >= startDate) {
       // 入力開始日を過ぎている（利用可能）
+      console.log('[START DATE] → 入力可能')
       return {
         isAvailable: true,
         startDate: data.value,
@@ -67,6 +78,9 @@ export async function checkStartDateAvailability(): Promise<{
         day: 'numeric'
       })
       
+      console.log('[START DATE] → 入力開始前、制限中')
+      console.log('[START DATE] 表示メッセージ:', `このセクションは ${formattedDate} から入力可能になります。`)
+      
       return {
         isAvailable: false,
         startDate: data.value,
@@ -74,7 +88,7 @@ export async function checkStartDateAvailability(): Promise<{
       }
     }
   } catch (error) {
-    console.error('入力開始日チェックエラー:', error)
+    console.error('[START DATE] 入力開始日チェックエラー:', error)
     return {
       isAvailable: true,
       startDate: null,
