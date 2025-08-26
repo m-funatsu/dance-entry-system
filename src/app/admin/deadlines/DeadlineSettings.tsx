@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 interface Setting {
   id: string
@@ -41,7 +40,6 @@ const sectionDescriptions: Record<string, string> = {
 }
 
 export default function DeadlineSettings({ initialSettings }: DeadlineSettingsProps) {
-  const router = useRouter()
   const supabase = createClient()
   
   // settingsの配列をオブジェクトに変換
@@ -98,7 +96,10 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
       }
 
       setMessage('期日設定を保存しました')
-      router.refresh()
+      // 確実なリロードを実行
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } catch (error) {
       console.error('Error saving deadlines:', error)
       setMessage('期日設定の保存に失敗しました')
