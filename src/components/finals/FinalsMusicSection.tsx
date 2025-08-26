@@ -48,7 +48,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           楽曲情報の変更 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="music_change_option"
@@ -59,7 +59,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             />
             準決勝から変更なし
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="music_change_option"

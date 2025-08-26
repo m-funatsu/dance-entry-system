@@ -813,7 +813,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           {[1, 2, 3, 4, 5].map((num) => (
             <div key={`related${num}`} className="border rounded-lg p-4 space-y-4">
-              <h5 className="font-medium">関係者{num}</h5>
+              <h5 className="font-medium text-gray-900">関係者{num}</h5>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -867,11 +867,11 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="font-medium">合計人数</span>
+              <span className="font-medium text-gray-900">合計人数</span>
               <span className="text-lg">{applicationsInfo.related_ticket_count || 0}人</span>
             </div>
             <div className="flex justify-between items-center mt-2">
-              <span className="font-medium">合計金額</span>
+              <span className="font-medium text-gray-900">合計金額</span>
               <span className="text-lg font-bold text-blue-600">
                 ¥{(applicationsInfo.related_ticket_total_amount || 0).toLocaleString()}
               </span>
@@ -905,7 +905,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           {[1, 2, 3].map((num) => (
             <div key={`companion${num}`} className="border rounded-lg p-4 space-y-4">
-              <h5 className="font-medium">同伴者{num}</h5>
+              <h5 className="font-medium text-gray-900">同伴者{num}</h5>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -950,7 +950,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="font-medium">合計金額</span>
+              <span className="font-medium text-gray-900">合計金額</span>
               <span className="text-lg font-bold text-blue-600">
                 ¥{(applicationsInfo.companion_total_amount || 0).toLocaleString()}
               </span>
@@ -1404,16 +1404,16 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
 
           <div className="bg-gray-50 p-4 rounded-lg space-y-2">
             <div className="flex justify-between items-center">
-              <span>関係者チケット合計</span>
+              <span className="font-medium text-gray-900">関係者チケット合計</span>
               <span>¥{(applicationsInfo.related_ticket_total_amount || 0).toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span>選手同伴申請合計</span>
+              <span className="font-medium text-gray-900">選手同伴申請合計</span>
               <span>¥{(applicationsInfo.companion_total_amount || 0).toLocaleString()}</span>
             </div>
             <div className="border-t pt-2 mt-2">
               <div className="flex justify-between items-center font-bold">
-                <span>総合計</span>
+                <span className="font-medium text-gray-900">総合計</span>
                 <span className="text-lg text-blue-600">
                   ¥{((applicationsInfo.related_ticket_total_amount || 0) + (applicationsInfo.companion_total_amount || 0)).toLocaleString()}
                 </span>
@@ -1619,7 +1619,7 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
             </div>
 
             <div className="bg-gray-50 p-4 rounded-md">
-              <h5 className="font-medium text-sm mb-2">合計希望枚数</h5>
+              <h5 className="font-medium text-sm mb-2 text-gray-900">合計希望枚数</h5>
               <p className="text-2xl font-bold text-gray-900">
                 {(seatRequest.premium_seats || 0) + (seatRequest.ss_seats || 0) + 
                  (seatRequest.s_seats || 0) + (seatRequest.a_seats || 0) + 

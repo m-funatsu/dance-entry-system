@@ -47,7 +47,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
           準決勝との音響指示 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="sound_change_option"
@@ -58,7 +58,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             />
             準決勝と同じ音響指示
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="sound_change_option"

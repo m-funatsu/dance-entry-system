@@ -41,7 +41,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       <h4 className="font-medium text-gray-900">振付情報</h4>
       
       <div>
-        <label className="flex items-center">
+        <label className="flex items-center text-gray-900">
           <input
             type="checkbox"
             checked={semifinalsInfo.choreographer_change_from_preliminary || false}
@@ -105,7 +105,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           小道具の有無 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="props_usage"
@@ -116,7 +116,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
             />
             あり
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center text-gray-900">
             <input
               type="radio"
               name="props_usage"
