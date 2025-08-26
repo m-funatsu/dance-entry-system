@@ -272,7 +272,7 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
               {selectedEntriesData.length > 0 && subject && body && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    プレビュー ({selectedEntriesData[0].users.name}さんの場合)
+                    プレビュー
                   </h4>
                   <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
                     <div className="mb-2">
