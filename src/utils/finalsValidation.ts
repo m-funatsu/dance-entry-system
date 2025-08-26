@@ -73,7 +73,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (data.choreographer_change === true) {
         // 変更ありの場合、振付師名は必須
         if (!data.choreographer_name) errors.push('決勝 - 振付師')
-        if (!data.choreographer2_name) errors.push('決勝 - 振付師2（決勝でダンサーが振付変更した場合）')
+        // 振付師2は任意項目のため必須チェックしない
       }
       // 小道具の有無は必須
       if (!data.props_usage) errors.push('小道具の有無')
