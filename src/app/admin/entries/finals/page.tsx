@@ -100,11 +100,6 @@ export default async function FinalsInfoListPage() {
   console.log('[FINALS DEBUG] マッピング完了')
   console.log('[FINALS DEBUG] マッピング後データ件数:', mappedFinalsInfoList?.length || 0)
 
-  // ファイルダウンロード用のパブリックURL生成
-  const getFileUrl = (filePath: string) => {
-    const { data } = adminSupabase.storage.from('files').getPublicUrl(filePath)
-    return data.publicUrl
-  }
 
   return (
     <div className="space-y-6">
