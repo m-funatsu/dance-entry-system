@@ -71,7 +71,7 @@ export default async function SemifinalsInfoListPage() {
   console.log('[SEMIFINALS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[SEMIFINALS DEBUG] ファイルエラー:', filesError)
 
-  // データをマッピング（全データを表示）
+  // データをマッピング（選考通過のみ表示）
   const mappedSemifinalsInfoList = semifinalsInfoList?.map(semifinalsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === semifinalsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
@@ -80,7 +80,8 @@ export default async function SemifinalsInfoListPage() {
     console.log(`[SEMIFINALS DEBUG] エントリーID ${semifinalsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
       hasUser: !!relatedUser,
-      fileCount: relatedFiles?.length || 0
+      fileCount: relatedFiles?.length || 0,
+      status: relatedEntry?.status
     })
     
     return {
@@ -96,7 +97,7 @@ export default async function SemifinalsInfoListPage() {
       },
       entry_files: relatedFiles || []
     }
-  }) || []
+  }).filter(item => item.entries?.status === 'selected') || []
 
   console.log('[SEMIFINALS DEBUG] マッピング完了')
   console.log('[SEMIFINALS DEBUG] マッピング後データ件数:', mappedSemifinalsInfoList?.length || 0)

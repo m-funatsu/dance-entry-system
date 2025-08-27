@@ -69,7 +69,7 @@ export default async function SnsInfoListPage() {
   console.log('[SNS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[SNS DEBUG] ファイルエラー:', filesError)
 
-  // データをマッピング（全データを表示）
+  // データをマッピング（選考通過のみ表示）
   const mappedSnsInfoList = snsInfoList?.map(snsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === snsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
@@ -78,7 +78,8 @@ export default async function SnsInfoListPage() {
     console.log(`[SNS DEBUG] エントリーID ${snsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
       hasUser: !!relatedUser,
-      fileCount: relatedFiles?.length || 0
+      fileCount: relatedFiles?.length || 0,
+      status: relatedEntry?.status
     })
     
     return {
@@ -94,7 +95,7 @@ export default async function SnsInfoListPage() {
       },
       entry_files: relatedFiles || []
     }
-  }) || []
+  }).filter(item => item.entries?.status === 'selected') || []
 
   console.log('[SNS DEBUG] マッピング完了')
   console.log('[SNS DEBUG] マッピング後データ件数:', mappedSnsInfoList?.length || 0)

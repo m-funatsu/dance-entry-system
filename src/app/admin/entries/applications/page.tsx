@@ -79,8 +79,8 @@ export default async function ApplicationsInfoListPage() {
   console.log('[APPLICATIONS DEBUG] 観覧席希望件数:', seatRequestsList?.length || 0)
   console.log('[APPLICATIONS DEBUG] 観覧席希望エラー:', seatRequestsError)
 
-  // データをマッピング（全エントリーを基準として表示）
-  const mappedApplicationsInfoList = entriesList?.map(entry => {
+  // データをマッピング（選考通過のみ表示）
+  const mappedApplicationsInfoList = entriesList?.filter(entry => entry.status === 'selected').map(entry => {
     const relatedUser = usersList?.find(user => user.id === entry.user_id)
     const relatedApplicationsInfo = applicationsInfoList?.find(app => app.entry_id === entry.id)
     const relatedFiles = filesList?.filter(file => file.entry_id === entry.id)
@@ -90,7 +90,8 @@ export default async function ApplicationsInfoListPage() {
       hasUser: !!relatedUser,
       hasApplicationsInfo: !!relatedApplicationsInfo,
       fileCount: relatedFiles?.length || 0,
-      hasSeatRequest: !!relatedSeatRequest
+      hasSeatRequest: !!relatedSeatRequest,
+      status: entry.status
     })
     
     return {

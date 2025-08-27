@@ -70,7 +70,7 @@ export default async function FinalsInfoListPage() {
   console.log('[FINALS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[FINALS DEBUG] ファイルエラー:', filesError)
 
-  // データをマッピング（全データを表示）
+  // データをマッピング（選考通過のみ表示）
   const mappedFinalsInfoList = finalsInfoList?.map(finalsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === finalsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
@@ -79,7 +79,8 @@ export default async function FinalsInfoListPage() {
     console.log(`[FINALS DEBUG] エントリーID ${finalsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
       hasUser: !!relatedUser,
-      fileCount: relatedFiles?.length || 0
+      fileCount: relatedFiles?.length || 0,
+      status: relatedEntry?.status
     })
     
     return {
@@ -95,7 +96,7 @@ export default async function FinalsInfoListPage() {
       },
       entry_files: relatedFiles || []
     }
-  }) || []
+  }).filter(item => item.entries?.status === 'selected') || []
 
   console.log('[FINALS DEBUG] マッピング完了')
   console.log('[FINALS DEBUG] マッピング後データ件数:', mappedFinalsInfoList?.length || 0)
