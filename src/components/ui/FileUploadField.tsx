@@ -18,6 +18,7 @@ export interface FileUploadFieldProps {
   maxSizeMB?: number
   accept?: string
   uploadPath?: (fileName: string) => string
+  helperText?: string
   placeholder?: {
     icon?: React.ReactNode
     title?: string
@@ -38,6 +39,7 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
   maxSizeMB,
   accept,
   uploadPath,
+  helperText,
   placeholder
 }) => {
   const [isDragging, setIsDragging] = useState(false)
@@ -168,6 +170,12 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
+      
+      {helperText && (
+        <p className="text-sm text-gray-600 mb-2">
+          {helperText}
+        </p>
+      )}
       
       {error && (
         <div className="mb-2 text-sm text-red-600">

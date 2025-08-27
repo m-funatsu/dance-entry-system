@@ -839,6 +839,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <div className="space-y-4">
             <FileUploadField
               label="振込確認用紙"
+              helperText="振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。"
               value={null}
               onChange={async (file) => {
                 console.log('[BANK SLIP UPLOAD] === 振込確認用紙アップロード開始 ===')
@@ -923,10 +924,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 formats: "JPG, PNG, GIF など（最大10MB、1件まで）"
               }}
             />
-            
-            <p className="text-sm text-gray-600 mt-2">
-              振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。
-            </p>
 
             {/* アップロード済みファイルのプレビュー（常時表示） */}
             {bankSlipFile ? (
