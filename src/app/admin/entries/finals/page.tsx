@@ -242,27 +242,67 @@ export default async function FinalsInfoListPage() {
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="overflow-x-auto" style={{maxWidth: '100vw'}}>
             <table className="divide-y divide-gray-200" style={{minWidth: '5000px', width: 'max-content'}}>
-              <thead className="bg-gray-50">
-                <tr>
+              <thead>
+                {/* セクションヘッダー行 */}
+                <tr className="bg-gray-100">
+                  <th className="px-2 py-2 text-center text-sm font-bold text-gray-700 border border-gray-300">
+                    基本項目
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-blue-700 border border-gray-300 bg-blue-100" colSpan={4}>
+                    ○作品情報
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-green-700 border border-gray-300 bg-green-100" colSpan={7}>
+                    ○楽曲著作関連情報
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-yellow-700 border border-gray-300 bg-yellow-100">
+                    ○楽曲データ添付
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-orange-700 border border-gray-300 bg-orange-100" colSpan={5}>
+                    ○音響情報
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-red-700 border border-gray-300 bg-red-100">
+                    ○音響データ添付
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-purple-700 border border-gray-300 bg-purple-100" colSpan={2}>
+                    ○照明情報
+                  </th>
+                  <th className="px-2 py-3 text-center text-sm font-bold text-gray-700 border border-gray-300 bg-gray-200" colSpan={28}>
+                    ○照明シーン詳細 (シーン1〜5・チェイサー)
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-lime-700 border border-gray-300 bg-lime-100" colSpan={7}>
+                    ○振付師情報
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-emerald-700 border border-gray-300 bg-emerald-100" colSpan={2}>
+                    ○作品振付師出席情報
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-emerald-700 border border-gray-300 bg-emerald-100">
+                    ○振付師写真
+                  </th>
+                  <th className="px-2 py-2 text-center text-sm font-bold text-rose-700 border border-gray-300 bg-rose-100" colSpan={3}>
+                    ○振付変更情報
+                  </th>
+                </tr>
+                {/* 詳細ヘッダー行 */}
+                <tr className="bg-gray-50">
                   {/* 基本項目 */}
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">
                     システム利用者名
                   </th>
                   {/* 作品情報 */}
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50 border border-gray-300">
                     楽曲情報の変更
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50 border border-gray-300">
                     作品タイトル
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50 border border-gray-300">
                     作品タイトル(ふりがな)
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50 border border-gray-300">
                     作品キャラクター・ストーリー等
                   </th>
                   {/* 楽曲著作関連情報 */}
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-green-50">
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-green-50 border border-gray-300">
                     楽曲著作権許諾
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-green-50">
