@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -56,8 +57,9 @@ export default function AdminRegisterPage() {
       }
 
       if (data.user) {
-        // ユーザープロフィールを管理者として作成
-        const { error: profileError } = await supabase
+        // 管理者権限でユーザープロフィールを作成
+        const adminSupabase = createAdminClient()
+        const { error: profileError } = await adminSupabase
           .from('users')
           .upsert({
             id: data.user.id,
@@ -67,6 +69,7 @@ export default function AdminRegisterPage() {
           })
 
         if (profileError) {
+          console.error('管理者プロフィール作成エラー:', profileError)
           setError('管理者プロフィールの作成に失敗しました')
           return
         }
