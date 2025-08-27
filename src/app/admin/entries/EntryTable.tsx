@@ -300,9 +300,9 @@ export default function EntryTable({ entries }: EntryTableProps) {
 
       setSelectedEntries([])
       
-      // 成功時は最新データで更新
+      // 成功時はページをリロード
       setTimeout(() => {
-        router.refresh()
+        window.location.reload()
       }, 1000)
     } catch (error) {
       // エラーの場合は元に戻す
