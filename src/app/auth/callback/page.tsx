@@ -17,30 +17,45 @@ function CallbackContent() {
       console.log('[CALLBACK] searchParams:', searchParams)
       
       try {
-        // URLパラメータをチェック
-        const type = searchParams.get('type')
+        // URLのハッシュフラグメントを確認
+        const hash = typeof window !== 'undefined' ? window.location.hash : ''
+        const hashParams = new URLSearchParams(hash.substring(1))
+        const type = searchParams.get('type') || hashParams.get('type')
+        const access_token = hashParams.get('access_token')
+        
         console.log('[CALLBACK] URLパラメータ type:', type)
+        console.log('[CALLBACK] access_token存在:', !!access_token)
+        
+        // アクセストークンがハッシュに含まれている場合、セッション交換を試行
+        if (access_token) {
+          console.log('[CALLBACK] ハッシュからトークン検出、セッション交換実行')
+          const { error } = await supabase.auth.getSession()
+          
+          if (error) {
+            console.error('[CALLBACK] セッション交換エラー:', error)
+            // セッション交換に失敗した場合、手動で交換を試行
+            console.log('[CALLBACK] 手動セッション交換を試行')
+            const refresh_token = hashParams.get('refresh_token')
+            if (refresh_token) {
+              const { error: setSessionError } = await supabase.auth.setSession({
+                access_token,
+                refresh_token
+              })
+              if (setSessionError) {
+                console.error('[CALLBACK] 手動セッション設定エラー:', setSessionError)
+              }
+            }
+          }
+        }
         
         // パスワードリセット用のコールバックの場合
         if (type === 'recovery') {
           console.log('[CALLBACK] パスワードリセット処理開始')
-          const { data, error } = await supabase.auth.getSession()
           
-          if (error) {
-            console.error('[CALLBACK] パスワードリセット認証エラー:', error)
-            setError('パスワードリセットの認証に失敗しました')
-            return
-          }
-
-          if (data.session) {
-            console.log('[CALLBACK] パスワードリセット → update-passwordへリダイレクト')
-            window.location.href = '/auth/update-password'
-            return
-          } else {
-            console.log('[CALLBACK] パスワードリセットセッション無効')
-            setError('パスワードリセットのセッションが無効です')
-            return
-          }
+          // パスワードリセットの場合は直接update-passwordページへ
+          console.log('[CALLBACK] パスワードリセット → update-passwordへリダイレクト')
+          window.location.href = '/auth/update-password'
+          return
         }
 
         // 通常のメール確認コールバック処理

@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavigationLogger from '@/components/NavigationLogger'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import SiteTitle from '@/components/SiteTitle'
@@ -13,6 +13,32 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [submitCount, setSubmitCount] = useState(0)
   const supabase = createClient()
+
+  // ページ読み込み時にURLハッシュをチェック
+  useEffect(() => {
+    const handleAuthCallback = () => {
+      if (typeof window === 'undefined') return
+      
+      const hash = window.location.hash
+      if (hash) {
+        console.log('[LOGIN] URLハッシュ検出:', hash)
+        const hashParams = new URLSearchParams(hash.substring(1))
+        const type = hashParams.get('type')
+        const access_token = hashParams.get('access_token')
+        
+        console.log('[LOGIN] type:', type, 'access_token存在:', !!access_token)
+        
+        // パスワードリセット用のトークンが含まれている場合
+        if (type === 'recovery' || access_token) {
+          console.log('[LOGIN] 認証トークン検出 - callbackページにリダイレクト')
+          // ハッシュを保持してcallbackページにリダイレクト
+          window.location.href = `/auth/callback${hash}`
+        }
+      }
+    }
+    
+    handleAuthCallback()
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     const currentSubmitCount = submitCount + 1
