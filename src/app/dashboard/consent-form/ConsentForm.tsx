@@ -78,8 +78,10 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
           
           <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
             <div className="text-center mb-6">
-              <h4 className="font-bold text-lg">【同意事項】</h4>
+              <h4 className="font-bold text-lg">2025　バルカーカップジャパンオープンショーダンス選手権　参加同意書</h4>
             </div>
+            
+            <h4 className="font-bold text-base mb-4">【同意事項】</h4>
             
             <div className="space-y-6">
               <div>
@@ -109,6 +111,11 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
                   <p>エントリーいただいた後に親権者（法定代理人）の方の同意書をいただくことになりますのでご了承ください。</p>
                 </div>
               </div>
+              
+              <div>
+                <h5 className="font-semibold text-base mb-2">④肖像利用について</h5>
+                <p>バルカーカップで撮影された映像と写真・氏名等の、テレビ・新聞・雑誌・インターネット等への掲載権および肖像権は主催者に属します。</p>
+              </div>
             </div>
 
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
@@ -129,12 +136,17 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
               className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
             />
             <span className="ml-3 text-sm font-medium text-gray-700">
-              上記の同意事項をすべて確認し、内容に同意します。
+              私は、①エントリーについて、②事故・怪我の対応について、③個人情報保護について、④肖像利用について、の内容を確認し、同意します。
               {initialData?.consent_form_submitted && (
                 <span className="ml-2 text-green-600">（提出済み）</span>
               )}
             </span>
           </label>
+          
+          <div className="mt-3 space-y-1 text-xs text-gray-600">
+            <p>※18歳未満の方の場合、必ず保護者の方の承認を得たうえで、ご同意ください。</p>
+            <p>※18歳未満の方の場合、エントリーいただいた後に親権者（法定代理人）の方の同意書をいただくことになりますのでご了承ください。</p>
+          </div>
         </div>
 
         {initialData?.consent_form_submitted && (
