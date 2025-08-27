@@ -130,9 +130,12 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
               console.log('[FINALS CHASER DISPLAY] === 決勝チェイサー曲表示値の計算 ===')
               console.log('[FINALS CHASER DISPLAY] audioFiles:', audioFiles)
               console.log('[FINALS CHASER DISPLAY] audioFiles?.chaser_song:', audioFiles?.chaser_song)
-              console.log('[FINALS CHASER DISPLAY] audioFiles?.chaser_song?.file_name:', audioFiles?.chaser_song?.file_name)
+              console.log('[FINALS CHASER DISPLAY] finalsInfo.chaser_song:', finalsInfo.chaser_song)
               
-              const displayValue = audioFiles?.chaser_song?.file_name || ''
+              // URLが存在する場合はURL、そうでなければfile_name
+              const urlValue = finalsInfo.chaser_song
+              const displayValue = urlValue || audioFiles?.chaser_song?.file_name || ''
+              console.log('[FINALS CHASER DISPLAY] URL値:', urlValue)
               console.log('[FINALS CHASER DISPLAY] 最終表示値:', displayValue)
               
               return displayValue

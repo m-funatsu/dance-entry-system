@@ -345,9 +345,12 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
             console.log('[MUSIC DATA DISPLAY] === 楽曲データ表示値の計算 ===')
             console.log('[MUSIC DATA DISPLAY] audioFiles:', audioFiles)
             console.log('[MUSIC DATA DISPLAY] audioFiles?.music_data_path:', audioFiles?.music_data_path)
-            console.log('[MUSIC DATA DISPLAY] audioFiles?.music_data_path?.file_name:', audioFiles?.music_data_path?.file_name)
+            console.log('[MUSIC DATA DISPLAY] semifinalsInfo.music_data_path:', semifinalsInfo.music_data_path)
             
-            const displayValue = audioFiles?.music_data_path?.file_name || ''
+            // URLが存在する場合はURL、そうでなければfile_name
+            const urlValue = semifinalsInfo.music_data_path
+            const displayValue = urlValue || audioFiles?.music_data_path?.file_name || ''
+            console.log('[MUSIC DATA DISPLAY] URL値:', urlValue)
             console.log('[MUSIC DATA DISPLAY] 最終表示値:', displayValue)
             
             return displayValue

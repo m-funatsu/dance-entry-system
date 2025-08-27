@@ -265,9 +265,12 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             console.log('[FINALS MUSIC DATA DISPLAY] === 決勝楽曲データ表示値の計算 ===')
             console.log('[FINALS MUSIC DATA DISPLAY] audioFiles:', audioFiles)
             console.log('[FINALS MUSIC DATA DISPLAY] audioFiles?.music_data_path:', audioFiles?.music_data_path)
-            console.log('[FINALS MUSIC DATA DISPLAY] audioFiles?.music_data_path?.file_name:', audioFiles?.music_data_path?.file_name)
+            console.log('[FINALS MUSIC DATA DISPLAY] finalsInfo.music_data_path:', finalsInfo.music_data_path)
             
-            const displayValue = audioFiles?.music_data_path?.file_name || ''
+            // URLが存在する場合はURL、そうでなければfile_name
+            const urlValue = finalsInfo.music_data_path
+            const displayValue = urlValue || audioFiles?.music_data_path?.file_name || ''
+            console.log('[FINALS MUSIC DATA DISPLAY] URL値:', urlValue)
             console.log('[FINALS MUSIC DATA DISPLAY] 最終表示値:', displayValue)
             
             return displayValue
