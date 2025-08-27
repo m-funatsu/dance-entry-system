@@ -47,10 +47,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         return true
       }
     },
-    semifinal_image1_path: { required: true },
-    semifinal_image2_path: { required: true },
-    semifinal_image3_path: { required: true },
-    semifinal_image4_path: { required: true },
     // 2曲の場合の追加ルール（条件付きで適用）
     final_player_photo_path: { 
       required: programInfo.song_count === '2曲',
@@ -81,42 +77,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
           const strValue = String(value || '').trim()
           if (!strValue) return 'この項目は必須です'
           if (strValue.length > 50) return '50文字以内で入力してください'
-        }
-        return true
-      }
-    },
-    final_image1_path: { 
-      required: programInfo.song_count === '2曲',
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲' && !value) {
-          return 'この項目は必須です'
-        }
-        return true
-      }
-    },
-    final_image2_path: { 
-      required: programInfo.song_count === '2曲',
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲' && !value) {
-          return 'この項目は必須です'
-        }
-        return true
-      }
-    },
-    final_image3_path: { 
-      required: programInfo.song_count === '2曲',
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲' && !value) {
-          return 'この項目は必須です'
-        }
-        return true
-      }
-    },
-    final_image4_path: { 
-      required: programInfo.song_count === '2曲',
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲' && !value) {
-          return 'この項目は必須です'
         }
         return true
       }
@@ -170,9 +130,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         // 画像フィールドの署名付きURLを取得
         const imageFields = [
           'player_photo_path',
-          'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
-          'final_player_photo_path',
-          'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
+          'final_player_photo_path'
         ]
         
         const urls: Record<string, string> = {}
@@ -412,30 +370,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
             error={errors.semifinal_highlight}
           />
 
-          {/* 作品イメージ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((num) => {
-              const fieldName = `semifinal_image${num}_path` as keyof ProgramInfo
-              return (
-                <div key={fieldName}>
-                  <FileUploadField
-                    label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
-                    required
-                    value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
-                    onChange={(file) => handleImageUpload(fieldName, file)}
-                    onDelete={() => handleImageDelete(fieldName)}
-                    category="image"
-                    disabled={uploading}
-                    maxSizeMB={100}
-                    accept="image/*"
-                  />
-                  {errors[fieldName] && (
-                    <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
-                  )}
-                </div>
-              )
-            })}
-          </div>
         </div>
 
         {/* 決勝用情報（2曲の場合のみ表示） */}
@@ -506,30 +440,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
               error={errors.final_highlight}
             />
 
-            {/* 作品イメージ */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((num) => {
-                const fieldName = `final_image${num}_path` as keyof ProgramInfo
-                return (
-                  <div key={fieldName}>
-                    <FileUploadField
-                      label={`作品イメージ${num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}`}
-                      required
-                      value={imageUrls[fieldName] || (programInfo[fieldName] as string)}
-                      onChange={(file) => handleImageUpload(fieldName, file)}
-                      onDelete={() => handleImageDelete(fieldName)}
-                      category="image"
-                      disabled={uploading}
-                      maxSizeMB={100}
-                      accept="image/*"
-                      />
-                    {errors[fieldName] && (
-                      <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
           </div>
         )}
 
