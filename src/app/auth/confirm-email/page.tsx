@@ -12,25 +12,16 @@ function ConfirmEmailContent() {
   const router = useRouter()
   
   useEffect(() => {
-    // URLパラメータから目的を判定
+    // codeパラメータがある場合は常にupdate-passwordページにリダイレクト
+    // （ウェルカムメールもパスワードリセットも両方ともSupabaseから送信されるため）
     const code = searchParams?.get('code')
     const type = searchParams?.get('type')
     const token_hash = searchParams?.get('token_hash')
     
     console.log('[CONFIRM-EMAIL] URL確認 - code:', code, 'type:', type, 'token_hash:', token_hash)
     
-    // パスワードリセットの判定条件
-    // 1. type='recovery'がある場合
-    // 2. token_hashがある場合  
-    // 3. codeパラメータがあり、emailパラメータがない場合（パスワードリセット特有）
-    const email = searchParams?.get('email')
-    const isPasswordReset = (type === 'recovery') || 
-                           token_hash || 
-                           (code && !email && window.location.href.includes('recovery')) ||
-                           (code && !email) // emailがない場合はパスワードリセット
-    
-    if (isPasswordReset) {
-      console.log('[CONFIRM-EMAIL] パスワードリセット検出 - update-passwordページにリダイレクト')
+    if (code || token_hash) {
+      console.log('[CONFIRM-EMAIL] Supabase認証コード検出 - update-passwordページにリダイレクト')
       const params = new URLSearchParams()
       if (code) params.append('code', code)
       if (token_hash) params.append('token_hash', token_hash)
@@ -42,8 +33,8 @@ function ConfirmEmailContent() {
       return
     }
     
-    // ウェルカムメール（メール確認）の場合はそのまま表示
-    console.log('[CONFIRM-EMAIL] メール確認ページとして表示')
+    // コードがない場合はメール確認待ち画面として表示
+    console.log('[CONFIRM-EMAIL] メール確認待ち画面として表示')
   }, [searchParams, router])
   
   try {
