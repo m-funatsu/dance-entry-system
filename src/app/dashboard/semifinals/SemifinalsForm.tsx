@@ -161,13 +161,13 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
                   console.log('[MUSIC DEBUG] Purpose一致でマッピング:', file.purpose)
                   filesMap[file.purpose] = file
                   
-                  // パブリックURLを取得（期限なし）
-                  const { data: urlData } = supabase.storage
+                  // 署名付きURLを取得（24時間有効）
+                  const { data: urlData } = await supabase.storage
                     .from('files')
-                    .getPublicUrl(file.file_path)
+                    .createSignedUrl(file.file_path, 86400)
                   
-                  if (urlData?.publicUrl) {
-                    urlUpdates[file.purpose] = urlData.publicUrl
+                  if (urlData?.signedUrl) {
+                    urlUpdates[file.purpose] = urlData.signedUrl
                   }
                 }
                 // purposeがnullまたは空の場合、ファイル名から推測
@@ -177,23 +177,23 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
                     filesMap['chaser_song'] = file
                     
                     // 署名付きURLを取得
-                    const { data: urlData } = supabase.storage
+                    const { data: urlData } = await supabase.storage
                       .from('files')
-                      .getPublicUrl(file.file_path)  // パブリックURL（期限なし）
+                      .createSignedUrl(file.file_path, 86400)
                     
-                    if (urlData?.publicUrl) {
-                      urlUpdates['chaser_song'] = urlData.publicUrl
+                    if (urlData?.signedUrl) {
+                      urlUpdates['chaser_song'] = urlData.signedUrl
                     }
                   } else if (file.file_path.includes('music_data_path')) {
                     filesMap['music_data_path'] = file
                     
                     // 署名付きURLを取得
-                    const { data: urlData } = supabase.storage
+                    const { data: urlData } = await supabase.storage
                       .from('files')
-                      .getPublicUrl(file.file_path)  // パブリックURL（期限なし）
+                      .createSignedUrl(file.file_path, 86400)
                     
-                    if (urlData?.publicUrl) {
-                      urlUpdates['music_data_path'] = urlData.publicUrl
+                    if (urlData?.signedUrl) {
+                      urlUpdates['music_data_path'] = urlData.signedUrl
                     }
                   }
                 }
@@ -337,17 +337,22 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       
       console.log('[UPLOAD DEBUG] File saved to database:', fileData)
       
-      // パブリックURLを取得（期限なし）
-      const { data: urlData } = supabase.storage
+      // 署名付きURLを取得（24時間有効）
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('files')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 86400) // 24時間（86400秒）
+        
+      if (urlError) {
+        console.error('[UPLOAD DEBUG] URL生成エラー:', urlError)
+        throw urlError
+      }
 
       // UIの状態を更新
-      console.log('[UPLOAD DEBUG] Updating UI state with public URL:', urlData?.publicUrl)
+      console.log('[UPLOAD DEBUG] Updating UI state with signed URL:', urlData?.signedUrl)
       setSemifinalsInfo(prev => {
         const updated = {
           ...prev,
-          [field]: urlData?.publicUrl || ''
+          [field]: urlData?.signedUrl || ''
         }
         console.log('[UPLOAD DEBUG] setSemifinalsInfo - 前の状態:', prev[field as keyof SemifinalsInfo])
         console.log('[UPLOAD DEBUG] setSemifinalsInfo - 新しい状態:', updated[field as keyof SemifinalsInfo])
@@ -370,7 +375,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         
         if (existingData) {
           // 既存レコードがある場合は更新
-          const updateValue = urlData?.publicUrl || fileName
+          const updateValue = urlData?.signedUrl || fileName
           console.log('[UPLOAD DEBUG] Updating semifinals_info with:', { field, value: updateValue })
           
           const { error: updateError } = await supabase
@@ -387,7 +392,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           }
         } else {
           // 既存レコードがない場合は作成
-          const insertValue = urlData?.publicUrl || fileName
+          const insertValue = urlData?.signedUrl || fileName
           console.log('[UPLOAD DEBUG] Inserting new semifinals_info with:', { field, value: insertValue })
           
           const { error: insertError } = await supabase
