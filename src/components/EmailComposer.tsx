@@ -59,15 +59,28 @@ entry-vqcup@valqua.com`
   useEffect(() => {
     const loadTemplates = async () => {
       try {
+        console.log('[TEMPLATE LOAD] === テンプレート取得開始 ===')
         const response = await fetch('/api/admin/notification-templates')
+        console.log('[TEMPLATE LOAD] レスポンス状態:', response.status, response.ok)
+        
         if (response.ok) {
           const data = await response.json()
-          setTemplates(data.templates || [])
+          console.log('[TEMPLATE LOAD] 取得データ:', data)
+          console.log('[TEMPLATE LOAD] データ型:', typeof data)
+          console.log('[TEMPLATE LOAD] 配列判定:', Array.isArray(data))
+          
+          // APIが配列を直接返すため、data.templatesではなくdataを使用
+          const templatesData = Array.isArray(data) ? data : (data.templates || [])
+          console.log('[TEMPLATE LOAD] 最終テンプレートデータ:', templatesData)
+          setTemplates(templatesData)
+        } else {
+          console.error('[TEMPLATE LOAD] API失敗:', response.status, response.statusText)
         }
       } catch (error) {
-        console.error('テンプレート取得エラー:', error)
+        console.error('[TEMPLATE LOAD] テンプレート取得エラー:', error)
       } finally {
         setTemplatesLoading(false)
+        console.log('[TEMPLATE LOAD] === テンプレート取得完了 ===')
       }
     }
     loadTemplates()
