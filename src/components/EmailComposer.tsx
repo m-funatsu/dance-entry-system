@@ -1,161 +1,99 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { NotificationTemplate } from '@/lib/types'
 
 interface EmailComposerProps {
-  selectedEntries: string[]
-  entries: {
+  selectedEntriesData: Array<{
     id: string
     users: {
       name: string
       email: string
     }
-    dance_style: string
-    team_name?: string
     participant_names: string
-    representative_name?: string
-    partner_name?: string
-    status: string
-  }[]
+    dance_style: string
+  }>
   onClose: () => void
   onSent: () => void
 }
 
-interface EmailTemplate {
+interface Template {
   id: string
   name: string
   subject: string
   body: string
 }
 
-const defaultTemplates: EmailTemplate[] = [
-  {
-    id: 'selection_pass',
-    name: '選考通過通知',
-    subject: '【ダンスコンテスト】選考結果のお知らせ - {{name}}様',
-    body: `{{name}}様
-
-お疲れ様です。
-ダンスコンテスト運営事務局です。
-
-この度は、ダンスコンテストにご応募いただき、誠にありがとうございました。
-厳正なる審査の結果、{{name}}様のエントリー「{{dance_style}}」につきまして、見事選考を通過されましたことをお知らせいたします。
-
-■ エントリー情報
-・ダンススタイル: {{dance_style}}
-・チーム名: {{team_name}}
-・参加者名: {{participant_names}}
-
-今後の詳細なスケジュールにつきましては、別途ご連絡させていただきます。
-
-引き続きよろしくお願いいたします。
-
-ダンスコンテスト運営事務局`
-  },
-  {
-    id: 'selection_fail',
-    name: '選考結果通知（不選考）',
-    subject: '【ダンスコンテスト】選考結果のお知らせ - {{name}}様',
-    body: `{{name}}様
-
-お疲れ様です。
-ダンスコンテスト運営事務局です。
-
-この度は、ダンスコンテストにご応募いただき、誠にありがとうございました。
-
-厳正なる審査の結果、今回は残念ながら選考を通過することができませんでした。
-多数のご応募をいただく中での判断となり、大変心苦しくお伝えすることとなります。
-
-■ エントリー情報
-・ダンススタイル: {{dance_style}}
-・チーム名: {{team_name}}
-・参加者名: {{participant_names}}
-
-今回は惜しくも選考を通過できませんでしたが、{{name}}様の情熱と努力は素晴らしいものでした。
-今後も様々な機会がございますので、ぜひチャレンジしていただければと思います。
-
-この度は貴重なお時間をいただき、ありがとうございました。
-
-ダンスコンテスト運営事務局`
-  },
-  {
-    id: 'general',
-    name: '一般通知',
-    subject: '【ダンスコンテスト】お知らせ - {{name}}様',
-    body: `{{name}}様
-
-お疲れ様です。
-ダンスコンテスト運営事務局です。
-
-■ エントリー情報
-・ダンススタイル: {{dance_style}}
-・チーム名: {{team_name}}
-・参加者名: {{participant_names}}
-
-（こちらにメッセージを記載してください）
-
-引き続きよろしくお願いいたします。
-
-ダンスコンテスト運営事務局`
-  }
-]
-
-export default function EmailComposer({ selectedEntries, entries, onClose, onSent }: EmailComposerProps) {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('')
+export const EmailComposer: React.FC<EmailComposerProps> = ({
+  selectedEntriesData,
+  onClose,
+  onSent
+}) => {
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
-  const [templates, setTemplates] = useState<NotificationTemplate[]>([])
+  const [selectedTemplate, setSelectedTemplate] = useState('')
+  const [templates, setTemplates] = useState<Template[]>([])
   const [templatesLoading, setTemplatesLoading] = useState(true)
 
-  const selectedEntriesData = entries?.filter(entry => selectedEntries.includes(entry.id)) || []
+  // デフォルトテンプレート
+  const defaultTemplates = [
+    {
+      id: 'welcome',
+      name: '【準決勝進出】おめでとうございます',
+      subject: '【バルカーカップ】準決勝進出のご連絡',
+      body: `お疲れ様です。バルカーカップ事務局です。
 
-  // テンプレートをデータベースから取得
+この度は、予選にご参加いただき、誠にありがとうございました。
+
+厳正な審査の結果、準決勝にお進みいただくことが決定いたしましたので、ご連絡申し上げます。
+
+準決勝の詳細につきましては、後日改めてご連絡させていただきます。
+
+引き続きよろしくお願いいたします。
+
+バルカーカップ事務局
+entry-vqcup@valqua.com`
+    }
+  ]
+
+  // データベースからテンプレートを取得
   useEffect(() => {
-    const fetchTemplates = async () => {
+    const loadTemplates = async () => {
       try {
         const response = await fetch('/api/admin/notification-templates')
         if (response.ok) {
           const data = await response.json()
-          setTemplates(data.filter((t: NotificationTemplate) => t.is_active))
+          setTemplates(data.templates || [])
         }
       } catch (error) {
-        console.error('Failed to fetch templates:', error)
+        console.error('テンプレート取得エラー:', error)
       } finally {
         setTemplatesLoading(false)
       }
     }
-
-    fetchTemplates()
+    loadTemplates()
   }, [])
 
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId)
     
-    // データベースからのテンプレートを優先、フォールバックとしてデフォルトテンプレートを使用
-    const dbTemplate = templates.find(t => t.id === templateId)
-    const defaultTemplate = defaultTemplates.find(t => t.id === templateId)
-    const template = dbTemplate || defaultTemplate
+    // データベーステンプレートまたはデフォルトテンプレートから選択
+    const allTemplates = [...templates, ...defaultTemplates]
+    const template = allTemplates.find(t => t.id === templateId)
     
     if (template) {
       setSubject(template.subject)
       setBody(template.body)
+    } else {
+      setSubject('')
+      setBody('')
     }
   }
 
-
-
   const handleSendEmails = () => {
-    if (!subject.trim() || !body.trim()) {
-      alert('件名とメール本文を入力してください')
-      return
-    }
-
-    // 全選択されたエントリーのメールアドレスを収集（BCC用）
     const emailAddresses = selectedEntriesData
-      .filter(entry => entry?.users?.email)
       .map(entry => entry.users.email)
-      .join(',')
+      .filter(email => email && email.trim() !== '')
+      .join(', ')
     
     if (!emailAddresses) {
       alert('有効なメールアドレスが見つかりません')
@@ -208,8 +146,8 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 左側：メール作成 */}
+          <div className="space-y-6">
+            {/* メール作成 */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -253,31 +191,9 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    メール本文
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (body.trim()) {
-                        navigator.clipboard.writeText(body).then(() => {
-                          alert('本文をクリップボードにコピーしました')
-                        }).catch(() => {
-                          alert('コピーに失敗しました')
-                        })
-                      } else {
-                        alert('コピーする本文がありません')
-                      }
-                    }}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    本文をコピー
-                  </button>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  メール本文
+                </label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -286,41 +202,22 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
                   placeholder="メール本文を入力..."
                 />
               </div>
-
             </div>
 
-            {/* 右側：送信先一覧とプレビュー */}
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  送信先一覧 ({selectedEntriesData.length}名)
-                </h4>
-                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md">
-                  {selectedEntriesData.map(entry => (
-                    <div key={entry.id} className="p-2 border-b border-gray-100 last:border-b-0">
-                      <div className="text-sm font-medium">{entry.users.name}</div>
-                      <div className="text-xs text-gray-500">{entry.users.email}</div>
-                      <div className="text-xs text-gray-400">{entry.dance_style}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {selectedEntriesData.length > 0 && subject && body && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    プレビュー
-                  </h4>
-                  <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
-                    <div className="mb-2">
-                      <strong>件名:</strong> {subject}
-                    </div>
-                    <div className="whitespace-pre-wrap text-sm">
-                      {body}
-                    </div>
+            {/* 送信先一覧 */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                送信先一覧 ({selectedEntriesData.length}名)
+              </h4>
+              <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md">
+                {selectedEntriesData.map(entry => (
+                  <div key={entry.id} className="p-2 border-b border-gray-100 last:border-b-0">
+                    <div className="text-sm font-medium">{entry.users.name}</div>
+                    <div className="text-xs text-gray-500">{entry.users.email}</div>
+                    <div className="text-xs text-gray-400">{entry.participant_names}</div>
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
 
@@ -332,11 +229,32 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
               キャンセル
             </button>
             <button
+              type="button"
+              onClick={() => {
+                if (body.trim()) {
+                  navigator.clipboard.writeText(body).then(() => {
+                    alert('本文をクリップボードにコピーしました')
+                  }).catch(() => {
+                    alert('コピーに失敗しました')
+                  })
+                } else {
+                  alert('コピーする本文がありません')
+                }
+              }}
+              disabled={!body.trim()}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              本文をコピー
+            </button>
+            <button
               onClick={handleSendEmails}
-              disabled={!subject.trim() || !body.trim() || selectedEntriesData.length === 0}
+              disabled={!subject.trim() || selectedEntriesData.length === 0}
               className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              メーラーを開く (${selectedEntriesData.length}名)
+              メーラーを開く ({selectedEntriesData.length}名)
             </button>
           </div>
         </div>
