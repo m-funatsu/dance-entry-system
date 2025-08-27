@@ -171,8 +171,8 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       ? subject.trim().substring(0, maxSubjectLength) + '...' 
       : subject.trim()
     
-    // mailtoリンクを作成（To、CC、件名のみ、本文なし）
-    const mailtoLink = `mailto:${toAddress}?cc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(cleanSubject)}`
+    // mailtoリンクを作成（To、BCC、件名のみ、本文なし）
+    const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(cleanSubject)}`
     
     console.log('mailto link length:', mailtoLink.length)
     
