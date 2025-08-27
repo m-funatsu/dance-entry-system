@@ -52,7 +52,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
   
   const [semifinalsInfo, setSemifinalsInfo] = useState<Partial<SemifinalsInfo>>({
     entry_id: entry?.id || '',
-    music_change_from_preliminary: false,
+    music_change_from_preliminary: undefined,
     copyright_permission: '',
     choreographer_change_from_preliminary: false
   })
@@ -228,7 +228,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
           // 新規作成時の初期設定
           const initialData: Partial<SemifinalsInfo> = {
             entry_id: entry.id,
-            music_change_from_preliminary: false,
+            music_change_from_preliminary: undefined,
             copyright_permission: '',
             choreographer_change_from_preliminary: false
           }
