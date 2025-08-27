@@ -307,10 +307,10 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     const isComplete = checkSnsInfoCompletion(formData, !!practiceVideoFile, !!introVideoFile)
     await updateFormStatus('sns_info', entry.id, isComplete)
     
-    // 保存成功後にダッシュボードにリダイレクト
+    // 保存成功後に同じページをリロード
     showToast('SNS情報を保存しました', 'success')
     setTimeout(() => {
-      window.location.href = '/dashboard'
+      window.location.reload()
     }, 1500)
   }
 

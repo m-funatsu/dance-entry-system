@@ -352,11 +352,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const isComplete = checkPreliminaryInfoCompletion(formData, !!videoFile)
     await updateFormStatus('preliminary_info', entryId, isComplete, hasAnyData)
     
-    // 保存成功後にダッシュボードにリダイレクト（強制リロード）
+    // 保存成功後に同じページをリロード
     showToast('予選情報を保存しました', 'success')
     setTimeout(() => {
-      console.log('[SAVE SUCCESS] ダッシュボードに強制リロードで遷移')
-      window.location.href = '/dashboard'
+      console.log('[SAVE SUCCESS] 同じページを強制リロード')
+      window.location.reload()
     }, 1500)
   }
 
