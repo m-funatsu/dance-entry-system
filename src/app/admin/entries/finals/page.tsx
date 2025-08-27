@@ -100,6 +100,24 @@ export default async function FinalsInfoListPage() {
   console.log('[FINALS DEBUG] マッピング完了')
   console.log('[FINALS DEBUG] マッピング後データ件数:', mappedFinalsInfoList?.length || 0)
 
+  // コード値を名称に変換する関数
+  const getMusicRightsLabel = (code: string) => {
+    switch (code) {
+      case 'commercial': return 'A.市販の楽曲を使用する'
+      case 'licensed': return 'B.自身で著作権に対し許諾を取った楽曲を使用する'
+      case 'original': return 'C.独自に製作されたオリジナル楽曲を使用する'
+      default: return code || '未入力'
+    }
+  }
+
+  const getMusicTypeLabel = (code: string) => {
+    switch (code) {
+      case 'cd': return 'CD楽曲'
+      case 'download': return 'データダウンロード楽曲'
+      case 'other': return 'その他（オリジナル曲）'
+      default: return code || '未入力'
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -118,13 +136,13 @@ export default async function FinalsInfoListPage() {
               item.work_title_kana || '',
               item.work_character_story || '',
               // 楽曲著作関連情報
-              item.copyright_permission || '',
+              getMusicRightsLabel(item.copyright_permission || ''),
               item.music_title || '',
               item.cd_title || '',
               item.artist || '',
               item.record_number || '',
               item.jasrac_code || '',
-              item.music_type || '',
+              getMusicTypeLabel(item.music_type || ''),
               // 音響情報
               item.sound_change_from_semifinals ? 'あり' : 'なし',
               item.sound_start_timing || '',
@@ -340,13 +358,13 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '280px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>著作権:</strong> {finalsInfo.copyright_permission || '未入力'}</div>
+                        <div><strong>著作権:</strong> {getMusicRightsLabel(finalsInfo.copyright_permission || '')}</div>
                         <div><strong>楽曲:</strong> {finalsInfo.music_title || '未入力'}</div>
                         <div><strong>CD:</strong> {finalsInfo.cd_title || '未入力'}</div>
                         <div><strong>アーティスト:</strong> {finalsInfo.artist || '未入力'}</div>
                         <div><strong>レコード番号:</strong> {finalsInfo.record_number || '未入力'}</div>
                         <div><strong>JASRAC:</strong> {finalsInfo.jasrac_code || '未入力'}</div>
-                        <div><strong>楽曲種類:</strong> {finalsInfo.music_type || '未入力'}</div>
+                        <div><strong>楽曲種類:</strong> {getMusicTypeLabel(finalsInfo.music_type || '')}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900">
