@@ -162,7 +162,7 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
       return
     }
     
-    const toAddress = 'entry_vqcup@valqua.com'
+    const toAddress = 'entry-vqcup@valqua.com'
     
     // 文字数制限でmailtoリンクの長さを制御
     const maxSubjectLength = 60   // 安全な件名長さ

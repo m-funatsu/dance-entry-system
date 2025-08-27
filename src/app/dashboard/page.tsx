@@ -1181,10 +1181,10 @@ export default async function DashboardPage() {
             </p>
             <p>
               <a 
-                href="mailto:entry_vqcup@valqua.com" 
+                href="mailto:entry-vqcup@valqua.com" 
                 className="text-indigo-600 hover:text-indigo-500"
               >
-                Mail:entry_vqcup@valqua.com
+                Mail:entry-vqcup@valqua.com
               </a>
             </p>
           </div>

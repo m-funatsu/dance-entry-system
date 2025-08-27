@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
               <div className="text-yellow-800 text-sm">
                 <p className="font-medium">※ 重要なお知らせ</p>
-                <p>パスワードの再発行メールは「entry_vqcup@valqua.com」から送信されます。もしメールが受信されない場合は迷惑メールフォルダに自動分類されている可能性があるためご注意ください。</p>
+                <p>パスワードの再発行メールは「entry-vqcup@valqua.com」から送信されます。もしメールが受信されない場合は迷惑メールフォルダに自動分類されている可能性があるためご注意ください。</p>
               </div>
             </div>
             
