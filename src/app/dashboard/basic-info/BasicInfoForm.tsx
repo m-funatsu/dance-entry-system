@@ -1272,17 +1272,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           </div>
         </div>
 
-        {/* ボタン */}
-        <div className="flex justify-end space-x-4 pt-6">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              window.location.href = '/dashboard'
-            }}
-          >
-            キャンセル
-          </Button>
+        {/* 保存ボタン */}
+        <div className="flex justify-end pt-6">
           <Button
             type="button"
             onClick={handleSubmit}
