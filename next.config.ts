@@ -3,6 +3,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // React Strict Modeを無効化（DOM操作エラーを回避）
   reactStrictMode: false,
+  // リダイレクト設定
+  async redirects() {
+    return [
+      {
+        source: '/info',
+        destination: '/qualification-requirements.html',
+        permanent: false,
+      },
+    ]
+  },
   // セキュリティヘッダーの設定
   async headers() {
     return [
