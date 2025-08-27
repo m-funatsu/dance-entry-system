@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import EmailComposer from '@/components/EmailComposer'
+import { EmailComposer } from '@/components/EmailComposer'
 import AdminLink from '@/components/admin/AdminLink'
 
 interface EntryWithDetails {
@@ -561,8 +561,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
 
       {showEmailComposer && (
         <EmailComposer
-          selectedEntries={selectedEntries}
-          entries={localEntries}
+          selectedEntriesData={localEntries.filter(entry => selectedEntries.includes(entry.id))}
           onClose={() => setShowEmailComposer(false)}
           onSent={() => {
             setSelectedEntries([])
