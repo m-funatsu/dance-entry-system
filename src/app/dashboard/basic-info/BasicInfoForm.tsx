@@ -858,6 +858,50 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   return
                 }
                 
+                // ファイルアップロード前に一時保存を実行（リダイレクトなし）
+                console.log('[BANK SLIP UPLOAD] === 一時保存実行開始 ===')
+                try {
+                  let currentEntryId = entryId
+
+                  // エントリーが存在しない場合は作成
+                  if (!currentEntryId) {
+                    console.log('[BANK SLIP UPLOAD] 新規エントリー作成')
+                    const { data: newEntry, error: entryError } = await supabase
+                      .from('entries')
+                      .insert({
+                        user_id: userId,
+                        participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
+                        status: 'pending'
+                      })
+                      .select()
+                      .maybeSingle()
+
+                    if (entryError) throw entryError
+                    currentEntryId = newEntry.id
+                  }
+
+                  // 基本情報を保存
+                  const updatedFormData = { ...formData, ...checkboxes, entry_id: currentEntryId }
+                  
+                  const { data: existingBasicInfo } = await supabase
+                    .from('basic_info')
+                    .select('id')
+                    .eq('entry_id', currentEntryId)
+                    .single()
+
+                  if (existingBasicInfo) {
+                    await supabase.from('basic_info').update(updatedFormData).eq('entry_id', currentEntryId)
+                  } else {
+                    await supabase.from('basic_info').insert({ ...updatedFormData, created_at: new Date().toISOString() })
+                  }
+                  
+                  console.log('[BANK SLIP UPLOAD] 一時保存完了')
+                } catch (tempSaveError) {
+                  console.error('[BANK SLIP UPLOAD] 一時保存失敗:', tempSaveError)
+                  showToast('基本情報の保存に失敗しました', 'error')
+                  return
+                }
+                
                 try {
                   // ファイルアップロード処理
                   const fileExt = file.name.split('.').pop()
