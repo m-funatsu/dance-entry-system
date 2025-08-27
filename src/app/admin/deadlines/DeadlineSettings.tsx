@@ -234,7 +234,7 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
           className={`px-4 py-2 rounded-md text-sm font-medium text-white ${
             saving 
               ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-indigo-600 hover:bg-indigo-700'
+              : 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
           }`}
         >
           {saving ? '保存中...' : '保存'}

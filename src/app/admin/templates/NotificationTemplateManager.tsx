@@ -272,7 +272,7 @@ export default function NotificationTemplateManager() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
               >
                 {editingTemplate ? '更新' : '作成'}
               </button>
@@ -328,13 +328,13 @@ export default function NotificationTemplateManager() {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(template)}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-medium cursor-pointer"
                     >
                       編集
                     </button>
                     <button
                       onClick={() => handleDelete(template.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium"
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium cursor-pointer"
                     >
                       削除
                     </button>

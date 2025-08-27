@@ -296,7 +296,7 @@ export default function AdminSettingsPage() {
                           className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
                             !faviconFile || isUploadingFavicon
                               ? 'bg-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                              : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer'
                           }`}
                         >
                           {isUploadingFavicon ? (
@@ -338,7 +338,7 @@ export default function AdminSettingsPage() {
                     className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
                       isSaving
                         ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer'
                     }`}
                   >
                     {isSaving ? (
