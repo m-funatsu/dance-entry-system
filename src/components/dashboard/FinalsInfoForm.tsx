@@ -157,7 +157,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
               // 署名付きURLを取得
               const { data: urlData } = await supabase.storage
                 .from('files')
-                .createSignedUrl(file.file_path, 3600)
+                .createSignedUrl(file.file_path, 86400)
 
               if (urlData?.signedUrl) {
                 urlUpdates[file.purpose] = urlData.signedUrl
@@ -274,7 +274,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
             // ファイルパスの場合、署名付きURLを生成
             const { data: urlData } = await supabase.storage
               .from('files')
-              .createSignedUrl(semifinalsData.chaser_song, 3600)
+              .createSignedUrl(semifinalsData.chaser_song, 86400)
             
             if (urlData?.signedUrl) {
               chaserSongUrl = urlData.signedUrl
@@ -479,16 +479,21 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         console.log('[UPLOAD] Database insert error (may already exist):', dbError)
       }
 
-      // URLを取得
-      const { data: { publicUrl } } = supabase.storage
+      // 署名付きURLを取得（24時間有効）
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('files')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 86400)
+        
+      if (urlError) {
+        console.error('[FINALS UPLOAD] URL生成エラー:', urlError)
+        throw urlError
+      }
 
       // finals_infoテーブルも更新
       const { error: updateError } = await supabase
         .from('finals_info')
         .update({
-          [field]: fileName
+          [field]: urlData?.signedUrl || fileName
         })
         .eq('entry_id', entry.id)
       
@@ -498,7 +503,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
 
       setFinalsInfo(prev => ({
         ...prev,
-        [field]: publicUrl
+        [field]: urlData?.signedUrl || fileName
       }))
       
       // audioFiles状態も更新（音声ファイルの場合）
