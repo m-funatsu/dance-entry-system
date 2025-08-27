@@ -772,14 +772,7 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         />
       )}
 
-          <div className="flex justify-between pt-6">
-            <button
-              type="button"
-              onClick={() => window.location.href = '/dashboard'}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-            >
-              ダッシュボードに戻る
-            </button>
+          <div className="flex justify-end pt-6">
             <SaveButton
               onClick={handleSave}
               disabled={saving}
@@ -789,18 +782,6 @@ export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
         </>
       )}
 
-      {/* 入力開始日前は戻るボタンのみ表示 */}
-      {!isStartDateAvailable && (
-        <div className="flex justify-between pt-6">
-          <button
-            type="button"
-            onClick={() => window.location.href = '/dashboard'}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-          >
-            ダッシュボードに戻る
-          </button>
-        </div>
-      )}
     </div>
   )
 }
