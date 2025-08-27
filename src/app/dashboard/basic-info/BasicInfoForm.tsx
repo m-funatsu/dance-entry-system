@@ -833,6 +833,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   <p>カ）バルカー</p>
                 </div>
               </div>
+              <div className="border-t border-blue-300 pt-2 mt-3">
+                <p className="font-medium">■振込確認用紙アップロードについて</p>
+                <p className="ml-4">振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。</p>
+              </div>
             </div>
           </div>
 
