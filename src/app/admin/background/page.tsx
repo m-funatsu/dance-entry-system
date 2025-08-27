@@ -55,7 +55,7 @@ export default async function BackgroundPage() {
               <form action="/auth/logout" method="post">
                 <button
                   type="submit"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer"
                 >
                   ログアウト
                 </button>

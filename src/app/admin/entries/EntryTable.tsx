@@ -376,28 +376,28 @@ export default function EntryTable({ entries }: EntryTableProps) {
               <button
                 onClick={() => bulkUpdateStatus('pending')}
                 disabled={loading}
-                className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 disabled:opacity-50"
+                className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 disabled:opacity-50 cursor-pointer"
               >
                 未処理に変更
               </button>
               <button
                 onClick={() => bulkUpdateStatus('selected')}
                 disabled={loading}
-                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
+                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 cursor-pointer"
               >
                 予選通過に変更
               </button>
               <button
                 onClick={() => bulkUpdateStatus('rejected')}
                 disabled={loading}
-                className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50"
+                className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50 cursor-pointer"
               >
                 予選敗退に変更
               </button>
               <button
                 onClick={() => setShowEmailComposer(true)}
                 disabled={loading}
-                className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50"
+                className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50 cursor-pointer"
               >
                 メール送信
               </button>
@@ -443,7 +443,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   }
                 }}
                 disabled={loading || selectedEntries.length === 0}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
               >
                 ウェルカムメール
               </button>

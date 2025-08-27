@@ -142,7 +142,7 @@ export default function NotificationTemplateManager() {
         <h2 className="text-lg font-medium text-gray-900">通知テンプレート一覧</h2>
         <button
           onClick={() => setIsCreating(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer"
         >
           新規テンプレート作成
         </button>
