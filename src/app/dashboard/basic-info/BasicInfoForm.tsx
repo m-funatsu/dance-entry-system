@@ -124,7 +124,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const {
     formData,
     handleFieldChange,
-    save: saveForm,
     saving,
     errors,
     error,
@@ -362,6 +361,8 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
   const handleSubmit = async () => {
     console.log('[BASIC INFO SUBMIT] === 保存ボタンクリック ===')
     console.log('[BASIC INFO SUBMIT] 一時保存モードで実行開始')
+    console.log('[BASIC INFO SUBMIT] 初期entryId:', entryId)
+    console.log('[BASIC INFO SUBMIT] 初期formData.entry_id:', formData.entry_id)
     
     // バリデーションはステータスチェック用のみ（保存は常に可能）
 
@@ -370,6 +371,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
 
       // エントリーが存在しない場合は作成
       if (!currentEntryId) {
+        console.log('[BASIC INFO SUBMIT] === 新規エントリー作成開始 ===')
         const { data: newEntry, error: entryError } = await supabase
           .from('entries')
           .insert({
@@ -380,10 +382,27 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           .select()
           .maybeSingle()
 
-        if (entryError) throw entryError
+        if (entryError) {
+          console.error('[BASIC INFO SUBMIT] エントリー作成エラー:', entryError)
+          throw entryError
+        }
+        
+        console.log('[BASIC INFO SUBMIT] 新規エントリー作成成功:', newEntry)
         currentEntryId = newEntry.id
+        console.log('[BASIC INFO SUBMIT] currentEntryId設定:', currentEntryId)
+        
+        // handleFieldChangeは非同期更新のため、直接formDataを更新
+        console.log('[BASIC INFO SUBMIT] formData更新前 entry_id:', formData.entry_id)
         handleFieldChange('entry_id', currentEntryId)
+        console.log('[BASIC INFO SUBMIT] handleFieldChange実行完了')
+        
+        // React Stateの更新を待つために少し待機
+        await new Promise(resolve => setTimeout(resolve, 100))
+        console.log('[BASIC INFO SUBMIT] 更新後待機完了')
+        
       } else {
+        console.log('[BASIC INFO SUBMIT] === 既存エントリー更新 ===')
+        console.log('[BASIC INFO SUBMIT] 既存entryId:', currentEntryId)
         // participant_namesを更新
         const { error: updateError } = await supabase
           .from('entries')
@@ -393,7 +412,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           })
           .eq('id', currentEntryId)
 
-        if (updateError) throw updateError
+        if (updateError) {
+          console.error('[BASIC INFO SUBMIT] エントリー更新エラー:', updateError)
+          throw updateError
+        }
+        console.log('[BASIC INFO SUBMIT] 既存エントリー更新完了')
       }
 
 
@@ -401,11 +424,22 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       console.log('=== [BASIC INFO SAVE] 保存処理開始 ===')
       console.log('[BASIC INFO SAVE] entryId:', entryId)
       console.log('[BASIC INFO SAVE] currentEntryId:', currentEntryId)
-      console.log('[BASIC INFO SAVE] formData:', JSON.stringify(formData, null, 2))
+      console.log('[BASIC INFO SAVE] 最新のformData:', JSON.stringify(formData, null, 2))
       console.log('[BASIC INFO SAVE] checkboxes:', JSON.stringify(checkboxes, null, 2))
       
-      const saveData = {
+      // ★重要: saveFormが正しいentry_idを受け取るように、formDataを直接更新
+      console.log('[BASIC INFO SAVE] === entry_id直接更新 ===')
+      console.log('[BASIC INFO SAVE] 更新前のformData.entry_id:', formData.entry_id)
+      
+      // 直接formDataのentry_idを更新（React Stateの非同期更新問題を回避）
+      const updatedFormData = {
         ...formData,
+        entry_id: currentEntryId
+      }
+      console.log('[BASIC INFO SAVE] 直接更新後のentry_id:', updatedFormData.entry_id)
+      
+      const saveData = {
+        ...updatedFormData,
         ...checkboxes,
         entry_id: currentEntryId
       }
@@ -418,15 +452,106 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       
       // 必須フィールドの事前チェック（デバッグ用）
       console.log('[BASIC INFO SAVE] === 事前必須フィールドチェック ===')
-      const preCheckResult = checkBasicInfoCompletion(formData, checkboxes)
+      const preCheckResult = checkBasicInfoCompletion(updatedFormData, checkboxes)
       console.log('[BASIC INFO SAVE] 事前チェック結果:', preCheckResult)
       console.log('[BASIC INFO SAVE] ================================')
 
       console.log('[BASIC INFO SAVE] フォーム保存開始')
       
-      // フォームデータを保存（onSuccessでステータス更新される）
-      await saveForm(true)  // 一時保存として実行
-      console.log('[BASIC INFO SAVE] フォーム保存完了')
+      // ★重要な修正: useBaseFormを使わずに直接保存処理を実行
+      // React Stateの非同期更新問題を根本的に回避
+      console.log('[BASIC INFO SAVE] === 直接保存処理実行 ===')
+      
+      try {
+        // 空文字列をnullに変換
+        const processedData = { ...updatedFormData, ...checkboxes }
+        Object.keys(processedData).forEach(key => {
+          const value = processedData[key as keyof typeof processedData]
+          if (value === '') {
+            if (key.includes('date') || key.includes('birthdate') || key.includes('_at')) {
+              (processedData as Record<string, unknown>)[key] = null
+            }
+          }
+        })
+        
+        // タイムスタンプ追加
+        const now = new Date().toISOString()
+        processedData.updated_at = now
+        
+        // データから不要なフィールドを除去
+        const dataToSave = { ...processedData }
+        if ('id' in dataToSave) {
+          delete dataToSave.id
+        }
+        
+        console.log('[BASIC INFO SAVE] 処理済み保存データ:', dataToSave)
+        
+        // basic_infoテーブルに既存レコードがあるかチェック
+        const { data: existingBasicInfo, error: checkError } = await supabase
+          .from('basic_info')
+          .select('id')
+          .eq('entry_id', currentEntryId)
+          .single()
+          
+        if (checkError && checkError.code !== 'PGRST116') { // PGRST116はレコードなしエラー
+          console.error('[BASIC INFO SAVE] 既存レコード確認エラー:', checkError)
+          throw checkError
+        }
+        
+        if (existingBasicInfo) {
+          // 更新
+          console.log('[BASIC INFO SAVE] 既存basic_info更新実行')
+          const { error: updateError } = await supabase
+            .from('basic_info')
+            .update(dataToSave)
+            .eq('entry_id', currentEntryId)
+            
+          if (updateError) {
+            console.error('[BASIC INFO SAVE] 更新エラー:', updateError)
+            throw updateError
+          }
+          console.log('[BASIC INFO SAVE] basic_info更新完了')
+        } else {
+          // 新規作成
+          console.log('[BASIC INFO SAVE] 新規basic_info作成実行')
+          dataToSave.created_at = now
+          
+          const { error: insertError } = await supabase
+            .from('basic_info')
+            .insert(dataToSave)
+            
+          if (insertError) {
+            console.error('[BASIC INFO SAVE] 挿入エラー:', insertError)
+            throw insertError
+          }
+          console.log('[BASIC INFO SAVE] basic_info作成完了')
+        }
+        
+        // 成功処理とステータス更新
+        console.log('[BASIC INFO SAVE] 保存成功')
+        showToast('基本情報を保存しました', 'success')
+        
+        // ステータス更新処理
+        console.log('[BASIC INFO SAVE] === ステータス更新処理開始 ===')
+        try {
+          const hasAnyData = Object.values(updatedFormData).some(value => value && value.toString().trim() !== '') || 
+                           Object.values(checkboxes).some(value => value === true)
+          const isComplete = checkBasicInfoCompletion(updatedFormData, checkboxes)
+          console.log('[BASIC INFO SAVE] ステータス判定 - hasData:', hasAnyData, 'isComplete:', isComplete)
+          
+          await updateFormStatus('basic_info', currentEntryId as string, isComplete, hasAnyData)
+          console.log('[BASIC INFO SAVE] ステータス更新完了')
+        } catch (statusError) {
+          console.error('[BASIC INFO SAVE] ステータス更新エラー:', statusError)
+          // ステータス更新エラーは致命的ではないので続行
+        }
+        
+      } catch (saveError) {
+        console.error('[BASIC INFO SAVE] 直接保存エラー:', saveError)
+        throw saveError
+      }
+      
+      console.log('[BASIC INFO SAVE] 直接保存処理完了')
 
       // 保存成功後にダッシュボードにリダイレクト
       setTimeout(() => {

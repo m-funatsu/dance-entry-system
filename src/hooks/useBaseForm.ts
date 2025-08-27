@@ -136,32 +136,56 @@ export function useBaseForm<T extends Record<string, unknown>>({
       ;(dataToSave as Record<string, unknown>).updated_at = now
       
       // 既存レコードの確認
+      console.log('[USEBASEFORM] === 既存レコード確認開始 ===')
+      console.log('[USEBASEFORM] uniqueField:', uniqueField)
+      console.log('[USEBASEFORM] formData[uniqueField]:', formData[uniqueField])
+      console.log('[USEBASEFORM] tableName:', tableName)
+      
       let existingRecord = null
       if (uniqueField in formData && formData[uniqueField]) {
-        const { data: existing } = await supabase
+        console.log('[USEBASEFORM] 既存レコード検索実行')
+        const { data: existing, error: searchError } = await supabase
           .from(tableName)
           .select('id')
           .eq(uniqueField, formData[uniqueField] as string)
           .single()
         
+        if (searchError) {
+          console.log('[USEBASEFORM] 既存レコード検索エラー（レコードなしの可能性）:', searchError.message)
+        } else {
+          console.log('[USEBASEFORM] 既存レコード発見:', existing)
+        }
+        
         existingRecord = existing
+      } else {
+        console.log('[USEBASEFORM] uniqueFieldが存在しないか空のため、新規作成フラグ')
       }
+      
+      console.log('[USEBASEFORM] existingRecord:', existingRecord)
       
       if (existingRecord) {
         // 更新
+        console.log('[USEBASEFORM] === 既存レコード更新モード ===')
+        console.log('[USEBASEFORM] 更新対象ID:', existingRecord.id)
+        console.log('[USEBASEFORM] 更新データ:', dataToSave)
+        
         const { error: updateError } = await supabase
           .from(tableName)
           .update(dataToSave)
           .eq(uniqueField, formData[uniqueField] as string)
         
         if (updateError) {
-          console.error('UPDATE エラー詳細:', updateError)
-          console.error('送信データ:', dataToSave)
+          console.error('[USEBASEFORM] UPDATE エラー詳細:', updateError)
+          console.error('[USEBASEFORM] 送信データ:', dataToSave)
           throw updateError
         }
+        console.log('[USEBASEFORM] 更新完了')
       } else {
         // 新規作成
+        console.log('[USEBASEFORM] === 新規レコード作成モード ===')
         ;(dataToSave as Record<string, unknown>).created_at = now
+        
+        console.log('[USEBASEFORM] 新規作成データ:', dataToSave)
         
         const { data: insertedData, error: insertError } = await supabase
           .from(tableName)
@@ -170,14 +194,17 @@ export function useBaseForm<T extends Record<string, unknown>>({
           .single()
         
         if (insertError) {
-          console.error('INSERT エラー詳細:', insertError)
-          console.error('送信データ:', dataToSave)
+          console.error('[USEBASEFORM] INSERT エラー詳細:', insertError)
+          console.error('[USEBASEFORM] 送信データ:', dataToSave)
           throw insertError
         }
+        
+        console.log('[USEBASEFORM] 新規作成完了:', insertedData)
         
         // 新規作成時はIDを更新
         if (insertedData && 'id' in insertedData) {
           setFormData(prev => ({ ...prev, id: insertedData.id }))
+          console.log('[USEBASEFORM] formData IDを更新:', insertedData.id)
         }
       }
       
