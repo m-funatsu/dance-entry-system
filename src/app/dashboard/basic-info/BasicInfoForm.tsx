@@ -818,7 +818,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">振込確認用紙アップロード</h3>
           <p className="text-sm text-gray-600 mb-6">
-            振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。
+            ※振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。
           </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
