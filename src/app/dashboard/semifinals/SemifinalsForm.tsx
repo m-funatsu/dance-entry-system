@@ -54,7 +54,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
     entry_id: entry?.id || '',
     music_change_from_preliminary: undefined,
     copyright_permission: '',
-    choreographer_change_from_preliminary: false
+    choreographer_change_from_preliminary: true
   })
 
   // フォーム保存フック
@@ -230,7 +230,7 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             entry_id: entry.id,
             music_change_from_preliminary: undefined,
             copyright_permission: '',
-            choreographer_change_from_preliminary: false
+            choreographer_change_from_preliminary: true
           }
           
           
