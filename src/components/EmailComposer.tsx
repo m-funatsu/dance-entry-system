@@ -187,6 +187,11 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     // コンポーザーを閉じる
     onSent()
     onClose()
+    
+    // メーラー起動後にページをリロード
+    setTimeout(() => {
+      window.location.reload()
+    }, 500)
   }
 
   return (
