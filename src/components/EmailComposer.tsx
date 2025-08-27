@@ -166,18 +166,13 @@ export default function EmailComposer({ selectedEntries, entries, onClose, onSen
     
     // 文字数制限でmailtoリンクの長さを制御
     const maxSubjectLength = 60   // 安全な件名長さ
-    const maxBodyLength = 800     // 安全な本文長さ
     
     const cleanSubject = subject.trim().length > maxSubjectLength 
       ? subject.trim().substring(0, maxSubjectLength) + '...' 
       : subject.trim()
     
-    const cleanBody = body.trim().length > maxBodyLength 
-      ? body.trim().substring(0, maxBodyLength) + '\n\n（以下省略）' 
-      : body.trim()
-    
-    // mailtoリンクを作成（すべてBCC送信）
-    const mailtoLink = `mailto:${toAddress}?bcc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(cleanBody)}`
+    // mailtoリンクを作成（To、CC、件名のみ、本文なし）
+    const mailtoLink = `mailto:${toAddress}?cc=${encodeURIComponent(emailAddresses)}&subject=${encodeURIComponent(cleanSubject)}`
     
     console.log('mailto link length:', mailtoLink.length)
     
