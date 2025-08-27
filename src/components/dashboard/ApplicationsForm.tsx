@@ -802,9 +802,6 @@ export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
               <p className="text-blue-700 font-medium">
                 ※振付師の方については、選手が3位までに入賞された場合、表彰式にて表彰を受けていただきます。
               </p>
-              <p className="text-orange-700 font-medium">
-                ※ドレスコードあり。準正装でお願いいたします。
-              </p>
               <p>
                 必ず事前申請をお願いいたします。当日の受付はいたしかねますのでご了承ください。
               </p>
