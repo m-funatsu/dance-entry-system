@@ -6,6 +6,7 @@ import { AudioUploadProps } from '@/lib/types'
 export const AudioUpload: React.FC<AudioUploadProps> = ({
   label,
   value,
+  displayName,
   onChange,
   onDelete,
   disabled = false,
@@ -127,7 +128,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
             </svg>
             <p className="text-sm font-medium text-green-700">アップロード済み</p>
             <p className="text-xs text-gray-600 mt-1">
-              {typeof value === 'string' ? value : value?.name || 'ファイル名不明'}
+              {displayName || (typeof value === 'string' && value.includes('http') ? 'ファイル名取得中...' : (typeof value === 'string' ? value : value?.name || 'ファイル名不明'))}
             </p>
             {uploadingFile && (
               <p className="text-xs text-gray-500 mt-1">

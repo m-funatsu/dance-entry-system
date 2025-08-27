@@ -59,6 +59,7 @@ export interface ImageUploadProps extends FileUploadProps {
 }
 
 export interface AudioUploadProps extends FileUploadProps {
+  displayName?: string
   accept?: string
 }
 

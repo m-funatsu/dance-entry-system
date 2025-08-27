@@ -103,19 +103,8 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
           
           <AudioUpload
             label="チェイサー（退場）曲音源"
-            value={(() => {
-              console.log('[CHASER SONG DISPLAY] === チェイサー曲表示値の計算 ===')
-              console.log('[CHASER SONG DISPLAY] audioFiles?.chaser_song:', audioFiles?.chaser_song)
-              console.log('[CHASER SONG DISPLAY] semifinalsInfo.chaser_song:', semifinalsInfo.chaser_song)
-              
-              // URLが存在する場合はURL、そうでなければfile_name
-              const urlValue = semifinalsInfo.chaser_song
-              const displayValue = urlValue || audioFiles?.chaser_song?.file_name || ''
-              console.log('[CHASER SONG DISPLAY] URL値:', urlValue)
-              console.log('[CHASER SONG DISPLAY] 最終表示値:', displayValue)
-              
-              return displayValue
-            })()}
+            value={semifinalsInfo.chaser_song || ''}
+            displayName={audioFiles?.chaser_song?.file_name}
             onChange={(file) => {
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)

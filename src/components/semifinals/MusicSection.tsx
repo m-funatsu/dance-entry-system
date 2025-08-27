@@ -341,20 +341,8 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
       <div>
         <AudioUpload
           label="楽曲データ"
-          value={(() => {
-            console.log('[MUSIC DATA DISPLAY] === 楽曲データ表示値の計算 ===')
-            console.log('[MUSIC DATA DISPLAY] audioFiles:', audioFiles)
-            console.log('[MUSIC DATA DISPLAY] audioFiles?.music_data_path:', audioFiles?.music_data_path)
-            console.log('[MUSIC DATA DISPLAY] semifinalsInfo.music_data_path:', semifinalsInfo.music_data_path)
-            
-            // URLが存在する場合はURL、そうでなければfile_name
-            const urlValue = semifinalsInfo.music_data_path
-            const displayValue = urlValue || audioFiles?.music_data_path?.file_name || ''
-            console.log('[MUSIC DATA DISPLAY] URL値:', urlValue)
-            console.log('[MUSIC DATA DISPLAY] 最終表示値:', displayValue)
-            
-            return displayValue
-          })()}
+          value={semifinalsInfo.music_data_path || ''}
+          displayName={audioFiles?.music_data_path?.file_name}
           onChange={(file) => {
             console.log('[MUSIC DATA UPLOAD] === 楽曲データファイル選択 ===')
             console.log('[MUSIC DATA UPLOAD] 選択されたファイル:', file.name)
