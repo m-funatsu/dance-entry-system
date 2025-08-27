@@ -12,19 +12,29 @@ function ConfirmEmailContent() {
   const router = useRouter()
   
   useEffect(() => {
-    // パスワードリセットの場合はupdate-passwordページにリダイレクト
+    // URLパラメータから目的を判定
     const code = searchParams?.get('code')
     const type = searchParams?.get('type')
+    const token_hash = searchParams?.get('token_hash')
     
-    console.log('[CONFIRM-EMAIL] URL確認 - code:', code, 'type:', type)
+    console.log('[CONFIRM-EMAIL] URL確認 - code:', code, 'type:', type, 'token_hash:', token_hash)
     
-    // codeパラメータがある場合（パスワードリセット）はupdate-passwordページにリダイレクト
-    if (code && !type) {
+    // パスワードリセットの場合の判定条件を厳密化
+    // type='recovery'またはtoken_hashがある場合はパスワードリセット
+    if ((type === 'recovery') || token_hash || (code && window.location.href.includes('recovery'))) {
       console.log('[CONFIRM-EMAIL] パスワードリセット検出 - update-passwordページにリダイレクト')
-      const newUrl = `/auth/update-password?code=${encodeURIComponent(code)}`
+      const params = new URLSearchParams()
+      if (code) params.append('code', code)
+      if (token_hash) params.append('token_hash', token_hash)
+      if (type) params.append('type', type)
+      
+      const newUrl = `/auth/update-password?${params.toString()}`
       window.location.href = newUrl
       return
     }
+    
+    // ウェルカムメール（メール確認）の場合はそのまま表示
+    console.log('[CONFIRM-EMAIL] メール確認ページとして表示')
   }, [searchParams, router])
   
   try {
