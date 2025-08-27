@@ -144,6 +144,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
           
           <div className="mt-3 space-y-1 text-xs text-gray-600">
             <p>※18歳未満の方の場合、必ず保護者の方の承認を得たうえで、ご同意ください。</p>
+            <p>※18歳未満の方の場合、エントリーいただいた後に親権者（法定代理人）の方の同意書をいただくことになりますのでご了承ください。</p>
           </div>
         </div>
 
