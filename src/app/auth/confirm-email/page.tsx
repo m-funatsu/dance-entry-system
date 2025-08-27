@@ -19,9 +19,17 @@ function ConfirmEmailContent() {
     
     console.log('[CONFIRM-EMAIL] URL確認 - code:', code, 'type:', type, 'token_hash:', token_hash)
     
-    // パスワードリセットの場合の判定条件を厳密化
-    // type='recovery'またはtoken_hashがある場合はパスワードリセット
-    if ((type === 'recovery') || token_hash || (code && window.location.href.includes('recovery'))) {
+    // パスワードリセットの判定条件
+    // 1. type='recovery'がある場合
+    // 2. token_hashがある場合  
+    // 3. codeパラメータがあり、emailパラメータがない場合（パスワードリセット特有）
+    const email = searchParams?.get('email')
+    const isPasswordReset = (type === 'recovery') || 
+                           token_hash || 
+                           (code && !email && window.location.href.includes('recovery')) ||
+                           (code && !email) // emailがない場合はパスワードリセット
+    
+    if (isPasswordReset) {
       console.log('[CONFIRM-EMAIL] パスワードリセット検出 - update-passwordページにリダイレクト')
       const params = new URLSearchParams()
       if (code) params.append('code', code)
@@ -29,6 +37,7 @@ function ConfirmEmailContent() {
       if (type) params.append('type', type)
       
       const newUrl = `/auth/update-password?${params.toString()}`
+      console.log('[CONFIRM-EMAIL] リダイレクト先:', newUrl)
       window.location.href = newUrl
       return
     }
