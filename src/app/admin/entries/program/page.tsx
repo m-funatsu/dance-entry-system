@@ -71,7 +71,7 @@ export default async function ProgramInfoListPage() {
   console.log('[PROGRAM DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[PROGRAM DEBUG] ファイルエラー:', filesError)
 
-  // データをマッピング（全データを表示）
+  // データをマッピング（選考通過のみ表示）
   const mappedProgramInfoList = programInfoList?.map(programInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === programInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
@@ -80,7 +80,8 @@ export default async function ProgramInfoListPage() {
     console.log(`[PROGRAM DEBUG] エントリーID ${programInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
       hasUser: !!relatedUser,
-      fileCount: relatedFiles?.length || 0
+      fileCount: relatedFiles?.length || 0,
+      status: relatedEntry?.status
     })
     
     return {
@@ -96,7 +97,7 @@ export default async function ProgramInfoListPage() {
       },
       entry_files: relatedFiles || []
     }
-  }) || []
+  }).filter(item => item.entries?.status === 'selected') || []
 
   console.log('[PROGRAM DEBUG] マッピング完了')
   console.log('[PROGRAM DEBUG] マッピング後データ件数:', mappedProgramInfoList?.length || 0)
