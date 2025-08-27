@@ -1,7 +1,7 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { Suspense, useEffect } from 'react'
 import SiteTitle from '@/components/SiteTitle'
 
 function ConfirmEmailContent() {
@@ -9,13 +9,32 @@ function ConfirmEmailContent() {
   
   // React Hooksは必ず最初に呼ぶ
   const searchParams = useSearchParams()
+  const router = useRouter()
+  
+  useEffect(() => {
+    // パスワードリセットの場合はupdate-passwordページにリダイレクト
+    const code = searchParams?.get('code')
+    const type = searchParams?.get('type')
+    
+    console.log('[CONFIRM-EMAIL] URL確認 - code:', code, 'type:', type)
+    
+    // codeパラメータがある場合（パスワードリセット）はupdate-passwordページにリダイレクト
+    if (code && !type) {
+      console.log('[CONFIRM-EMAIL] パスワードリセット検出 - update-passwordページにリダイレクト')
+      const newUrl = `/auth/update-password?code=${encodeURIComponent(code)}`
+      window.location.href = newUrl
+      return
+    }
+  }, [searchParams, router])
   
   try {
     console.log('[CONFIRM-EMAIL] useSearchParams取得完了')
     console.log('[CONFIRM-EMAIL] searchParams:', searchParams)
     
     const email = searchParams?.get('email') || ''
+    const code = searchParams?.get('code')
     console.log('[CONFIRM-EMAIL] 取得したemail:', email)
+    console.log('[CONFIRM-EMAIL] 取得したcode:', code)
     
     // URLパラメータのデバッグ
     if (typeof window !== 'undefined') {
