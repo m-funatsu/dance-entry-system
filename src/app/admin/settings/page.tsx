@@ -4,24 +4,14 @@ import { useState, useEffect } from 'react'
 import AdminLink from '@/components/admin/AdminLink'
 import Image from 'next/image'
 interface Settings {
-  admin_email: string
   site_title: string
-  competition_name: string
-  competition_year: string
-  competition_date: string
-  competition_venue: string
   // ファビコン設定
   favicon_url: string
 }
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings>({
-    admin_email: '',
     site_title: '2025 バルカーカップ ダンスエントリーシステム',
-    competition_name: 'バルカーカップ',
-    competition_year: '2025',
-    competition_date: '',
-    competition_venue: '',
     favicon_url: ''
   })
   const [isLoading, setIsLoading] = useState(true)
@@ -222,82 +212,6 @@ export default function AdminSettingsPage() {
               </h2>
 
               <div className="space-y-6">
-                {/* 大会基本情報 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">大会基本情報</h3>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          大会名
-                        </label>
-                        <input
-                          type="text"
-                          value={settings.competition_name}
-                          onChange={(e) => handleChange('competition_name', e.target.value)}
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          開催年
-                        </label>
-                        <input
-                          type="text"
-                          value={settings.competition_year}
-                          onChange={(e) => handleChange('competition_year', e.target.value)}
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        開催日
-                      </label>
-                      <input
-                        type="date"
-                        value={settings.competition_date}
-                        onChange={(e) => handleChange('competition_date', e.target.value)}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        開催場所
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.competition_venue}
-                        onChange={(e) => handleChange('competition_venue', e.target.value)}
-                        placeholder="例: 東京国際フォーラム"
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-
-
-
-                {/* メール設定 */}
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">通知設定</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        管理者通知メールアドレス
-                      </label>
-                      <input
-                        type="email"
-                        value={settings.admin_email}
-                        onChange={(e) => handleChange('admin_email', e.target.value)}
-                        placeholder="admin@example.com"
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 {/* 表示設定 */}
                 <div className="border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">表示設定</h3>
