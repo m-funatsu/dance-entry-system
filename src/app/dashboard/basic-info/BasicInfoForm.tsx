@@ -553,9 +553,9 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
       
       console.log('[BASIC INFO SAVE] 直接保存処理完了')
 
-      // 保存成功後にダッシュボードにリダイレクト
+      // 保存成功後に同じページをリロード（最新データ表示のため）
       setTimeout(() => {
-        window.location.href = '/dashboard'
+        window.location.reload()
       }, 1500)
 
     } catch (error) {
