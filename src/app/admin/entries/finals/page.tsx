@@ -239,14 +239,259 @@ export default async function FinalsInfoListPage() {
       
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">決勝情報一覧</h1>
-        <p className="text-gray-600">エントリーの決勝情報をCSVでダウンロードできます（{mappedFinalsInfoList?.length || 0}件）</p>
+        <p className="text-gray-600">エントリーの決勝情報をまとめて確認できます（{mappedFinalsInfoList?.length || 0}件）</p>
+        <p className="text-sm text-blue-600 mt-2">💡 横にスクロールして全ての項目をご確認ください</p>
       </div>
 
-      {!mappedFinalsInfoList || mappedFinalsInfoList.length === 0 ? (
+      {mappedFinalsInfoList && mappedFinalsInfoList.length > 0 ? (
+        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <div className="overflow-x-auto" style={{maxWidth: '100vw'}}>
+            <table className="divide-y divide-gray-200" style={{minWidth: '4200px', width: 'max-content'}}>
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    1. システム利用者名
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-60">
+                    2. 作品情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-72">
+                    3. 楽曲著作関連情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    4. 楽曲データ添付
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    5. 音響情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    6. 音響データ添付
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    7. 照明情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    8. 照明シーン1
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    9. 照明シーン1イメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    10. 照明シーン2
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    11. 照明シーン2イメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    12. 照明シーン3
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    13. 照明シーン3イメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    14. 照明シーン4
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    15. 照明シーン4イメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    16. 照明シーン5
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    17. 照明シーン5イメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    18. 照明シーン チェイサー
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    18-2. 照明シーン チェイサーイメージ画像
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    19. 振付変更情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
+                    20. 振付師情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    21. 小道具情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    22. 作品振付師出席情報
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    23. 振付師写真
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {mappedFinalsInfoList.map((finalsInfo) => (
+                  <tr key={finalsInfo.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 whitespace-nowrap text-xs text-gray-900">
+                      <div className="font-medium">{finalsInfo.entries?.users?.name || '不明なユーザー'}</div>
+                      <div className="text-gray-500">{finalsInfo.entries?.participant_names || 'エントリー名なし'}</div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '240px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>楽曲変更:</strong> {finalsInfo.music_change ? 'あり' : 'なし'}</div>
+                        <div><strong>タイトル:</strong> {finalsInfo.work_title || '未入力'}</div>
+                        <div><strong>ふりがな:</strong> {finalsInfo.work_title_kana || '未入力'}</div>
+                        <div><strong>ストーリー:</strong> {finalsInfo.work_character_story ? `${finalsInfo.work_character_story.slice(0, 30)}...` : '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '280px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>著作権:</strong> {finalsInfo.copyright_permission || '未入力'}</div>
+                        <div><strong>楽曲:</strong> {finalsInfo.music_title || '未入力'}</div>
+                        <div><strong>CD:</strong> {finalsInfo.cd_title || '未入力'}</div>
+                        <div><strong>アーティスト:</strong> {finalsInfo.artist || '未入力'}</div>
+                        <div><strong>レコード番号:</strong> {finalsInfo.record_number || '未入力'}</div>
+                        <div><strong>JASRAC:</strong> {finalsInfo.jasrac_code || '未入力'}</div>
+                        <div><strong>楽曲種類:</strong> {finalsInfo.music_type || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                      ).length > 0 ? '添付あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>変更:</strong> {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}</div>
+                        <div><strong>スタート:</strong> {finalsInfo.sound_start_timing || '未入力'}</div>
+                        <div><strong>チェイサー:</strong> {finalsInfo.chaser_song_designation || '未入力'}</div>
+                        <div><strong>FO開始:</strong> {finalsInfo.fade_out_start_time || '未入力'}</div>
+                        <div><strong>FO完了:</strong> {finalsInfo.fade_out_complete_time || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                      ).length > 0 ? '添付あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>変更:</strong> {finalsInfo.lighting_change_from_semifinals ? 'あり' : 'なし'}</div>
+                        <div><strong>踊り出し:</strong> {finalsInfo.dance_start_timing || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.scene1_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.scene1_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.scene1_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.scene1_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.scene2_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.scene2_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.scene2_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.scene2_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.scene3_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.scene3_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.scene3_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.scene3_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.scene4_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.scene4_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.scene4_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.scene4_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.scene5_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.scene5_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.scene5_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.scene5_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        <div><strong>時間:</strong> {finalsInfo.chaser_exit_time || '未入力'}</div>
+                        <div><strong>きっかけ:</strong> {finalsInfo.chaser_exit_trigger || '未入力'}</div>
+                        <div><strong>色:</strong> {finalsInfo.chaser_exit_color_type || '未入力'}</div>
+                        <div><strong>イメージ:</strong> {finalsInfo.chaser_exit_image || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                      ).length > 0 ? '画像あり' : 'なし'}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="text-xs">
+                        {finalsInfo.choreography_change_timing || '未入力'}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>変更:</strong> {finalsInfo.choreographer_change ? 'あり' : 'なし'}</div>
+                        <div><strong>①:</strong> {finalsInfo.choreographer_name || '未入力'}</div>
+                        <div><strong>②:</strong> {finalsInfo.choreographer2_name || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '150px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>有無:</strong> {finalsInfo.props_usage || '未入力'}</div>
+                        <div><strong>詳細:</strong> {finalsInfo.props_details || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '150px'}}>
+                      <div className="space-y-1 text-xs">
+                        <div><strong>出席:</strong> {finalsInfo.choreographer_attendance || '未入力'}</div>
+                        <div><strong>写真:</strong> {finalsInfo.choreographer_photo_permission || '未入力'}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-gray-900">
+                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
+                        file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                      ).length > 0 ? '写真あり' : 'なし'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
         <div className="text-center py-12">
           <div className="text-gray-500">決勝情報が登録されていません</div>
         </div>
-      ) : null}
+      )}
     </div>
   )
 }
