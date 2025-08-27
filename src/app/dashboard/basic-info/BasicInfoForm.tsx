@@ -817,9 +817,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
         {/* 振込確認用紙アップロードセクション */}
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">振込確認用紙アップロード</h3>
-          <p className="text-sm text-gray-600 mb-6">
-            ※振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。
-          </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
             <div className="text-sm text-blue-800 space-y-2">
@@ -926,6 +923,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 formats: "JPG, PNG, GIF など（最大10MB、1件まで）"
               }}
             />
+            
+            <p className="text-sm text-gray-600 mt-2">
+              振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。
+            </p>
 
             {/* アップロード済みファイルのプレビュー（常時表示） */}
             {bankSlipFile ? (
