@@ -358,12 +358,12 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '280px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>著作権:</strong> {getMusicRightsLabel(finalsInfo.copyright_permission || '')}</div>
-                        <div><strong>楽曲:</strong> {finalsInfo.music_title || '未入力'}</div>
-                        <div><strong>CD:</strong> {finalsInfo.cd_title || '未入力'}</div>
+                        <div><strong>楽曲著作権許諾:</strong> {getMusicRightsLabel(finalsInfo.copyright_permission || '')}</div>
+                        <div><strong>使用楽曲タイトル:</strong> {finalsInfo.music_title || '未入力'}</div>
+                        <div><strong>収録CDタイトル:</strong> {finalsInfo.cd_title || '未入力'}</div>
                         <div><strong>アーティスト:</strong> {finalsInfo.artist || '未入力'}</div>
                         <div><strong>レコード番号:</strong> {finalsInfo.record_number || '未入力'}</div>
-                        <div><strong>JASRAC:</strong> {finalsInfo.jasrac_code || '未入力'}</div>
+                        <div><strong>JASRAC作品コード:</strong> {finalsInfo.jasrac_code || '未入力'}</div>
                         <div><strong>楽曲種類:</strong> {getMusicTypeLabel(finalsInfo.music_type || '')}</div>
                       </div>
                     </td>
