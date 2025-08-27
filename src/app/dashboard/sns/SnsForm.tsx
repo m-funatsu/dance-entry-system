@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, FileUploadField, Alert, SaveButton, CancelButton, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
@@ -600,16 +600,13 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
         )}
 
         {/* ボタン */}
-        <div className="flex justify-between pt-6">
-          <CancelButton onClick={() => router.push('/dashboard')} />
-          <div className="space-x-4">
-            <SaveButton
-              onClick={handleSave}
-              disabled={saving || uploading || !entry}
-              loading={saving}
-            />
-          </div>
-          </div>
+        <div className="flex justify-end pt-6">
+          <SaveButton
+            onClick={handleSave}
+            disabled={saving || uploading || !entry}
+            loading={saving}
+          />
+        </div>
         </div>
       </form>
       )}

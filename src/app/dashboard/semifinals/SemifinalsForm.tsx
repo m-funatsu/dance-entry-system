@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkSemifinalsInfoCompletion } from '@/lib/status-utils'
-import { Alert, TabNavigation, SaveButton, CancelButton } from '@/components/ui'
+import { Alert, TabNavigation, SaveButton } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { DebugLogger } from '@/lib/debug-logger'
@@ -817,15 +817,12 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
         </p>
       </div>
 
-      <div className="flex justify-between pt-6">
-        <CancelButton onClick={() => router.push('/dashboard')} />
-        <div className="space-x-4">
-          <SaveButton
+      <div className="flex justify-end pt-6">
+        <SaveButton
             onClick={handleSave}
             disabled={saving || !entry}
             loading={saving}
           />
-        </div>
       </div>
 
       {!entry && (

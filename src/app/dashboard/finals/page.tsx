@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import FinalsInfoForm from '@/components/dashboard/FinalsInfoForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { BackButton } from '@/components/dashboard/BackButton'
@@ -43,14 +42,6 @@ export default async function FinalsPage() {
             <p className="text-gray-600">
               エントリー情報が見つかりません。まず基本情報を登録してください。
             </p>
-            <div className="mt-4">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                ダッシュボードに戻る
-              </Link>
-            </div>
           </div>
         </main>
       </div>

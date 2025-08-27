@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkPreliminaryInfoCompletion } from '@/lib/status-utils'
-import { FormField, SaveButton, CancelButton, Alert, DeadlineNoticeAsync, VideoUpload } from '@/components/ui'
+import { FormField, SaveButton, Alert, DeadlineNoticeAsync, VideoUpload } from '@/components/ui'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
@@ -757,21 +757,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         </div>
       </div>
 
-      <div className="flex justify-between pt-6">
-        <CancelButton onClick={() => {
-          console.log('[CANCEL BUTTON] === 戻るボタンクリック ===')
-          console.log('[CANCEL BUTTON] saving state:', saving)
-          console.log('[CANCEL BUTTON] uploading state:', uploading)
-          console.log('[CANCEL BUTTON] 強制リロードでダッシュボードに遷移')
-          window.location.href = '/dashboard'
-        }} />
-        <div className="space-x-4">
-          <SaveButton
+      <div className="flex justify-end pt-6">
+        <SaveButton
             onClick={handleSave}
             disabled={saving || uploading}
             loading={saving}
           />
-        </div>
       </div>
     </form>
   )
