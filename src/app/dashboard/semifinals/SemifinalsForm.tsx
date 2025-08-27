@@ -232,20 +232,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
             copyright_permission: '',
             choreographer_change_from_preliminary: true
           }
-          
-          
-          if (prelimData) {
-            // 予選情報から楽曲情報をデフォルト設定
-            initialData.work_title = prelimData.work_title || ''
-            initialData.work_character_story = prelimData.work_story || ''
-            initialData.music_title = prelimData.music_title || ''
-            initialData.cd_title = prelimData.cd_title || ''
-            initialData.artist = prelimData.artist || ''
-            initialData.record_number = prelimData.record_number || ''
-            initialData.jasrac_code = prelimData.jasrac_code || ''
-            initialData.music_type = prelimData.music_type || ''
-          }
-          
           setSemifinalsInfo(initialData)
         }
       } catch (error) {
