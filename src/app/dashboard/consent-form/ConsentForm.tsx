@@ -78,22 +78,38 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
           
           <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
             <div className="text-center mb-6">
-              <h4 className="font-bold text-lg">2025　バルカーカップジャパンオープンショーダンス選手権　参加同意書</h4>
+              <h4 className="font-bold text-lg">【同意事項】</h4>
             </div>
             
-            <ol className="space-y-4 ml-6 list-decimal">
-              <li>
-                私は、「2025 バルカーカップジャパンオープンショーダンス選手権」（以降、選手権）期間中に主催者が設けたすべての規約、規則、指示に従うことを同意します。
-              </li>
+            <div className="space-y-6">
+              <div>
+                <h5 className="font-semibold text-base mb-2">①エントリーについて</h5>
+                <p>「2025 バルカーカップジャパンオープンショーダンス選手権」（以下、本大会といいます。）期間中に主催者及び大会実施場所における施設管理者が設けたすべての規約、規則、指示に遵守いただける方のみエントリーください。</p>
+              </div>
               
-              <li>
-                選手権当日に、参加者自身の健康状態に無理がない状態で臨むことを約束します。
-              </li>
+              <div>
+                <h5 className="font-semibold text-base mb-2">②事故・怪我の対応について</h5>
+                <div className="space-y-2">
+                  <p>１．出場者は、本大会に出場するにあたり、自身の健康状態に無理がない状態で臨むものとします。</p>
+                  <p>２．出場者は、自らのパフォーマンスその他出場者の行為に専ら起因する事故・怪我・発病等が発生した場合、出場者に生じた身体及び精神的な傷害ならびに医療費その他の費用について、主催者及び施設管理者は一切責任を負わないものとします。</p>
+                  <p>３．出場者が他人に怪我を負わせた場合又は本大会の備品その他物品を損壊した場合、その責任は出場者自身にあり、主催者及び施設管理者は当該怪我に関する費用や損害賠償等の責任は一切負わないものとします。</p>
+                </div>
+              </div>
               
-              <li>
-                選手権期間中、事故・怪我・発病等が発生する可能性があることを認識しています。万が一発生した場合、その際発生した身体及び精神的な傷害ならびに医療費・その他の費用について、主催者・施設側に対し一切責任を問いません。また、他人に怪我を負わせた場合、その責任は参加者自身にあり、主催者、施設側いずれに対しても怪我等に関する費用や損害賠償等の請求をいたしません。
-              </li>
-            </ol>
+              <div>
+                <h5 className="font-semibold text-base mb-2">③個人情報保護について</h5>
+                <div className="space-y-2">
+                  <p>本大会では、個人情報の適正な収集・利用・管理等に取り組んでおります。</p>
+                  <p>出場者は、必ず以下の弊社個人情報保護方針をご確認いただき、同意の上でエントリーして下さい。</p>
+                  <p>
+                    <a href="https://www.valquacup.jp/policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 underline">
+                      プライバシーポリシー | バルカーカップ（Valqua Cup） – ジャパンオープンショーダンス選手権
+                    </a>
+                  </p>
+                  <p>エントリーいただいた後に親権者（法定代理人）の方の同意書をいただくことになりますのでご了承ください。</p>
+                </div>
+              </div>
+            </div>
 
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
               <p className="text-sm">
@@ -151,7 +167,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
                 className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white ${
                   saving || !consentChecked
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-indigo-600 hover:bg-indigo-700'
+                    : 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
                 }`}
               >
                 {saving ? '提出中...' : '同意して提出'}
