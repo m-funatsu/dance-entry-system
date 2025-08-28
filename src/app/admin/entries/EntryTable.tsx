@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailComposer } from '@/components/EmailComposer'
 import AdminLink from '@/components/admin/AdminLink'
+import { 
+  checkBasicInfoCompletion,
+  checkPreliminaryInfoCompletion, 
+  checkProgramInfoCompletion,
+  checkSemifinalsInfoCompletion,
+  checkFinalsInfoCompletion,
+  checkSnsInfoCompletion,
+  checkApplicationsInfoCompletion
+} from '@/lib/status-utils'
 
 interface EntryWithDetails {
   id: string
@@ -103,14 +112,41 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // 各フォームの判定ロジック（配列・単一オブジェクト両方に対応）
-    const hasBasicInfo = entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
-    const hasPreliminaryInfo = entry.preliminary_info && (Array.isArray(entry.preliminary_info) ? entry.preliminary_info.length > 0 : !!entry.preliminary_info)
-    const hasProgramInfo = entry.program_info && (Array.isArray(entry.program_info) ? entry.program_info.length > 0 : !!entry.program_info)
-    const hasSemifinalsInfo = entry.semifinals_info && (Array.isArray(entry.semifinals_info) ? entry.semifinals_info.length > 0 : !!entry.semifinals_info)
-    const hasFinalsInfo = entry.finals_info && (Array.isArray(entry.finals_info) ? entry.finals_info.length > 0 : !!entry.finals_info)
-    const hasApplicationsInfo = entry.applications_info && (Array.isArray(entry.applications_info) ? entry.applications_info.length > 0 : !!entry.applications_info)
-    const hasSnsInfo = entry.sns_info && (Array.isArray(entry.sns_info) ? entry.sns_info.length > 0 : !!entry.sns_info)
+    // 各フォームの必須項目完了状況をチェック
+    const basicInfoData = Array.isArray(entry.basic_info) && entry.basic_info.length > 0 ? entry.basic_info[0] : entry.basic_info
+    const preliminaryInfoData = Array.isArray(entry.preliminary_info) && entry.preliminary_info.length > 0 ? entry.preliminary_info[0] : entry.preliminary_info  
+    const programInfoData = Array.isArray(entry.program_info) && entry.program_info.length > 0 ? entry.program_info[0] : entry.program_info
+    const semifinalsInfoData = Array.isArray(entry.semifinals_info) && entry.semifinals_info.length > 0 ? entry.semifinals_info[0] : entry.semifinals_info
+    const finalsInfoData = Array.isArray(entry.finals_info) && entry.finals_info.length > 0 ? entry.finals_info[0] : entry.finals_info
+    const applicationsInfoData = Array.isArray(entry.applications_info) && entry.applications_info.length > 0 ? entry.applications_info[0] : entry.applications_info
+    const snsInfoData = Array.isArray(entry.sns_info) && entry.sns_info.length > 0 ? entry.sns_info[0] : entry.sns_info
+
+    // 予選動画の有無確認
+    const hasVideo = entry.entry_files.some(file => file.file_type === 'video')
+    
+    // SNS動画の有無確認  
+    const snsVideoFiles = entry.entry_files.filter(file => 
+      file.file_type === 'video' && 
+      (file.purpose === 'sns_practice_video' || file.purpose === 'sns_introduction_highlight')
+    )
+
+    // 各フォームの必須項目完了判定
+    const isBasicComplete = basicInfoData ? checkBasicInfoCompletion(basicInfoData as Record<string, unknown>, basicInfoData as Record<string, boolean>) : false
+    const isPreliminaryComplete = preliminaryInfoData ? checkPreliminaryInfoCompletion(preliminaryInfoData as Record<string, unknown>, hasVideo) : false
+    const isProgramComplete = programInfoData ? checkProgramInfoCompletion(programInfoData as Record<string, unknown>) : false
+    const isSemifinalsComplete = semifinalsInfoData ? checkSemifinalsInfoCompletion(semifinalsInfoData as Record<string, unknown>) : false
+    const isFinalsComplete = finalsInfoData ? checkFinalsInfoCompletion(finalsInfoData as Record<string, unknown>) : false
+    const isSnsComplete = snsInfoData ? checkSnsInfoCompletion(snsInfoData as Record<string, unknown>, snsVideoFiles.length) : false
+    const isApplicationsComplete = applicationsInfoData ? checkApplicationsInfoCompletion(applicationsInfoData as Record<string, unknown>) : false
+
+    // データ存在チェック（完了チェックとは別）
+    const hasBasicInfo = !!basicInfoData
+    const hasPreliminaryInfo = !!preliminaryInfoData
+    const hasProgramInfo = !!programInfoData
+    const hasSemifinalsInfo = !!semifinalsInfoData
+    const hasFinalsInfo = !!finalsInfoData
+    const hasApplicationsInfo = !!applicationsInfoData
+    const hasSnsInfo = !!snsInfoData
     
     // 参加同意書の状況を確認（基本情報の同意項目で判定）
     const hasConsentForm = (() => {
@@ -190,37 +226,51 @@ export default function EntryTable({ entries }: EntryTableProps) {
     return (
       <div className="flex flex-wrap gap-1">
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasBasicInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasBasicInfo ? 
+            (isBasicComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           基本
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasPreliminaryInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasPreliminaryInfo ? 
+            (isPreliminaryComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           予選
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasProgramInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasProgramInfo ? 
+            (isProgramComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           プログラム
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasSemifinalsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasSemifinalsInfo ? 
+            (isSemifinalsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           準決勝
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasFinalsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasFinalsInfo ? 
+            (isFinalsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           決勝
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasApplicationsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasApplicationsInfo ? 
+            (isApplicationsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           申請
         </span>
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasSnsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+          hasSnsInfo ? 
+            (isSnsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
+            'bg-gray-100 text-gray-400'
         }`}>
           SNS
         </span>
