@@ -36,6 +36,7 @@ interface EntryWithDetails {
   entry_files: {
     id: string
     file_type: string
+    purpose?: string
   }[]
   selections?: {
     id: string
@@ -129,14 +130,23 @@ export default function EntryTable({ entries }: EntryTableProps) {
       file.file_type === 'video' && 
       (file.purpose === 'sns_practice_video' || file.purpose === 'sns_introduction_highlight')
     )
+    const hasPracticeVideo = snsVideoFiles.some(file => file.purpose === 'sns_practice_video')
+    const hasIntroductionVideo = snsVideoFiles.some(file => file.purpose === 'sns_introduction_highlight')
 
     // 各フォームの必須項目完了判定
-    const isBasicComplete = basicInfoData ? checkBasicInfoCompletion(basicInfoData as Record<string, unknown>, basicInfoData as Record<string, boolean>) : false
+    const isBasicComplete = basicInfoData ? checkBasicInfoCompletion(
+      basicInfoData as Record<string, unknown>, 
+      {
+        agreement_checked: !!(basicInfoData as Record<string, unknown>).agreement_checked,
+        privacy_policy_checked: !!(basicInfoData as Record<string, unknown>).privacy_policy_checked,
+        media_consent_checked: !!(basicInfoData as Record<string, unknown>).media_consent_checked
+      }
+    ) : false
     const isPreliminaryComplete = preliminaryInfoData ? checkPreliminaryInfoCompletion(preliminaryInfoData as Record<string, unknown>, hasVideo) : false
     const isProgramComplete = programInfoData ? checkProgramInfoCompletion(programInfoData as Record<string, unknown>) : false
     const isSemifinalsComplete = semifinalsInfoData ? checkSemifinalsInfoCompletion(semifinalsInfoData as Record<string, unknown>) : false
     const isFinalsComplete = finalsInfoData ? checkFinalsInfoCompletion(finalsInfoData as Record<string, unknown>) : false
-    const isSnsComplete = snsInfoData ? checkSnsInfoCompletion(snsInfoData as Record<string, unknown>, snsVideoFiles.length) : false
+    const isSnsComplete = snsInfoData ? checkSnsInfoCompletion(snsInfoData as Record<string, unknown>, hasPracticeVideo, hasIntroductionVideo) : false
     const isApplicationsComplete = applicationsInfoData ? checkApplicationsInfoCompletion(applicationsInfoData as Record<string, unknown>) : false
 
     // データ存在チェック（完了チェックとは別）
