@@ -20,8 +20,13 @@ function LoginForm() {
   // URLパラメータからメッセージを取得
   useEffect(() => {
     const message = searchParams.get('message')
+    console.log('🔍 [LOGIN] URLパラメータ確認:', { message, url: window.location.href })
     if (message) {
-      setSuccessMessage(decodeURIComponent(message))
+      const decodedMessage = decodeURIComponent(message)
+      console.log('✅ [LOGIN] メッセージ設定:', decodedMessage)
+      setSuccessMessage(decodedMessage)
+    } else {
+      console.log('❌ [LOGIN] メッセージなし')
     }
   }, [searchParams])
 
@@ -226,6 +231,13 @@ function LoginForm() {
         {successMessage && (
           <div className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded-md p-3">
             {successMessage}
+          </div>
+        )}
+        
+        {/* デバッグ用: successMessageの状態確認 */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="text-xs text-gray-400 text-center">
+            DEBUG: successMessage = &quot;{successMessage || 'なし'}&quot;
           </div>
         )}
 

@@ -41,6 +41,7 @@ export async function updateSession(request: NextRequest) {
     '/login',
     '/auth/login',
     '/auth/register',
+    '/auth/admin-register', // 管理者登録ページを公開ルートに追加
     '/auth/logout',
     '/auth/reset-password',
     '/auth/update-password',
