@@ -1,6 +1,5 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -13,7 +12,6 @@ export default function AdminRegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const supabase = createClient()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,57 +25,58 @@ export default function AdminRegisterPage() {
     }
 
     try {
-      // 管理者アカウントを作成
-      const { data, error } = await supabase.auth.signUp({
+      // 管理者権限でユーザーアカウントを直接作成（メール確認不要）
+      const adminSupabase = createAdminClient()
+      
+      // 管理者権限でユーザーを作成
+      const { data: adminUserData, error: adminError } = await adminSupabase.auth.admin.createUser({
         email,
         password,
-        options: {
-          data: {
-            name: name,
-          }
+        email_confirm: true, // メール確認を自動で完了
+        user_metadata: {
+          name: name
         }
       })
 
-      if (error) {
+      if (adminError) {
+        console.error('管理者アカウント作成エラー:', adminError)
         // エラーメッセージを日本語化
         let errorMessage = '管理者登録に失敗しました'
-        if (error.message.includes('User already registered')) {
+        if (adminError.message.includes('User already registered')) {
           errorMessage = 'このメールアドレスは既に登録されています'
-        } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'メールアドレスの確認が完了していません'
-        } else if (error.message.includes('Password should be at least')) {
+        } else if (adminError.message.includes('Password should be at least')) {
           errorMessage = 'パスワードは8文字以上である必要があります'
-        } else if (error.message.includes('Invalid email')) {
+        } else if (adminError.message.includes('Invalid email')) {
           errorMessage = '有効なメールアドレスを入力してください'
-        } else if (error.message.includes('Too many requests')) {
+        } else if (adminError.message.includes('Too many requests')) {
           errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
         }
         setError(errorMessage)
         return
       }
 
-      if (data.user) {
-        // 管理者権限でユーザープロフィールを作成
-        const adminSupabase = createAdminClient()
+      if (adminUserData?.user) {
+        // 管理者プロフィールを作成
         const { error: profileError } = await adminSupabase
           .from('users')
           .upsert({
-            id: data.user.id,
-            email: data.user.email,
+            id: adminUserData.user.id,
+            email: adminUserData.user.email,
             name: name,
             role: 'admin'
           })
 
         if (profileError) {
           console.error('管理者プロフィール作成エラー:', profileError)
-          setError('管理者プロフィールの作成に失敗しました')
+          setError(`管理者プロフィールの作成に失敗しました: ${profileError.message}`)
           return
         }
 
         router.push('/auth/login?message=管理者アカウントが作成されました。ログインしてください。')
       }
-    } catch {
-      setError('登録に失敗しました')
+    } catch (error) {
+      console.error('予期しないエラー:', error)
+      setError('登録に失敗しました。詳細はコンソールを確認してください。')
     } finally {
       setLoading(false)
     }
