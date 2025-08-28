@@ -1204,10 +1204,6 @@ export default async function DashboardPage() {
               </div>
 
               {/* SNS情報表示 */}
-                </div>
-              </div>
-
-              {/* SNS情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
