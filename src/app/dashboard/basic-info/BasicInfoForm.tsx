@@ -13,9 +13,10 @@ interface BasicInfoFormProps {
   userId: string
   entryId: string | null
   initialData: BasicInfo | null
+  isEditable?: boolean
 }
 
-export default function BasicInfoForm({ userId, entryId, initialData }: BasicInfoFormProps) {
+export default function BasicInfoForm({ userId, entryId, initialData, isEditable = true }: BasicInfoFormProps) {
   const supabase = createClient()
   const { showToast } = useToast()
   const [checkboxes, setCheckboxes] = useState({
@@ -680,6 +681,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           value={formData.dance_style}
           onChange={(e) => handleFieldChangeWithValidation('dance_style', e.target.value)}
           required
+          disabled={!isEditable}
           error={errors.dance_style}
         >
           <option value="">選択してください</option>
@@ -697,6 +699,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             value={formData.category_division}
             onChange={(e) => handleFieldChangeWithValidation('category_division', e.target.value)}
             required
+            disabled={!isEditable}
             error={errors.category_division}
           >
             <option value="">選択してください</option>
@@ -721,6 +724,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.representative_name}
               onChange={(e) => handleFieldChangeWithValidation('representative_name', e.target.value)}
               required
+              disabled={!isEditable}
               error={fieldErrors.representative_name || errors.representative_name}
             />
             <FormField
@@ -729,6 +733,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.representative_furigana}
               onChange={(e) => handleFieldChangeWithValidation('representative_furigana', e.target.value)}
               required
+              disabled={!isEditable}
               placeholder="カタカナで入力"
               error={fieldErrors.representative_furigana || errors.representative_furigana}
             />
@@ -739,6 +744,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('representative_romaji', e.target.value)}
               placeholder="Yamada Taro"
               required
+              disabled={!isEditable}
               error={fieldErrors.representative_romaji || errors.representative_romaji}
             />
             <FormField
@@ -750,6 +756,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               max="2025-11-23"
               min="1920-01-01"
               required
+              disabled={!isEditable}
               error={fieldErrors.representative_birthdate || errors.representative_birthdate}
             />
             <FormField
@@ -758,6 +765,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_name', e.target.value)}
               required
+              disabled={!isEditable}
               error={fieldErrors.partner_name || errors.partner_name}
             />
             <FormField
@@ -766,6 +774,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_furigana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_furigana', e.target.value)}
               required
+              disabled={!isEditable}
               placeholder="カタカナで入力"
               error={fieldErrors.partner_furigana || errors.partner_furigana}
             />
@@ -776,6 +785,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('partner_romaji', e.target.value)}
               placeholder="Tanaka Hanako"
               required
+              disabled={!isEditable}
               error={fieldErrors.partner_romaji || errors.partner_romaji}
             />
             <FormField
@@ -787,6 +797,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               max="2025-11-23"
               min="1920-01-01"
               required
+              disabled={!isEditable}
               error={fieldErrors.partner_birthdate || errors.partner_birthdate}
             />
             
@@ -797,6 +808,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.representative_email}
               onChange={(e) => handleFieldChangeWithValidation('representative_email', e.target.value)}
               required
+              disabled={!isEditable}
               placeholder="example@email.com"
               error={fieldErrors.representative_email || errors.representative_email}
             />
@@ -808,6 +820,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.phone_number}
               onChange={(e) => handleFieldChangeWithValidation('phone_number', e.target.value)}
               required
+              disabled={!isEditable}
               placeholder="090-1234-5678"
               error={fieldErrors.phone_number || errors.phone_number}
             />
@@ -1088,6 +1101,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name', e.target.value)}
               placeholder="山田太郎"
+              disabled={!isEditable}
               error={fieldErrors.real_name || errors.real_name}
             />
             
@@ -1097,6 +1111,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('real_name_kana', e.target.value)}
               placeholder="ヤマダタロウ"
+              disabled={!isEditable}
               error={fieldErrors.real_name_kana || errors.real_name_kana}
             />
             
@@ -1106,6 +1121,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name', e.target.value)}
               placeholder="田中花子"
+              disabled={!isEditable}
               error={fieldErrors.partner_real_name || errors.partner_real_name}
             />
             
@@ -1115,6 +1131,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.partner_real_name_kana || ''}
               onChange={(e) => handleFieldChangeWithValidation('partner_real_name_kana', e.target.value)}
               placeholder="タナカハナコ"
+              disabled={!isEditable}
               error={fieldErrors.partner_real_name_kana || errors.partner_real_name_kana}
             />
           </div>
@@ -1132,6 +1149,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_1', e.target.value)}
               placeholder="山田太郎"
               required
+              disabled={!isEditable}
               error={fieldErrors.emergency_contact_name_1 || errors.emergency_contact_name_1}
             />
             
@@ -1143,6 +1161,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_1', e.target.value)}
               placeholder="090-1234-5678"
               required
+              disabled={!isEditable}
               error={fieldErrors.emergency_contact_phone_1 || errors.emergency_contact_phone_1}
             />
             
@@ -1152,6 +1171,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.emergency_contact_name_2 || ''}
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_name_2', e.target.value)}
               placeholder="山田花子"
+              disabled={!isEditable}
             />
             
             <FormField
@@ -1161,6 +1181,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
               value={formData.emergency_contact_phone_2 || ''}
               onChange={(e) => handleFieldChangeWithValidation('emergency_contact_phone_2', e.target.value)}
               placeholder="090-5678-1234"
+              disabled={!isEditable}
               error={fieldErrors.emergency_contact_phone_2 || errors.emergency_contact_phone_2}
             />
           </div>
@@ -1192,6 +1213,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.guardian_name || ''}
                 onChange={(e) => handleFieldChangeWithValidation('guardian_name', e.target.value)}
                 required
+                disabled={!isEditable}
                 error={fieldErrors.guardian_name || errors.guardian_name}
               />
               
@@ -1202,6 +1224,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.guardian_phone || ''}
                 onChange={(e) => handleFieldChangeWithValidation('guardian_phone', e.target.value)}
                 required
+                disabled={!isEditable}
                 placeholder="090-1234-5678"
                 error={fieldErrors.guardian_phone || errors.guardian_phone}
               />
@@ -1213,6 +1236,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.guardian_email || ''}
                 onChange={(e) => handleFieldChangeWithValidation('guardian_email', e.target.value)}
                 required
+                disabled={!isEditable}
                 placeholder="guardian@example.com"
                 error={fieldErrors.guardian_email || errors.guardian_email}
               />
@@ -1241,6 +1265,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.partner_guardian_name || ''}
                 onChange={(e) => handleFieldChangeWithValidation('partner_guardian_name', e.target.value)}
                 required
+                disabled={!isEditable}
                 error={fieldErrors.partner_guardian_name || errors.partner_guardian_name}
               />
               
@@ -1251,6 +1276,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.partner_guardian_phone || ''}
                 onChange={(e) => handleFieldChangeWithValidation('partner_guardian_phone', e.target.value)}
                 required
+                disabled={!isEditable}
                 placeholder="090-1234-5678"
                 error={fieldErrors.partner_guardian_phone || errors.partner_guardian_phone}
               />
@@ -1262,6 +1288,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 value={formData.partner_guardian_email || ''}
                 onChange={(e) => handleFieldChangeWithValidation('partner_guardian_email', e.target.value)}
                 required
+                disabled={!isEditable}
                 placeholder="guardian@example.com"
                 error={fieldErrors.partner_guardian_email || errors.partner_guardian_email}
               />
@@ -1287,6 +1314,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 checked={checkboxes.agreement_checked}
                 onChange={(e) => handleCheckboxChange('agreement_checked', e.target.checked)}
                 required
+                disabled={!isEditable}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <span className="ml-2 text-sm font-medium text-gray-700">
@@ -1306,6 +1334,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 checked={checkboxes.media_consent_checked}
                 onChange={(e) => handleCheckboxChange('media_consent_checked', e.target.checked)}
                 required
+                disabled={!isEditable}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <span className="ml-2 text-sm font-medium text-gray-700">
@@ -1335,6 +1364,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 checked={checkboxes.privacy_policy_checked}
                 onChange={(e) => handleCheckboxChange('privacy_policy_checked', e.target.checked)}
                 required
+                disabled={!isEditable}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <span className="ml-2 text-sm font-medium text-gray-700">
@@ -1349,7 +1379,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={saving}
+            disabled={saving || !isEditable}
           >
             {saving ? '保存中...' : '保存'}
           </Button>

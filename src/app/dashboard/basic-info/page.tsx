@@ -85,25 +85,22 @@ export default async function BasicInfoPage() {
           </div>
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              {!basicInfoEditable ? (
-                <div className="text-center py-12">
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                    <h3 className="text-lg font-medium text-red-800 mb-2">入力期限切れ</h3>
-                    <p className="text-red-700">
-                      基本情報の入力期限が過ぎているため、編集できません。
-                    </p>
-                    <p className="text-sm text-red-600 mt-2">
-                      期限: {deadlineInfo?.date}
+              {!basicInfoEditable && (
+                <div className="mb-6">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-red-800 mb-1">入力期限切れ</h3>
+                    <p className="text-sm text-red-700">
+                      基本情報の入力期限が過ぎているため、編集できません。期限: {deadlineInfo?.date}
                     </p>
                   </div>
                 </div>
-              ) : (
-                <BasicInfoForm 
-                  userId={user.id} 
-                  entryId={entry?.id || null}
-                  initialData={basicInfo} 
-                />
               )}
+              <BasicInfoForm 
+                userId={user.id} 
+                entryId={entry?.id || null}
+                initialData={basicInfo}
+                isEditable={basicInfoEditable}
+              />
             </div>
           </div>
         </div>
