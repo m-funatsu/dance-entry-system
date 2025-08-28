@@ -524,7 +524,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             </div>
           ) : (
             <VideoUpload
-              value={videoFile ? (videoFile as EntryFile).file_name : ''}
+              value={(() => {
+                const fileName = videoFile ? (videoFile as EntryFile).file_name : ''
+                console.log('[VIDEO DISPLAY] 表示ファイル名:', fileName)
+                console.log('[VIDEO DISPLAY] videoFileオブジェクト:', videoFile)
+                return fileName
+              })()}
               onChange={handleFileUpload}
               onDelete={() => handleFileDelete()}
               disabled={uploading || !!videoFile || !entryId}

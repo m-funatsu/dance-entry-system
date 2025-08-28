@@ -163,8 +163,8 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
         {
           entry_id: entryId,
           file_type: fileType,
-          file_name: file.name,
-          file_path: data.path,
+          file_name: file.name, // 元の日本語ファイル名を保持
+          file_path: data.path, // サニタイズされたパスを使用
         }
       ])
       .select()
