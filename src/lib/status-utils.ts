@@ -238,22 +238,27 @@ export function checkPreliminaryInfoCompletion(
   formData: Record<string, unknown>,
   hasVideo: boolean
 ): boolean {
-  // 予選情報フォームに実際に存在する必須フィールドのみを使用
-  const requiredFields = [
+  // フォームの必須項目のみ（任意項目は除外、条件付き必須は別途チェック）
+  const baseRequiredFields = [
     'work_title',
-    'work_title_kana', // 作品タイトルふりがな（必須だがチェックされていなかった）
-    'work_story', // work_summaryではなくwork_story
+    'work_title_kana',
+    'work_story',
     'music_title',
-    'cd_title',
-    'artist',
-    'record_number',
-    'jasrac_code',
+    'music_type',
+    'music_rights_cleared',
     'choreographer1_name',
     'choreographer1_furigana'
-    // choreographer2は任意項目のため除外
   ]
   
-  const { isComplete } = checkFormCompletion('PRELIMINARY INFO', formData, requiredFields, hasVideo)
+  // 条件付き必須項目: JASRAC作品コード（A.市販の楽曲を使用する場合のみ）
+  const conditionallyRequired: string[] = []
+  if (formData.music_rights_cleared === 'A') {
+    conditionallyRequired.push('jasrac_code')
+  }
+  
+  const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
+  
+  const { isComplete } = checkFormCompletion('PRELIMINARY INFO', formData, allRequiredFields, hasVideo)
   return isComplete
 }
 
@@ -264,21 +269,74 @@ export async function checkSemifinalsInfoCompletion(
   formData: Record<string, unknown>, 
   entryId?: string
 ): Promise<boolean> {
-  // 準決勝情報フォームに実際に存在する必須フィールドのみを使用
-  const requiredFields = [
+  console.log(`[SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック開始 ===`)
+  console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
+  console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
+
+  // 基本必須フィールド
+  const baseRequiredFields = [
+    'music_change_from_preliminary', // 選択必須
     'work_title',
-    'work_character_story', // work_summaryではなく実際のフィールド名
+    'work_character_story',
+    'copyright_permission',
     'music_title',
-    'cd_title',
-    'artist',
-    'record_number',
-    'jasrac_code',
     'music_type',
-    'copyright_permission'
-    // choreographer関連は準決勝では変更可能で、基本的にはコピーされるため一旦除外
+    'music_data_path',
+    // Sound Section
+    'sound_start_timing',
+    'chaser_song_designation',
+    'fade_out_start_time',
+    'fade_out_complete_time',
+    // Lighting Section
+    'dance_start_timing',
+    'scene1_time',
+    'scene1_trigger', 
+    'scene1_color_type',
+    'scene1_color_other',
+    'scene1_image',
+    'scene1_image_path',
+    'chaser_exit_time',
+    'chaser_exit_trigger',
+    'chaser_exit_color_type', 
+    'chaser_exit_color_other',
+    'chaser_exit_image',
+    'chaser_exit_image_path',
+    // Choreographer Section
+    'props_usage',
+    // Bank Section
+    'bank_name',
+    'branch_name', 
+    'account_type',
+    'account_number',
+    'account_holder'
   ]
   
-  const { isComplete: fieldsComplete } = checkFormCompletion('SEMIFINALS INFO', formData, requiredFields)
+  // 条件付き必須項目を追加
+  const conditionallyRequired: string[] = []
+  
+  // JASRAC作品コード（市販楽曲の場合のみ必須）
+  if (formData.copyright_permission === 'commercial') {
+    conditionallyRequired.push('jasrac_code')
+  }
+  
+  // チェイサー曲（必要な場合のみ必須）
+  if (formData.chaser_song_designation === 'required') {
+    conditionallyRequired.push('chaser_song')
+  }
+  
+  // 小道具詳細（小道具ありの場合のみ必須）
+  if (formData.props_usage === 'あり') {
+    conditionallyRequired.push('props_details')
+  }
+  
+  const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
+  
+  console.log(`[SEMIFINALS INFO COMPLETION] 基本必須フィールド数: ${baseRequiredFields.length}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] 条件付き必須フィールド数: ${conditionallyRequired.length}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] 条件付き必須フィールド:`, conditionallyRequired)
+  console.log(`[SEMIFINALS INFO COMPLETION] 全必須フィールド数: ${allRequiredFields.length}`)
+  
+  const { isComplete: fieldsComplete } = checkFormCompletion('SEMIFINALS INFO', formData, allRequiredFields)
   
   // 振込確認用紙のチェック
   let hasPaymentSlip = false
@@ -287,22 +345,30 @@ export async function checkSemifinalsInfoCompletion(
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       
-      const { data: paymentSlipData } = await supabase
+      const { data: paymentSlipData, error: paymentSlipError } = await supabase
         .from('entry_files')
         .select('id')
         .eq('entry_id', entryId)
         .eq('purpose', 'semifinals_payment_slip')
-        .single()
+        .maybeSingle()
+      
+      console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙検索結果:`, paymentSlipData)
+      console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙検索エラー:`, paymentSlipError)
       
       hasPaymentSlip = !!paymentSlipData
     } catch (error) {
-      console.log('振込確認用紙チェックエラー:', error)
+      console.log('[SEMIFINALS INFO COMPLETION] 振込確認用紙チェックエラー:', error)
       hasPaymentSlip = false
     }
   }
   
   const result = fieldsComplete && hasPaymentSlip
-  console.log('[SEMIFINALS COMPLETION] フィールド完了:', fieldsComplete, '振込確認用紙:', hasPaymentSlip, '結果:', result)
+  
+  console.log(`[SEMIFINALS INFO COMPLETION] === チェック結果まとめ ===`)
+  console.log(`[SEMIFINALS INFO COMPLETION] フィールド完了: ${fieldsComplete}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] 最終結果: ${result}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック終了 ===`)
   
   return result
 }
@@ -311,14 +377,26 @@ export async function checkSemifinalsInfoCompletion(
  * プログラム情報フォームの完了状況をチェック
  */
 export function checkProgramInfoCompletion(formData: Record<string, unknown>): boolean {
-  const requiredFields = [
-    'player_name',
-    'player_name_furigana'
+  // フォームの実際の必須項目
+  const baseRequiredFields = [
+    'player_photo_path',
+    'semifinal_story'
   ]
   
-  return requiredFields.every(field => {
+  // 楽曲数による条件付き必須項目
+  const allRequiredFields = [...baseRequiredFields]
+  if (formData.song_count === '2曲') {
+    allRequiredFields.push('final_story')
+  }
+  
+  console.log(`[PROGRAM INFO CHECK] 楽曲数: ${formData.song_count}`)
+  console.log(`[PROGRAM INFO CHECK] チェック対象フィールド:`, allRequiredFields)
+  
+  return allRequiredFields.every(field => {
     const value = formData[field]
-    return value && value.toString().trim() !== ''
+    const isValid = !!(value && value.toString().trim() !== '')
+    console.log(`[PROGRAM INFO CHECK] ${field}: "${value}" -> ${isValid}`)
+    return isValid
   })
 }
 

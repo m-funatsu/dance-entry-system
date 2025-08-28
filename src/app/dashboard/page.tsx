@@ -164,28 +164,15 @@ export default async function DashboardPage() {
   const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
     if (!programInfo) return false
     
-    // 必須フィールドのチェック
+    // フォームの実際の必須項目のみ
     const requiredFields = [
       'player_photo_path',
-      'semifinal_story',
-      'semifinal_highlight',
-      'semifinal_image1_path',
-      'semifinal_image2_path',
-      'semifinal_image3_path',
-      'semifinal_image4_path'
+      'semifinal_story'
     ]
     
-    // 2曲の場合の追加必須フィールド
+    // 楽曲数による条件付き必須項目
     if (programInfo['song_count'] === '2曲') {
-      requiredFields.push(
-        'final_player_photo_path',
-        'final_story',
-        'final_highlight',
-        'final_image1_path',
-        'final_image2_path',
-        'final_image3_path',
-        'final_image4_path'
-      )
+      requiredFields.push('final_story')
     }
     
     return requiredFields.every(field => {
@@ -291,20 +278,28 @@ export default async function DashboardPage() {
   const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
-    // status-utils.tsのcheckPreliminaryInfoCompletionと同じ必須フィールドを使用
-    const requiredFields = [
+    
+    // フォームの必須項目のみ（任意項目は除外）
+    const baseRequiredFields = [
       'work_title',
-      'work_title_kana', // 作品タイトルふりがな（重要な必須項目）
+      'work_title_kana',
       'work_story',
       'music_title',
-      'cd_title',
-      'artist',
-      'record_number',
-      'jasrac_code',
+      'music_type',
+      'music_rights_cleared',
       'choreographer1_name',
       'choreographer1_furigana'
     ]
-    return requiredFields.every(field => {
+    
+    // 条件付き必須: JASRAC作品コード（A.市販の楽曲を使用する場合のみ）
+    const conditionallyRequired: string[] = []
+    if (preliminaryInfo.music_rights_cleared === 'A') {
+      conditionallyRequired.push('jasrac_code')
+    }
+    
+    const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
+    
+    return allRequiredFields.every(field => {
       const value = preliminaryInfo[field]
       return value && value.toString().trim() !== ''
     })
@@ -314,24 +309,104 @@ export default async function DashboardPage() {
   const checkSemifinalsInfoComplete = (semifinalsInfo: { [key: string]: unknown } | null) => {
     if (!semifinalsInfo) return false
     
-    // status-utils.tsのcheckSemifinalsInfoCompletionと同じ必須フィールドを使用
-    const requiredFields = [
+    console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック（ダッシュボード）===')
+    console.log('[DASHBOARD SEMIFINALS CHECK] semifinalsInfo:', semifinalsInfo)
+    
+    // 基本必須フィールド - バリデーションルールに完全準拠
+    const baseRequiredFields = [
+      'music_change_from_preliminary', // 選択必須
       'work_title',
-      'work_character_story', 
+      'work_character_story',
+      'copyright_permission',
       'music_title',
-      'cd_title',
-      'artist',
-      'record_number',
-      'jasrac_code',
       'music_type',
-      'copyright_permission'
+      'music_data_path',
+      // Sound Section
+      'sound_start_timing',
+      'chaser_song_designation',
+      'fade_out_start_time',
+      'fade_out_complete_time',
+      // Lighting Section
+      'dance_start_timing',
+      'scene1_time',
+      'scene1_trigger', 
+      'scene1_color_type',
+      'scene1_color_other',
+      'scene1_image',
+      'scene1_image_path',
+      'chaser_exit_time',
+      'chaser_exit_trigger',
+      'chaser_exit_color_type', 
+      'chaser_exit_color_other',
+      'chaser_exit_image',
+      'chaser_exit_image_path',
+      // Choreographer Section
+      'props_usage',
+      // Bank Section
+      'bank_name',
+      'branch_name', 
+      'account_type',
+      'account_number',
+      'account_holder'
     ]
     
-    return requiredFields.every(field => {
+    // 条件付き必須項目
+    const conditionallyRequired: string[] = []
+    
+    // JASRAC作品コード（市販楽曲の場合のみ必須）
+    if (semifinalsInfo.copyright_permission === 'commercial') {
+      conditionallyRequired.push('jasrac_code')
+    }
+    
+    // チェイサー曲（必要な場合のみ必須）
+    if (semifinalsInfo.chaser_song_designation === 'required') {
+      conditionallyRequired.push('chaser_song')
+    }
+    
+    // 小道具詳細（小道具ありの場合のみ必須）
+    if (semifinalsInfo.props_usage === 'あり') {
+      conditionallyRequired.push('props_details')
+    }
+    
+    const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
+    
+    console.log('[DASHBOARD SEMIFINALS CHECK] 基本必須フィールド数:', baseRequiredFields.length)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 条件付き必須フィールド:', conditionallyRequired)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 全必須フィールド数:', allRequiredFields.length)
+    
+    // フィールドチェック
+    const fieldResults: Record<string, boolean> = {}
+    const missingFields: string[] = []
+    
+    allRequiredFields.forEach(field => {
       const value = semifinalsInfo[field]
-      if (typeof value === 'boolean') return value !== null && value !== undefined
-      return value && value.toString().trim() !== ''
+      let isValid = false
+      
+      if (typeof value === 'boolean') {
+        isValid = value !== null && value !== undefined
+      } else {
+        isValid = !!(value && value.toString().trim() !== '')
+      }
+      
+      fieldResults[field] = isValid
+      console.log(`[DASHBOARD SEMIFINALS CHECK] ${field}: "${value}" -> ${isValid}`)
+      
+      if (!isValid) {
+        missingFields.push(field)
+      }
     })
+    
+    const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+    
+    console.log('[DASHBOARD SEMIFINALS CHECK] === チェック結果まとめ ===')
+    console.log('[DASHBOARD SEMIFINALS CHECK] 全フィールド完了:', hasAllRequiredFields)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド数:', missingFields.length)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド:', missingFields)
+    console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック終了（ダッシュボード）===')
+    
+    // 注意：振込確認用紙のチェックはここでは行わない（ファイル情報が利用できないため）
+    // 実際の完了判定はstatus-utils.tsのcheckSemifinalsInfoCompletionで行う
+    return hasAllRequiredFields
   }
 
   // 決勝情報の完了判定関数
