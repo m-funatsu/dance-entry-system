@@ -126,6 +126,7 @@ export default async function DashboardPage() {
     
     snsInfo = data
     console.log('SNS情報:', snsInfo) // デバッグ用ログ
+    console.log('Entry ID:', entry.id) // エントリーIDも確認
     
     // SNS動画ファイルの確認
     const { data: snsFiles, error: filesError } = await supabase
@@ -1271,6 +1272,22 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">SNS情報</h3>
+                  </div>
+                  {/* 全体デバッグ情報 */}
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                    <strong>デバッグ情報:</strong><br />
+                    Entry ID: {entry?.id || 'なし'}<br />
+                    SNS Info: {snsInfo ? 'データあり' : 'データなし'}<br />
+                    {snsInfo && (
+                      <>
+                        Practice Video Path: {snsInfo.practice_video_path || 'なし'}<br />
+                        Introduction Highlight Path: {snsInfo.introduction_highlight_path || 'なし'}<br />
+                        SNS Notes: {snsInfo.sns_notes || 'なし'}<br />
+                        Created At: {snsInfo.created_at || 'なし'}
+                      </>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center mb-4">
                     {isFormEditable('sns_deadline') ? (
                       <EditButton href="/dashboard/sns" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
@@ -1285,6 +1302,11 @@ export default async function DashboardPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-500">練習動画(約30秒)横長動画</label>
                       <div className="mt-1 text-base text-gray-900">
+                        {/* デバッグ情報 */}
+                        <div className="mb-2 text-xs text-gray-400">
+                          デバッグ: snsInfo={snsInfo ? 'あり' : 'なし'}, 
+                          practice_video_path={snsInfo?.practice_video_path || 'なし'}
+                        </div>
                         {snsInfo?.practice_video_path ? (
                           <FilePreview
                             filePath={snsInfo.practice_video_path}
@@ -1299,6 +1321,10 @@ export default async function DashboardPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-500">選手紹介・見所（30秒）</label>
                       <div className="mt-1 text-base text-gray-900">
+                        {/* デバッグ情報 */}
+                        <div className="mb-2 text-xs text-gray-400">
+                          デバッグ: introduction_highlight_path={snsInfo?.introduction_highlight_path || 'なし'}
+                        </div>
                         {snsInfo?.introduction_highlight_path ? (
                           <FilePreview
                             filePath={snsInfo.introduction_highlight_path}
