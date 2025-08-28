@@ -11,6 +11,17 @@ export async function createAdminUser(formData: FormData) {
     return { error: 'すべてのフィールドを入力してください' }
   }
 
+  // 入力検証
+  if (password.length < 8) {
+    return { error: 'パスワードは8文字以上である必要があります' }
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: '有効なメールアドレスを入力してください' }
+  }
+
+  console.log('Input validation passed:', { email, nameLength: name.length, passwordLength: password.length })
+
   try {
     // 管理者権限でユーザーアカウントを直接作成（メール確認不要）
     const adminSupabase = createAdminClient()
@@ -30,8 +41,15 @@ export async function createAdminUser(formData: FormData) {
     })
 
     if (adminError) {
+      // 詳細なエラー情報を表示（一時的）
+      console.error('Admin registration error details:', {
+        message: adminError.message,
+        code: adminError.status,
+        fullError: adminError
+      })
+      
       // エラーメッセージを日本語化
-      let errorMessage = '管理者登録に失敗しました'
+      let errorMessage = `管理者登録に失敗しました: ${adminError.message}`
       if (adminError.message.includes('User already registered')) {
         errorMessage = 'このメールアドレスは既に登録されています'
       } else if (adminError.message.includes('Password should be at least')) {
@@ -40,6 +58,8 @@ export async function createAdminUser(formData: FormData) {
         errorMessage = '有効なメールアドレスを入力してください'
       } else if (adminError.message.includes('Too many requests')) {
         errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+      } else if (adminError.message.includes('Password')) {
+        errorMessage = `パスワード要件エラー: ${adminError.message}`
       }
       return { error: errorMessage }
     }
