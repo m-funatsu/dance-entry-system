@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import type { EntryFile } from '@/lib/types'
 import Link from 'next/link'
 import MessageAlert from '@/components/MessageAlert'
 import BackgroundLoader from '@/components/BackgroundLoader'
@@ -9,6 +10,7 @@ import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
 import SiteTitle from '@/components/SiteTitle'
 import { StartDateInline } from '@/components/dashboard/StartDateInline'
+import FilePreview from '@/components/FilePreview'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
 export const dynamic = 'force-dynamic'
@@ -180,10 +182,11 @@ export default async function DashboardPage() {
 
   // ファイル情報の取得
   const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0 }
+  let preliminaryVideoFile: EntryFile | null = null
   if (entry) {
     const { data: files } = await supabase
       .from('entry_files')
-      .select('file_type, purpose')
+      .select('*')
       .eq('entry_id', entry.id)
 
     if (files) {
@@ -191,7 +194,10 @@ export default async function DashboardPage() {
         if (file.file_type === 'music') fileStats.music++
         else if (file.file_type === 'video') {
           fileStats.video++
-          if (file.purpose === 'preliminary') fileStats.preliminaryVideo++
+          if (file.purpose === 'preliminary') {
+            fileStats.preliminaryVideo++
+            preliminaryVideoFile = file as EntryFile
+          }
         }
         else if (file.file_type === 'photo') fileStats.photo++
       })
@@ -963,9 +969,17 @@ export default async function DashboardPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">予選提出動画</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {fileStats.video > 0 ? 'アップロード済み' : '未アップロード'}
-                        </p>
+                        <div className="mt-1 text-base text-gray-900">
+                          {preliminaryVideoFile ? (
+                            <FilePreview
+                              filePath={(preliminaryVideoFile as EntryFile).file_path}
+                              fileName={(preliminaryVideoFile as EntryFile).file_name}
+                              fileType="video"
+                            />
+                          ) : (
+                            <span className="text-gray-500">未アップロード</span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">予選 - 振付師1</label>
@@ -1018,7 +1032,17 @@ export default async function DashboardPage() {
                         <div className="space-y-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
-                            <p className="mt-1 text-base text-gray-900">{programInfo?.player_photo_path ? 'アップロード済み' : '未アップロード'}</p>
+                            <div className="mt-1 text-base text-gray-900">
+                              {programInfo?.player_photo_path ? (
+                                <FilePreview
+                                  filePath={programInfo.player_photo_path}
+                                  fileName="選手紹介用画像（準決勝用）"
+                                  fileType="image"
+                                />
+                              ) : (
+                                <span className="text-gray-500">未アップロード</span>
+                              )}
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
@@ -1042,7 +1066,17 @@ export default async function DashboardPage() {
                           <div className="space-y-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
-                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_player_photo_path ? 'アップロード済み' : '未アップロード'}</p>
+                              <div className="mt-1 text-base text-gray-900">
+                                {programInfo?.final_player_photo_path ? (
+                                  <FilePreview
+                                    filePath={programInfo.final_player_photo_path}
+                                    fileName="選手紹介用画像（決勝用）"
+                                    fileType="image"
+                                  />
+                                ) : (
+                                  <span className="text-gray-500">未アップロード</span>
+                                )}
+                              </div>
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
@@ -1224,15 +1258,31 @@ export default async function DashboardPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-500">練習動画(約30秒)横長動画</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {snsInfo?.practice_video_path ? 'アップロード済み' : '未設定'}
-                      </p>
+                      <div className="mt-1 text-base text-gray-900">
+                        {snsInfo?.practice_video_path ? (
+                          <FilePreview
+                            filePath={snsInfo.practice_video_path}
+                            fileName="練習動画(約30秒)横長動画"
+                            fileType="video"
+                          />
+                        ) : (
+                          <span className="text-gray-500">未設定</span>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-500">選手紹介・見所（30秒）</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {snsInfo?.introduction_highlight_path ? 'アップロード済み' : '未設定'}
-                      </p>
+                      <div className="mt-1 text-base text-gray-900">
+                        {snsInfo?.introduction_highlight_path ? (
+                          <FilePreview
+                            filePath={snsInfo.introduction_highlight_path}
+                            fileName="選手紹介・見所（30秒）"
+                            fileType="video"
+                          />
+                        ) : (
+                          <span className="text-gray-500">未設定</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
