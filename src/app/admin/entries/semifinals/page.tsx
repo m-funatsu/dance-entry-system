@@ -126,7 +126,7 @@ export default async function SemifinalsInfoListPage() {
     switch (code) {
       case 'required': return '必要'
       case 'not_required': return '不要'
-      case 'included': return '必要'
+      case 'included': return '自作曲に組み込み'
       default: return code || '未入力'
     }
   }
