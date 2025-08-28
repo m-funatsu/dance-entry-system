@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { FormField, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
 import { useFormValidation, useFileUploadV2 } from '@/hooks'
+import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkProgramInfoCompletion } from '@/lib/status-utils'
 import type { Entry, ProgramInfo } from '@/lib/types'
 import { logger } from '@/lib/logger'
@@ -15,6 +16,7 @@ interface ProgramInfoFormProps {
 
 export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   const supabase = createClient()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
@@ -225,7 +227,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         return newUrls
       })
       
-      alert('画像を削除しました')
+      showToast('画像を削除しました', 'success')
     } catch (err) {
       logger.error(`Exception deleting image ${field}`, err)
       setError('画像の削除に失敗しました')
@@ -305,13 +307,15 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       const isComplete = checkProgramInfoCompletion(programInfo)
       await updateFormStatus('program_info', entry.id, isComplete)
 
-      // ポップアップで保存成功メッセージを表示
-      alert('プログラム掲載用情報を保存しました')
+      // Toast通知で保存成功メッセージを表示（決勝情報と同じ方式）
+      showToast('プログラム掲載用情報を保存しました', 'success')
       
-      console.log('🎉 [PROGRAM INFO] 成功ポップアップ表示完了 - リロード実行')
+      console.log('🎉 [PROGRAM INFO] 成功Toast表示完了 - 1.5秒後にリロード')
       
-      // すぐにリロード
-      window.location.reload()
+      // 1.5秒後にリロード（決勝情報と同じタイミング）
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
 
     } catch (err) {
       console.error('💥 [PROGRAM INFO] 保存で予期しないエラー:', err)
