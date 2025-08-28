@@ -112,7 +112,6 @@ export default async function DashboardPage() {
 
   // SNS情報の取得
   let snsInfo = null
-  let snsVideoFiles = 0
   let practiceVideo: EntryFile | null = null
   let introductionVideo: EntryFile | null = null
   if (entry) {
@@ -141,7 +140,6 @@ export default async function DashboardPage() {
     }
     
     if (snsFiles) {
-      snsVideoFiles = snsFiles.length
       practiceVideo = (snsFiles.find(file => file.purpose === 'sns_practice_video') as EntryFile) || null
       introductionVideo = (snsFiles.find(file => file.purpose === 'sns_introduction_highlight') as EntryFile) || null
     }
@@ -547,19 +545,87 @@ export default async function DashboardPage() {
     return allSectionsValid
   }
 
-  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null, videoFileCount: number) => {
-    // SNS情報が登録されていて、かつ動画ファイルが2つ（練習風景と選手紹介）存在する場合のみ完了とする
-    if (!snsInfo) return false
-    if (videoFileCount < 2) return false
+  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null, practiceVideo: EntryFile | null, introductionVideo: EntryFile | null) => {
+    console.log('[DASHBOARD SNS CHECK] === SNS情報完了チェック（ダッシュボード）===')
+    console.log('[DASHBOARD SNS CHECK] snsInfo:', !!snsInfo)
+    console.log('[DASHBOARD SNS CHECK] 練習動画:', !!practiceVideo)
+    console.log('[DASHBOARD SNS CHECK] 紹介動画:', !!introductionVideo)
     
-    // sns_infoテーブルにレコードがあり、動画ファイルが2つある場合は完了
-    return true
+    // SNSInfoForm.tsxの必須項目と完全一致：
+    // - 練習動画（約30秒）横長動画（*必須）
+    // - 選手紹介・見どころ（30秒）（*必須）
+    const hasPracticeVideo = !!practiceVideo
+    const hasIntroductionVideo = !!introductionVideo
+    
+    const result = hasPracticeVideo && hasIntroductionVideo
+    
+    console.log('[DASHBOARD SNS CHECK] === チェック結果まとめ ===')
+    console.log('[DASHBOARD SNS CHECK] 練習動画（必須）:', hasPracticeVideo)
+    console.log('[DASHBOARD SNS CHECK] 紹介動画（必須）:', hasIntroductionVideo)
+    console.log('[DASHBOARD SNS CHECK] 最終完了判定:', result)
+    console.log('[DASHBOARD SNS CHECK] === SNS情報完了チェック終了（ダッシュボード）===')
+    
+    return result
   }
 
   // 各種申請の完了判定関数
   const checkApplicationsInfoComplete = (applicationsInfo: { [key: string]: unknown } | null) => {
-    // applications_infoテーブルにレコードが存在すれば申請済みとする
-    return !!applicationsInfo
+    console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック（ダッシュボード）===')
+    console.log('[DASHBOARD APPLICATIONS CHECK] applicationsInfo:', !!applicationsInfo)
+    
+    if (!applicationsInfo) {
+      console.log('[DASHBOARD APPLICATIONS CHECK] applications_infoなし: true（申請なしでも完了とみなす）')
+      console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
+      return true
+    }
+    
+    // ApplicationsForm.tsxの必須項目と完全一致：
+    // - メイク申請をする場合のみ条件付き必須項目がある
+    let hasRequiredIssues = false
+    const missingFields: string[] = []
+    
+    // メイク申請（準決勝）の条件付き必須チェック
+    const hasMakeupApplication = !!(
+      applicationsInfo.makeup_name ||
+      applicationsInfo.makeup_email ||
+      applicationsInfo.makeup_phone ||
+      applicationsInfo.makeup_preferred_stylist ||
+      applicationsInfo.makeup_notes
+    )
+    
+    console.log('[DASHBOARD APPLICATIONS CHECK] メイク申請（準決勝）の入力:', hasMakeupApplication)
+    
+    if (hasMakeupApplication) {
+      console.log('[DASHBOARD APPLICATIONS CHECK] === メイク申請（準決勝）必須項目チェック ===')
+      
+      const makeupRequiredFields = [
+        'makeup_name',     // 申請者氏名（*必須）
+        'makeup_email',    // メールアドレス（*必須）
+        'makeup_phone'     // ご連絡先電話番号（*必須）
+      ]
+      
+      makeupRequiredFields.forEach(field => {
+        const value = applicationsInfo[field]
+        const isValid = !!(value && value.toString().trim() !== '')
+        console.log(`[DASHBOARD APPLICATIONS CHECK] ${field}: "${value}" -> ${isValid}`)
+        
+        if (!isValid) {
+          hasRequiredIssues = true
+          missingFields.push(field)
+        }
+      })
+    }
+    
+    const result = !hasRequiredIssues
+    
+    console.log('[DASHBOARD APPLICATIONS CHECK] === チェック結果まとめ ===')
+    console.log('[DASHBOARD APPLICATIONS CHECK] メイク申請入力:', hasMakeupApplication)
+    console.log('[DASHBOARD APPLICATIONS CHECK] 必須項目問題:', hasRequiredIssues)
+    console.log('[DASHBOARD APPLICATIONS CHECK] 未入力フィールド:', missingFields)
+    console.log('[DASHBOARD APPLICATIONS CHECK] 最終完了判定:', result)
+    console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
+    
+    return result
   }
 
 
@@ -1016,7 +1082,7 @@ export default async function DashboardPage() {
                         SNS情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkSnsInfoComplete(snsInfo, snsVideoFiles) ? '登録済み' : '未登録'}
+                        {checkSnsInfoComplete(snsInfo, practiceVideo, introductionVideo) ? '登録済み' : '未登録'}
                       </dd>
                       <StartDateInline section="sns" />
                       {(() => {
@@ -1067,7 +1133,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請済み' : '申請可能'}
+                        {checkApplicationsInfoComplete(applicationsInfo) ? '登録済み' : applicationsInfo ? '入力中' : '未登録'}
                       </dd>
                       <StartDateInline section="optional_request" />
                       {(() => {
@@ -1094,7 +1160,7 @@ export default async function DashboardPage() {
                 <div className="text-sm">
                   <EditButton href="/dashboard/applications">
                     {isFormEditable('optional_request_deadline')
-                      ? (checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請')
+                      ? (applicationsInfo ? '編集' : '登録')
                       : '確認（編集不可）'
                     } →
                   </EditButton>

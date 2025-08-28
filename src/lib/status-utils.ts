@@ -573,12 +573,107 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
 
 /**
  * SNS情報フォームの完了状況をチェック
+ * SNSInfoForm.tsxの必須項目と完全一致：
+ * - 練習動画（約30秒）横長動画（*必須）
+ * - 選手紹介・見どころ（30秒）（*必須）
  */
 export function checkSnsInfoCompletion(
   formData: Record<string, unknown>,
   hasPracticeVideo: boolean,
   hasIntroductionVideo: boolean
 ): boolean {
-  // SNS情報は動画のアップロードが主要な要素
-  return hasPracticeVideo && hasIntroductionVideo
+  console.log(`[SNS INFO CHECK] === SNS情報完了チェック開始 ===`)
+  console.log(`[SNS INFO CHECK] 受信したformData:`, formData)
+  console.log(`[SNS INFO CHECK] 練習動画存在: ${hasPracticeVideo}`)
+  console.log(`[SNS INFO CHECK] 紹介動画存在: ${hasIntroductionVideo}`)
+  
+  // SNS情報フォームでは動画アップロードが必須項目
+  const result = hasPracticeVideo && hasIntroductionVideo
+  
+  console.log(`[SNS INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[SNS INFO CHECK] 練習動画（必須）: ${hasPracticeVideo}`)
+  console.log(`[SNS INFO CHECK] 紹介動画（必須）: ${hasIntroductionVideo}`)
+  console.log(`[SNS INFO CHECK] 最終完了判定: ${result}`)
+  console.log(`[SNS INFO CHECK] === SNS情報完了チェック終了 ===`)
+  
+  return result
+}
+
+/**
+ * 申請情報フォームの完了状況をチェック
+ * ApplicationsForm.tsxの必須項目と完全一致：
+ * - 関係者チケット申請: 任意（申請がある場合は関係性と氏名が必要）
+ * - 選手同伴申請: 任意（申請がある場合は氏名が必要）
+ * - メイク・ヘアメイク申請（準決勝）: 条件付き必須
+ *   - 申請者氏名（*必須 - メイク申請をする場合）
+ *   - メールアドレス（*必須 - メイク申請をする場合）
+ *   - ご連絡先電話番号（*必須 - メイク申請をする場合）
+ * - 払込用紙: 条件付き必須（チケットや同伴申請がある場合）
+ */
+export function checkApplicationsInfoCompletion(
+  formData: Record<string, unknown>
+): boolean {
+  console.log(`[APPLICATIONS INFO CHECK] === 申請情報完了チェック開始 ===`)
+  console.log(`[APPLICATIONS INFO CHECK] 受信したformData:`, formData)
+  
+  // 申請情報フォームは基本的に全て任意項目
+  // ただし、メイク申請をする場合は準決勝用の必須項目がある
+  let hasRequiredIssues = false
+  const missingFields: string[] = []
+  
+  // メイク申請（準決勝）の条件付き必須チェック
+  const hasMakeupApplication = !!(
+    formData.makeup_name ||
+    formData.makeup_email ||
+    formData.makeup_phone ||
+    formData.makeup_preferred_stylist ||
+    formData.makeup_notes
+  )
+  
+  console.log(`[APPLICATIONS INFO CHECK] メイク申請（準決勝）の入力: ${hasMakeupApplication}`)
+  
+  if (hasMakeupApplication) {
+    console.log(`[APPLICATIONS INFO CHECK] === メイク申請（準決勝）必須項目チェック ===`)
+    
+    const makeupRequiredFields = [
+      'makeup_name',     // 申請者氏名（*必須）
+      'makeup_email',    // メールアドレス（*必須）
+      'makeup_phone'     // ご連絡先電話番号（*必須）
+    ]
+    
+    makeupRequiredFields.forEach(field => {
+      const value = formData[field]
+      const isValid = !!(value && value.toString().trim() !== '')
+      console.log(`[APPLICATIONS INFO CHECK] ${field}: "${value}" -> ${isValid}`)
+      
+      if (!isValid) {
+        hasRequiredIssues = true
+        missingFields.push(field)
+      }
+    })
+  }
+  
+  // 関係者チケットや同伴申請がある場合の払込用紙チェック
+  // （これは完了判定には含めないが、ログに記録）
+  const hasTicketApplications = !!(
+    formData.related1_name || formData.related2_name || formData.related3_name ||
+    formData.related4_name || formData.related5_name
+  )
+  const hasCompanionApplications = !!(
+    formData.companion1_name || formData.companion2_name || formData.companion3_name
+  )
+  
+  console.log(`[APPLICATIONS INFO CHECK] 関係者チケット申請: ${hasTicketApplications}`)
+  console.log(`[APPLICATIONS INFO CHECK] 同伴申請: ${hasCompanionApplications}`)
+  
+  const result = !hasRequiredIssues
+  
+  console.log(`[APPLICATIONS INFO CHECK] === チェック結果まとめ ===`)
+  console.log(`[APPLICATIONS INFO CHECK] メイク申請入力: ${hasMakeupApplication}`)
+  console.log(`[APPLICATIONS INFO CHECK] 必須項目問題: ${hasRequiredIssues}`)
+  console.log(`[APPLICATIONS INFO CHECK] 未入力フィールド:`, missingFields)
+  console.log(`[APPLICATIONS INFO CHECK] 最終完了判定: ${result}`)
+  console.log(`[APPLICATIONS INFO CHECK] === 申請情報完了チェック終了 ===`)
+  
+  return result
 }

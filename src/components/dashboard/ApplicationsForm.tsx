@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 // import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { updateFormStatus, checkApplicationsInfoCompletion } from '@/lib/status-utils'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { FileUploadField } from '@/components/ui/FileUploadField'
@@ -337,6 +338,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
         }
       }
 
+      // 申請情報の完了判定とステータス更新
+      const isComplete = checkApplicationsInfoCompletion(applicationsInfo)
+      await updateFormStatus('applications_info', entry.id, isComplete, true)
 
       setSuccess('各種申請情報を保存しました')
       setTimeout(() => {
