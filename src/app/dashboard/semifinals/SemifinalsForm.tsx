@@ -740,7 +740,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
 
   return (
     <div className="space-y-6">
-      <DeadlineNoticeAsync deadlineKey="semifinals_deadline" />
+      {isEditable && <DeadlineNoticeAsync deadlineKey="semifinals_deadline" />}
       
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}

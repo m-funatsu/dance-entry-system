@@ -337,7 +337,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900">プログラム掲載用情報</h3>
 
-      <DeadlineNoticeAsync deadlineKey="program_info_deadline" />
+      {isEditable && <DeadlineNoticeAsync deadlineKey="program_info_deadline" />}
 
       {error && <Alert type="error" message={error} />}
 

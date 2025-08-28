@@ -636,7 +636,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
 
-      <DeadlineNoticeAsync deadlineKey="basic_info_deadline" />
+      {isEditable && <DeadlineNoticeAsync deadlineKey="basic_info_deadline" />}
 
       {/* 2025年大会概要 */}
       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">

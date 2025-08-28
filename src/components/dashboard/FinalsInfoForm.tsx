@@ -719,7 +719,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       {/* 入力開始日後のみフォーム表示 */}
       {isStartDateAvailable && (
         <>
-          <DeadlineNoticeAsync deadlineKey="finals_deadline" />
+          {isEditable && <DeadlineNoticeAsync deadlineKey="finals_deadline" />}
 
           {error && <Alert type="error" message={error} />}
           {success && <Alert type="success" message={success} />}

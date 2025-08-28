@@ -29,7 +29,7 @@ export default async function SemifinalsPage() {
   const entry = entries && entries.length > 0 ? entries[0] : null
 
   // 期限チェック
-  const musicInfoEditable = await isFormEditable('music_info_deadline')
+  const semifinalsEditable = await isFormEditable('semifinals_deadline')
   
   // 期限情報を取得（エラーメッセージ用）
   const supabase2 = await createClient()
@@ -38,7 +38,7 @@ export default async function SemifinalsPage() {
     acc[setting.key] = setting.value
     return acc
   }, {} as Record<string, string>) || {}
-  const deadlineInfo = await getDeadlineInfo(settingsMap['music_info_deadline'])
+  const deadlineInfo = await getDeadlineInfo(settingsMap['semifinals_deadline'])
 
   if (!entry) {
     return (
@@ -85,7 +85,7 @@ export default async function SemifinalsPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              {!musicInfoEditable && (
+              {!semifinalsEditable && (
                 <div className="mb-6">
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <h3 className="text-sm font-medium text-red-800 mb-1">入力期限切れ</h3>
@@ -95,7 +95,7 @@ export default async function SemifinalsPage() {
                   </div>
                 </div>
               )}
-              <SemifinalsForm userId={user.id} entry={entry} isEditable={musicInfoEditable} />
+              <SemifinalsForm userId={user.id} entry={entry} isEditable={semifinalsEditable} />
             </div>
           </div>
         </div>

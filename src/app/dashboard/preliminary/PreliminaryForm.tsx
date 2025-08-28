@@ -379,7 +379,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
 
-      <DeadlineNoticeAsync deadlineKey="music_info_deadline" />
+      {isEditable && <DeadlineNoticeAsync deadlineKey="music_info_deadline" />}
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">

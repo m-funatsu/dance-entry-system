@@ -648,7 +648,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
       <h3 className="text-lg font-semibold text-gray-900">各種申請</h3>
 
       <StartDateNotice section="optional_request" />
-      <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />
+      {isEditable && <DeadlineNoticeAsync deadlineKey="optional_request_deadline" />}
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">

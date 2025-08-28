@@ -343,7 +343,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
           {error && <Alert type="error" message={error} />}
           {success && <Alert type="success" message={success} />}
 
-          <DeadlineNoticeAsync deadlineKey="sns_deadline" />
+          {isEditable && <DeadlineNoticeAsync deadlineKey="sns_deadline" />}
 
           <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
