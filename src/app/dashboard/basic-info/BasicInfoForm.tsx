@@ -852,12 +852,6 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   return
                 }
                 
-                if (!entryId) {
-                  console.error('[BANK SLIP UPLOAD] entryIdが存在しません')
-                  showToast('基本情報を先に保存してください', 'error')
-                  return
-                }
-                
                 // ファイルアップロード前に一時保存を実行（リダイレクトなし）
                 console.log('[BANK SLIP UPLOAD] === 一時保存実行開始 ===')
                 let useEntryId = entryId
