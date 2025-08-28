@@ -88,7 +88,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
   // 独自の状態管理（useFormSaveの代わり）
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   // ファイルアップロードフック
   const { uploadImage, uploading } = useFileUploadV2({
@@ -226,7 +225,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
         return newUrls
       })
       
-      setSuccess('画像を削除しました')
+      alert('画像を削除しました')
     } catch (err) {
       logger.error(`Exception deleting image ${field}`, err)
       setError('画像の削除に失敗しました')
@@ -235,7 +234,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
   const handleSave = async () => {
     setError(null)
-    setSuccess(null)
     setSaving(true)
 
     try {
@@ -307,16 +305,13 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       const isComplete = checkProgramInfoCompletion(programInfo)
       await updateFormStatus('program_info', entry.id, isComplete)
 
-      // 保存成功メッセージを設定
-      setSuccess('プログラム情報を保存しました')
+      // ポップアップで保存成功メッセージを表示
+      alert('プログラム掲載用情報を保存しました')
       
-      console.log('🎉 [PROGRAM INFO] 成功メッセージ設定完了 - 3秒後にリロード')
+      console.log('🎉 [PROGRAM INFO] 成功ポップアップ表示完了 - リロード実行')
       
-      // 成功メッセージを3秒間表示してからリロード
-      setTimeout(() => {
-        console.log('🔄 [PROGRAM INFO] ページリロード実行')
-        window.location.reload()
-      }, 3000)
+      // すぐにリロード
+      window.location.reload()
 
     } catch (err) {
       console.error('💥 [PROGRAM INFO] 保存で予期しないエラー:', err)
@@ -338,7 +333,6 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       <DeadlineNoticeAsync deadlineKey="program_info_deadline" />
 
       {error && <Alert type="error" message={error} />}
-      {success && <Alert type="success" message={success} />}
 
       <div className="space-y-4">
         {/* 楽曲数 */}
