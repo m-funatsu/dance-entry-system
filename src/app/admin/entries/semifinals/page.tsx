@@ -200,7 +200,9 @@ export default async function SemifinalsInfoListPage() {
               // 小道具情報
               `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
               // 振込確認
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
+              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => 
+                file.purpose === 'bank_slip' || (file.purpose && file.purpose.includes('payment_confirmation'))
+              ).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 賞金振込先情報
               `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
               // 選考ステータス
@@ -694,7 +696,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')
+                          file.purpose === 'bank_slip' || (file.purpose && file.purpose.includes('payment_confirmation'))
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -703,12 +705,12 @@ export default async function SemifinalsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              📄 {file.file_name}
+                              {file.file_type === 'pdf' ? '📄' : '🖼️'} {file.file_name}
                             </a>
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'pdf' && file.purpose && file.purpose.includes('payment_confirmation')
+                          file.purpose === 'bank_slip' || (file.purpose && file.purpose.includes('payment_confirmation'))
                         )) && (
                           <span className="text-xs text-gray-400">振込確認書なし</span>
                         )}
