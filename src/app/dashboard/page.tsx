@@ -512,15 +512,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('basic_info_deadline') ? (
-                    <EditButton href="/dashboard/basic-info">
-                      {basicInfo ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/basic-info">
+                    {isFormEditable('basic_info_deadline') 
+                      ? (basicInfo ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>

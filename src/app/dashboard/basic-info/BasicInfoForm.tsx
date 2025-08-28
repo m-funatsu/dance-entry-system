@@ -1003,7 +1003,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
               accept="image/jpeg,image/jpg,image/png,image/gif"
               maxSizeMB={10}
               required
-              disabled={!!bankSlipFile}
+              disabled={!!bankSlipFile || !isEditable}
               placeholder={{
                 title: bankSlipFile ? "既にアップロード済みです" : "振込確認用紙をアップロード",
                 formats: "JPG, PNG, GIF など（最大10MB、1件まで）"
@@ -1037,6 +1037,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                   </div>
                   <button
                     type="button"
+                    disabled={!isEditable}
                     onClick={async () => {
                       console.log('[BANK SLIP DELETE] === 振込確認用紙削除開始 ===')
                       if (!window.confirm('振込確認用紙を削除してもよろしいですか？')) {
@@ -1072,7 +1073,11 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                         showToast('振込確認用紙の削除に失敗しました', 'error')
                       }
                     }}
-                    className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                    className={`px-3 py-1 text-xs rounded ${
+                      !isEditable 
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    }`}
                   >
                     削除
                   </button>

@@ -51,13 +51,6 @@ export default async function BasicInfoPage() {
   }, {} as Record<string, string>) || {}
   const deadlineInfo = await getDeadlineInfo(settingsMap['basic_info_deadline'])
   
-  // デバッグ情報
-  console.log('=== 基本情報期限デバッグ ===')
-  console.log('現在日時:', new Date().toISOString())
-  console.log('設定された期限:', settingsMap['basic_info_deadline'])
-  console.log('期限情報:', deadlineInfo)
-  console.log('編集可能:', basicInfoEditable)
-  console.log('=========================')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,17 +65,6 @@ export default async function BasicInfoPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* デバッグ情報 */}
-          <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 className="font-medium text-yellow-800">デバッグ情報</h4>
-            <div className="text-sm text-yellow-700 space-y-1">
-              <p>現在日時: {new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</p>
-              <p>設定された期限: {settingsMap['basic_info_deadline'] || '未設定'}</p>
-              <p>期限日時: {deadlineInfo?.date || '無効'}</p>
-              <p>期限切れ: {deadlineInfo?.isExpired ? 'はい' : 'いいえ'}</p>
-              <p>編集可能: {basicInfoEditable ? 'はい' : 'いいえ'}</p>
-            </div>
-          </div>
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               {!basicInfoEditable && (
