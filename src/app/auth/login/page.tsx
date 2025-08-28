@@ -15,22 +15,18 @@ export default function LoginPage() {
   const [submitCount, setSubmitCount] = useState(0)
   const supabase = createClient()
 
-  // URLパラメータからメッセージを取得（window.location.searchを直接使用）
+  // URLパラメータからメッセージを取得
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
       const message = urlParams.get('message')
-      console.log('🔍 [LOGIN] URLパラメータ確認:', { message, url: window.location.href })
       if (message) {
         const decodedMessage = decodeURIComponent(message)
-        console.log('✅ [LOGIN] メッセージ設定:', decodedMessage)
         setSuccessMessage(decodedMessage)
         
         // URLからパラメータを削除（履歴汚染を避ける）
         const newUrl = window.location.origin + window.location.pathname
         window.history.replaceState({}, '', newUrl)
-      } else {
-        console.log('❌ [LOGIN] メッセージなし')
       }
     }
   }, [])
@@ -241,11 +237,6 @@ export default function LoginPage() {
               {successMessage}
             </div>
           )}
-          
-          {/* デバッグ用: successMessageの状態確認 */}
-          <div className="text-xs text-gray-400 text-center">
-            DEBUG: successMessage = &quot;{successMessage || 'なし'}&quot;
-          </div>
 
           {error && (
             <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-md p-3">
