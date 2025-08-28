@@ -23,7 +23,6 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('ApplicationsForm isEditable:', isEditable)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -750,6 +749,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       setApplicationsInfo(prev => ({ ...prev, [`related${num}_relationship`]: e.target.value }))
                       setTimeout(calculateTicketTotal, 0)
                     }}
+                    disabled={!isEditable}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   >
                     <option value="">選択してください</option>
@@ -770,6 +770,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       setApplicationsInfo(prev => ({ ...prev, [`related${num}_name`]: e.target.value }))
                       setTimeout(calculateTicketTotal, 0)
                     }}
+                    disabled={!isEditable}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
@@ -782,6 +783,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="text"
                     value={applicationsInfo[`related${num}_furigana` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`related${num}_furigana`]: e.target.value }))}
+                    disabled={!isEditable}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
@@ -840,6 +842,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="text"
                     value={applicationsInfo[`companion${num}_name` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_name`]: e.target.value }))}
+                    disabled={!isEditable}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
@@ -852,6 +855,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="text"
                     value={applicationsInfo[`companion${num}_furigana` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_furigana`]: e.target.value }))}
+                    disabled={!isEditable}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
@@ -864,6 +868,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="text"
                     value={applicationsInfo[`companion${num}_purpose` as keyof ApplicationsInfo] as string || ''}
                     onChange={(e) => setApplicationsInfo(prev => ({ ...prev, [`companion${num}_purpose`]: e.target.value }))}
+                    disabled={!isEditable}
                     placeholder="例：付き添い、撮影、介助など"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                   />
@@ -914,6 +919,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 type="text"
                 value={applicationsInfo.makeup_preferred_stylist || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist: e.target.value }))}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="希望がある場合は美容師名を入力してください"
               />
@@ -958,6 +964,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   }))
                 }
               }}
+              disabled={!isEditable}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               required
             >
@@ -981,6 +988,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               type="email"
               value={applicationsInfo.makeup_email || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email: e.target.value }))}
+              disabled={!isEditable}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="example@email.com"
               required
@@ -995,6 +1003,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               type="tel"
               value={applicationsInfo.makeup_phone || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone: e.target.value }))}
+              disabled={!isEditable}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="例: 090-1234-5678"
               required
@@ -1020,7 +1029,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   <button
                     type="button"
                     onClick={() => handleMakeupStyleDelete(1, false)}
-                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                    disabled={!isEditable}
+                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     画像を削除
                   </button>
@@ -1068,7 +1078,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   <button
                     type="button"
                     onClick={() => handleMakeupStyleDelete(2, false)}
-                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                    disabled={!isEditable}
+                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     画像を削除
                   </button>
@@ -1107,6 +1118,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 value={applicationsInfo.makeup_notes || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes: e.target.value }))}
                 rows={3}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="その他、ご要望や注意事項があればご記入ください"
               />
@@ -1126,6 +1138,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 type="text"
                 value={applicationsInfo.makeup_preferred_stylist_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_preferred_stylist_final: e.target.value }))}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="希望がある場合は美容師名を入力してください"
               />
@@ -1164,6 +1177,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     }))
                   }
                 }}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               >
                 <option value="">選択してください</option>
@@ -1186,6 +1200,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 type="email"
                 value={applicationsInfo.makeup_email_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_email_final: e.target.value }))}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="example@email.com"
               />
@@ -1199,6 +1214,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 type="tel"
                 value={applicationsInfo.makeup_phone_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_phone_final: e.target.value }))}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="090-1234-5678"
               />
@@ -1223,7 +1239,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     <button
                       type="button"
                       onClick={() => handleMakeupStyleDelete(1, true)}
-                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                      disabled={!isEditable}
+                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       画像を削除
                     </button>
@@ -1240,7 +1257,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                           e.target.value = ''
                         }
                       }}
-                      disabled={uploadingMakeupFile}
+                      disabled={uploadingMakeupFile || !isEditable}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                     />
                     {uploadingMakeupFile && (
@@ -1271,7 +1288,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     <button
                       type="button"
                       onClick={() => handleMakeupStyleDelete(2, true)}
-                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800"
+                      disabled={!isEditable}
+                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       画像を削除
                     </button>
@@ -1288,7 +1306,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                           e.target.value = ''
                         }
                       }}
-                      disabled={uploadingMakeupFile}
+                      disabled={uploadingMakeupFile || !isEditable}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                     />
                     {uploadingMakeupFile && (
@@ -1310,6 +1328,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 value={applicationsInfo.makeup_notes_final || ''}
                 onChange={(e) => setApplicationsInfo(prev => ({ ...prev, makeup_notes_final: e.target.value }))}
                 rows={3}
+                disabled={!isEditable}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
                 placeholder="その他、ご要望や注意事項があればご記入ください"
               />
@@ -1352,7 +1371,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
               maxSizeMB={10}
               onChange={handleFileUpload}
-              disabled={uploadingFile}
+              disabled={uploadingFile || !isEditable}
               placeholder={{
                 title: "払込用紙をアップロード",
                 subtitle: "複数枚の画像やPDFをアップロード可能",
@@ -1425,7 +1444,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       {/* 削除ボタン */}
                       <button
                         onClick={() => handleFileDelete(file.id)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                        disabled={!isEditable}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="削除"
                       >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1447,6 +1467,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               value={applicationsInfo.applications_notes || ''}
               onChange={(e) => setApplicationsInfo(prev => ({ ...prev, applications_notes: e.target.value }))}
               rows={3}
+              disabled={!isEditable}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900"
               placeholder="その他、申請に関する注意事項や要望があれば記入してください"
             />
@@ -1459,7 +1480,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
       <div className="flex justify-end pt-6">
         <button
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || !isEditable}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
         >
           {saving ? '保存中...' : '保存'}

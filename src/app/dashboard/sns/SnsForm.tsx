@@ -24,7 +24,6 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('SNSForm isEditable:', isEditable)
   
   // 入力開始日制御
@@ -418,7 +417,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                   <button
                     type="button"
                     onClick={() => handleFileDelete('practice_video')}
-                    disabled={uploading}
+                    disabled={uploading || !isEditable}
                     className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -457,7 +456,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 value={null}
                 onChange={(file) => handleFileUpload('practice_video', file)}
                 category="video"
-                disabled={uploading || !!practiceVideoFile || !entry}
+                disabled={uploading || !!practiceVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={50}
                 accept="video/*"
@@ -531,7 +530,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                   <button
                     type="button"
                     onClick={() => handleFileDelete('introduction_highlight')}
-                    disabled={uploading}
+                    disabled={uploading || !isEditable}
                     className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -570,7 +569,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 value={null}
                 onChange={(file) => handleFileUpload('introduction_highlight', file)}
                 category="video"
-                disabled={uploading || !!introVideoFile || !entry}
+                disabled={uploading || !!introVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={50}
                 accept="video/*"
@@ -590,6 +589,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
           type="textarea"
           value={formData.sns_notes || ''}
           onChange={(e) => handleFieldChange('sns_notes', e.target.value)}
+          disabled={!isEditable}
           rows={4}
           placeholder="SNS掲載に関する希望や注意事項があれば記入してください"
         />
@@ -612,7 +612,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
         <div className="flex justify-end pt-6">
           <SaveButton
             onClick={handleSave}
-            disabled={saving || uploading || !entry}
+            disabled={saving || uploading || !entry || !isEditable}
             loading={saving}
           />
         </div>

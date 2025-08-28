@@ -20,7 +20,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('ProgramInfoForm isEditable:', isEditable)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
@@ -350,6 +349,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
           type="select"
           value={programInfo.song_count || '1曲'}
           onChange={(e) => handleFieldChange('song_count', e.target.value)}
+          disabled={!isEditable}
         >
           <option value="1曲">1曲（準決勝と決勝で同じ楽曲を使用する）</option>
           <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
@@ -368,6 +368,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             name="affiliation"
             value={programInfo.affiliation || ''}
             onChange={(e) => handleFieldChange('affiliation', e.target.value)}
+            disabled={!isEditable}
           />
 
           {/* 選手紹介用画像 */}
@@ -379,7 +380,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               onChange={(file) => handleImageUpload('player_photo_path', file)}
               onDelete={() => handleImageDelete('player_photo_path')}
               category="image"
-              disabled={uploading}
+              disabled={uploading || !isEditable}
               maxSizeMB={100}
               accept="image/*"
             />
@@ -407,6 +408,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             value={programInfo.semifinal_story || ''}
             onChange={(e) => handleFieldChange('semifinal_story', e.target.value)}
             required
+            disabled={!isEditable}
             maxLength={100}
             rows={3}
             error={errors.semifinal_story}
@@ -420,6 +422,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             value={programInfo.semifinal_highlight || ''}
             onChange={(e) => handleFieldChange('semifinal_highlight', e.target.value)}
             required
+            disabled={!isEditable}
             maxLength={50}
             rows={2}
             error={errors.semifinal_highlight}
@@ -438,6 +441,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               name="final_affiliation"
               value={programInfo.final_affiliation || ''}
               onChange={(e) => handleFieldChange('final_affiliation', e.target.value)}
+              disabled={!isEditable}
             />
 
             {/* 選手紹介用画像 */}
@@ -449,7 +453,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
                 onChange={(file) => handleImageUpload('final_player_photo_path', file)}
                 onDelete={() => handleImageDelete('final_player_photo_path')}
                 category="image"
-                disabled={uploading}
+                disabled={uploading || !isEditable}
                 maxSizeMB={100}
                 accept="image/*"
               />
@@ -477,6 +481,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               value={programInfo.final_story || ''}
               onChange={(e) => handleFieldChange('final_story', e.target.value)}
               required
+              disabled={!isEditable}
               maxLength={100}
               rows={3}
               error={errors.final_story}
@@ -490,6 +495,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               value={programInfo.final_highlight || ''}
               onChange={(e) => handleFieldChange('final_highlight', e.target.value)}
               required
+              disabled={!isEditable}
               maxLength={50}
               rows={2}
               error={errors.final_highlight}
@@ -506,6 +512,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             type="textarea"
             value={programInfo.notes || ''}
             onChange={(e) => handleFieldChange('notes', e.target.value)}
+            disabled={!isEditable}
             rows={4}
             placeholder="その他の連絡事項があれば記入してください"
           />
@@ -515,7 +522,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
       <div className="flex justify-end">
         <SaveButton
           onClick={handleSave}
-          disabled={saving || uploading}
+          disabled={saving || uploading || !isEditable}
           loading={saving}
         />
       </div>

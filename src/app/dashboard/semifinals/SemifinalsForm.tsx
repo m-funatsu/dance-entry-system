@@ -29,7 +29,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   const { showToast } = useToast()
   const debugLogger = DebugLogger.getInstance()
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('SemifinalsForm isEditable:', isEditable)
   
   // クライアントサイドでのデバッグロガー初期化を確認
@@ -772,6 +771,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
+          isEditable={isEditable}
         />
       )}
 
@@ -783,6 +783,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
+          isEditable={isEditable}
         />
       )}
 
@@ -793,6 +794,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          isEditable={isEditable}
         />
       )}
 
@@ -801,6 +803,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           semifinalsInfo={semifinalsInfo}
           preliminaryInfo={preliminaryInfo}
           onChange={handleFieldChange}
+          isEditable={isEditable}
         />
       )}
 
@@ -809,6 +812,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           semifinalsInfo={semifinalsInfo}
           validationErrors={validationErrors.bank || []}
           onChange={handleFieldChange}
+          isEditable={isEditable}
         />
       )}
 
@@ -821,7 +825,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       <div className="flex justify-end pt-6">
         <SaveButton
             onClick={handleSave}
-            disabled={saving || !entry}
+            disabled={saving || !entry || !isEditable}
             loading={saving}
           />
       </div>

@@ -22,7 +22,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   const supabase = createClient()
   const { showToast } = useToast()
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('PreliminaryForm isEditable:', isEditable)
   
   const [formData, setFormData] = useState({
@@ -402,6 +401,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             value={formData.work_title}
             onChange={(e) => handleFieldChange('work_title', e.target.value)}
             required
+            disabled={!isEditable}
             placeholder="例：情熱のタンゴ"
             error={errors.work_title}
           />
@@ -412,6 +412,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             value={formData.work_title_kana}
             onChange={(e) => handleFieldChange('work_title_kana', e.target.value)}
             required
+            disabled={!isEditable}
             placeholder="例：じょうねつのたんご"
             error={errors.work_title_kana}
           />
@@ -423,6 +424,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             value={formData.work_story}
             onChange={(e) => handleFieldChange('work_story', e.target.value)}
             required
+            disabled={!isEditable}
             maxLength={50}
             rows={2}
             placeholder="作品の概要やキャラクター設定などを簡潔に"
@@ -497,7 +499,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                   <button
                     type="button"
                     onClick={handleFileDelete}
-                    disabled={uploading}
+                    disabled={uploading || !isEditable}
                     className="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -540,7 +542,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               })()}
               onChange={handleFileUpload}
               onDelete={() => handleFileDelete()}
-              disabled={uploading || !!videoFile || !entryId}
+              disabled={uploading || !!videoFile || !entryId || !isEditable}
               required
               maxSizeMB={250}
               accept="video/*"
@@ -567,6 +569,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     checked={formData.music_rights_cleared === 'A'}
                     onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
+                    disabled={!isEditable}
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
                   <span className="ml-2 text-sm text-gray-700">
@@ -581,6 +584,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     checked={formData.music_rights_cleared === 'B'}
                     onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
+                    disabled={!isEditable}
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
                   <span className="ml-2 text-sm text-gray-700">
@@ -595,6 +599,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     checked={formData.music_rights_cleared === 'C'}
                     onChange={(e) => handleFieldChange('music_rights_cleared', e.target.value)}
                     required
+                    disabled={!isEditable}
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                   />
                   <span className="ml-2 text-sm text-gray-700">
@@ -647,6 +652,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               value={formData.music_title}
               onChange={(e) => handleFieldChange('music_title', e.target.value)}
               required
+              disabled={!isEditable}
               placeholder="楽曲名"
               error={errors.music_title}
             />
@@ -656,6 +662,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="cd_title"
               value={formData.cd_title}
               onChange={(e) => handleFieldChange('cd_title', e.target.value)}
+              disabled={!isEditable}
               placeholder="CD/アルバム名"
               error={errors.cd_title}
             />
@@ -665,6 +672,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="artist"
               value={formData.artist}
               onChange={(e) => handleFieldChange('artist', e.target.value)}
+              disabled={!isEditable}
               placeholder="アーティスト名"
               error={errors.artist}
             />
@@ -674,6 +682,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="record_number"
               value={formData.record_number}
               onChange={(e) => handleFieldChange('record_number', e.target.value)}
+              disabled={!isEditable}
               placeholder="例：ABCD-12345"
               error={errors.record_number}
             />
@@ -684,6 +693,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               value={formData.jasrac_code}
               onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
               required={formData.music_rights_cleared === 'A'}
+              disabled={!isEditable}
               placeholder="例：123-4567-8"
               error={errors.jasrac_code}
             />
@@ -695,6 +705,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               value={formData.music_type}
               onChange={(e) => handleFieldChange('music_type', e.target.value)}
               required
+              disabled={!isEditable}
               error={errors.music_type}
             >
               <option value="">選択してください</option>
@@ -736,6 +747,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             value={formData.choreographer1_name}
             onChange={(e) => handleFieldChange('choreographer1_name', e.target.value)}
             required
+            disabled={!isEditable}
             placeholder="例：山田太郎"
             error={errors.choreographer1_name}
           />
@@ -746,6 +758,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             value={formData.choreographer1_furigana}
             onChange={(e) => handleFieldChange('choreographer1_furigana', e.target.value)}
             required
+            disabled={!isEditable}
             placeholder="例：ヤマダタロウ"
             error={errors.choreographer1_furigana}
           />
@@ -755,6 +768,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             name="choreographer2_name"
             value={formData.choreographer2_name}
             onChange={(e) => handleFieldChange('choreographer2_name', e.target.value)}
+            disabled={!isEditable}
             placeholder="例：佐藤花子"
             error={errors.choreographer2_name}
           />
@@ -764,6 +778,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             name="choreographer2_furigana"
             value={formData.choreographer2_furigana}
             onChange={(e) => handleFieldChange('choreographer2_furigana', e.target.value)}
+            disabled={!isEditable}
             placeholder="例：サトウハナコ"
             error={errors.choreographer2_furigana}
           />
@@ -773,7 +788,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       <div className="flex justify-end pt-6">
         <SaveButton
             onClick={handleSave}
-            disabled={saving || uploading}
+            disabled={saving || uploading || !isEditable}
             loading={saving}
           />
       </div>

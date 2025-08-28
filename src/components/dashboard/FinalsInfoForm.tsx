@@ -24,7 +24,6 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   
-  // TODO: isEditableをフォーム項目に適用する予定
   console.log('FinalsInfoForm isEditable:', isEditable)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
@@ -743,6 +742,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
+          isEditable={isEditable}
         />
       )}
 
@@ -756,6 +756,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
+          isEditable={isEditable}
         />
       )}
 
@@ -767,6 +768,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onChange={handleFieldChange}
           onLightingChangeOption={handleLightingChangeOption}
           onFileUpload={handleFileUpload}
+          isEditable={isEditable}
         />
       )}
 
@@ -778,13 +780,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onChange={handleFieldChange}
           onChoreographerChangeOption={handleChoreographerChangeOption}
           onFileUpload={handleFileUpload}
+          isEditable={isEditable}
         />
       )}
 
           <div className="flex justify-end pt-6">
             <SaveButton
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || !isEditable}
               loading={saving}
             />
           </div>
