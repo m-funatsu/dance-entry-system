@@ -1471,7 +1471,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                         className={`absolute top-2 right-2 p-1 rounded-full transition-colors ${
                           !isEditable
                             ? 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-50'
-                            : 'bg-red-500 text-white hover:bg-red-600'
+                            : 'bg-red-500 text-white hover:bg-red-600 cursor-pointer'
                         }`}
                         title="削除"
                       >
