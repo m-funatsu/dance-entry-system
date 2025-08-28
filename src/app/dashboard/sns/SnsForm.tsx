@@ -146,14 +146,18 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     loadData()
   }, [entry?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const saveVideoFileInfo = async (filePath: string, field: 'practice_video' | 'introduction_highlight') => {
+  const saveVideoFileInfo = async (filePath: string, field: 'practice_video' | 'introduction_highlight', originalFileName?: string) => {
     try {
+      // 元のファイル名を使用（提供されない場合はパスから抽出）
+      const fileName = originalFileName || filePath.split('/').pop() || ''
+      console.log('[SNS SAVE VIDEO] 保存ファイル名:', { originalFileName, extractedName: filePath.split('/').pop(), finalFileName: fileName, field })
+      
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
         .insert({
           entry_id: entry?.id,
           file_type: 'video',
-          file_name: filePath.split('/').pop() || '',
+          file_name: fileName, // 元の日本語ファイル名を保持
           file_path: filePath,
           purpose: `sns_${field}`
         })
@@ -191,11 +195,12 @@ export default function SNSForm({ entry, userId }: SNSFormProps) {
     }
 
     try {
+      console.log('[SNS VIDEO UPLOAD] 元のファイル名:', file.name)
       const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
       
       if (result.success && result.path) {
-        // ファイル情報をデータベースに保存
-        await saveVideoFileInfo(result.path, field)
+        // ファイル情報をデータベースに保存（元のファイル名を渡す）
+        await saveVideoFileInfo(result.path, field, file.name)
         
         // 署名付きURLを取得してプレビューを更新
         const { data } = await supabase.storage
