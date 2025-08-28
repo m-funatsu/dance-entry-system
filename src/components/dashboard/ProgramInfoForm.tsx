@@ -42,26 +42,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
         return true
       }
     },
-    semifinal_highlight: { 
-      required: true,
-      maxLength: 50,
-      custom: (value: unknown) => {
-        const strValue = String(value || '').trim()
-        if (!strValue) return 'この項目は必須です'
-        if (strValue.length > 50) return '50文字以内で入力してください'
-        return true
-      }
-    },
-    // 2曲の場合の追加ルール（条件付きで適用）
-    final_player_photo_path: { 
-      required: programInfo.song_count === '2曲',
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲' && !value) {
-          return 'この項目は必須です'
-        }
-        return true
-      }
-    },
     final_story: { 
       required: programInfo.song_count === '2曲',
       maxLength: 100,
@@ -74,18 +54,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
         return true
       }
     },
-    final_highlight: { 
-      required: programInfo.song_count === '2曲',
-      maxLength: 50,
-      custom: (value: unknown) => {
-        if (programInfo.song_count === '2曲') {
-          const strValue = String(value || '').trim()
-          if (!strValue) return 'この項目は必須です'
-          if (strValue.length > 50) return '50文字以内で入力してください'
-        }
-        return true
-      }
-    }
   }
 
   const { errors, validateSingleField } = useFormValidation(programInfo, validationRules)
@@ -129,8 +97,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
       if (data) {
         // 画像フィールドの署名付きURLを取得
         const imageFields = [
-          'player_photo_path',
-          'final_player_photo_path'
+          'player_photo_path'
         ]
         
         const urls: Record<string, string> = {}
@@ -247,7 +214,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
       const imageFields = [
         'player_photo_path',
         'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
-        'final_player_photo_path',
         'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
       ]
       
@@ -414,20 +380,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             error={errors.semifinal_story}
           />
 
-          {/* 見所 */}
-          <FormField
-            label="作品見所（50文字以内）"
-            name="semifinal_highlight"
-            type="textarea"
-            value={programInfo.semifinal_highlight || ''}
-            onChange={(e) => handleFieldChange('semifinal_highlight', e.target.value)}
-            required
-            disabled={!isEditable}
-            maxLength={50}
-            rows={2}
-            error={errors.semifinal_highlight}
-          />
-
         </div>
 
         {/* 決勝用情報（2曲の場合のみ表示） */}
@@ -435,44 +387,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
           <div className="border-t pt-4">
             <h4 className="font-medium mb-3 text-gray-900">決勝用情報</h4>
             
-            {/* 所属教室または所属 */}
-            <FormField
-              label="所属教室または所属（任意）"
-              name="final_affiliation"
-              value={programInfo.final_affiliation || ''}
-              onChange={(e) => handleFieldChange('final_affiliation', e.target.value)}
-              disabled={!isEditable}
-            />
-
-            {/* 選手紹介用画像 */}
-            <div className="mb-4">
-              <FileUploadField
-                label="選手紹介用画像"
-                required
-                value={imageUrls.final_player_photo_path || programInfo.final_player_photo_path}
-                onChange={(file) => handleImageUpload('final_player_photo_path', file)}
-                onDelete={() => handleImageDelete('final_player_photo_path')}
-                category="image"
-                disabled={uploading || !isEditable}
-                maxSizeMB={100}
-                accept="image/*"
-              />
-              {errors.final_player_photo_path && (
-                <p className="mt-1 text-sm text-red-600">{errors.final_player_photo_path}</p>
-              )}
-              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                <p className="text-sm text-blue-800 font-medium mb-2">画像についての要件：</p>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• 必要枚数：1枚</li>
-                  <li>• 服装：大会用衣装または競技衣装</li>
-                  <li>• サイズ：原寸で解像度300～350dpi以上が好ましい</li>
-                  <li>• 背景：正方形サイズに切り抜くので、背景の指定なし</li>
-                  <li>• 向き：二人の顔が正面を向いていること（推奨）</li>
-                  <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
-                </ul>
-              </div>
-            </div>
-
             {/* あらすじ・ストーリー */}
             <FormField
               label="作品あらすじ・ストーリー（100文字以内）"
@@ -485,20 +399,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               maxLength={100}
               rows={3}
               error={errors.final_story}
-            />
-
-            {/* 見所 */}
-            <FormField
-              label="作品見所（50文字以内）"
-              name="final_highlight"
-              type="textarea"
-              value={programInfo.final_highlight || ''}
-              onChange={(e) => handleFieldChange('final_highlight', e.target.value)}
-              required
-              disabled={!isEditable}
-              maxLength={50}
-              rows={2}
-              error={errors.final_highlight}
             />
 
           </div>
