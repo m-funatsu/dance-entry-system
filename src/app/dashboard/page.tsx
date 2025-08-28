@@ -114,23 +114,33 @@ export default async function DashboardPage() {
   let snsInfo = null
   let snsVideoFiles = 0
   if (entry) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sns_info')
       .select('*')
       .eq('entry_id', entry.id)
       .maybeSingle()
     
+    if (error) {
+      console.error('SNS情報取得エラー:', error)
+    }
+    
     snsInfo = data
+    console.log('SNS情報:', snsInfo) // デバッグ用ログ
     
     // SNS動画ファイルの確認
-    const { data: snsFiles } = await supabase
+    const { data: snsFiles, error: filesError } = await supabase
       .from('entry_files')
       .select('*')
       .eq('entry_id', entry.id)
       .in('purpose', ['sns_practice_video', 'sns_introduction_highlight'])
       .eq('file_type', 'video')
     
+    if (filesError) {
+      console.error('SNSファイル取得エラー:', filesError)
+    }
+    
     snsVideoFiles = snsFiles?.length || 0
+    console.log('SNS動画ファイル:', snsFiles) // デバッグ用ログ
   }
 
   // 各種申請情報の取得
