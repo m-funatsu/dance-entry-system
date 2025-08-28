@@ -20,6 +20,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [paymentSlip, setPaymentSlip] = useState<File | null>(null)
   const [paymentSlipUrl, setPaymentSlipUrl] = useState<string>('')
+  const [paymentSlipFileName, setPaymentSlipFileName] = useState<string>('')
   
   // 既存の振込確認用紙を読み込む
   useEffect(() => {
@@ -49,6 +50,9 @@ export const BankSection: React.FC<BankSectionProps> = ({
         if (fileData) {
           console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりました:', fileData.file_name)
           
+          // ファイル名を保存
+          setPaymentSlipFileName(fileData.file_name || '')
+          
           // パブリックURLを生成
           const { data: urlData } = supabase.storage
             .from('files')
@@ -62,6 +66,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
           }
         } else {
           console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりませんでした')
+          setPaymentSlipFileName('')
         }
       } catch (error) {
         console.error('[BANK SECTION LOAD] 振込確認用紙の読み込みエラー:', error)
@@ -151,6 +156,8 @@ export const BankSection: React.FC<BankSectionProps> = ({
         setPaymentSlipUrl(urlData.publicUrl)
       }
 
+      // ファイル名も保存
+      setPaymentSlipFileName(file.name)
       setPaymentSlip(file)
       console.log('[BANK SECTION] === 振込確認用紙アップロード完了 ===')
       
@@ -193,6 +200,29 @@ export const BankSection: React.FC<BankSectionProps> = ({
               formats: "JPEG, JPG, PNG, GIF, PDF"
             }}
           />
+          
+          {/* アップロード済みファイルの詳細表示 */}
+          {paymentSlipUrl && paymentSlipFileName && (
+            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <svg className="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium text-green-800">アップロード済み</span>
+                </div>
+                <a 
+                  href={paymentSlipUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  表示
+                </a>
+              </div>
+              <p className="text-sm text-green-700 mt-1">ファイル名: {paymentSlipFileName}</p>
+            </div>
+          )}
           
           {paymentSlipUrl && (
             <button
@@ -249,6 +279,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
                   // UI状態をクリア
                   setPaymentSlip(null)
                   setPaymentSlipUrl('')
+                  setPaymentSlipFileName('')
                   console.log('[BANK SECTION DELETE] UI状態クリア完了')
                   console.log('[BANK SECTION DELETE] === 振込確認用紙削除完了 ===')
                   
