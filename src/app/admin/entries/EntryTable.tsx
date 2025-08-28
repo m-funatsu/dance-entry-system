@@ -590,7 +590,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
           {/* 危険操作エリア */}
           <div className="mt-3 pt-3 border-t border-indigo-200">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-red-600 font-medium">
+              <span className="text-sm text-red-700 font-semibold">
                 ⚠️ 危険操作: 削除したデータは復元できません
               </span>
               <button
