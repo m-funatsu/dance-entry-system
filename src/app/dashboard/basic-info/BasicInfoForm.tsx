@@ -874,10 +874,18 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                     useEntryId = newEntry.id
                   }
 
-                  // 基本情報を保存
+                  // 基本情報を保存（空文字列をnullに変換）
                   const updatedFormData = { ...formData, ...checkboxes, entry_id: useEntryId }
                   
-                  console.log('[BANK SLIP UPLOAD] 基本情報保存データ:', updatedFormData)
+                  // 日付フィールドの空文字列をnullに変換
+                  Object.keys(updatedFormData).forEach(key => {
+                    const value = updatedFormData[key as keyof typeof updatedFormData]
+                    if (value === '' && (key.includes('date') || key.includes('birthdate') || key.includes('_at'))) {
+                      (updatedFormData as Record<string, unknown>)[key] = null
+                    }
+                  })
+                  
+                  console.log('[BANK SLIP UPLOAD] 基本情報保存データ（処理後）:', updatedFormData)
                   
                   const { data: existingBasicInfo, error: checkError } = await supabase
                     .from('basic_info')
