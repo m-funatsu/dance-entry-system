@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkSemifinalsInfoCompletion } from '@/lib/status-utils'
-import { Alert, TabNavigation, SaveButton } from '@/components/ui'
+import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { DebugLogger } from '@/lib/debug-logger'
@@ -737,6 +737,8 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
 
   return (
     <div className="space-y-6">
+      <DeadlineNoticeAsync deadlineKey="semifinals_deadline" />
+      
       {error && <Alert type="error" message={error} />}
       {success && <Alert type="success" message={success} />}
 
