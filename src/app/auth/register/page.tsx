@@ -271,8 +271,6 @@ export default function RegisterPage() {
               <li>• 大文字を1文字以上</li>
               <li>• 小文字を1文字以上</li>
               <li>• 数字を1文字以上</li>
-              <li>• 連続した数字は避ける（123456など）</li>
-              <li>• よく使われるパスワードは避ける</li>
             </ul>
           </div>
 
