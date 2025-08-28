@@ -127,8 +127,6 @@ export default async function DashboardPage() {
     }
     
     snsInfo = data
-    console.log('SNS情報:', snsInfo) // デバッグ用ログ
-    console.log('Entry ID:', entry.id) // エントリーIDも確認
     
     // SNS動画ファイルの確認
     const { data: snsFiles, error: filesError } = await supabase
@@ -147,9 +145,6 @@ export default async function DashboardPage() {
       practiceVideo = (snsFiles.find(file => file.purpose === 'sns_practice_video') as EntryFile) || null
       introductionVideo = (snsFiles.find(file => file.purpose === 'sns_introduction_highlight') as EntryFile) || null
     }
-    console.log('SNS動画ファイル:', snsFiles) // デバッグ用ログ
-    console.log('練習動画:', practiceVideo) // デバッグ用ログ
-    console.log('紹介動画:', introductionVideo) // デバッグ用ログ
   }
 
   // 各種申請情報の取得
@@ -1280,37 +1275,6 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">SNS情報</h3>
-                  </div>
-                  {/* 全体デバッグ情報 */}
-                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                    <strong>デバッグ情報:</strong><br />
-                    Entry ID: {entry?.id || 'なし'}<br />
-                    SNS Info: {snsInfo ? 'データあり' : 'データなし'}<br />
-                    SNS Video Files: {snsVideoFiles}個<br />
-                    Practice Video: {practiceVideo ? 'ファイルあり' : 'ファイルなし'}<br />
-                    Introduction Video: {introductionVideo ? 'ファイルあり' : 'ファイルなし'}<br />
-                    {snsInfo && (
-                      <>
-                        Practice Video Path (sns_info): {snsInfo.practice_video_path || 'なし'}<br />
-                        Introduction Highlight Path (sns_info): {snsInfo.introduction_highlight_path || 'なし'}<br />
-                        SNS Notes: {snsInfo.sns_notes || 'なし'}<br />
-                        Created At: {snsInfo.created_at || 'なし'}
-                      </>
-                    )}
-                    {practiceVideo && (
-                      <>
-                        <br />Practice Video File Path: {practiceVideo.file_path}<br />
-                        Practice Video File Name: {practiceVideo.file_name}
-                      </>
-                    )}
-                    {introductionVideo && (
-                      <>
-                        <br />Introduction Video File Path: {introductionVideo.file_path}<br />
-                        Introduction Video File Name: {introductionVideo.file_name}
-                      </>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center mb-4">
                     {isFormEditable('sns_deadline') ? (
                       <EditButton href="/dashboard/sns" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
@@ -1325,11 +1289,6 @@ export default async function DashboardPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-500">練習動画(約30秒)横長動画</label>
                       <div className="mt-1 text-base text-gray-900">
-                        {/* デバッグ情報 */}
-                        <div className="mb-2 text-xs text-gray-400">
-                          デバッグ: practiceVideo={practiceVideo ? 'あり' : 'なし'}, 
-                          file_path={practiceVideo?.file_path || 'なし'}
-                        </div>
                         {practiceVideo ? (
                           <FilePreview
                             filePath={practiceVideo.file_path}
@@ -1344,11 +1303,6 @@ export default async function DashboardPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-500">選手紹介・見所（30秒）</label>
                       <div className="mt-1 text-base text-gray-900">
-                        {/* デバッグ情報 */}
-                        <div className="mb-2 text-xs text-gray-400">
-                          デバッグ: introductionVideo={introductionVideo ? 'あり' : 'なし'}, 
-                          file_path={introductionVideo?.file_path || 'なし'}
-                        </div>
                         {introductionVideo ? (
                           <FilePreview
                             filePath={introductionVideo.file_path}
