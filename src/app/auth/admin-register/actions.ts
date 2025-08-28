@@ -1,7 +1,6 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { redirect } from 'next/navigation'
 
 export async function createAdminUser(formData: FormData) {
   const email = formData.get('email') as string
@@ -80,8 +79,8 @@ export async function createAdminUser(formData: FormData) {
 
       console.log('User profile created successfully')
 
-      // 成功時はリダイレクト
-      redirect('/auth/login?message=管理者アカウントが作成されました。ログインしてください。')
+      // 成功時は成功フラグを返す
+      return { success: true, message: '管理者アカウントが作成されました。ログインしてください。' }
     }
 
     return { error: 'アカウント作成に失敗しました（ユーザーデータが空です）' }

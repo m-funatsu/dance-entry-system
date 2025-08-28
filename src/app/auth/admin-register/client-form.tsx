@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface ClientFormProps {
-  createAdminUser: (formData: FormData) => Promise<{ error?: string }>
+  createAdminUser: (formData: FormData) => Promise<{ error?: string; success?: boolean; message?: string }>
 }
 
 export function ClientForm({ createAdminUser }: ClientFormProps) {
@@ -11,6 +12,7 @@ export function ClientForm({ createAdminUser }: ClientFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -29,11 +31,17 @@ export function ClientForm({ createAdminUser }: ClientFormProps) {
       
       if (result.error) {
         setError(result.error)
+      } else if (result.success) {
+        // 成功時はクライアントサイドでリダイレクト
+        router.push(`/auth/login?message=${encodeURIComponent(result.message || '管理者アカウントが作成されました。')}`)
       }
-      // 成功時はサーバーアクション内でredirectされる
     } catch (error) {
       console.error('フォーム送信エラー:', error)
-      setError('送信に失敗しました')
+      // NEXT_REDIRECTエラーを除外
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      if (!errorMessage.includes('NEXT_REDIRECT')) {
+        setError('送信に失敗しました')
+      }
     } finally {
       setLoading(false)
     }
