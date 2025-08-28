@@ -44,7 +44,7 @@ export default function DownloadButton({ data, headers, filename, className = ''
   return (
     <button
       onClick={handleDownload}
-      className={`bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium ${className}`}
+      className={`bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer ${className}`}
     >
       📥 CSV ダウンロード
     </button>
