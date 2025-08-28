@@ -137,6 +137,8 @@ export default function RegisterPage() {
           errorMessage = '⚠️ メール送信回数の上限に達しました。\n15-30分お待ちいただいてから再度お試しください。\n\nまたは別のメールアドレスでお試しください。'
         } else if (error.message.includes('Error sending confirmation email') || error.code === 'unexpected_failure') {
           errorMessage = '🚨 メール送信システムに障害が発生しています。\n\n管理者に連絡してメール認証を一時的に無効化してもらってください。\n\nまたは時間をおいて再度お試しください。'
+        } else if (error.message.includes('Password is known to be weak') || error.code === 'weak_password') {
+          errorMessage = '❌ パスワードが弱すぎます。\n\n以下を避けてください：\n• 連続した数字（123456など）\n• よく使われるパスワード\n• 辞書に載っている単語\n\nより複雑なパスワードを設定してください。'
         } else {
           errorMessage = `登録に失敗しました。\nエラー詳細: ${error.message}`
         }
@@ -269,6 +271,8 @@ export default function RegisterPage() {
               <li>• 大文字を1文字以上</li>
               <li>• 小文字を1文字以上</li>
               <li>• 数字を1文字以上</li>
+              <li>• 連続した数字は避ける（123456など）</li>
+              <li>• よく使われるパスワードは避ける</li>
             </ul>
           </div>
 

@@ -58,6 +58,8 @@ export async function createAdminUser(formData: FormData) {
         errorMessage = '有効なメールアドレスを入力してください'
       } else if (adminError.message.includes('Too many requests')) {
         errorMessage = 'リクエストが多すぎます。しばらく待ってからお試しください'
+      } else if (adminError.message.includes('Password is known to be weak') || adminError.code === 'weak_password') {
+        errorMessage = 'パスワードが弱すぎます。連続した数字や辞書語を避けて、より複雑なパスワードを設定してください。'
       } else if (adminError.message.includes('Password')) {
         errorMessage = `パスワード要件エラー: ${adminError.message}`
       }
