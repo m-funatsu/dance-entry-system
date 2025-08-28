@@ -1180,7 +1180,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             
             <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
               <p className="text-sm text-blue-800">
-                中学生以下の未成年選手につきましては、保護者の同伴が必要となります。<br />
+                未成年選手につきましては、保護者の同伴が必要となります。<br />
                 詳細は事務局より追ってご案内申し上げます。
               </p>
             </div>
@@ -1229,7 +1229,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
             
             <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
               <p className="text-sm text-blue-800">
-                中学生以下の未成年選手につきましては、保護者の同伴が必要となります。<br />
+                未成年選手につきましては、保護者の同伴が必要となります。<br />
                 詳細は事務局より追ってご案内申し上げます。
               </p>
             </div>
