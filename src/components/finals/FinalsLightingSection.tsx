@@ -69,11 +69,16 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
       <FormField
         label="決勝 - 踊り出しタイミング"
         name="dance_start_timing"
+        type="select"
         value={finalsInfo.dance_start_timing || ''}
         onChange={(e) => onChange({ dance_start_timing: e.target.value })}
         disabled={lightingChangeOption === 'same'}
         required={lightingChangeOption === 'different'}
-      />
+      >
+        <option value="">選択してください</option>
+        <option value="音先">音先</option>
+        <option value="板付">板付</option>
+      </FormField>
 
       {/* シーン1-5 */}
       {[1, 2, 3, 4, 5].map((sceneNum) => (
