@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import NavigationLogger from '@/components/NavigationLogger'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import SiteTitle from '@/components/SiteTitle'
@@ -11,8 +12,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [submitCount, setSubmitCount] = useState(0)
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // URLパラメータからメッセージを取得
+  useEffect(() => {
+    const message = searchParams.get('message')
+    if (message) {
+      setSuccessMessage(decodeURIComponent(message))
+    }
+  }, [searchParams])
 
   // ページ読み込み時にURLハッシュをチェック
   useEffect(() => {
@@ -215,8 +226,16 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {successMessage && (
+            <div className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded-md p-3">
+              {successMessage}
+            </div>
+          )}
+
           {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
+            <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-md p-3">
+              {error}
+            </div>
           )}
 
           <div>
