@@ -12,6 +12,7 @@ interface FinalsSoundSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
   audioFiles?: Record<string, { file_name: string }>
+  isEditable?: boolean
 }
 
 export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
@@ -22,7 +23,8 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   onSoundChangeOption,
   onFileUpload,
   onFileDelete,
-  audioFiles
+  audioFiles,
+  isEditable = true
 }) => {
   console.log('[FINALS SOUND SECTION DEBUG] === FinalsSoundSection レンダリング ===')
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles:', audioFiles)
@@ -54,6 +56,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
               value="same"
               checked={soundChangeOption === 'same'}
               onChange={() => onSoundChangeOption('same')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と同じ音響指示
@@ -65,6 +68,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
               value="different"
               checked={soundChangeOption === 'different'}
               onChange={() => onSoundChangeOption('different')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と異なる音響指示
@@ -77,7 +81,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         name="sound_start_timing"
         value={finalsInfo.sound_start_timing || ''}
         onChange={(e) => onChange({ sound_start_timing: e.target.value })}
-        disabled={soundChangeOption === 'same'}
+        disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       />
 
@@ -100,7 +104,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             }
           }
         }}
-        disabled={soundChangeOption === 'same'}
+        disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       >
         <option value="">選択してください</option>
@@ -150,7 +154,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
               console.log('[FINALS CHASER DELETE] === 決勝チェイサー曲削除 ===')
               onFileDelete('chaser_song')
             } : undefined}
-            disabled={soundChangeOption === 'same'}
+            disabled={soundChangeOption === 'same' || !isEditable}
             required={soundChangeOption === 'different' && finalsInfo.chaser_song_designation === '必要'}
             accept=".wav,.mp3,.m4a"
           />
@@ -163,7 +167,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         value={finalsInfo.fade_out_start_time || ''}
         onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
         placeholder="例：3:45"
-        disabled={soundChangeOption === 'same'}
+        disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       />
 
@@ -173,7 +177,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         value={finalsInfo.fade_out_complete_time || ''}
         onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
         placeholder="例：4:00"
-        disabled={soundChangeOption === 'same'}
+        disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       />
     </div>

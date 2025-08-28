@@ -9,12 +9,14 @@ interface BankSectionProps {
   semifinalsInfo: Partial<SemifinalsInfo>
   validationErrors: string[]
   onChange: (updates: Partial<SemifinalsInfo>) => void
+  isEditable?: boolean
 }
 
 export const BankSection: React.FC<BankSectionProps> = ({
   semifinalsInfo,
   validationErrors,
-  onChange
+  onChange,
+  isEditable = true
 }) => {
   const supabase = createClient()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -192,6 +194,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
             label="振込確認用紙"
             value={paymentSlipUrl}
             onChange={handleFileUpload}
+            disabled={!isEditable}
             accept=".jpg,.jpeg,.png,.gif,.pdf"
             maxSizeMB={10}
             category="document"
@@ -227,6 +230,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
           {paymentSlipUrl && (
             <button
               type="button"
+              disabled={!isEditable}
               onClick={async () => {
                 console.log('[BANK SECTION DELETE] === 振込確認用紙削除開始 ===')
                 console.log('[BANK SECTION DELETE] 現在のURL:', paymentSlipUrl)
@@ -327,6 +331,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         name="bank_name"
         value={semifinalsInfo.bank_name || ''}
         onChange={(e) => onChange({ bank_name: e.target.value })}
+        disabled={!isEditable}
         required
       />
 
@@ -335,6 +340,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         name="branch_name"
         value={semifinalsInfo.branch_name || ''}
         onChange={(e) => onChange({ branch_name: e.target.value })}
+        disabled={!isEditable}
         required
       />
 
@@ -344,6 +350,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         type="select"
         value={semifinalsInfo.account_type || ''}
         onChange={(e) => onChange({ account_type: e.target.value })}
+        disabled={!isEditable}
         required
       >
         <option value="">選択してください</option>
@@ -356,6 +363,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         name="account_number"
         value={semifinalsInfo.account_number || ''}
         onChange={(e) => onChange({ account_number: e.target.value })}
+        disabled={!isEditable}
         required
       />
 
@@ -364,6 +372,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         name="account_holder"
         value={semifinalsInfo.account_holder || ''}
         onChange={(e) => onChange({ account_holder: e.target.value })}
+        disabled={!isEditable}
         placeholder="カタカナで入力してください"
         required
       />

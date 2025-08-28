@@ -11,6 +11,7 @@ interface MusicSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
   audioFiles?: Record<string, { file_name: string }>
+  isEditable?: boolean
 }
 
 export const MusicSection: React.FC<MusicSectionProps> = ({
@@ -20,7 +21,8 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
   onChange,
   onFileUpload,
   onFileDelete,
-  audioFiles
+  audioFiles,
+  isEditable = true
 }) => {
   console.log('[MUSIC SECTION DEBUG] === MusicSection レンダリング ===')
   console.log('[MUSIC SECTION DEBUG] audioFiles:', audioFiles)
@@ -108,6 +110,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               handleMusicChange(false)
             }
           }}
+          disabled={!isEditable}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
           required
         >
@@ -137,7 +140,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="work_title"
         value={semifinalsInfo.work_title || ''}
         onChange={(e) => onChange({ work_title: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
       />
 
@@ -146,7 +149,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="work_title_kana"
         value={semifinalsInfo.work_title_kana || ''}
         onChange={(e) => onChange({ work_title_kana: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
         placeholder="ひらがなで入力"
       />
@@ -157,7 +160,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         type="textarea"
         value={semifinalsInfo.work_character_story || ''}
         onChange={(e) => onChange({ work_character_story: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
         maxLength={50}
         rows={2}
@@ -175,7 +178,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               value="commercial"
               checked={semifinalsInfo.copyright_permission === 'commercial'}
               onChange={() => onChange({ copyright_permission: 'commercial' })}
-              disabled={!semifinalsInfo.music_change_from_preliminary}
+              disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
               className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
                 !semifinalsInfo.music_change_from_preliminary 
                   ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
@@ -193,7 +196,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               value="licensed"
               checked={semifinalsInfo.copyright_permission === 'licensed'}
               onChange={() => onChange({ copyright_permission: 'licensed' })}
-              disabled={!semifinalsInfo.music_change_from_preliminary}
+              disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
               className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
                 !semifinalsInfo.music_change_from_preliminary 
                   ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
@@ -211,7 +214,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               value="original"
               checked={semifinalsInfo.copyright_permission === 'original'}
               onChange={() => onChange({ copyright_permission: 'original' })}
-              disabled={!semifinalsInfo.music_change_from_preliminary}
+              disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
               className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 ${
                 !semifinalsInfo.music_change_from_preliminary 
                   ? 'disabled:cursor-not-allowed disabled:bg-gray-100' 
@@ -264,7 +267,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="music_title"
         value={semifinalsInfo.music_title || ''}
         onChange={(e) => onChange({ music_title: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
       />
 
@@ -273,7 +276,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="cd_title"
         value={semifinalsInfo.cd_title || ''}
         onChange={(e) => onChange({ cd_title: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
       />
 
       <FormField
@@ -281,7 +284,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="artist"
         value={semifinalsInfo.artist || ''}
         onChange={(e) => onChange({ artist: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
       />
 
       <FormField
@@ -289,7 +292,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="record_number"
         value={semifinalsInfo.record_number || ''}
         onChange={(e) => onChange({ record_number: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
       />
 
       <FormField
@@ -297,7 +300,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         name="jasrac_code"
         value={semifinalsInfo.jasrac_code || ''}
         onChange={(e) => onChange({ jasrac_code: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required={semifinalsInfo.copyright_permission === 'commercial'}
       />
 
@@ -307,7 +310,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         type="select"
         value={semifinalsInfo.music_type || ''}
         onChange={(e) => onChange({ music_type: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary}
+        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
       >
         <option value="">選択してください</option>
@@ -354,6 +357,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               onFileDelete('music_data_path')
             }
           }}
+          disabled={!isEditable}
           required
           accept=".wav,.mp3,.m4a"
         />

@@ -10,6 +10,7 @@ interface FinalsChoreographerSectionProps {
   onChange: (updates: Partial<FinalsInfo>) => void
   onChoreographerChangeOption: (option: 'same' | 'different') => void
   onFileUpload: (field: string, file: File) => void
+  isEditable?: boolean
 }
 
 export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProps> = ({
@@ -18,7 +19,8 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
   validationErrors,
   onChange,
   onChoreographerChangeOption,
-  onFileUpload
+  onFileUpload,
+  isEditable = true
 }) => {
   return (
     <div className="space-y-6">
@@ -48,6 +50,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               value="same"
               checked={choreographerChangeOption === 'same'}
               onChange={() => onChoreographerChangeOption('same')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と同じ振付師
@@ -59,6 +62,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               value="different"
               checked={choreographerChangeOption === 'different'}
               onChange={() => onChoreographerChangeOption('different')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝とは異なる振付師

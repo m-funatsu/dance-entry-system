@@ -7,12 +7,14 @@ interface ChoreographerSectionProps {
   semifinalsInfo: Partial<SemifinalsInfo>
   preliminaryInfo: PreliminaryInfo | null
   onChange: (updates: Partial<SemifinalsInfo>) => void
+  isEditable?: boolean
 }
 
 export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
   semifinalsInfo,
   preliminaryInfo,
-  onChange
+  onChange,
+  isEditable = true
 }) => {
   const handleChoreographerChange = (checked: boolean) => {
     if (checked) {
@@ -46,6 +48,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
             type="checkbox"
             checked={semifinalsInfo.choreographer_change_from_preliminary || false}
             onChange={(e) => handleChoreographerChange(e.target.checked)}
+            disabled={!isEditable}
             className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
           />
           予選との振付師の変更
@@ -63,7 +66,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
         name="choreographer_name"
         value={semifinalsInfo.choreographer_name || ''}
         onChange={(e) => onChange({ choreographer_name: e.target.value })}
-        disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+        disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
         required
       />
 
@@ -72,7 +75,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
         name="choreographer_furigana"
         value={semifinalsInfo.choreographer_furigana || ''}
         onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
-        disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+        disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
         required
         placeholder="ひらがなで入力"
       />
@@ -87,7 +90,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           name="choreographer2_name"
           value={semifinalsInfo.choreographer2_name || ''}
           onChange={(e) => onChange({ choreographer2_name: e.target.value })}
-          disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+          disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
         />
 
         <FormField
@@ -95,7 +98,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           name="choreographer2_furigana"
           value={semifinalsInfo.choreographer2_furigana || ''}
           onChange={(e) => onChange({ choreographer2_furigana: e.target.value })}
-          disabled={!semifinalsInfo.choreographer_change_from_preliminary}
+          disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
           placeholder="ひらがなで入力"
         />
       </div>
@@ -112,6 +115,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
               value="あり"
               checked={semifinalsInfo.props_usage === 'あり'}
               onChange={() => onChange({ props_usage: 'あり' })}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             あり
@@ -123,6 +127,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
               value="なし"
               checked={semifinalsInfo.props_usage === 'なし'}
               onChange={() => onChange({ props_usage: 'なし', props_details: '' })}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             なし
@@ -136,6 +141,7 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
           name="props_details"
           value={semifinalsInfo.props_details || ''}
           onChange={(e) => onChange({ props_details: e.target.value })}
+          disabled={!isEditable}
           required
           placeholder="例：扇子、スカーフ、傘など"
         />

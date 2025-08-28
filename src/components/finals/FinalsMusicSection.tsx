@@ -12,6 +12,7 @@ interface FinalsMusicSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
   audioFiles?: Record<string, { file_name: string }>
+  isEditable?: boolean
 }
 
 export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
@@ -22,7 +23,8 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
   onMusicChangeOption,
   onFileUpload,
   onFileDelete,
-  audioFiles
+  audioFiles,
+  isEditable = true
 }) => {
   console.log('[FINALS MUSIC SECTION DEBUG] === FinalsMusicSection レンダリング ===')
   console.log('[FINALS MUSIC SECTION DEBUG] audioFiles:', audioFiles)
@@ -55,6 +57,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
               value="unchanged"
               checked={musicChangeOption === 'unchanged'}
               onChange={() => onMusicChangeOption('unchanged')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝から変更なし
@@ -66,6 +69,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
               value="changed"
               checked={musicChangeOption === 'changed'}
               onChange={() => onMusicChangeOption('changed')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝から変更あり
@@ -272,7 +276,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             console.log('[FINALS MUSIC DATA DELETE] === 決勝楽曲データ削除 ===')
             onFileDelete('music_data_path')
           } : undefined}
-          disabled={musicChangeOption === 'unchanged'}
+          disabled={musicChangeOption === 'unchanged' || !isEditable}
           required={musicChangeOption === 'changed'}
           accept=".wav,.mp3,.m4a"
         />

@@ -10,6 +10,7 @@ interface SoundSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
   audioFiles?: Record<string, { file_name: string }>
+  isEditable?: boolean
 }
 
 export const SoundSection: React.FC<SoundSectionProps> = ({
@@ -18,7 +19,8 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
   onChange,
   onFileUpload,
   onFileDelete,
-  audioFiles
+  audioFiles,
+  isEditable = true
 }) => {
   return (
     <div className="space-y-4">
@@ -45,6 +47,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         name="sound_start_timing"
         value={semifinalsInfo.sound_start_timing || ''}
         onChange={(e) => onChange({ sound_start_timing: e.target.value })}
+        disabled={!isEditable}
         required
       />
 
@@ -77,6 +80,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               }
             }
           }}
+          disabled={!isEditable}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
           required
         >
@@ -129,6 +133,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
                 onFileDelete('chaser_song')
               }
             }}
+            disabled={!isEditable}
             required
             accept=".wav,.mp3,.m4a"
           />
@@ -140,6 +145,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         name="fade_out_start_time"
         value={semifinalsInfo.fade_out_start_time || ''}
         onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
+        disabled={!isEditable}
         placeholder="例：3:45"
         required
       />
@@ -149,6 +155,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         name="fade_out_complete_time"
         value={semifinalsInfo.fade_out_complete_time || ''}
         onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
+        disabled={!isEditable}
         placeholder="例：4:00"
         required
       />

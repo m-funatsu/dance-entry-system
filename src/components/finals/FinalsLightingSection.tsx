@@ -11,6 +11,7 @@ interface FinalsLightingSectionProps {
   onChange: (updates: Partial<FinalsInfo>) => void
   onLightingChangeOption: (option: 'same' | 'different') => void
   onFileUpload: (field: string, file: File) => void
+  isEditable?: boolean
 }
 
 export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
@@ -19,7 +20,8 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
   validationErrors,
   onChange,
   onLightingChangeOption,
-  onFileUpload
+  onFileUpload,
+  isEditable = true
 }) => {
   return (
     <div className="space-y-6">
@@ -48,6 +50,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               value="same"
               checked={lightingChangeOption === 'same'}
               onChange={() => onLightingChangeOption('same')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と同じ照明指示
@@ -59,6 +62,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               value="different"
               checked={lightingChangeOption === 'different'}
               onChange={() => onLightingChangeOption('different')}
+              disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と異なる照明指示

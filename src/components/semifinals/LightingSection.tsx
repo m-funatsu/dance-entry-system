@@ -10,6 +10,7 @@ interface LightingSectionProps {
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete: (field: string) => void
+  isEditable?: boolean
 }
 
 export const LightingSection: React.FC<LightingSectionProps> = ({
@@ -17,7 +18,8 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
   validationErrors,
   onChange,
   onFileUpload,
-  onFileDelete
+  onFileDelete,
+  isEditable = true
 }) => {
   return (
     <div className="space-y-6">
@@ -45,6 +47,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
         type="select"
         value={semifinalsInfo.dance_start_timing || ''}
         onChange={(e) => onChange({ dance_start_timing: e.target.value })}
+        disabled={!isEditable}
         required
       >
         <option value="">選択してください</option>
@@ -63,6 +66,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               name={`scene${sceneNum}_time`}
               value={semifinalsInfo[`scene${sceneNum}_time` as keyof SemifinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_time`]: e.target.value })}
+              disabled={!isEditable}
               placeholder="例：0:30"
               required={sceneNum === 1}
             />
@@ -72,6 +76,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               name={`scene${sceneNum}_trigger`}
               value={semifinalsInfo[`scene${sceneNum}_trigger` as keyof SemifinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_trigger`]: e.target.value })}
+              disabled={!isEditable}
               required={sceneNum === 1}
             />
 
@@ -81,6 +86,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               type="select"
               value={semifinalsInfo[`scene${sceneNum}_color_type` as keyof SemifinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_color_type`]: e.target.value })}
+              disabled={!isEditable}
               required={sceneNum === 1}
             >
               <option value="">選択してください</option>
@@ -94,6 +100,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               name={`scene${sceneNum}_color_other`}
               value={semifinalsInfo[`scene${sceneNum}_color_other` as keyof SemifinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_color_other`]: e.target.value })}
+              disabled={!isEditable}
               placeholder="具体的な色の指定など"
               required={sceneNum === 1}
             />
@@ -103,6 +110,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               name={`scene${sceneNum}_image`}
               value={semifinalsInfo[`scene${sceneNum}_image` as keyof SemifinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_image`]: e.target.value })}
+              disabled={!isEditable}
               required={sceneNum === 1}
             />
 
@@ -114,6 +122,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 value={semifinalsInfo[`scene${sceneNum}_image_path` as keyof SemifinalsInfo] as string}
                 onChange={(file) => onFileUpload(`scene${sceneNum}_image_path`, file)}
                 onDelete={() => onFileDelete(`scene${sceneNum}_image_path`)}
+                disabled={!isEditable}
                 required={sceneNum === 1}
               />
             </div>
@@ -125,6 +134,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 type="textarea"
                 value={semifinalsInfo[`scene${sceneNum}_notes` as keyof SemifinalsInfo] as string || ''}
                 onChange={(e) => onChange({ [`scene${sceneNum}_notes`]: e.target.value })}
+                disabled={!isEditable}
                 rows={2}
               />
             </div>
@@ -142,6 +152,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             name="chaser_exit_time"
             value={semifinalsInfo.chaser_exit_time || ''}
             onChange={(e) => onChange({ chaser_exit_time: e.target.value })}
+            disabled={!isEditable}
             required
           />
 
@@ -150,6 +161,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             name="chaser_exit_trigger"
             value={semifinalsInfo.chaser_exit_trigger || ''}
             onChange={(e) => onChange({ chaser_exit_trigger: e.target.value })}
+            disabled={!isEditable}
             required
           />
 
@@ -159,6 +171,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             type="select"
             value={semifinalsInfo.chaser_exit_color_type || ''}
             onChange={(e) => onChange({ chaser_exit_color_type: e.target.value })}
+            disabled={!isEditable}
             required
           >
             <option value="">選択してください</option>
@@ -172,6 +185,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             name="chaser_exit_color_other"
             value={semifinalsInfo.chaser_exit_color_other || ''}
             onChange={(e) => onChange({ chaser_exit_color_other: e.target.value })}
+            disabled={!isEditable}
             placeholder="具体的な色の指定など"
             required
           />
@@ -181,6 +195,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
             name="chaser_exit_image"
             value={semifinalsInfo.chaser_exit_image || ''}
             onChange={(e) => onChange({ chaser_exit_image: e.target.value })}
+            disabled={!isEditable}
             required
           />
 
@@ -192,6 +207,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               value={semifinalsInfo.chaser_exit_image_path}
               onChange={(file) => onFileUpload('chaser_exit_image_path', file)}
               onDelete={() => onFileDelete('chaser_exit_image_path')}
+              disabled={!isEditable}
               required
             />
           </div>
@@ -203,6 +219,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               type="textarea"
               value={semifinalsInfo.chaser_exit_notes || ''}
               onChange={(e) => onChange({ chaser_exit_notes: e.target.value })}
+              disabled={!isEditable}
               rows={2}
             />
           </div>
