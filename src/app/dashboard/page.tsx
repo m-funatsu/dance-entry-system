@@ -902,47 +902,34 @@ export default async function DashboardPage() {
                         <p className="mt-1 text-base text-gray-900">{basicInfo?.dance_style || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">代表者名</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {basicInfo?.representative_name || '未設定'}
-                          {basicInfo?.representative_furigana && (
-                            <span className="text-sm text-gray-600">（{basicInfo.representative_furigana}）</span>
-                          )}
-                        </p>
+                        <label className="block text-sm font-medium text-gray-500">エントリー名</label>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.representative_name || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">パートナー名</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {basicInfo?.partner_name || '未設定'}
-                          {basicInfo?.partner_furigana && (
-                            <span className="text-sm text-gray-600">（{basicInfo.partner_furigana}）</span>
-                          )}
-                        </p>
+                        <label className="block text-sm font-medium text-gray-500">パートナーエントリー名</label>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.partner_name || '未設定'}</p>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">振付師</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {basicInfo?.choreographer || '未設定'}
-                          {basicInfo?.choreographer_furigana && (
-                            <span className="text-sm text-gray-600">（{basicInfo.choreographer_furigana}）</span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-500">代表者メールアドレス</label>
                         <p className="mt-1 text-base text-gray-900">{basicInfo?.representative_email || '未設定'}</p>
                       </div>
+                    </div>
+                    <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">電話番号</label>
+                        <label className="block text-sm font-medium text-gray-500">代表者電話番号</label>
                         <p className="mt-1 text-base text-gray-900">{basicInfo?.phone_number || '未設定'}</p>
                       </div>
                       <div>
+                        <label className="block text-sm font-medium text-gray-500">参加資格</label>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.agreement_checked ? '同意済み' : '未確認'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">写真・映像使用許諾</label>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.media_consent_checked ? '同意済み' : '未確認'}</p>
+                      </div>
+                      <div>
                         <label className="block text-sm font-medium text-gray-500">プライバシーポリシー</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {basicInfo?.privacy_policy_checked ? '同意済み' : '未同意'}
-                        </p>
+                        <p className="mt-1 text-base text-gray-900">{basicInfo?.privacy_policy_checked ? '同意済み' : '未確認'}</p>
                       </div>
                     </div>
                   </div>
