@@ -23,6 +23,12 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
   const getSignedUrl = useCallback(async () => {
     if (!filePath || signedUrl) return
 
+    // 既にHTTPS URLの場合はそのまま使用
+    if (filePath.startsWith('https://')) {
+      setSignedUrl(filePath)
+      return
+    }
+
     setUrlLoading(true)
     const supabase = createClient()
     
