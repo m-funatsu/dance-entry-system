@@ -750,11 +750,6 @@ export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
       {/* 入力開始日後のみフォーム表示 */}
       {isStartDateAvailable && (
         <>
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-        <p className="text-sm text-blue-800">
-          準決勝に進出された場合の詳細情報をご記入ください。
-        </p>
-      </div>
 
       {/* セクションタブ */}
       <TabNavigation
