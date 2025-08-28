@@ -221,30 +221,71 @@ export default async function DashboardPage() {
   // 必須項目のチェック関数
   const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
     if (!basicInfo) return false
-    // status-utils.tsのcheckBasicInfoCompletionと同じ必須フィールドを使用
-    const requiredFields = [
+    
+    // 基本必須フィールド（フォームのvalidationRulesと一致）
+    const baseRequiredFields = [
       'dance_style',
-      'category_division',
+      'category_division', 
       'representative_name',
       'representative_furigana',
+      'representative_romaji',
+      'representative_birthdate',
       'representative_email',
-      'partner_name',
-      'partner_furigana',
       'phone_number',
-      'real_name',
-      'real_name_kana',
-      'partner_real_name',
-      'partner_real_name_kana',
       'emergency_contact_name_1',
       'emergency_contact_phone_1',
-      'agreement_checked',
-      'privacy_policy_checked'
+      'partner_name',
+      'partner_furigana', 
+      'partner_romaji',
+      'partner_birthdate'
     ]
-    return requiredFields.every(field => {
+    
+    // 年齢による動的必須チェック
+    const calculateAge = (birthdate: string): number => {
+      const today = new Date()
+      const birth = new Date(birthdate)
+      let age = today.getFullYear() - birth.getFullYear()
+      const monthDiff = today.getMonth() - birth.getMonth()
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--
+      }
+      return age
+    }
+
+    const requiredFields = [...baseRequiredFields]
+    
+    // 代表者18歳未満の場合、保護者情報を必須に追加
+    const repAge = basicInfo.representative_birthdate ? calculateAge(basicInfo.representative_birthdate as string) : 999
+    if (repAge < 18) {
+      requiredFields.push('guardian_name', 'guardian_phone', 'guardian_email')
+    }
+    
+    // パートナー18歳未満の場合、保護者情報を必須に追加  
+    const partnerAge = basicInfo.partner_birthdate ? calculateAge(basicInfo.partner_birthdate as string) : 999
+    if (partnerAge < 18) {
+      requiredFields.push('partner_guardian_name', 'partner_guardian_phone', 'partner_guardian_email')
+    }
+
+    // 必須同意チェックボックス
+    const requiredAgreements = [
+      'agreement_checked',
+      'privacy_policy_checked',
+      'media_consent_checked'
+    ]
+    
+    // 必須フィールドのチェック
+    const hasAllRequiredFields = requiredFields.every(field => {
       const value = basicInfo[field]
-      if (typeof value === 'boolean') return value === true
       return value && value.toString().trim() !== ''
     })
+    
+    // 必須同意のチェック
+    const hasAllAgreements = requiredAgreements.every(field => {
+      const value = basicInfo[field]
+      return value === true
+    })
+    
+    return hasAllRequiredFields && hasAllAgreements
   }
 
   const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {

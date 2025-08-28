@@ -152,7 +152,7 @@ export function checkBasicInfoCompletion(
   console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
   console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
   
-  // 基本情報フォームのバリデーションルールと完全一致させる（本名フィールドは任意）
+  // 基本情報フォームのバリデーションルールと完全一致させる
   const requiredFields = [
     'dance_style',
     'category_division',
@@ -170,6 +170,31 @@ export function checkBasicInfoCompletion(
     'partner_birthdate'
   ]
   
+  // 年齢による保護者情報の動的必須チェック
+  const calculateAge = (birthdate: string): number => {
+    const today = new Date()
+    const birth = new Date(birthdate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDiff = today.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
+  }
+
+  // 代表者の年齢チェック
+  const repAge = formData.representative_birthdate ? calculateAge(formData.representative_birthdate as string) : 999
+  const partnerAge = formData.partner_birthdate ? calculateAge(formData.partner_birthdate as string) : 999
+
+  // 18歳未満の場合、保護者情報を必須に追加
+  if (repAge < 18) {
+    requiredFields.push('guardian_name', 'guardian_phone', 'guardian_email')
+  }
+  
+  if (partnerAge < 18) {
+    requiredFields.push('partner_guardian_name', 'partner_guardian_phone', 'partner_guardian_email')
+  }
+  
   console.log(`[BASIC INFO CHECK] チェック対象フィールド:`, requiredFields)
   
   // 必須フィールドの入力チェック
@@ -183,11 +208,11 @@ export function checkBasicInfoCompletion(
   
   const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
   
-  // ダッシュボードと同じ同意事項チェック - basic_infoテーブルのデータから判定
+  // すべての必須同意事項をチェック（フォームと完全一致）
   const agreementResults = {
     agreement_checked: formData.agreement_checked || checkboxes.agreement_checked,
-    privacy_policy_checked: formData.privacy_policy_checked || checkboxes.privacy_policy_checked
-    // media_consent_checkedはダッシュボードでチェックしていない
+    privacy_policy_checked: formData.privacy_policy_checked || checkboxes.privacy_policy_checked,
+    media_consent_checked: formData.media_consent_checked || checkboxes.media_consent_checked
   }
   
   console.log(`[BASIC INFO CHECK] 同意事項チェック（ダッシュボード準拠）:`, agreementResults)
