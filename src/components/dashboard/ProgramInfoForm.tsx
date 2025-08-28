@@ -308,19 +308,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
       {error && <Alert type="error" message={error} />}
 
       <div className="space-y-6">
-        {/* 楽曲数 */}
-        <FormField
-          label="楽曲数"
-          name="song_count"
-          type="select"
-          value={programInfo.song_count || '1曲'}
-          onChange={(e) => handleFieldChange('song_count', e.target.value)}
-          disabled={!isEditable}
-        >
-          <option value="1曲">1曲（準決勝と決勝で同じ楽曲を使用する）</option>
-          <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
-        </FormField>
-
         {/* 選手紹介用画像 */}
         <div>
           <FileUploadField
@@ -358,6 +345,19 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
           onChange={(e) => handleFieldChange('affiliation', e.target.value)}
           disabled={!isEditable}
         />
+
+        {/* 楽曲数 */}
+        <FormField
+          label="楽曲数"
+          name="song_count"
+          type="select"
+          value={programInfo.song_count || '1曲'}
+          onChange={(e) => handleFieldChange('song_count', e.target.value)}
+          disabled={!isEditable}
+        >
+          <option value="1曲">1曲（準決勝と決勝で同じ楽曲を使用する）</option>
+          <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
+        </FormField>
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">

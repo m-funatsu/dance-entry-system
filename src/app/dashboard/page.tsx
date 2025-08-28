@@ -1011,11 +1011,6 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">楽曲数</label>
-                      <p className="mt-1 text-base text-gray-900">{programInfo?.song_count || '未設定'}</p>
-                    </div>
-                    
-                    <div>
                       <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
                       <div className="mt-1 text-base text-gray-900">
                         {programInfo?.player_photo_path ? (
@@ -1033,6 +1028,11 @@ export default async function DashboardPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-500">所属教室または所属</label>
                       <p className="mt-1 text-base text-gray-900">{programInfo?.affiliation || '未設定'}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">楽曲数</label>
+                      <p className="mt-1 text-base text-gray-900">{programInfo?.song_count || '未設定'}</p>
                     </div>
                     
                     {/* 準決勝用 */}
