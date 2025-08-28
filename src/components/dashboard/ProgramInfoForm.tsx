@@ -261,10 +261,10 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
     }
 
-    const result = await save(dataToSave)
+    await save(dataToSave)
 
-    // saveの結果に基づいて成功メッセージを設定
-    if (!result || result.success !== false) {
+    // save関数でエラーが発生しなかった場合は成功とみなす
+    if (!error) {
       // 必須項目が完了している場合はステータスを「登録済み」に更新
       const isComplete = checkProgramInfoCompletion(programInfo)
       await updateFormStatus('program_info', entry.id, isComplete)
