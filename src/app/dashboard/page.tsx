@@ -1295,21 +1295,15 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">練習風景動画</label>
+                      <label className="block text-sm font-medium text-gray-500">練習動画(約30秒)横長動画</label>
                       <p className="mt-1 text-base text-gray-900">
                         {snsInfo?.practice_video_path ? 'アップロード済み' : '未設定'}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">選手紹介・見所動画</label>
+                      <label className="block text-sm font-medium text-gray-500">選手紹介・見所（30秒）</label>
                       <p className="mt-1 text-base text-gray-900">
                         {snsInfo?.introduction_highlight_path ? 'アップロード済み' : '未設定'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">備考</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {snsInfo?.sns_notes || '未設定'}
                       </p>
                     </div>
                   </div>
