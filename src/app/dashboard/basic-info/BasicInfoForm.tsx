@@ -1076,7 +1076,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                     className={`px-3 py-1 text-xs rounded ${
                       !isEditable 
                         ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                        : 'bg-red-600 text-white hover:bg-red-700'
+                        : 'bg-red-600 text-white hover:bg-red-700 cursor-pointer'
                     }`}
                   >
                     削除
