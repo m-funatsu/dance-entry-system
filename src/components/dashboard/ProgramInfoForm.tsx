@@ -307,7 +307,7 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
 
       {error && <Alert type="error" message={error} />}
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* 楽曲数 */}
         <FormField
           label="楽曲数"
@@ -321,24 +321,12 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
           <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
         </FormField>
 
-
-        {/* 準決勝用情報 */}
+        {/* 選手紹介用情報 */}
         <div className="border-t pt-4">
-          <h4 className="font-medium mb-3 text-gray-900">
-            {programInfo.song_count === '1曲' ? '決勝・準決勝用情報' : '準決勝用情報'}
-          </h4>
+          <h4 className="font-medium mb-4 text-gray-900">選手紹介用情報</h4>
           
-          {/* 所属教室または所属 */}
-          <FormField
-            label="所属教室または所属（任意）"
-            name="affiliation"
-            value={programInfo.affiliation || ''}
-            onChange={(e) => handleFieldChange('affiliation', e.target.value)}
-            disabled={!isEditable}
-          />
-
           {/* 選手紹介用画像 */}
-          <div className="mb-4">
+          <div className="mb-6">
             <FileUploadField
               label="選手紹介用画像"
               required
@@ -366,7 +354,23 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             </div>
           </div>
 
-          {/* あらすじ・ストーリー */}
+          {/* 所属教室または所属 */}
+          <FormField
+            label="所属教室または所属（任意）"
+            name="affiliation"
+            value={programInfo.affiliation || ''}
+            onChange={(e) => handleFieldChange('affiliation', e.target.value)}
+            disabled={!isEditable}
+          />
+        </div>
+
+        {/* 準決勝用情報 */}
+        <div className="border-t pt-4">
+          <h4 className="font-medium mb-4 text-gray-900">
+            {programInfo.song_count === '1曲' ? '準決勝・決勝用作品情報' : '準決勝用作品情報'}
+          </h4>
+          
+          {/* 作品あらすじ・ストーリー */}
           <FormField
             label="作品あらすじ・ストーリー（100文字以内）"
             name="semifinal_story"
@@ -379,15 +383,14 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             rows={3}
             error={errors.semifinal_story}
           />
-
         </div>
 
         {/* 決勝用情報（2曲の場合のみ表示） */}
         {programInfo.song_count === '2曲' && (
           <div className="border-t pt-4">
-            <h4 className="font-medium mb-3 text-gray-900">決勝用情報</h4>
+            <h4 className="font-medium mb-4 text-gray-900">決勝用作品情報</h4>
             
-            {/* あらすじ・ストーリー */}
+            {/* 作品あらすじ・ストーリー */}
             <FormField
               label="作品あらすじ・ストーリー（100文字以内）"
               name="final_story"
@@ -400,7 +403,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               rows={3}
               error={errors.final_story}
             />
-
           </div>
         )}
 
