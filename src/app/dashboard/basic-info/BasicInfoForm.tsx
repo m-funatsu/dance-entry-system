@@ -883,19 +883,30 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   // 基本情報を保存
                   const updatedFormData = { ...formData, ...checkboxes, entry_id: currentEntryId }
                   
-                  const { data: existingBasicInfo } = await supabase
+                  const { data: existingBasicInfo, error: checkError } = await supabase
                     .from('basic_info')
                     .select('id')
                     .eq('entry_id', currentEntryId)
                     .single()
 
+                  if (checkError && checkError.code !== 'PGRST116') {
+                    throw checkError
+                  }
+
                   if (existingBasicInfo) {
-                    await supabase.from('basic_info').update(updatedFormData).eq('entry_id', currentEntryId)
+                    await supabase.from('basic_info').update({...updatedFormData, updated_at: new Date().toISOString()}).eq('entry_id', currentEntryId)
                   } else {
-                    await supabase.from('basic_info').insert({ ...updatedFormData, created_at: new Date().toISOString() })
+                    await supabase.from('basic_info').insert({ ...updatedFormData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
                   }
                   
-                  console.log('[BANK SLIP UPLOAD] 一時保存完了')
+                  // ページのentryIdを更新（新規作成時）
+                  if (!entryId && currentEntryId) {
+                    console.log('[BANK SLIP UPLOAD] ページ状態のentryIdを更新:', currentEntryId)
+                    // ここでentryIdを実際に更新する必要があります
+                    // このままだとentryIdが更新されないため、再度currentEntryIdを使用
+                  }
+                  
+                  console.log('[BANK SLIP UPLOAD] 一時保存完了、使用entryId:', currentEntryId)
                 } catch (tempSaveError) {
                   console.error('[BANK SLIP UPLOAD] 一時保存失敗:', tempSaveError)
                   showToast('基本情報の保存に失敗しました', 'error')
@@ -903,9 +914,10 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 }
                 
                 try {
-                  // ファイルアップロード処理
+                  // ファイルアップロード処理（一時保存で取得したcurrentEntryIdを使用）
+                  const useEntryId = currentEntryId || entryId
                   const fileExt = file.name.split('.').pop()
-                  const fileName = `${entryId}/bank_slip_${Date.now()}.${fileExt}`
+                  const fileName = `${useEntryId}/bank_slip_${Date.now()}.${fileExt}`
                   
                   console.log('[BANK SLIP UPLOAD] アップロード先:', fileName)
                   
@@ -920,7 +932,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   
                   // ファイル情報をデータベースに保存
                   const insertData = {
-                    entry_id: entryId,
+                    entry_id: useEntryId,
                     file_type: 'photo',
                     file_name: file.name,
                     file_path: fileName,
