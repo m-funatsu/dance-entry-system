@@ -816,11 +816,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         />
       )}
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-        <p className="text-sm text-yellow-800">
-          ※ 準決勝情報は準決勝進出が決定してからでも追加・修正可能です。
-        </p>
-      </div>
 
       <div className="flex justify-end pt-6">
         <SaveButton
