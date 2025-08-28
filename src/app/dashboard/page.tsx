@@ -990,6 +990,78 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
+              {/* プログラム掲載用情報詳細表示 */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">プログラム掲載用情報</h3>
+                    {isFormEditable('program_info_deadline') ? (
+                      <EditButton href="/dashboard/program-info" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        編集
+                      </EditButton>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-400">
+                        期限切れ
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">楽曲数</label>
+                      <p className="mt-1 text-base text-gray-900">{programInfo?.song_count || '未設定'}</p>
+                    </div>
+                    
+                    {/* 準決勝用 */}
+                    <div className="border-t pt-4">
+                      <h4 className="text-base font-medium text-gray-700 mb-3">準決勝用</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
+                            <p className="mt-1 text-base text-gray-900">{programInfo?.player_photo_path ? 'アップロード済み' : '未アップロード'}</p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
+                            <p className="mt-1 text-base text-gray-900">{programInfo?.semifinal_story || '未設定'}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-500">作品見所(50文字以内)</label>
+                            <p className="mt-1 text-base text-gray-900">{programInfo?.semifinal_highlight || '未設定'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* 決勝用 */}
+                    {programInfo?.song_count === '2曲' && (
+                      <div className="border-t pt-4">
+                        <h4 className="text-base font-medium text-gray-700 mb-3">決勝用</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
+                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_player_photo_path ? 'アップロード済み' : '未アップロード'}</p>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
+                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_story || '未設定'}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-500">作品見所(50文字以内)</label>
+                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_highlight || '未設定'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* 準決勝情報表示 */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
