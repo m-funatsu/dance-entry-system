@@ -1139,38 +1139,68 @@ export default async function DashboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">作品タイトル</label>
-                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.work_title || '未設定'}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">楽曲情報の変更</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {finalsInfo?.music_change 
+                            ? (finalsInfo?.copy_preliminary_music ? '予選と同じ楽曲' : '新しい楽曲')
+                            : '準決勝と同じ楽曲'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品キャラクター・ストーリー等(50字以内)</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.work_character_story || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">楽曲データ</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {finalsInfo?.music_data_path ? 'アップロード済み' : '未アップロード'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">音楽スタートのタイミング(きっかけ、ポーズなど)</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.sound_start_timing || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">決勝 - 踊り出しタイミング</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.dance_start_timing || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付変更部分(曲が始まってから何分何秒の部分か)</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreography_change_timing || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">変更前（準決勝振付）</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreography_before_change || '未設定'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">使用楽曲タイトル</label>
-                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.music_title || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
-                      <p className="mt-1 text-base text-gray-900">{finalsInfo?.artist || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">楽曲変更</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {finalsInfo?.music_change 
-                          ? (finalsInfo?.copy_preliminary_music ? '予選と同じ楽曲' : '新しい楽曲')
-                          : '準決勝と同じ楽曲'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">音響指示変更</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {finalsInfo?.sound_change_from_semifinals ? '変更あり' : '準決勝と同じ'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">照明指示変更</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {finalsInfo?.lighting_change_from_semifinals ? '変更あり' : '準決勝と同じ'}
-                      </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">変更後（決勝振付）</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreography_after_change || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名①</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreographer_name || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名フリガナ①</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreographer_furigana || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名②</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreographer2_name || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名フリガナ②</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreographer2_furigana || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品振付師出席予定</label>
+                        <p className="mt-1 text-base text-gray-900">{finalsInfo?.choreographer_attendance || '未設定'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
