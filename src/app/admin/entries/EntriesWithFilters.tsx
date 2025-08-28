@@ -187,7 +187,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
             <div className="flex flex-col space-y-1">
               <label className="text-xs font-medium text-gray-700">ジャンル</label>
               <select 
-                className="rounded-md border-gray-300 text-sm"
+                className="rounded-md border-gray-300 text-sm cursor-pointer"
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
               >
@@ -202,7 +202,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
             <div className="flex flex-col space-y-1">
               <label className="text-xs font-medium text-gray-700">提出ステータス</label>
               <select 
-                className="rounded-md border-gray-300 text-sm"
+                className="rounded-md border-gray-300 text-sm cursor-pointer"
                 value={formFilter}
                 onChange={(e) => setFormFilter(e.target.value)}
               >
@@ -230,7 +230,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
             <div className="flex flex-col space-y-1">
               <label className="text-xs font-medium text-gray-700">選考ステータス</label>
               <select 
-                className="rounded-md border-gray-300 text-sm"
+                className="rounded-md border-gray-300 text-sm cursor-pointer"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -247,7 +247,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                   setGenreFilter('')
                   setFormFilter('')
                 }}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
               >
                 フィルタをクリア
               </button>
