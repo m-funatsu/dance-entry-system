@@ -14,12 +14,16 @@ interface PreliminaryFormProps {
   initialData: PreliminaryInfo | null
   preliminaryVideo: EntryFile | null
   userId: string
+  isEditable?: boolean
 }
 
-export default function PreliminaryForm({ entryId, initialData, preliminaryVideo, userId }: PreliminaryFormProps) {
+export default function PreliminaryForm({ entryId, initialData, preliminaryVideo, userId, isEditable = true }: PreliminaryFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('PreliminaryForm isEditable:', isEditable)
   
   const [formData, setFormData] = useState({
     work_title: initialData?.work_title || '',

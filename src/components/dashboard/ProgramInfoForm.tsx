@@ -12,12 +12,16 @@ import { logger } from '@/lib/logger'
 
 interface ProgramInfoFormProps {
   entry: Entry
+  isEditable?: boolean
 }
 
-export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
+export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInfoFormProps) {
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('ProgramInfoForm isEditable:', isEditable)
   const [programInfo, setProgramInfo] = useState<Partial<ProgramInfo>>({
     entry_id: entry.id,
     song_count: '1曲'

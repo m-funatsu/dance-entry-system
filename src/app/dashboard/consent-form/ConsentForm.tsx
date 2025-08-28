@@ -10,12 +10,16 @@ import type { Entry } from '@/lib/types'
 interface ConsentFormProps {
   entryId: string | null
   initialData: Entry | null
+  isEditable?: boolean
 }
 
-export default function ConsentForm({ entryId, initialData }: ConsentFormProps) {
+export default function ConsentForm({ entryId, initialData, isEditable = true }: ConsentFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('ConsentForm isEditable:', isEditable)
   
   const [consentChecked, setConsentChecked] = useState(initialData?.consent_form_submitted || false)
   const [saving, setSaving] = useState(false)

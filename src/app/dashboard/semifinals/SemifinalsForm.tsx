@@ -20,13 +20,17 @@ import type { Entry, SemifinalsInfo, PreliminaryInfo, EntryFile } from '@/lib/ty
 interface SemifinalsFormProps {
   userId: string
   entry: Entry | null
+  isEditable?: boolean
 }
 
-export default function SemifinalsForm({ entry, userId }: SemifinalsFormProps) {
+export default function SemifinalsForm({ entry, userId, isEditable = true }: SemifinalsFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
   const debugLogger = DebugLogger.getInstance()
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('SemifinalsForm isEditable:', isEditable)
   
   // クライアントサイドでのデバッグロガー初期化を確認
   useEffect(() => {

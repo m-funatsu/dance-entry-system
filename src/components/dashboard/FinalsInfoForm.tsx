@@ -16,12 +16,16 @@ import type { Entry, FinalsInfo } from '@/lib/types'
 
 interface FinalsInfoFormProps {
   entry: Entry
+  isEditable?: boolean
 }
 
-export default function FinalsInfoForm({ entry }: FinalsInfoFormProps) {
+export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoFormProps) {
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('FinalsInfoForm isEditable:', isEditable)
   const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)

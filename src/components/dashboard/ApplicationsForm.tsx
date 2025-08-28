@@ -11,16 +11,20 @@ import type { Entry, ApplicationsInfo, EntryFile, BasicInfo } from '@/lib/types'
 
 interface ApplicationsFormProps {
   entry: Entry
+  isEditable?: boolean
 }
 
 const TICKET_PRICE = 5000 // チケット単価（円）
 const COMPANION_FEE = 4000 // 同伴料（円）
 
-export default function ApplicationsForm({ entry }: ApplicationsFormProps) {
+export default function ApplicationsForm({ entry, isEditable = true }: ApplicationsFormProps) {
   // const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('ApplicationsForm isEditable:', isEditable)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('ticket')

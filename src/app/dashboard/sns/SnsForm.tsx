@@ -15,13 +15,17 @@ import type { Entry, SnsFormData, EntryFile } from '@/lib/types'
 interface SNSFormProps {
   userId: string
   entry: Entry | null
+  isEditable?: boolean
 }
 
-export default function SNSForm({ entry, userId }: SNSFormProps) {
+export default function SNSForm({ entry, userId, isEditable = true }: SNSFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
+  
+  // TODO: isEditableをフォーム項目に適用する予定
+  console.log('SNSForm isEditable:', isEditable)
   
   // 入力開始日制御
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
