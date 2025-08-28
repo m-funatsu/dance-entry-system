@@ -720,10 +720,13 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
             <div className="text-sm text-green-800 space-y-2">
               <p className="font-medium">📌 関係者チケット注文申請について</p>
               <p>
-                振付師の方、選手のスポンサーの方（衣装など）については、以下の料金で控室・飛天にお入りいただくことが可能です。
+                振付師の方、選手のスポンサーの方（衣装など）、選手保護者については、以下の料金で控室・飛天にお入りいただくことが可能です。
               </p>
               <p className="font-medium">
                 ・場所：フロアステージ横の関係者用テーブル
+              </p>
+              <p className="text-orange-700 font-medium">
+                ※選手保護者で飛天観覧席でのご観覧を希望の方は、別途観覧席チケットをお求めください。
               </p>
               <p className="text-blue-700 font-medium">
                 ※振付師の方については、選手が3位までに入賞された場合、表彰式にて表彰を受けていただきます。
