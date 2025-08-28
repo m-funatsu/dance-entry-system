@@ -123,7 +123,7 @@ export function useFileUploadV2({
       
       // 成功時の処理
       if (onSuccess) {
-        onSuccess({ ...result, field: options.field })
+        onSuccess({ ...result, field: options.field, originalFileName: file.name })
       }
       
       return result

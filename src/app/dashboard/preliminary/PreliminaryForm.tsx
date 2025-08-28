@@ -40,7 +40,6 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
-  const [uploadingFileInfo, setUploadingFileInfo] = useState<File | null>(null)
 
   // バリデーションルール
   const validationRules = {
@@ -74,14 +73,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // ファイルアップロードフック
   const { uploading, deleteFile, uploadVideo } = useFileUploadV2({
     category: 'video',
-    onSuccess: async (result: { url?: string; path?: string }) => {
+    onSuccess: async (result: { url?: string; path?: string; originalFileName?: string }) => {
       console.log('[UPLOAD SUCCESS] onSuccess呼び出し:', result)
       try {
         if (result.path) {
           // ファイル情報をデータベースに保存
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo開始')
-          // onSuccess時にはFile情報が失われているため、別の方法で元のファイル名を取得
-          const savedFile = await saveVideoFileInfo(result.path)
+          const savedFile = await saveVideoFileInfo(result.path, result.originalFileName)
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo完了:', savedFile)
           
           // setVideoFileの更新（useEffectとの重複を避けるため条件付き）
