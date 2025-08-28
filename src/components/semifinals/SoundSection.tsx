@@ -57,10 +57,24 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
           onChange={(e) => {
             if (e.target.value === 'included') {
               onChange({ chaser_song_designation: 'included', chaser_song: '' })
+              // 音源ファイルが存在する場合は削除
+              if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
+                console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - チェイサー音源を削除')
+                if (onFileDelete) {
+                  onFileDelete('chaser_song')
+                }
+              }
             } else if (e.target.value === 'required') {
               onChange({ chaser_song_designation: 'required' })
             } else if (e.target.value === 'not_required') {
               onChange({ chaser_song_designation: 'not_required', chaser_song: '' })
+              // 音源ファイルが存在する場合は削除
+              if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
+                console.log('[CHASER CHANGE] 「不要（無音）」選択 - チェイサー音源を削除')
+                if (onFileDelete) {
+                  onFileDelete('chaser_song')
+                }
+              }
             }
           }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"

@@ -86,7 +86,20 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         name="chaser_song_designation"
         type="select"
         value={finalsInfo.chaser_song_designation || ''}
-        onChange={(e) => onChange({ chaser_song_designation: e.target.value })}
+        onChange={(e) => {
+          const newValue = e.target.value
+          onChange({ chaser_song_designation: newValue })
+          
+          // 「自作曲に組み込み」または「不要（無音）」選択時は音源ファイルを削除
+          if ((newValue === '自作曲に組み込み' || newValue === '不要（無音）')) {
+            if ((finalsInfo.chaser_song && finalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
+              console.log('[FINALS CHASER CHANGE] チェイサー曲指定変更 - 音源を削除:', newValue)
+              if (onFileDelete) {
+                onFileDelete('chaser_song')
+              }
+            }
+          }
+        }}
         disabled={soundChangeOption === 'same'}
         required={soundChangeOption === 'different'}
       >
