@@ -239,7 +239,7 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
   const handleSave = async () => {
     setError(null)
-    setSuccess(null)
+    // setSuccess(null) を削除 - 既存の成功メッセージを保持
 
     // バリデーションはステータスチェック用のみ（保存は常に可能）
 
@@ -261,17 +261,22 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       }
     }
 
-    await save(dataToSave)
+    const result = await save(dataToSave)
 
-    // 必須項目が完了している場合はステータスを「登録済み」に更新
-    const isComplete = checkProgramInfoCompletion(programInfo)
-    await updateFormStatus('program_info', entry.id, isComplete)
+    // saveの結果に基づいて成功メッセージを設定
+    if (!result || result.success !== false) {
+      // 必須項目が完了している場合はステータスを「登録済み」に更新
+      const isComplete = checkProgramInfoCompletion(programInfo)
+      await updateFormStatus('program_info', entry.id, isComplete)
 
-    // 保存成功後にダッシュボードにリダイレクト
-    setSuccess('プログラム情報を保存しました')
-    setTimeout(() => {
-      window.location.reload()
-    }, 1500)
+      // 保存成功メッセージを設定
+      setSuccess('プログラム情報を保存しました')
+      
+      // 成功メッセージを3秒間表示してからリロード
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000)
+    }
   }
 
   if (loading) {
