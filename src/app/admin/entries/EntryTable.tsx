@@ -415,30 +415,88 @@ export default function EntryTable({ entries }: EntryTableProps) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/entries/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          entryIds: selectedEntries,
-        }),
+      // ダミーエントリーと実エントリーを分別
+      const realEntryIds = selectedEntries.filter(id => !id.startsWith('dummy-'))
+      const dummyEntryIds = selectedEntries.filter(id => id.startsWith('dummy-'))
+      
+      console.log('🗑️ [BULK DELETE] 削除対象分析:', {
+        total: selectedEntries.length,
+        realEntries: realEntryIds.length,
+        dummyEntries: dummyEntryIds.length,
+        realIds: realEntryIds,
+        dummyIds: dummyEntryIds
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        alert(errorData.error || 'エントリーの削除に失敗しました')
-        return
+      let totalDeleted = 0
+      const errors: string[] = []
+
+      // 1. 実エントリーの削除
+      if (realEntryIds.length > 0) {
+        console.log('🗑️ [BULK DELETE] 実エントリー削除開始')
+        
+        const entryResponse = await fetch('/api/admin/entries/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            entryIds: realEntryIds,
+          }),
+        })
+
+        if (!entryResponse.ok) {
+          const errorData = await entryResponse.json()
+          console.error('❌ [BULK DELETE] 実エントリー削除エラー:', errorData)
+          errors.push(`実エントリー削除失敗: ${errorData.error}`)
+        } else {
+          const result = await entryResponse.json()
+          console.log('✅ [BULK DELETE] 実エントリー削除成功:', result)
+          totalDeleted += result.deletedCount || realEntryIds.length
+        }
       }
 
-      const result = await response.json()
-      const message = `${result.deletedCount}件のエントリーを削除しました\n\n📁 ファイル削除: ${result.filesDeletionSummary.details}`
-      alert(message)
+      // 2. ダミーエントリー（ユーザー）の削除
+      if (dummyEntryIds.length > 0) {
+        console.log('🗑️ [BULK DELETE] ダミーエントリー（ユーザー）削除開始')
+        
+        // ダミーIDからuser_idを抽出
+        const userIdsToDelete = dummyEntryIds.map(id => id.replace('dummy-', ''))
+        
+        const userResponse = await fetch('/api/admin/entries/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            entryIds: [], // 空の配列
+            userIds: userIdsToDelete // ユーザーIDを追加
+          }),
+        })
+
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json()
+          console.error('❌ [BULK DELETE] ユーザー削除エラー:', errorData)
+          errors.push(`ユーザー削除失敗: ${errorData.error}`)
+        } else {
+          const userResult = await userResponse.json()
+          console.log('✅ [BULK DELETE] ユーザー削除成功:', userResult)
+          totalDeleted += dummyEntryIds.length
+        }
+      }
+
+      // 結果表示
+      if (errors.length > 0) {
+        alert(`削除処理完了（一部エラー）:\n✅ 削除成功: ${totalDeleted}件\n❌ エラー:\n${errors.join('\n')}`)
+      } else {
+        alert(`${totalDeleted}件を削除しました`)
+      }
+
       setSelectedEntries([])
-      router.refresh()
+      window.location.reload()
+      
     } catch (error) {
-      console.error('Bulk delete error:', error)
-      alert('エントリーの削除に失敗しました')
+      console.error('💥 [BULK DELETE] 予期しないエラー:', error)
+      alert(`削除に失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
