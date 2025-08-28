@@ -940,7 +940,7 @@ export default async function DashboardPage() {
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">予選情報</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">オンライン予選情報</h3>
                     {isFormEditable('music_info_deadline') ? (
                       <EditButton href="/dashboard/preliminary" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
@@ -951,24 +951,40 @@ export default async function DashboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
-                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.work_title || '未設定'}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品タイトル</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.work_title || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品キャラクター・ストーリー等(50字以内)</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.work_story || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">予選提出動画</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {fileStats.video > 0 ? 'アップロード済み' : '未アップロード'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">予選 - 振付師1</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.choreographer1_name || '未設定'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">楽曲タイトル</label>
-                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.music_title || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">アーティスト</label>
-                      <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.artist || '未設定'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">予選動画</label>
-                      <p className="mt-1 text-base text-gray-900">
-                        {fileStats.video > 0 ? 'アップロード済み' : '未アップロード'}
-                      </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">予選 - 振付師1 フリガナ</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.choreographer1_furigana || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">予選 - 振付師2</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.choreographer2_name || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">予選 - 振付師2 フリガナ</label>
+                        <p className="mt-1 text-base text-gray-900">{preliminaryInfo?.choreographer2_furigana || '未設定'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
