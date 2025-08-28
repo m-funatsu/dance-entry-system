@@ -442,6 +442,13 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             <p className="text-sm text-red-600 mb-4">予選動画のアップロードは必須です</p>
           )}
           
+          {/* 予選動画アップロードの注意書き */}
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-sm text-blue-800">
+              予選動画のアップロードはネットワーク環境により時間がかかることがあります。アップロード中はそのままお待ちください。
+            </p>
+          </div>
+          
           {videoFile ? (
             <div className="space-y-4">
               {/* 動画プレビュー */}
