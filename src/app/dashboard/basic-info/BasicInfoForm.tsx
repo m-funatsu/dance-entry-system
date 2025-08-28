@@ -877,20 +877,42 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   // 基本情報を保存
                   const updatedFormData = { ...formData, ...checkboxes, entry_id: useEntryId }
                   
+                  console.log('[BANK SLIP UPLOAD] 基本情報保存データ:', updatedFormData)
+                  
                   const { data: existingBasicInfo, error: checkError } = await supabase
                     .from('basic_info')
                     .select('id')
                     .eq('entry_id', useEntryId)
                     .single()
 
+                  console.log('[BANK SLIP UPLOAD] 既存データチェック:', { existingBasicInfo, checkError })
+
                   if (checkError && checkError.code !== 'PGRST116') {
-                    throw checkError
+                    console.error('[BANK SLIP UPLOAD] 既存データチェックエラー:', checkError)
+                    // 406エラーの場合は無視して新規作成を試行
+                    if (checkError.code !== 'PGRST406') {
+                      throw checkError
+                    }
                   }
 
                   if (existingBasicInfo) {
-                    await supabase.from('basic_info').update({...updatedFormData, updated_at: new Date().toISOString()}).eq('entry_id', useEntryId)
+                    console.log('[BANK SLIP UPLOAD] 既存データ更新')
+                    const { error: updateError } = await supabase.from('basic_info').update({...updatedFormData, updated_at: new Date().toISOString()}).eq('entry_id', useEntryId)
+                    if (updateError) {
+                      console.error('[BANK SLIP UPLOAD] 更新エラー:', updateError)
+                      throw updateError
+                    }
                   } else {
-                    await supabase.from('basic_info').insert({ ...updatedFormData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+                    console.log('[BANK SLIP UPLOAD] 新規データ作成')
+                    const insertData = { ...updatedFormData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+                    console.log('[BANK SLIP UPLOAD] 挿入データ:', insertData)
+                    
+                    const { error: insertError } = await supabase.from('basic_info').insert(insertData)
+                    if (insertError) {
+                      console.error('[BANK SLIP UPLOAD] 挿入エラー:', insertError)
+                      // 400エラーでも続行を試みる（ファイルアップロードは可能な場合がある）
+                      console.warn('[BANK SLIP UPLOAD] basic_info保存失敗だが、ファイルアップロードは続行')
+                    }
                   }
                   
                   console.log('[BANK SLIP UPLOAD] 一時保存完了、使用entryId:', useEntryId)
