@@ -40,6 +40,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   
   const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [uploadingFileInfo, setUploadingFileInfo] = useState<File | null>(null)
 
   // バリデーションルール
   const validationRules = {
@@ -79,6 +80,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         if (result.path) {
           // ファイル情報をデータベースに保存
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo開始')
+          // onSuccess時にはFile情報が失われているため、別の方法で元のファイル名を取得
           const savedFile = await saveVideoFileInfo(result.path)
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo完了:', savedFile)
           
@@ -163,14 +165,18 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     validateSingleField(field, value)
   }
 
-  const saveVideoFileInfo = async (filePath: string) => {
+  const saveVideoFileInfo = async (filePath: string, originalFileName?: string) => {
     try {
+      // 元のファイル名を使用（提供されない場合はパスから抽出）
+      const fileName = originalFileName || filePath.split('/').pop() || ''
+      console.log('[SAVE VIDEO] 保存ファイル名:', { originalFileName, extractedName: filePath.split('/').pop(), finalFileName: fileName })
+      
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
         .insert({
           entry_id: entryId,
           file_type: 'video',
-          file_name: filePath.split('/').pop() || '',
+          file_name: fileName, // 元の日本語ファイル名を保持
           file_path: filePath,
           purpose: 'preliminary'
         })
