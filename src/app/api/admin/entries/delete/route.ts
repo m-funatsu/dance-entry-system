@@ -130,8 +130,40 @@ export async function DELETE(request: NextRequest) {
         }
 
         console.log('✅ [DELETE API] エントリー削除成功')
+
+        // エントリー削除後、対応するユーザーも削除
+        console.log('👤 [DELETE API] エントリーに関連するユーザー削除開始')
+        const userIdsFromEntries = [...new Set(entriesData.map(entry => entry.user_id))]
+        console.log('👤 [DELETE API] 削除対象ユーザーID:', userIdsFromEntries)
+
+        for (const userId of userIdsFromEntries) {
+          try {
+            // 認証システムからユーザーを削除
+            const { error: authDeleteError } = await adminSupabase.auth.admin.deleteUser(userId)
+            if (authDeleteError) {
+              console.error(`❌ [DELETE API] 認証ユーザー削除エラー (${userId}):`, authDeleteError)
+            } else {
+              console.log(`✅ [DELETE API] 認証ユーザー削除成功 (${userId})`)
+            }
+
+            // usersテーブルからもユーザーを削除
+            const { error: userDeleteError } = await adminSupabase
+              .from('users')
+              .delete()
+              .eq('id', userId)
+
+            if (userDeleteError) {
+              console.error(`❌ [DELETE API] usersテーブル削除エラー (${userId}):`, userDeleteError)
+            } else {
+              console.log(`✅ [DELETE API] usersテーブル削除成功 (${userId})`)
+            }
+          } catch (userError) {
+            console.error(`💥 [DELETE API] ユーザー削除で予期しないエラー (${userId}):`, userError)
+          }
+        }
+
         totalDeleted += entryIds.length
-        deletionSummary.push(`エントリー ${entryIds.length}件`)
+        deletionSummary.push(`エントリー+ユーザー ${entryIds.length}件`)
       } else {
         console.log('ℹ️ [DELETE API] 削除対象のエントリーが見つかりません')
       }
