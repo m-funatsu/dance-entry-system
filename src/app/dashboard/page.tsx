@@ -1015,36 +1015,32 @@ export default async function DashboardPage() {
                       <p className="mt-1 text-base text-gray-900">{programInfo?.song_count || '未設定'}</p>
                     </div>
                     
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
+                      <div className="mt-1 text-base text-gray-900">
+                        {programInfo?.player_photo_path ? (
+                          <FilePreview
+                            filePath={programInfo.player_photo_path}
+                            fileName="選手紹介用画像"
+                            fileType="image"
+                          />
+                        ) : (
+                          <span className="text-gray-500">未アップロード</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500">所属教室または所属</label>
+                      <p className="mt-1 text-base text-gray-900">{programInfo?.affiliation || '未設定'}</p>
+                    </div>
+                    
                     {/* 準決勝用 */}
                     <div className="border-t pt-4">
                       <h4 className="text-base font-medium text-gray-700 mb-3">準決勝用</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
-                            <div className="mt-1 text-base text-gray-900">
-                              {programInfo?.player_photo_path ? (
-                                <FilePreview
-                                  filePath={programInfo.player_photo_path}
-                                  fileName="選手紹介用画像（準決勝用）"
-                                  fileType="image"
-                                />
-                              ) : (
-                                <span className="text-gray-500">未アップロード</span>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
-                            <p className="mt-1 text-base text-gray-900">{programInfo?.semifinal_story || '未設定'}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-500">作品見所(50文字以内)</label>
-                            <p className="mt-1 text-base text-gray-900">{programInfo?.semifinal_highlight || '未設定'}</p>
-                          </div>
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
+                        <p className="mt-1 text-base text-gray-900">{programInfo?.semifinal_story || '未設定'}</p>
                       </div>
                     </div>
                     
@@ -1052,33 +1048,9 @@ export default async function DashboardPage() {
                     {programInfo?.song_count === '2曲' && (
                       <div className="border-t pt-4">
                         <h4 className="text-base font-medium text-gray-700 mb-3">決勝用</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-500">選手紹介用画像</label>
-                              <div className="mt-1 text-base text-gray-900">
-                                {programInfo?.final_player_photo_path ? (
-                                  <FilePreview
-                                    filePath={programInfo.final_player_photo_path}
-                                    fileName="選手紹介用画像（決勝用）"
-                                    fileType="image"
-                                  />
-                                ) : (
-                                  <span className="text-gray-500">未アップロード</span>
-                                )}
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
-                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_story || '未設定'}</p>
-                            </div>
-                          </div>
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-500">作品見所(50文字以内)</label>
-                              <p className="mt-1 text-base text-gray-900">{programInfo?.final_highlight || '未設定'}</p>
-                            </div>
-                          </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500">作品あらすじ・ストーリー(100文字以内)</label>
+                          <p className="mt-1 text-base text-gray-900">{programInfo?.final_story || '未設定'}</p>
                         </div>
                       </div>
                     )}
