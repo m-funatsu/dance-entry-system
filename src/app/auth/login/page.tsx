@@ -1,13 +1,13 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import NavigationLogger from '@/components/NavigationLogger'
 import BackgroundLoader from '@/components/BackgroundLoader'
 import SiteTitle from '@/components/SiteTitle'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -170,123 +170,131 @@ export default function LoginPage() {
   }
 
   return (
-    <>
-      <NavigationLogger />
-      <BackgroundLoader pageType="login" />
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8" style={{
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--login-bg-image, none)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}>
-      <div className="max-w-md w-full space-y-6 sm:space-y-8">
-        <div>
-          <h1 className="mt-4 sm:mt-6 text-center font-extrabold leading-tight">
-            <SiteTitle 
-              fallback="2025バルカーカップ ダンスエントリーシステム"
-              style={{color: '#FFD700', fontSize: '36px', lineHeight: '1.2'}}
-              splitMode="double"
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8" style={{
+      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--login-bg-image, none)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }}>
+    <div className="max-w-md w-full space-y-6 sm:space-y-8">
+      <div>
+        <h1 className="mt-4 sm:mt-6 text-center font-extrabold leading-tight">
+          <SiteTitle 
+            fallback="2025バルカーカップ ダンスエントリーシステム"
+            style={{color: '#FFD700', fontSize: '36px', lineHeight: '1.2'}}
+            splitMode="double"
+          />
+        </h1>
+        <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
+          ログインしてください
+        </p>
+      </div>
+      <form className="mt-6 sm:mt-8 space-y-6" onSubmit={handleLogin}>
+        <div className="rounded-md shadow-sm -space-y-px">
+          <div>
+            <label htmlFor="email" className="sr-only">
+              メールアドレス
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="appearance-none rounded-none relative block w-full px-3 py-3 sm:py-2 border border-gray-300 placeholder-gray-500 text-black font-medium rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm bg-white"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-          </h1>
-          <p className="mt-2 text-center" style={{color: '#FFD700', fontSize: '21px'}}>
-            ログインしてください
-          </p>
-        </div>
-        <form className="mt-6 sm:mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                メールアドレス
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-3 sm:py-2 border border-gray-300 placeholder-gray-500 text-black font-medium rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm bg-white"
-                placeholder="メールアドレス"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                パスワード
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-3 sm:py-2 border border-gray-300 placeholder-gray-500 text-black font-medium rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm bg-white"
-                placeholder="パスワード"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
           </div>
+          <div>
+            <label htmlFor="password" className="sr-only">
+              パスワード
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="appearance-none rounded-none relative block w-full px-3 py-3 sm:py-2 border border-gray-300 placeholder-gray-500 text-black font-medium rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-base sm:text-sm bg-white"
+              placeholder="パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+        </div>
 
-          {successMessage && (
-            <div className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded-md p-3">
-              {successMessage}
-            </div>
-          )}
+        {successMessage && (
+          <div className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded-md p-3">
+            {successMessage}
+          </div>
+        )}
 
-          {error && (
-            <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-md p-3">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-md p-3">
+            {error}
+          </div>
+        )}
 
+        <div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="group relative w-full flex justify-center py-3 sm:py-2 px-4 border border-transparent text-base sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          >
+            {loading ? 'ログイン中...' : 'ログイン'}
+          </button>
+        </div>
+
+        <div className="text-center space-y-3 sm:space-y-2">
           <div>
             <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-3 sm:py-2 px-4 border border-transparent text-base sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+              type="button"
+              onClick={() => {
+                console.log('🔸 [LOGIN] パスワード忘れリンククリック')
+                window.location.href = '/auth/reset-password'
+              }}
+              className="bg-transparent border-none cursor-pointer underline"
+              style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
             >
-              {loading ? 'ログイン中...' : 'ログイン'}
+              パスワードを忘れた方はこちら
             </button>
           </div>
-
-          <div className="text-center space-y-3 sm:space-y-2">
-            <div>
+          <div>
+            <p>
+              <span 
+                className="block sm:inline"
+                style={{color: '#FFD700', fontSize: '16.5px'}}
+              >
+                アカウントをお持ちでない場合は、
+              </span>
               <button
                 type="button"
                 onClick={() => {
-                  console.log('🔸 [LOGIN] パスワード忘れリンククリック')
-                  window.location.href = '/auth/reset-password'
+                  console.log('🔸 [LOGIN] 新規登録リンククリック')
+                  window.location.href = '/auth/register'
                 }}
-                className="bg-transparent border-none cursor-pointer underline"
+                className="cursor-pointer underline bg-transparent border-none"
                 style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
               >
-                パスワードを忘れた方はこちら
+                新規登録
               </button>
-            </div>
-            <div>
-              <p>
-                <span 
-                  className="block sm:inline"
-                  style={{color: '#FFD700', fontSize: '16.5px'}}
-                >
-                  アカウントをお持ちでない場合は、
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    console.log('🔸 [LOGIN] 新規登録リンククリック')
-                    window.location.href = '/auth/register'
-                  }}
-                  className="cursor-pointer underline bg-transparent border-none"
-                  style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
-                >
-                  新規登録
-                </button>
-              </p>
-            </div>
+            </p>
           </div>
-        </form>
-      </div>
-      </div>
+        </div>
+      </form>
+    </div>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <>
+      <NavigationLogger />
+      <BackgroundLoader pageType="login" />
+      <Suspense fallback={<div>読み込み中...</div>}>
+        <LoginForm />
+      </Suspense>
     </>
   )
 }
