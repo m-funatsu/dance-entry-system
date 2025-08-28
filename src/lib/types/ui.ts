@@ -52,6 +52,7 @@ export interface FileUploadProps {
   required?: boolean
   maxSizeMB?: number
   accept?: string
+  isEditable?: boolean
 }
 
 export interface ImageUploadProps extends FileUploadProps {

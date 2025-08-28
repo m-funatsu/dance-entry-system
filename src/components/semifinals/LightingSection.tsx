@@ -123,6 +123,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 onChange={(file) => onFileUpload(`scene${sceneNum}_image_path`, file)}
                 onDelete={() => onFileDelete(`scene${sceneNum}_image_path`)}
                 disabled={!isEditable}
+                isEditable={isEditable}
                 required={sceneNum === 1}
               />
             </div>
@@ -208,6 +209,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               onChange={(file) => onFileUpload('chaser_exit_image_path', file)}
               onDelete={() => onFileDelete('chaser_exit_image_path')}
               disabled={!isEditable}
+              isEditable={isEditable}
               required
             />
           </div>

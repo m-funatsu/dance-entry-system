@@ -10,7 +10,8 @@ export default function ImageUpload({
   onDelete,
   label, 
   required = false,
-  accept = "image/*" 
+  accept = "image/*",
+  isEditable = true
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
@@ -127,15 +128,17 @@ export default function ImageUpload({
                 }}
               />
             </div>
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {isEditable && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
             <p className="mt-4 text-sm text-gray-600">
               クリックまたは新しい画像をドラッグして変更
             </p>
@@ -148,13 +151,15 @@ export default function ImageUpload({
               </svg>
               <p className="text-sm text-red-600 font-medium">画像の読み込みに失敗しました</p>
               <p className="text-xs text-red-500">URLの有効期限が切れている可能性があります</p>
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
-              >
-                削除して再アップロード
-              </button>
+              {isEditable && (
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                >
+                  削除して再アップロード
+                </button>
+              )}
             </div>
           </div>
         ) : (

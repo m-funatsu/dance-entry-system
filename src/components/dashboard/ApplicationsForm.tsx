@@ -1030,7 +1030,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="button"
                     onClick={() => handleMakeupStyleDelete(1, false)}
                     disabled={!isEditable}
-                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full mt-2 text-sm transition-colors ${
+                      !isEditable
+                        ? 'text-gray-400 cursor-not-allowed opacity-50'
+                        : 'text-red-600 hover:text-red-800'
+                    }`}
                   >
                     画像を削除
                   </button>
@@ -1079,7 +1083,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     type="button"
                     onClick={() => handleMakeupStyleDelete(2, false)}
                     disabled={!isEditable}
-                    className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full mt-2 text-sm transition-colors ${
+                      !isEditable
+                        ? 'text-gray-400 cursor-not-allowed opacity-50'
+                        : 'text-red-600 hover:text-red-800'
+                    }`}
                   >
                     画像を削除
                   </button>
@@ -1240,7 +1248,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       type="button"
                       onClick={() => handleMakeupStyleDelete(1, true)}
                       disabled={!isEditable}
-                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`w-full mt-2 text-sm transition-colors ${
+                        !isEditable
+                          ? 'text-gray-400 cursor-not-allowed opacity-50'
+                          : 'text-red-600 hover:text-red-800'
+                      }`}
                     >
                       画像を削除
                     </button>
@@ -1289,7 +1301,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       type="button"
                       onClick={() => handleMakeupStyleDelete(2, true)}
                       disabled={!isEditable}
-                      className="w-full mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`w-full mt-2 text-sm transition-colors ${
+                        !isEditable
+                          ? 'text-gray-400 cursor-not-allowed opacity-50'
+                          : 'text-red-600 hover:text-red-800'
+                      }`}
                     >
                       画像を削除
                     </button>
@@ -1445,7 +1461,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       <button
                         onClick={() => handleFileDelete(file.id)}
                         disabled={!isEditable}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`absolute top-2 right-2 p-1 rounded-full transition-colors ${
+                          !isEditable
+                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-50'
+                            : 'bg-red-500 text-white hover:bg-red-600'
+                        }`}
                         title="削除"
                       >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
