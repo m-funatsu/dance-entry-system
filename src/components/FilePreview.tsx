@@ -6,7 +6,7 @@ import Image from 'next/image'
 interface FilePreviewProps {
   filePath?: string
   fileName?: string
-  fileType: 'image' | 'video'
+  fileType: 'image' | 'video' | 'audio'
   className?: string
 }
 
@@ -14,6 +14,7 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
   const [isOpen, setIsOpen] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [videoError, setVideoError] = useState(false)
+  const [audioError, setAudioError] = useState(false)
 
   if (!filePath) {
     return <span className="text-gray-500">未設定</span>
@@ -78,7 +79,7 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
                     />
                   </div>
                 )
-              ) : (
+              ) : fileType === 'video' ? (
                 videoError ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">動画の読み込みに失敗しました</p>
@@ -94,6 +95,24 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
                     >
                       お使いのブラウザは動画再生に対応していません。
                     </video>
+                  </div>
+                )
+              ) : (
+                audioError ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">音楽ファイルの読み込みに失敗しました</p>
+                    <p className="text-sm text-gray-400 mt-2">ファイル: {filePath}</p>
+                  </div>
+                ) : (
+                  <div className="flex justify-center">
+                    <audio
+                      src={publicUrl}
+                      controls
+                      className="w-full max-w-md"
+                      onError={() => setAudioError(true)}
+                    >
+                      お使いのブラウザは音楽再生に対応していません。
+                    </audio>
                   </div>
                 )
               )}

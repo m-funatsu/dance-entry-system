@@ -1133,9 +1133,17 @@ export default async function DashboardPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">楽曲データ</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {semifinalsInfo?.music_data_path ? 'アップロード済み' : '未アップロード'}
-                        </p>
+                        <div className="mt-1 text-base text-gray-900">
+                          {semifinalsInfo?.music_data_path ? (
+                            <FilePreview
+                              filePath={semifinalsInfo.music_data_path}
+                              fileName="準決勝用楽曲データ"
+                              fileType="audio"
+                            />
+                          ) : (
+                            <span className="text-gray-500">未アップロード</span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">音楽スタートのタイミング(きっかけ、ポーズなど)</label>
@@ -1199,9 +1207,17 @@ export default async function DashboardPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">楽曲データ</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {finalsInfo?.music_data_path ? 'アップロード済み' : '未アップロード'}
-                        </p>
+                        <div className="mt-1 text-base text-gray-900">
+                          {finalsInfo?.music_data_path ? (
+                            <FilePreview
+                              filePath={finalsInfo.music_data_path}
+                              fileName="決勝用楽曲データ"
+                              fileType="audio"
+                            />
+                          ) : (
+                            <span className="text-gray-500">未アップロード</span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-500">音楽スタートのタイミング(きっかけ、ポーズなど)</label>
