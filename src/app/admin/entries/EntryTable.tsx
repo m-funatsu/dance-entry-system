@@ -266,11 +266,18 @@ export default function EntryTable({ entries }: EntryTableProps) {
       return
     }
 
+    console.log('🔄 [STATUS UPDATE] ステータス更新開始:', {
+      selectedEntries,
+      newStatus,
+      entryCount: selectedEntries.length
+    })
+
     setLoading(true)
     const originalEntries = [...localEntries]
 
     try {
       // 楽観的更新: 先に画面を更新
+      console.log('📝 [STATUS UPDATE] 楽観的更新実行中...')
       setLocalEntries(prev => 
         prev.map(entry => 
           selectedEntries.includes(entry.id)
@@ -278,6 +285,15 @@ export default function EntryTable({ entries }: EntryTableProps) {
             : entry
         )
       )
+
+      console.log('🌐 [STATUS UPDATE] API呼び出し開始:', {
+        url: '/api/admin/entries/status',
+        method: 'PUT',
+        payload: {
+          entryIds: selectedEntries,
+          status: newStatus,
+        }
+      })
 
       const response = await fetch('/api/admin/entries/status', {
         method: 'PUT',
@@ -290,26 +306,72 @@ export default function EntryTable({ entries }: EntryTableProps) {
         }),
       })
 
+      console.log('📡 [STATUS UPDATE] APIレスポンス:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: response.url
+      })
+
       if (!response.ok) {
         // エラーの場合は元に戻す
+        console.error('❌ [STATUS UPDATE] APIエラー - レスポンス詳細:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        })
+
+        let errorData: Record<string, unknown> = {}
+        try {
+          errorData = await response.json()
+          console.error('❌ [STATUS UPDATE] エラー詳細:', errorData)
+        } catch (jsonError) {
+          console.error('❌ [STATUS UPDATE] レスポンスJSONパース失敗:', jsonError)
+          
+          // テキストとして読み取りを試行
+          try {
+            const textResponse = await response.text()
+            console.error('❌ [STATUS UPDATE] レスポンステキスト:', textResponse)
+          } catch (textError) {
+            console.error('❌ [STATUS UPDATE] レスポンステキスト読み取り失敗:', textError)
+          }
+        }
+
         setLocalEntries(originalEntries)
-        const errorData = await response.json()
-        alert(errorData.error || 'ステータスの更新に失敗しました')
+        const errorMessage = errorData.error || errorData.message || `HTTP Error ${response.status}: ${response.statusText}`
+        console.error('❌ [STATUS UPDATE] 最終エラーメッセージ:', errorMessage)
+        alert(`Failed to update entry status: ${errorMessage}`)
         return
       }
 
+      console.log('✅ [STATUS UPDATE] 成功 - レスポンス処理中...')
+      
+      try {
+        const successData = await response.json()
+        console.log('✅ [STATUS UPDATE] 成功データ:', successData)
+      } catch (jsonError) {
+        console.warn('⚠️ [STATUS UPDATE] 成功レスポンスJSONパース失敗（成功は維持）:', jsonError)
+      }
+
       setSelectedEntries([])
+      console.log('🔄 [STATUS UPDATE] ページリロード予約（1秒後）')
       
       // 成功時はページをリロード
       setTimeout(() => {
+        console.log('🔄 [STATUS UPDATE] ページリロード実行')
         window.location.reload()
       }, 1000)
     } catch (error) {
       // エラーの場合は元に戻す
       setLocalEntries(originalEntries)
-      console.error('Bulk status update error:', error)
-      alert('ステータスの更新に失敗しました')
+      console.error('💥 [STATUS UPDATE] 予期しないエラー:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      })
+      alert(`ステータスの更新に失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
+      console.log('🏁 [STATUS UPDATE] 処理完了 - ローディング状態解除')
       setLoading(false)
     }
   }
