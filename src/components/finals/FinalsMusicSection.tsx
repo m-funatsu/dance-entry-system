@@ -109,7 +109,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           楽曲著作権許諾 {musicChangeOption === 'changed' && <span className="text-red-500">*</span>}
         </label>
         <div className="space-y-2">
-          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
+          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-500' : 'text-gray-800'}`}>
             <input
               type="radio"
               name="copyright_permission"
@@ -121,7 +121,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             />
             A.市販の楽曲を使用する
           </label>
-          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
+          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-500' : 'text-gray-800'}`}>
             <input
               type="radio"
               name="copyright_permission"
@@ -133,7 +133,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             />
             B.自身で著作権に対し許諾を取った楽曲を使用する
           </label>
-          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-400' : ''}`}>
+          <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-500' : 'text-gray-800'}`}>
             <input
               type="radio"
               name="copyright_permission"
