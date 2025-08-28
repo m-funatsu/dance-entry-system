@@ -86,7 +86,8 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
             <div className="space-y-6">
               <div>
                 <h5 className="font-semibold text-base mb-2">①エントリーについて</h5>
-                <p>「2025 バルカーカップジャパンオープンショーダンス選手権」（以下、本大会といいます。）期間中に主催者及び大会実施場所における施設管理者が設けたすべての規約、規則、指示に遵守いただける方のみエントリーください。</p>
+                <p>「2025 バルカーカップジャパンオープンショーダンス選手権」（以下、本大会といいます。）期間中に主催者及び大会実施場所における施設管理者が定めたすべての規約、規則、指示に遵守いただける方のみエントリーください。</p>
+                <p className="mt-2">なお、かかる規約、規則等を遵守いただけない場合、主催者の判断によりエントリー、出場の取消又は失格とさせていただくこともあることを予めご了承ください。</p>
               </div>
               
               <div>
@@ -143,7 +144,7 @@ export default function ConsentForm({ entryId, initialData }: ConsentFormProps) 
           </label>
           
           <div className="mt-3 space-y-1 text-xs text-gray-600">
-            <p>※18歳未満の方の場合、必ず保護者の方の承認を得たうえで、ご同意ください。</p>
+            <p>※18歳未満の方の場合、必ず親権者（法定代理人）の方の承認を得たうえで、ご同意ください。</p>
             <p>※18歳未満の方の場合、エントリーいただいた後に親権者（法定代理人）の方の同意書をいただくことになりますのでご了承ください。</p>
           </div>
         </div>
