@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  // 開発環境でのみデバッグ情報を表示
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  
-  if (!isDevelopment) {
-    return NextResponse.json({ error: 'Debug endpoint is only available in development' }, { status: 403 })
-  }
+  // セキュリティのため、限定的な情報のみ表示
 
   const envDebug = {
     NODE_ENV: process.env.NODE_ENV,
