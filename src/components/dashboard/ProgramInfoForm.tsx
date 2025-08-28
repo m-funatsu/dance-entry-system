@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { FormField, SaveButton, Alert, DeadlineNoticeAsync } from '@/components/ui'
 import { FileUploadField } from '@/components/ui/FileUploadField'
-import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
+import { useFormValidation, useFileUploadV2 } from '@/hooks'
 import { updateFormStatus, checkProgramInfoCompletion } from '@/lib/status-utils'
 import type { Entry, ProgramInfo } from '@/lib/types'
 import { logger } from '@/lib/logger'
@@ -85,14 +85,10 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
   const { errors, validateSingleField } = useFormValidation(programInfo, validationRules)
 
-  // フォーム保存フック
-  const { save, saving, error, success, setError, setSuccess } = useFormSave({
-    tableName: 'program_info',
-    uniqueField: 'entry_id',
-    redirectPath: undefined,
-    onSuccess: (message) => setSuccess(message),
-    onError: (error) => setError(error)
-  })
+  // 独自の状態管理（useFormSaveの代わり）
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // ファイルアップロードフック
   const { uploadImage, uploading } = useFileUploadV2({
@@ -239,32 +235,74 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
 
   const handleSave = async () => {
     setError(null)
-    // setSuccess(null) を削除 - 既存の成功メッセージを保持
+    setSuccess(null)
+    setSaving(true)
 
-    // バリデーションはステータスチェック用のみ（保存は常に可能）
-
-    // 保存するデータを準備（URLではなくパスのみを保存）
-    const dataToSave = { ...programInfo, entry_id: entry.id }
-    const imageFields = [
-      'player_photo_path',
-      'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
-      'final_player_photo_path',
-      'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
-    ]
-    
-    // 画像フィールドがURLの場合はnullにする（相対パスのみ保存）
-    for (const field of imageFields) {
-      const value = (dataToSave as Record<string, unknown>)[field] as string
-      if (value && (value.startsWith('https://') || value.startsWith('http://') || value.includes('supabase'))) {
-        // 署名付きURLやpublicURLの場合はnullにする
-        ;(dataToSave as Record<string, unknown>)[field] = null
+    try {
+      // 保存するデータを準備（URLではなくパスのみを保存）
+      const dataToSave = { ...programInfo, entry_id: entry.id }
+      const imageFields = [
+        'player_photo_path',
+        'semifinal_image1_path', 'semifinal_image2_path', 'semifinal_image3_path', 'semifinal_image4_path',
+        'final_player_photo_path',
+        'final_image1_path', 'final_image2_path', 'final_image3_path', 'final_image4_path'
+      ]
+      
+      // 画像フィールドがURLの場合はnullにする（相対パスのみ保存）
+      for (const field of imageFields) {
+        const value = (dataToSave as Record<string, unknown>)[field] as string
+        if (value && (value.startsWith('https://') || value.startsWith('http://') || value.includes('supabase'))) {
+          // 署名付きURLやpublicURLの場合はnullにする
+          ;(dataToSave as Record<string, unknown>)[field] = null
+        }
       }
-    }
 
-    await save(dataToSave)
+      console.log('💾 [PROGRAM INFO] 保存開始:', { entryId: entry.id, dataToSave })
 
-    // save関数でエラーが発生しなかった場合は成功とみなす
-    if (!error) {
+      // 既存データの確認
+      const { data: existingData } = await supabase
+        .from('program_info')
+        .select('id')
+        .eq('entry_id', entry.id)
+        .maybeSingle()
+
+      let saveError = null
+
+      if (existingData) {
+        // 更新
+        console.log('📝 [PROGRAM INFO] 既存データを更新')
+        const updateData = { ...dataToSave }
+        delete updateData.id
+
+        const { error: updateError } = await supabase
+          .from('program_info')
+          .update({
+            ...updateData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('entry_id', entry.id)
+
+        saveError = updateError
+      } else {
+        // 新規作成
+        console.log('➕ [PROGRAM INFO] 新規データを作成')
+        const insertData = { ...dataToSave }
+        delete insertData.id
+
+        const { error: insertError } = await supabase
+          .from('program_info')
+          .insert(insertData)
+
+        saveError = insertError
+      }
+
+      if (saveError) {
+        console.error('❌ [PROGRAM INFO] 保存エラー:', saveError)
+        throw saveError
+      }
+
+      console.log('✅ [PROGRAM INFO] 保存成功')
+
       // 必須項目が完了している場合はステータスを「登録済み」に更新
       const isComplete = checkProgramInfoCompletion(programInfo)
       await updateFormStatus('program_info', entry.id, isComplete)
@@ -272,10 +310,20 @@ export default function ProgramInfoForm({ entry }: ProgramInfoFormProps) {
       // 保存成功メッセージを設定
       setSuccess('プログラム情報を保存しました')
       
+      console.log('🎉 [PROGRAM INFO] 成功メッセージ設定完了 - 3秒後にリロード')
+      
       // 成功メッセージを3秒間表示してからリロード
       setTimeout(() => {
+        console.log('🔄 [PROGRAM INFO] ページリロード実行')
         window.location.reload()
       }, 3000)
+
+    } catch (err) {
+      console.error('💥 [PROGRAM INFO] 保存で予期しないエラー:', err)
+      const errorMessage = err instanceof Error ? err.message : 'データの保存に失敗しました'
+      setError(errorMessage)
+    } finally {
+      setSaving(false)
     }
   }
 
