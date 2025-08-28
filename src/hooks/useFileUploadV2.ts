@@ -16,7 +16,7 @@ export interface UseFileUploadOptions {
   category?: FileCategory
   config?: FileUploadConfig
   generatePath?: (fileName: string, fileInfo?: { userId?: string; entryId?: string; field?: string }) => string
-  onSuccess?: (result: UploadFileResult & { field?: string }) => void
+  onSuccess?: (result: UploadFileResult & { field?: string; originalFileName?: string }) => void
   onError?: (error: string) => void
 }
 
