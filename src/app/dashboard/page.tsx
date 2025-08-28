@@ -561,15 +561,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('music_info_deadline') ? (
-                    <EditButton href="/dashboard/preliminary">
-                      {preliminaryInfo ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/preliminary">
+                    {isFormEditable('music_info_deadline') 
+                      ? (preliminaryInfo ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -613,15 +610,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('program_info_deadline') ? (
-                    <EditButton href="/dashboard/program-info">
-                      {entry && entry.program_info_submitted ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/program-info">
+                    {isFormEditable('program_info_deadline')
+                      ? (entry && entry.program_info_submitted ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -666,15 +660,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('consent_form_deadline') ? (
-                    <EditButton href="/dashboard/consent-form">
-                      {entry && entry.consent_form_submitted ? '確認' : '提出'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/consent-form">
+                    {isFormEditable('consent_form_deadline')
+                      ? (entry && entry.consent_form_submitted ? '確認' : '提出')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -719,15 +710,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('music_info_deadline') ? (
-                    <EditButton href="/dashboard/semifinals">
-                      {semifinalsInfo ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/semifinals">
+                    {isFormEditable('music_info_deadline')
+                      ? (semifinalsInfo ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -772,15 +760,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('finals_deadline') ? (
-                    <EditButton href="/dashboard/finals">
-                      {finalsInfo ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/finals">
+                    {isFormEditable('finals_deadline')
+                      ? (finalsInfo ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -825,15 +810,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('sns_deadline') ? (
-                    <EditButton href="/dashboard/sns">
-                      {entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/sns">
+                    {isFormEditable('sns_deadline')
+                      ? (entry && (entry.instagram || entry.twitter || entry.facebook) ? '編集' : '登録')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
@@ -879,15 +861,12 @@ export default async function DashboardPage() {
               </div>
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
-                  {isFormEditable('optional_request_deadline') ? (
-                    <EditButton href="/dashboard/applications">
-                      {checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請'} →
-                    </EditButton>
-                  ) : (
-                    <span className="font-medium text-gray-400">
-                      期限切れ（編集不可）
-                    </span>
-                  )}
+                  <EditButton href="/dashboard/applications">
+                    {isFormEditable('optional_request_deadline')
+                      ? (checkApplicationsInfoComplete(applicationsInfo) ? '編集' : '申請')
+                      : '確認（編集不可）'
+                    } →
+                  </EditButton>
                 </div>
               </div>
             </div>
