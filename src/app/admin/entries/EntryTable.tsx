@@ -656,7 +656,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
               <button
                 onClick={bulkDeleteEntries}
                 disabled={loading}
-                className="px-3 py-1 bg-red-700 text-white rounded text-sm hover:bg-red-800 disabled:opacity-50 border border-red-600 font-medium"
+                className="px-3 py-1 bg-red-700 text-white rounded text-sm hover:bg-red-800 disabled:opacity-50 border border-red-600 font-medium cursor-pointer"
               >
                 🗑️ 削除
               </button>
