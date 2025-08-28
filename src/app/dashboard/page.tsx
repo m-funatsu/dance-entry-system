@@ -113,6 +113,8 @@ export default async function DashboardPage() {
   // SNS情報の取得
   let snsInfo = null
   let snsVideoFiles = 0
+  let practiceVideo: EntryFile | null = null
+  let introductionVideo: EntryFile | null = null
   if (entry) {
     const { data, error } = await supabase
       .from('sns_info')
@@ -140,8 +142,14 @@ export default async function DashboardPage() {
       console.error('SNSファイル取得エラー:', filesError)
     }
     
-    snsVideoFiles = snsFiles?.length || 0
+    if (snsFiles) {
+      snsVideoFiles = snsFiles.length
+      practiceVideo = (snsFiles.find(file => file.purpose === 'sns_practice_video') as EntryFile) || null
+      introductionVideo = (snsFiles.find(file => file.purpose === 'sns_introduction_highlight') as EntryFile) || null
+    }
     console.log('SNS動画ファイル:', snsFiles) // デバッグ用ログ
+    console.log('練習動画:', practiceVideo) // デバッグ用ログ
+    console.log('紹介動画:', introductionVideo) // デバッグ用ログ
   }
 
   // 各種申請情報の取得
@@ -1278,12 +1286,27 @@ export default async function DashboardPage() {
                     <strong>デバッグ情報:</strong><br />
                     Entry ID: {entry?.id || 'なし'}<br />
                     SNS Info: {snsInfo ? 'データあり' : 'データなし'}<br />
+                    SNS Video Files: {snsVideoFiles}個<br />
+                    Practice Video: {practiceVideo ? 'ファイルあり' : 'ファイルなし'}<br />
+                    Introduction Video: {introductionVideo ? 'ファイルあり' : 'ファイルなし'}<br />
                     {snsInfo && (
                       <>
-                        Practice Video Path: {snsInfo.practice_video_path || 'なし'}<br />
-                        Introduction Highlight Path: {snsInfo.introduction_highlight_path || 'なし'}<br />
+                        Practice Video Path (sns_info): {snsInfo.practice_video_path || 'なし'}<br />
+                        Introduction Highlight Path (sns_info): {snsInfo.introduction_highlight_path || 'なし'}<br />
                         SNS Notes: {snsInfo.sns_notes || 'なし'}<br />
                         Created At: {snsInfo.created_at || 'なし'}
+                      </>
+                    )}
+                    {practiceVideo && (
+                      <>
+                        <br />Practice Video File Path: {practiceVideo.file_path}<br />
+                        Practice Video File Name: {practiceVideo.file_name}
+                      </>
+                    )}
+                    {introductionVideo && (
+                      <>
+                        <br />Introduction Video File Path: {introductionVideo.file_path}<br />
+                        Introduction Video File Name: {introductionVideo.file_name}
                       </>
                     )}
                   </div>
@@ -1304,13 +1327,13 @@ export default async function DashboardPage() {
                       <div className="mt-1 text-base text-gray-900">
                         {/* デバッグ情報 */}
                         <div className="mb-2 text-xs text-gray-400">
-                          デバッグ: snsInfo={snsInfo ? 'あり' : 'なし'}, 
-                          practice_video_path={snsInfo?.practice_video_path || 'なし'}
+                          デバッグ: practiceVideo={practiceVideo ? 'あり' : 'なし'}, 
+                          file_path={practiceVideo?.file_path || 'なし'}
                         </div>
-                        {snsInfo?.practice_video_path ? (
+                        {practiceVideo ? (
                           <FilePreview
-                            filePath={snsInfo.practice_video_path}
-                            fileName="練習動画(約30秒)横長動画"
+                            filePath={practiceVideo.file_path}
+                            fileName={practiceVideo.file_name}
                             fileType="video"
                           />
                         ) : (
@@ -1323,12 +1346,13 @@ export default async function DashboardPage() {
                       <div className="mt-1 text-base text-gray-900">
                         {/* デバッグ情報 */}
                         <div className="mb-2 text-xs text-gray-400">
-                          デバッグ: introduction_highlight_path={snsInfo?.introduction_highlight_path || 'なし'}
+                          デバッグ: introductionVideo={introductionVideo ? 'あり' : 'なし'}, 
+                          file_path={introductionVideo?.file_path || 'なし'}
                         </div>
-                        {snsInfo?.introduction_highlight_path ? (
+                        {introductionVideo ? (
                           <FilePreview
-                            filePath={snsInfo.introduction_highlight_path}
-                            fileName="選手紹介・見所（30秒）"
+                            filePath={introductionVideo.file_path}
+                            fileName={introductionVideo.file_name}
                             fileType="video"
                           />
                         ) : (
