@@ -57,7 +57,9 @@ export default function ConsentForm({ entryId, initialData, isEditable = true }:
       if (error) throw error
 
       showToast('参加同意書を提出しました', 'success')
-      router.push('/dashboard')
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
     } catch (error) {
       console.error('Error submitting consent form:', error)
       showToast('同意書の提出に失敗しました', 'error')
