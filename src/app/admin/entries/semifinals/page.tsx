@@ -126,6 +126,7 @@ export default async function SemifinalsInfoListPage() {
     switch (code) {
       case 'required': return '必要'
       case 'not_required': return '不要'
+      case 'included': return '必要'
       default: return code || '未入力'
     }
   }
@@ -242,12 +243,12 @@ export default async function SemifinalsInfoListPage() {
               '16. 照明シーン5',
               '17. 照明シーン5イメージ画像',
               '18. 照明シーン チェイサー',
-              '18-2. 照明シーン チェイサーイメージ画像',
-              '19. 振付師情報',
-              '20. 小道具情報',
-              '21. 振込確認',
-              '22. 賞金振込先情報',
-              '23. 選考ステータス'
+              '19. 照明シーン チェイサーイメージ画像',
+              '20. 振付師情報',
+              '21. 小道具情報',
+              '22. 振込確認',
+              '23. 賞金振込先情報',
+              '24. 選考ステータス'
             ]}
             filename="semifinals_info_24columns"
           />
@@ -320,22 +321,22 @@ export default async function SemifinalsInfoListPage() {
                     18. 照明シーン チェイサー
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    18-2. 照明シーン チェイサーイメージ画像
+                    19. 照明シーン チェイサーイメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    19. 振付師情報
+                    20. 振付師情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-36">
-                    20. 小道具情報
+                    21. 小道具情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    21. 振込確認
+                    22. 振込確認
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    22. 賞金振込先情報
+                    23. 賞金振込先情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    23. 選考ステータス
+                    24. 選考ステータス
                   </th>
                 </tr>
               </thead>
@@ -649,7 +650,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 18-2. 照明シーン チェイサーイメージ画像 */}
+                    {/* 19. 照明シーン チェイサーイメージ画像 */}
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
@@ -674,7 +675,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 19. 振付師情報 */}
+                    {/* 20. 振付師情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
                         <div className="mb-1"><strong>振付師氏名①:</strong> {semifinalsInfo.choreographer_name || '未入力'}</div>
@@ -684,7 +685,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 20. 小道具情報 */}
+                    {/* 21. 小道具情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
                         <div className="mb-1"><strong>小道具の有無:</strong> {semifinalsInfo.props_usage || '未入力'}</div>
@@ -692,7 +693,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 21. 振込確認 */}
+                    {/* 22. 振込確認 */}
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
@@ -717,7 +718,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 22. 賞金振込先情報 */}
+                    {/* 23. 賞金振込先情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
                         <div className="mb-1"><strong>銀行名:</strong> {semifinalsInfo.bank_name || '未入力'}</div>
@@ -728,7 +729,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
                     
-                    {/* 23. 選考ステータス */}
+                    {/* 24. 選考ステータス */}
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         semifinalsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
