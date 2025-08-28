@@ -860,11 +860,11 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 
                 // ファイルアップロード前に一時保存を実行（リダイレクトなし）
                 console.log('[BANK SLIP UPLOAD] === 一時保存実行開始 ===')
+                let useEntryId = entryId
+                
                 try {
-                  let currentEntryId = entryId
-
                   // エントリーが存在しない場合は作成
-                  if (!currentEntryId) {
+                  if (!useEntryId) {
                     console.log('[BANK SLIP UPLOAD] 新規エントリー作成')
                     const { data: newEntry, error: entryError } = await supabase
                       .from('entries')
@@ -877,16 +877,16 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                       .maybeSingle()
 
                     if (entryError) throw entryError
-                    currentEntryId = newEntry.id
+                    useEntryId = newEntry.id
                   }
 
                   // 基本情報を保存
-                  const updatedFormData = { ...formData, ...checkboxes, entry_id: currentEntryId }
+                  const updatedFormData = { ...formData, ...checkboxes, entry_id: useEntryId }
                   
                   const { data: existingBasicInfo, error: checkError } = await supabase
                     .from('basic_info')
                     .select('id')
-                    .eq('entry_id', currentEntryId)
+                    .eq('entry_id', useEntryId)
                     .single()
 
                   if (checkError && checkError.code !== 'PGRST116') {
@@ -894,19 +894,12 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                   }
 
                   if (existingBasicInfo) {
-                    await supabase.from('basic_info').update({...updatedFormData, updated_at: new Date().toISOString()}).eq('entry_id', currentEntryId)
+                    await supabase.from('basic_info').update({...updatedFormData, updated_at: new Date().toISOString()}).eq('entry_id', useEntryId)
                   } else {
                     await supabase.from('basic_info').insert({ ...updatedFormData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
                   }
                   
-                  // ページのentryIdを更新（新規作成時）
-                  if (!entryId && currentEntryId) {
-                    console.log('[BANK SLIP UPLOAD] ページ状態のentryIdを更新:', currentEntryId)
-                    // ここでentryIdを実際に更新する必要があります
-                    // このままだとentryIdが更新されないため、再度currentEntryIdを使用
-                  }
-                  
-                  console.log('[BANK SLIP UPLOAD] 一時保存完了、使用entryId:', currentEntryId)
+                  console.log('[BANK SLIP UPLOAD] 一時保存完了、使用entryId:', useEntryId)
                 } catch (tempSaveError) {
                   console.error('[BANK SLIP UPLOAD] 一時保存失敗:', tempSaveError)
                   showToast('基本情報の保存に失敗しました', 'error')
@@ -914,8 +907,7 @@ export default function BasicInfoForm({ userId, entryId, initialData }: BasicInf
                 }
                 
                 try {
-                  // ファイルアップロード処理（一時保存で取得したcurrentEntryIdを使用）
-                  const useEntryId = currentEntryId || entryId
+                  // ファイルアップロード処理
                   const fileExt = file.name.split('.').pop()
                   const fileName = `${useEntryId}/bank_slip_${Date.now()}.${fileExt}`
                   
