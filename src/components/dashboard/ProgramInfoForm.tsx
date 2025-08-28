@@ -321,48 +321,43 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
           <option value="2曲">2曲（準決勝と決勝で異なる楽曲を使用する）</option>
         </FormField>
 
-        {/* 選手紹介用情報 */}
-        <div className="border-t pt-4">
-          <h4 className="font-medium mb-4 text-gray-900">選手紹介用情報</h4>
-          
-          {/* 選手紹介用画像 */}
-          <div className="mb-6">
-            <FileUploadField
-              label="選手紹介用画像"
-              required
-              value={imageUrls.player_photo_path || programInfo.player_photo_path}
-              onChange={(file) => handleImageUpload('player_photo_path', file)}
-              onDelete={() => handleImageDelete('player_photo_path')}
-              category="image"
-              disabled={uploading || !isEditable}
-              maxSizeMB={100}
-              accept="image/*"
-            />
-            {errors.player_photo_path && (
-              <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
-            )}
-            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-sm text-blue-800 font-medium mb-2">画像についての要件：</p>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• 必要枚数：1枚</li>
-                <li>• 服装：大会用衣装または競技衣装</li>
-                <li>• サイズ：原寸で解像度300～350dpi以上が好ましい</li>
-                <li>• 背景：正方形サイズに切り抜くので、背景の指定なし</li>
-                <li>• 向き：二人の顔が正面を向いていること（推奨）</li>
-                <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* 所属教室または所属 */}
-          <FormField
-            label="所属教室または所属（任意）"
-            name="affiliation"
-            value={programInfo.affiliation || ''}
-            onChange={(e) => handleFieldChange('affiliation', e.target.value)}
-            disabled={!isEditable}
+        {/* 選手紹介用画像 */}
+        <div>
+          <FileUploadField
+            label="選手紹介用画像"
+            required
+            value={imageUrls.player_photo_path || programInfo.player_photo_path}
+            onChange={(file) => handleImageUpload('player_photo_path', file)}
+            onDelete={() => handleImageDelete('player_photo_path')}
+            category="image"
+            disabled={uploading || !isEditable}
+            maxSizeMB={100}
+            accept="image/*"
           />
+          {errors.player_photo_path && (
+            <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>
+          )}
+          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-sm text-blue-800 font-medium mb-2">画像についての要件：</p>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• 必要枚数：1枚</li>
+              <li>• 服装：大会用衣装または競技衣装</li>
+              <li>• サイズ：原寸で解像度300～350dpi以上が好ましい</li>
+              <li>• 背景：正方形サイズに切り抜くので、背景の指定なし</li>
+              <li>• 向き：二人の顔が正面を向いていること（推奨）</li>
+              <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
+            </ul>
+          </div>
         </div>
+
+        {/* 所属教室または所属 */}
+        <FormField
+          label="所属教室または所属（任意）"
+          name="affiliation"
+          value={programInfo.affiliation || ''}
+          onChange={(e) => handleFieldChange('affiliation', e.target.value)}
+          disabled={!isEditable}
+        />
 
         {/* 準決勝用情報 */}
         <div className="border-t pt-4">
