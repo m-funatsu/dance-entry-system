@@ -26,7 +26,14 @@ export default function AdminRegisterPage() {
 
     try {
       // 管理者権限でユーザーアカウントを直接作成（メール確認不要）
-      const adminSupabase = createAdminClient()
+      let adminSupabase
+      try {
+        adminSupabase = createAdminClient()
+      } catch (configError) {
+        console.error('Admin client creation failed:', configError)
+        setError('管理者機能の設定が不正です。Vercelの環境変数を確認してください。')
+        return
+      }
       
       // 管理者権限でユーザーを作成
       const { data: adminUserData, error: adminError } = await adminSupabase.auth.admin.createUser({
@@ -91,6 +98,10 @@ export default function AdminRegisterPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-red-600">
             ⚠️ 開発用のページです。本番環境では削除してください。
+          </p>
+          <p className="mt-1 text-center text-xs text-gray-600">
+            環境変数エラーが出る場合は、Vercelダッシュボードで<br/>
+            SUPABASE_SERVICE_ROLE_KEYを設定してください。
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleRegister}>
