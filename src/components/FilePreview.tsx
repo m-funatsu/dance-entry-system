@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
 
 interface FilePreviewProps {
   filePath?: string
@@ -15,13 +16,42 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
   const [imageError, setImageError] = useState(false)
   const [videoError, setVideoError] = useState(false)
   const [audioError, setAudioError] = useState(false)
+  const [signedUrl, setSignedUrl] = useState<string>('')
+  const [urlLoading, setUrlLoading] = useState(false)
+
+  // Supabase署名付きURLを取得
+  const getSignedUrl = useCallback(async () => {
+    if (!filePath || signedUrl) return
+
+    setUrlLoading(true)
+    const supabase = createClient()
+    
+    try {
+      const { data, error } = await supabase.storage
+        .from('files')
+        .createSignedUrl(filePath, 3600) // 1時間有効
+
+      if (error) {
+        console.error('署名付きURL取得エラー:', error)
+      } else if (data?.signedUrl) {
+        setSignedUrl(data.signedUrl)
+      }
+    } catch (error) {
+      console.error('URL取得失敗:', error)
+    } finally {
+      setUrlLoading(false)
+    }
+  }, [filePath, signedUrl])
+
+  useEffect(() => {
+    if (isOpen && !signedUrl && !urlLoading && filePath) {
+      getSignedUrl()
+    }
+  }, [isOpen, signedUrl, urlLoading, filePath, getSignedUrl])
 
   if (!filePath) {
     return <span className="text-gray-500">未設定</span>
   }
-
-  // SupabaseストレージのパブリックURLを構築
-  const publicUrl = `https://ckffwsmgtivqjqkhppkj.supabase.co/storage/v1/object/public/files/${filePath}`
 
   const handlePreviewClick = () => {
     setIsOpen(true)
@@ -60,7 +90,16 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
             </div>
             
             <div className="p-4 max-h-[80vh] overflow-auto">
-              {fileType === 'image' ? (
+              {urlLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">ファイルを読み込み中...</p>
+                </div>
+              ) : !signedUrl ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">ファイルのURLを取得できませんでした</p>
+                  <p className="text-sm text-gray-400 mt-2">ファイル: {filePath}</p>
+                </div>
+              ) : fileType === 'image' ? (
                 imageError ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">画像の読み込みに失敗しました</p>
@@ -69,7 +108,7 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
                 ) : (
                   <div className="flex justify-center">
                     <Image
-                      src={publicUrl}
+                      src={signedUrl}
                       alt={fileName || 'プレビュー画像'}
                       width={800}
                       height={600}
@@ -88,7 +127,7 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
                 ) : (
                   <div className="flex justify-center">
                     <video
-                      src={publicUrl}
+                      src={signedUrl}
                       controls
                       className="max-w-full max-h-[60vh] rounded"
                       onError={() => setVideoError(true)}
@@ -106,7 +145,7 @@ export default function FilePreview({ filePath, fileName, fileType, className = 
                 ) : (
                   <div className="flex justify-center">
                     <audio
-                      src={publicUrl}
+                      src={signedUrl}
                       controls
                       className="w-full max-w-md"
                       onError={() => setAudioError(true)}
