@@ -1080,71 +1080,44 @@ export default async function DashboardPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">作品タイトル／テーマ</label>
+                        <label className="block text-sm font-medium text-gray-500">作品タイトル</label>
                         <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.work_title || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">使用楽曲タイトル</label>
-                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.music_title || '未設定'}</p>
+                        <label className="block text-sm font-medium text-gray-500">作品キャラクター・ストーリー等(50字以内)</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.work_character_story || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">アーティスト</label>
-                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.artist || '未設定'}</p>
+                        <label className="block text-sm font-medium text-gray-500">楽曲データ</label>
+                        <p className="mt-1 text-base text-gray-900">
+                          {semifinalsInfo?.music_data_path ? 'アップロード済み' : '未アップロード'}
+                        </p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">音楽スタートタイミング</label>
+                        <label className="block text-sm font-medium text-gray-500">音楽スタートのタイミング(きっかけ、ポーズなど)</label>
                         <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.sound_start_timing || '未設定'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">準決勝 - 踊り出しタイミング</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.dance_start_timing || '未設定'}</p>
                       </div>
                     </div>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">踊り出しタイミング</label>
-                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.dance_start_timing || '未設定'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">振付師</label>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名①</label>
                         <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.choreographer_name || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">賞金振込先銀行</label>
-                        <p className="mt-1 text-base text-gray-900">
-                          {semifinalsInfo?.bank_name ? `${semifinalsInfo.bank_name} ${semifinalsInfo.branch_name || ''}` : '未設定'}
-                        </p>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名フリガナ①</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.choreographer_furigana || '未設定'}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-500">口座名義</label>
-                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.account_holder || '未設定'}</p>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名②</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.choreographer2_name || '未設定'}</p>
                       </div>
-                    </div>
-                  </div>
-                  
-                  {/* ファイル情報表示 */}
-                  <div className="mt-6 pt-6 border-t">
-                    <h4 className="text-sm font-medium text-gray-900 mb-4">アップロードファイル</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 border rounded-lg">
-                        <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-                        </svg>
-                        <p className="text-sm font-medium text-gray-900">音源</p>
-                        <p className="text-2xl font-bold text-gray-900">{fileStats.music}</p>
-                        <p className="text-xs text-gray-500">ファイル</p>
-                      </div>
-                      <div className="text-center p-4 border rounded-lg">
-                        <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        <p className="text-sm font-medium text-gray-900">動画</p>
-                        <p className="text-2xl font-bold text-gray-900">{fileStats.video}</p>
-                        <p className="text-xs text-gray-500">ファイル</p>
-                      </div>
-                      <div className="text-center p-4 border rounded-lg">
-                        <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                        </svg>
-                        <p className="text-sm font-medium text-gray-900">写真</p>
-                        <p className="text-2xl font-bold text-gray-900">{fileStats.photo}</p>
-                        <p className="text-xs text-gray-500">ファイル</p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500">振付師 氏名フリガナ②</label>
+                        <p className="mt-1 text-base text-gray-900">{semifinalsInfo?.choreographer2_furigana || '未設定'}</p>
                       </div>
                     </div>
                   </div>
