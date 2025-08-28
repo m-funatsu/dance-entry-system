@@ -286,11 +286,29 @@ export default function EntryTable({ entries }: EntryTableProps) {
         )
       )
 
+      // ダミーエントリー（dummy-で始まるID）を除外
+      const realEntryIds = selectedEntries.filter(id => !id.startsWith('dummy-'))
+      
+      console.log('🔍 [STATUS UPDATE] エントリーIDフィルタリング:', {
+        originalSelected: selectedEntries,
+        filteredReal: realEntryIds,
+        dummyIds: selectedEntries.filter(id => id.startsWith('dummy-')),
+        realCount: realEntryIds.length,
+        dummyCount: selectedEntries.length - realEntryIds.length
+      })
+
+      if (realEntryIds.length === 0) {
+        console.warn('⚠️ [STATUS UPDATE] 実際のエントリーが選択されていません（ダミーエントリーのみ）')
+        alert('ダミーエントリー（ログインのみのユーザー）のステータスは変更できません')
+        setLocalEntries(originalEntries)
+        return
+      }
+
       console.log('🌐 [STATUS UPDATE] API呼び出し開始:', {
         url: '/api/admin/entries/status',
         method: 'PUT',
         payload: {
-          entryIds: selectedEntries,
+          entryIds: realEntryIds,
           status: newStatus,
         }
       })
@@ -301,7 +319,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          entryIds: selectedEntries,
+          entryIds: realEntryIds,
           status: newStatus,
         }),
       })
