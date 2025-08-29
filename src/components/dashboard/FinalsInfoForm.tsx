@@ -68,11 +68,160 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       // 2. 準決勝情報を読み込み（同期は実行しない）
       await loadSemifinalsInfo()
       
-      console.log('[FINALS INIT] 初期化完了 - 自動同期は無効（準決勝保存時のみ）')
+      console.log('[FINALS INIT] 初期化完了')
     }
     
     initializeForm()
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 準決勝データの自動同期機能
+  useEffect(() => {
+
+    const checkForSemifinalsUpdates = async () => {
+      try {
+        console.log('[AUTO SYNC] 準決勝データ更新チェック開始')
+        
+        // 現在の準決勝データを取得
+        const { data: currentSemifinalsData } = await supabase
+          .from('semifinals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .maybeSingle()
+
+        if (!currentSemifinalsData) return
+
+        // 決勝情報を取得して同期設定を確認
+        const { data: finalsData } = await supabase
+          .from('finals_info')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .maybeSingle()
+
+        if (!finalsData) return
+
+        console.log('[AUTO SYNC] 同期設定確認:')
+        console.log('[AUTO SYNC] - 楽曲情報:', finalsData.music_change === false ? '同期対象' : '非同期')
+        console.log('[AUTO SYNC] - 音響指示:', finalsData.sound_change_from_semifinals === false ? '同期対象' : '非同期')
+        console.log('[AUTO SYNC] - 照明指示:', finalsData.lighting_change_from_semifinals === false ? '同期対象' : '非同期')
+
+        let hasUpdated = false
+        let updatedData = { ...finalsData }
+
+        // 楽曲情報の同期チェック
+        if (finalsData.music_change === false) {
+          const musicNeedsSync = (
+            finalsData.work_title !== currentSemifinalsData.work_title ||
+            finalsData.music_title !== currentSemifinalsData.music_title ||
+            finalsData.artist !== currentSemifinalsData.artist
+          )
+          
+          if (musicNeedsSync) {
+            console.log('[AUTO SYNC] 楽曲情報を同期中...')
+            const musicData = {
+              work_title: currentSemifinalsData.work_title || '',
+              work_title_kana: currentSemifinalsData.work_title_kana || '',
+              work_character_story: currentSemifinalsData.work_character_story || '',
+              copyright_permission: currentSemifinalsData.copyright_permission || '',
+              music_title: currentSemifinalsData.music_title || '',
+              artist: currentSemifinalsData.artist || '',
+              cd_title: currentSemifinalsData.cd_title || '',
+              record_number: currentSemifinalsData.record_number || '',
+              jasrac_code: currentSemifinalsData.jasrac_code || '',
+              music_type: currentSemifinalsData.music_type || '',
+              music_data_path: currentSemifinalsData.music_data_path || ''
+            }
+            updatedData = { ...updatedData, ...musicData }
+            await syncMusicData(currentSemifinalsData)
+            hasUpdated = true
+          }
+        }
+
+        // 音響指示の同期チェック
+        if (finalsData.sound_change_from_semifinals === false) {
+          const soundNeedsSync = (
+            finalsData.sound_start_timing !== currentSemifinalsData.sound_start_timing ||
+            finalsData.chaser_song_designation !== currentSemifinalsData.chaser_song_designation
+          )
+          
+          if (soundNeedsSync) {
+            console.log('[AUTO SYNC] 音響指示を同期中...')
+            const mapChaserSongDesignation = (value: string): string => {
+              switch (value) {
+                case 'included': return '自作曲に組み込み'
+                case 'required': return '必要'
+                case 'not_required': return '不要（無音）'
+                default: return value
+              }
+            }
+            const soundData = {
+              sound_start_timing: currentSemifinalsData.sound_start_timing || '',
+              chaser_song_designation: mapChaserSongDesignation(currentSemifinalsData.chaser_song_designation || ''),
+              chaser_song: currentSemifinalsData.chaser_song || '',
+              fade_out_start_time: currentSemifinalsData.fade_out_start_time || '',
+              fade_out_complete_time: currentSemifinalsData.fade_out_complete_time || ''
+            }
+            updatedData = { ...updatedData, ...soundData }
+            await syncSoundData(currentSemifinalsData)
+            hasUpdated = true
+          }
+        }
+
+        // 照明指示の同期チェック
+        if (finalsData.lighting_change_from_semifinals === false) {
+          const lightingNeedsSync = (
+            finalsData.dance_start_timing !== currentSemifinalsData.dance_start_timing ||
+            finalsData.scene1_time !== currentSemifinalsData.scene1_time ||
+            finalsData.chaser_exit_time !== currentSemifinalsData.chaser_exit_time
+          )
+          
+          if (lightingNeedsSync) {
+            console.log('[AUTO SYNC] 照明指示を同期中...')
+            const lightingData = {
+              dance_start_timing: currentSemifinalsData.dance_start_timing || '',
+              scene1_time: currentSemifinalsData.scene1_time || '',
+              scene1_trigger: currentSemifinalsData.scene1_trigger || '',
+              scene1_color_type: currentSemifinalsData.scene1_color_type || '',
+              scene1_color_other: currentSemifinalsData.scene1_color_other || '',
+              scene1_image: currentSemifinalsData.scene1_image || '',
+              scene1_image_path: currentSemifinalsData.scene1_image_path || '',
+              chaser_exit_time: currentSemifinalsData.chaser_exit_time || '',
+              chaser_exit_trigger: currentSemifinalsData.chaser_exit_trigger || '',
+              chaser_exit_color_type: currentSemifinalsData.chaser_exit_color_type || '',
+              chaser_exit_color_other: currentSemifinalsData.chaser_exit_color_other || '',
+              chaser_exit_image: currentSemifinalsData.chaser_exit_image || '',
+              chaser_exit_image_path: currentSemifinalsData.chaser_exit_image_path || ''
+            }
+            updatedData = { ...updatedData, ...lightingData }
+            await syncLightingData(currentSemifinalsData)
+            hasUpdated = true
+          }
+        }
+
+        if (hasUpdated) {
+          console.log('[AUTO SYNC] 決勝情報を準決勝から自動同期しました')
+          
+          // 同期したデータをデータベースに保存
+          await saveAutoSyncedData(updatedData)
+          
+          // フォームデータを再読み込み
+          await loadFinalsInfo()
+        }
+
+      } catch (error) {
+        console.error('[AUTO SYNC] 自動同期エラー:', error)
+      }
+    }
+
+    // 5秒間隔で同期チェック
+    const syncInterval = setInterval(checkForSemifinalsUpdates, 5000)
+
+    // クリーンアップ
+    return () => {
+      if (syncInterval) {
+        clearInterval(syncInterval)
+      }
+    }
+  }, [entry.id, supabase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadFinalsInfo = async () => {
     setLoading(true)
@@ -165,6 +314,27 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     } catch (err) {
       console.error('[SYNC] 準決勝情報読み込みエラー:', err)
       return null
+    }
+  }
+
+  // 自動同期したデータをデータベースに保存
+  const saveAutoSyncedData = async (updatedData: Partial<FinalsInfo>) => {
+    try {
+      console.log('[AUTO SYNC SAVE] 自動同期データを保存中...')
+      
+      const { error } = await supabase
+        .from('finals_info')
+        .update(updatedData)
+        .eq('entry_id', entry.id)
+
+      if (error) {
+        console.error('[AUTO SYNC SAVE] 保存エラー:', error)
+        throw error
+      }
+
+      console.log('[AUTO SYNC SAVE] 自動同期データの保存完了')
+    } catch (error) {
+      console.error('[AUTO SYNC SAVE] 自動同期データ保存に失敗:', error)
     }
   }
 
