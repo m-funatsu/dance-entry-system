@@ -118,17 +118,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
         }
-        if (data.sound_change_from_semifinals === false && data.sound_start_timing) {
+        if (data.sound_change_from_semifinals === false) {
           setSoundChangeOption('same')
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
         }
-        if (data.lighting_change_from_semifinals === false && data.dance_start_timing) {
+        if (data.lighting_change_from_semifinals === false) {
           setLightingChangeOption('same')
         } else if (data.lighting_change_from_semifinals === true) {
           setLightingChangeOption('different')
         }
-        if (data.choreographer_change === false && data.choreographer_name) {
+        if (data.choreographer_change === false) {
           setChoreographerChangeOption('same')
         } else if (data.choreographer_change === true) {
           setChoreographerChangeOption('different')
