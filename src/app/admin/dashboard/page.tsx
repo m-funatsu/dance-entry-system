@@ -25,81 +25,17 @@ export default async function AdminDashboardPage() {
 
   // 管理者クライアントでデータを取得
   const adminSupabase = createAdminClient()
-  const [entriesResult, usersResult, filesResult, basicInfoResult, preliminaryInfoResult] = await Promise.all([
+  const [entriesResult, usersResult] = await Promise.all([
     adminSupabase.from('entries').select('*').order('created_at', { ascending: false }),
-    adminSupabase.from('users').select('id, name, email'),
-    adminSupabase.from('entry_files').select('id, entry_id, file_type, purpose'),
-    adminSupabase.from('basic_info').select('*'),
-    adminSupabase.from('preliminary_info').select('*')
+    adminSupabase.from('users').select('id, name, email')
   ])
   
   const { data: entries } = entriesResult
   const { data: allUsers } = usersResult
-  const { data: allFiles } = filesResult
-  const { data: allBasicInfo } = basicInfoResult
-  const { data: allPreliminaryInfo } = preliminaryInfoResult
 
-  // 必須項目の判定関数
-  const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
-    if (!basicInfo) return false
-    const requiredFields = [
-      'dance_style',
-      'representative_name',
-      'representative_furigana',
-      'representative_email',
-      'partner_name',
-      'partner_furigana',
-      'phone_number',
-      'choreographer',
-      'choreographer_furigana',
-      'agreement_checked',
-      'privacy_policy_checked'
-    ]
-    return requiredFields.every(field => {
-      const value = basicInfo[field]
-      if (typeof value === 'boolean') return value === true
-      return value && value.toString().trim() !== ''
-    })
-  }
-
-  const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
-    if (!preliminaryInfo) return false
-    if (!hasVideo) return false
-    // フォームの必須項目（新しい要件に基づく）
-    const requiredFields = [
-      'work_title',
-      'work_title_kana',
-      'work_story',
-      'music_title',
-      'cd_title', // 常時必須に変更
-      'artist', // 常時必須に変更
-      'record_number', // 常時必須に変更
-      'music_type',
-      'music_rights_cleared',
-      'choreographer1_name',
-      'choreographer1_furigana'
-      // jasrac_code は必須から除外
-    ]
-    return requiredFields.every(field => {
-      const value = preliminaryInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
-
-  // 手動でユーザーデータと関連情報をマッピング（安全な処理）
+  // 手動でユーザーデータをマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
-    const basicInfo = allBasicInfo?.find(b => b.entry_id === entry.id)
-    const preliminaryInfo = allPreliminaryInfo?.find(p => p.entry_id === entry.id)
-    const entryFiles = allFiles?.filter(f => f.entry_id === entry.id) || []
-    const hasVideo = entryFiles.some(f => f.file_type === 'video' && f.purpose === 'preliminary')
-    
-    // 必須項目の完了状況を判定
-    const basicInfoComplete = checkBasicInfoComplete(basicInfo)
-    const preliminaryInfoComplete = checkPreliminaryInfoComplete(preliminaryInfo, hasVideo)
-    
-    // 提出ステータスを判定（両方の必須項目が完了していれば提出済み）
-    const isSubmitted = basicInfoComplete && preliminaryInfoComplete
     
     return {
       ...entry,
@@ -107,28 +43,27 @@ export default async function AdminDashboardPage() {
         name: user.name || '不明なユーザー' 
       } : { 
         name: '不明なユーザー' 
-      },
-      basic_info: basicInfo,
-      preliminary_info: preliminaryInfo,
-      entry_files: entryFiles,
-      isSubmitted
+      }
     }
   }) || []
 
-  // 予選向け情報（基本情報＋予選情報）が完了しているエントリー数
+  // 予選向け情報提出状況（基本情報＋予選情報の提出ステータスが「登録済み」）
   const preliminarySubmitted = entriesWithUsers.filter(e => {
-    const hasBasicInfo = e.basic_info && checkBasicInfoComplete(e.basic_info)
-    const hasPreliminaryInfo = e.preliminary_info && checkPreliminaryInfoComplete(e.preliminary_info, e.entry_files.some((f: { file_type: string; purpose: string }) => f.file_type === 'video' && f.purpose === 'preliminary'))
-    return hasBasicInfo && hasPreliminaryInfo
+    const basicInfoSubmitted = e.basic_info_status === '登録済み'
+    const preliminaryInfoSubmitted = e.preliminary_info_status === '登録済み'
+    return basicInfoSubmitted && preliminaryInfoSubmitted
   }).length
   
-  // 本選向け情報（準決勝以降の情報）が完了しているエントリー数
-  const finalsSubmitted = entriesWithUsers.filter(e => {
-    const hasSemifinalsInfo = e.semifinals_info
-    const hasFinalsInfo = e.finals_info
-    const hasApplicationsInfo = e.applications_info
-    const hasSnsInfo = e.sns_info
-    return !!(hasSemifinalsInfo && hasFinalsInfo && hasApplicationsInfo && hasSnsInfo)
+  // 予選通過者（selectedステータス）のみを対象とする
+  const selectedEntries = entriesWithUsers.filter(e => e.status === 'selected')
+  
+  // 本選向け情報提出状況（予選通過者のうち、プログラム、準決勝、決勝、SNSの提出ステータスが「登録済み」）
+  const finalsSubmitted = selectedEntries.filter(e => {
+    const programInfoSubmitted = e.program_info_status === '登録済み'
+    const semifinalsInfoSubmitted = e.semifinals_info_status === '登録済み'
+    const finalsInfoSubmitted = e.finals_info_status === '登録済み'
+    const snsInfoSubmitted = e.sns_info_status === '登録済み'
+    return programInfoSubmitted && semifinalsInfoSubmitted && finalsInfoSubmitted && snsInfoSubmitted
   }).length
 
   const stats = {
@@ -143,8 +78,8 @@ export default async function AdminDashboardPage() {
   const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
     let genre = '未分類'
     
-    if (entry.basic_info?.dance_style) {
-      genre = entry.basic_info.dance_style as string
+    if (entry.dance_style) {
+      genre = entry.dance_style as string
     }
     
     if (!acc[genre]) {
@@ -302,7 +237,7 @@ export default async function AdminDashboardPage() {
                         本選向け情報提出状況
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {stats.finalsSubmitted} / {stats.total}
+                        {stats.finalsSubmitted} / {stats.selected}
                       </dd>
                     </dl>
                   </div>
