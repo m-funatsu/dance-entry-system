@@ -306,37 +306,13 @@ export default async function DashboardPage() {
     console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック（ダッシュボード）===')
     console.log('[DASHBOARD SEMIFINALS CHECK] semifinalsInfo:', semifinalsInfo)
     
-    // 基本必須フィールド - バリデーションルールに完全準拠
+    // 実際のフォームの必須項目に合わせた正しい必須フィールド
     const baseRequiredFields = [
-      'music_change_from_preliminary', // 選択必須
-      'work_title',
-      'work_character_story',
-      'copyright_permission',
-      'music_title',
-      'music_type',
-      'music_data_path',
-      // Sound Section
-      'sound_start_timing',
-      'chaser_song_designation',
-      'fade_out_start_time',
-      'fade_out_complete_time',
-      // Lighting Section
-      'dance_start_timing',
-      'scene1_time',
-      'scene1_trigger', 
-      'scene1_color_type',
-      'scene1_color_other',
-      'scene1_image',
-      'scene1_image_path',
-      'chaser_exit_time',
-      'chaser_exit_trigger',
-      'chaser_exit_color_type', 
-      'chaser_exit_color_other',
-      'chaser_exit_image',
-      'chaser_exit_image_path',
-      // Choreographer Section
-      'props_usage',
-      // Bank Section
+      'sound_start_timing',  // 音楽スタートのタイミング（*必須）
+      'dance_start_timing',  // 踊り出しタイミング（*必須）
+      'choreographer_name',  // 振付師①氏名（*必須）
+      'choreographer_furigana', // 振付師①フリガナ（*必須）
+      // 賞金振込先情報（全て必須）
       'bank_name',
       'branch_name', 
       'account_type',
@@ -344,43 +320,24 @@ export default async function DashboardPage() {
       'account_holder'
     ]
     
-    // 条件付き必須項目
-    const conditionallyRequired: string[] = []
+    // music_change_from_preliminary の選択チェック（boolean値として必須）
+    const musicChangeSelected = semifinalsInfo.music_change_from_preliminary !== null && 
+                               semifinalsInfo.music_change_from_preliminary !== undefined
     
-    // JASRAC作品コード（市販楽曲の場合のみ必須）
-    if (semifinalsInfo.copyright_permission === 'commercial') {
-      conditionallyRequired.push('jasrac_code')
+    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲変更選択:', musicChangeSelected, semifinalsInfo.music_change_from_preliminary)
+    
+    if (!musicChangeSelected) {
+      console.log('[DASHBOARD SEMIFINALS CHECK] === 楽曲変更の選択が未完了 ===')
+      return false
     }
     
-    // チェイサー曲（必要な場合のみ必須）
-    if (semifinalsInfo.chaser_song_designation === 'required') {
-      conditionallyRequired.push('chaser_song')
-    }
-    
-    // 小道具詳細（小道具ありの場合のみ必須）
-    if (semifinalsInfo.props_usage === 'あり') {
-      conditionallyRequired.push('props_details')
-    }
-    
-    const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
-    
-    console.log('[DASHBOARD SEMIFINALS CHECK] 基本必須フィールド数:', baseRequiredFields.length)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 条件付き必須フィールド:', conditionallyRequired)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 全必須フィールド数:', allRequiredFields.length)
-    
-    // フィールドチェック
+    // 基本必須フィールドチェック
     const fieldResults: Record<string, boolean> = {}
     const missingFields: string[] = []
     
-    allRequiredFields.forEach(field => {
+    baseRequiredFields.forEach(field => {
       const value = semifinalsInfo[field]
-      let isValid = false
-      
-      if (typeof value === 'boolean') {
-        isValid = value !== null && value !== undefined
-      } else {
-        isValid = !!(value && value.toString().trim() !== '')
-      }
+      const isValid = !!(value && value.toString().trim() !== '')
       
       fieldResults[field] = isValid
       console.log(`[DASHBOARD SEMIFINALS CHECK] ${field}: "${value}" -> ${isValid}`)
@@ -393,14 +350,13 @@ export default async function DashboardPage() {
     const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
     
     console.log('[DASHBOARD SEMIFINALS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD SEMIFINALS CHECK] 全フィールド完了:', hasAllRequiredFields)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲変更選択:', musicChangeSelected)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 基本必須フィールド完了:', hasAllRequiredFields)
     console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド数:', missingFields.length)
     console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド:', missingFields)
     console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック終了（ダッシュボード）===')
     
-    // 注意：振込確認用紙のチェックはここでは行わない（ファイル情報が利用できないため）
-    // 実際の完了判定はstatus-utils.tsのcheckSemifinalsInfoCompletionで行う
-    return hasAllRequiredFields
+    return musicChangeSelected && hasAllRequiredFields
   }
 
   // 決勝情報の完了判定関数
@@ -495,7 +451,7 @@ export default async function DashboardPage() {
 
     // 4. 振付師セクション
     const choreographerChange = finalsInfo.choreographer_change
-    if (!choreographerChange && choreographerChange !== false) {
+    if (choreographerChange === null || choreographerChange === undefined) {
       missingFields.push('振付師の変更選択')
       allSectionsValid = false
     } else if (choreographerChange === true) {
@@ -519,18 +475,28 @@ export default async function DashboardPage() {
       }
     }
     
-    // 振付師出席情報は常に必須
-    const choreographerRequiredFields = [
-      'choreographer_attendance', 'choreographer_photo_permission', 'choreographer_photo_path'
-    ]
+    // 振付師出席情報は常に必須（写真は条件付き）
+    const choreographerAttendance = finalsInfo.choreographer_attendance
+    const choreographerPhotoPermission = finalsInfo.choreographer_photo_permission
     
-    choreographerRequiredFields.forEach(field => {
-      const value = finalsInfo[field]
-      if (!value || value.toString().trim() === '') {
-        missingFields.push(field)
+    if (!choreographerAttendance || choreographerAttendance.toString().trim() === '') {
+      missingFields.push('choreographer_attendance')
+      allSectionsValid = false
+    }
+    
+    if (!choreographerPhotoPermission || choreographerPhotoPermission.toString().trim() === '') {
+      missingFields.push('choreographer_photo_permission')
+      allSectionsValid = false
+    }
+    
+    // 振付師写真は写真許可が「許可する」の場合のみ必須
+    if (choreographerPhotoPermission === '許可する') {
+      const choreographerPhotoPath = finalsInfo.choreographer_photo_path
+      if (!choreographerPhotoPath || choreographerPhotoPath.toString().trim() === '') {
+        missingFields.push('choreographer_photo_path')
         allSectionsValid = false
       }
-    })
+    }
 
     console.log('[DASHBOARD FINALS CHECK] === チェック結果まとめ ===')
     console.log('[DASHBOARD FINALS CHECK] 全セクション有効:', allSectionsValid)
