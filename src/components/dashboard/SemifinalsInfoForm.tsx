@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import { BankSection } from '@/components/semifinals/BankSection'
-import type { Entry, SemifinalsInfo } from '@/lib/types'
+import type { Entry, SemifinalsInfo, FinalsInfo } from '@/lib/types'
 
 interface SemifinalsInfoFormProps {
   entry: Entry
@@ -29,6 +29,123 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
   const [paymentSlipFile, setPaymentSlipFile] = useState<File | null>(null)
+
+  // 決勝情報への同期処理
+  const syncToFinals = async () => {
+    console.log('[FINALS SYNC] 決勝同期チェック開始')
+    
+    // 決勝情報を取得して同期設定を確認
+    const { data: finalsData, error: finalsError } = await supabase
+      .from('finals_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .maybeSingle()
+
+    if (finalsError) {
+      console.error('[FINALS SYNC] 決勝情報取得エラー:', finalsError)
+      return
+    }
+
+    if (!finalsData) {
+      console.log('[FINALS SYNC] 決勝情報が存在しないため同期をスキップ')
+      return
+    }
+
+    let hasUpdated = false
+    const updatedData: Partial<FinalsInfo> = {}
+
+    console.log('[FINALS SYNC] 同期設定確認:')
+    console.log('[FINALS SYNC] - 楽曲情報:', finalsData.music_change === false ? '同期対象' : '非同期')
+    console.log('[FINALS SYNC] - 音響指示:', finalsData.sound_change_from_semifinals === false ? '同期対象' : '非同期')
+    console.log('[FINALS SYNC] - 照明指示:', finalsData.lighting_change_from_semifinals === false ? '同期対象' : '非同期')
+
+    // 楽曲情報の同期
+    if (finalsData.music_change === false) {
+      console.log('[FINALS SYNC] 楽曲情報を同期')
+      updatedData.work_title = semifinalsInfo.work_title || ''
+      updatedData.work_title_kana = semifinalsInfo.work_title_kana || ''
+      updatedData.work_character_story = semifinalsInfo.work_character_story || ''
+      updatedData.copyright_permission = semifinalsInfo.copyright_permission || ''
+      updatedData.music_title = semifinalsInfo.music_title || ''
+      updatedData.artist = semifinalsInfo.artist || ''
+      updatedData.cd_title = semifinalsInfo.cd_title || ''
+      updatedData.record_number = semifinalsInfo.record_number || ''
+      updatedData.jasrac_code = semifinalsInfo.jasrac_code || ''
+      updatedData.music_type = semifinalsInfo.music_type || ''
+      updatedData.music_data_path = semifinalsInfo.music_data_path || ''
+      hasUpdated = true
+    }
+
+    // 音響指示の同期
+    if (finalsData.sound_change_from_semifinals === false) {
+      console.log('[FINALS SYNC] 音響指示を同期')
+      
+      // 追い出し楽曲指定の値変換
+      const mapChaserSongDesignation = (value: string): string => {
+        switch (value) {
+          case 'included': return '自作曲に組み込み'
+          case 'required': return '必要'
+          case 'not_required': return '不要（無音）'
+          default: return value
+        }
+      }
+      
+      updatedData.sound_start_timing = semifinalsInfo.sound_start_timing || ''
+      updatedData.chaser_song_designation = mapChaserSongDesignation(semifinalsInfo.chaser_song_designation || '')
+      updatedData.chaser_song = semifinalsInfo.chaser_song || ''
+      updatedData.fade_out_start_time = semifinalsInfo.fade_out_start_time || ''
+      updatedData.fade_out_complete_time = semifinalsInfo.fade_out_complete_time || ''
+      hasUpdated = true
+    }
+
+    // 照明指示の同期
+    if (finalsData.lighting_change_from_semifinals === false) {
+      console.log('[FINALS SYNC] 照明指示を同期')
+      updatedData.dance_start_timing = semifinalsInfo.dance_start_timing || ''
+      updatedData.scene1_time = semifinalsInfo.scene1_time
+      updatedData.scene1_trigger = semifinalsInfo.scene1_trigger || ''
+      updatedData.scene1_color_type = semifinalsInfo.scene1_color_type || ''
+      updatedData.scene1_color_other = semifinalsInfo.scene1_color_other || ''
+      updatedData.scene1_image = semifinalsInfo.scene1_image || ''
+      updatedData.scene1_image_path = semifinalsInfo.scene1_image_path || ''
+      updatedData.scene1_notes = semifinalsInfo.scene1_notes || ''
+      updatedData.chaser_exit_time = semifinalsInfo.chaser_exit_time
+      updatedData.chaser_exit_trigger = semifinalsInfo.chaser_exit_trigger || ''
+      updatedData.chaser_exit_color_type = semifinalsInfo.chaser_exit_color_type || ''
+      updatedData.chaser_exit_color_other = semifinalsInfo.chaser_exit_color_other || ''
+      updatedData.chaser_exit_image = semifinalsInfo.chaser_exit_image || ''
+      updatedData.chaser_exit_image_path = semifinalsInfo.chaser_exit_image_path || ''
+      updatedData.chaser_exit_notes = semifinalsInfo.chaser_exit_notes || ''
+      hasUpdated = true
+    }
+
+    // 振付師情報の同期（choreographer_change設定が存在する場合）
+    if (finalsData.choreographer_change === false) {
+      console.log('[FINALS SYNC] 振付師情報を同期')
+      updatedData.choreographer_name = semifinalsInfo.choreographer_name || ''
+      updatedData.choreographer_furigana = semifinalsInfo.choreographer_name_kana || ''
+      updatedData.choreographer2_name = semifinalsInfo.choreographer2_name || ''
+      updatedData.choreographer2_furigana = semifinalsInfo.choreographer2_furigana || ''
+      hasUpdated = true
+    }
+
+    if (hasUpdated) {
+      console.log('[FINALS SYNC] 決勝情報を更新中...')
+      const { error } = await supabase
+        .from('finals_info')
+        .update(updatedData)
+        .eq('entry_id', entry.id)
+
+      if (error) {
+        console.error('[FINALS SYNC] 決勝更新エラー:', error)
+        throw error
+      }
+
+      console.log('[FINALS SYNC] 決勝情報の同期完了')
+    } else {
+      console.log('[FINALS SYNC] 同期対象項目がないため同期をスキップ')
+    }
+  }
 
   useEffect(() => {
     if (!hasLoadedInitialData) {
@@ -207,6 +324,16 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         }
       }
 
+      // 決勝情報の同期チェック（一時保存でない場合のみ）
+      if (!isTemporary) {
+        try {
+          await syncToFinals()
+        } catch (syncError) {
+          console.error('決勝同期エラー:', syncError)
+          // 同期エラーがあっても保存は成功扱いにする
+        }
+      }
+      
       setSuccess(isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました')
       // データを保持するため、再読み込みはしない
     } catch (err) {
