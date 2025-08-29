@@ -417,7 +417,8 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1') || file.purpose.includes('makeup_style2'))
+                          file.file_type === 'photo' && file.purpose && 
+                          (file.purpose === 'makeup_style1' || file.purpose === 'makeup_style2') // 準決勝用のみ（_finalなし）
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -431,7 +432,8 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1') || file.purpose.includes('makeup_style2'))
+                          file.file_type === 'photo' && file.purpose && 
+                          (file.purpose === 'makeup_style1' || file.purpose === 'makeup_style2') // 準決勝用のみ
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -453,7 +455,8 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1_final') || file.purpose.includes('makeup_style2_final'))
+                          file.file_type === 'photo' && file.purpose && 
+                          (file.purpose === 'makeup_style1_final' || file.purpose === 'makeup_style2_final') // 決勝用のみ
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -467,7 +470,8 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && (file.purpose.includes('makeup_style1_final') || file.purpose.includes('makeup_style2_final'))
+                          file.file_type === 'photo' && file.purpose && 
+                          (file.purpose === 'makeup_style1_final' || file.purpose === 'makeup_style2_final') // 決勝用のみ
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
