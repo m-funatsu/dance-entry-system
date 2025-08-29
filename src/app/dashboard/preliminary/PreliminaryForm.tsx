@@ -34,7 +34,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     artist: initialData?.artist || '',
     record_number: initialData?.record_number || '',
     jasrac_code: initialData?.jasrac_code || '',
-    music_type: initialData?.music_type || 'cd',
+    music_type: initialData?.music_type || '',
     choreographer1_name: initialData?.choreographer1_name || '',
     choreographer1_furigana: initialData?.choreographer1_furigana || '',
     choreographer2_name: initialData?.choreographer2_name || '',
