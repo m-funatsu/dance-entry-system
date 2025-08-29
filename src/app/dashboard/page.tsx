@@ -277,20 +277,21 @@ export default async function DashboardPage() {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
     
-    // フォームの必須項目（新しい要件に基づく）
+    // 予選フォームの*マーク付き必須項目
     const requiredFields = [
-      'work_title',
-      'work_title_kana',
-      'work_story',
-      'music_title',
-      'cd_title', // 常時必須に変更
-      'artist', // 常時必須に変更
-      'record_number', // 常時必須に変更
-      'music_type',
-      'music_rights_cleared',
-      'choreographer1_name',
-      'choreographer1_furigana'
-      // jasrac_code は必須から除外
+      'work_title',              // 作品タイトル *
+      'work_title_kana',         // 作品タイトルかな *
+      'work_story',              // 作品ストーリー *
+      'music_title',             // 楽曲タイトル *
+      'cd_title',                // CDタイトル *
+      'artist',                  // アーティスト *
+      'record_number',           // レコード番号 *
+      'music_type',              // 楽曲種類 *
+      'music_rights_cleared',    // 楽曲著作権許可 *
+      'choreographer1_name',     // 振付師1氏名 *
+      'choreographer1_furigana'  // 振付師1フリガナ *
+      // 予選提出動画はhasVideoパラメータでチェック
+      // jasrac_code は任意項目
     ]
     
     return requiredFields.every(field => {
@@ -311,6 +312,8 @@ export default async function DashboardPage() {
       // 音響指示情報
       'sound_start_timing',      // 音楽スタートのタイミング *
       'chaser_song_designation', // チェイサー曲の指定 *
+      'fade_out_start_time',     // フェードアウト開始時間 *
+      'fade_out_complete_time',  // フェードアウト完了時間 *
       // 照明指示情報 
       'dance_start_timing',      // 踊り出しタイミング *
       'scene1_time',             // シーン1時間 *
