@@ -179,8 +179,8 @@ export default async function DashboardPage() {
     })
   }
 
-  // ファイル情報の取得
-  const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0 }
+  // ファイル情報の取得（振込確認用紙を含む）
+  const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0, bankSlip: 0 }
   let preliminaryVideoFile: EntryFile | null = null
   if (entry) {
     const { data: files } = await supabase
@@ -199,11 +199,16 @@ export default async function DashboardPage() {
           }
         }
         else if (file.file_type === 'photo') fileStats.photo++
+        
+        // 振込確認用紙のチェック
+        if (file.purpose === 'bank_slip') {
+          fileStats.bankSlip++
+        }
       })
     }
   }
 
-  // 必須項目のチェック関数
+  // 必須項目のチェック関数  
   const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
     if (!basicInfo) return false
     
@@ -271,6 +276,19 @@ export default async function DashboardPage() {
     })
     
     return hasAllRequiredFields && hasAllAgreements
+  }
+  
+  // 振込確認用紙の状態確認
+  let hasBankSlip = false
+  if (entry) {
+    const { data: bankSlipFiles } = await supabase
+      .from('entry_files')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .eq('purpose', 'bank_slip')
+    
+    hasBankSlip = !!(bankSlipFiles && bankSlipFiles.length > 0)
+    console.log('[DASHBOARD BASIC INFO] 振込確認用紙チェック:', hasBankSlip)
   }
 
   const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
@@ -771,7 +789,7 @@ export default async function DashboardPage() {
                         基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkBasicInfoComplete(basicInfo) ? '登録済み' : basicInfo ? '入力中' : '未登録'}
+                        {(checkBasicInfoComplete(basicInfo) && hasBankSlip) ? '登録済み' : basicInfo ? '入力中' : '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.basic_info_deadline)
