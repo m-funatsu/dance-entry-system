@@ -108,6 +108,21 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               handleMusicChange(true)
             } else if (e.target.value === 'different') {
               handleMusicChange(false)
+            } else if (e.target.value === '') {
+              // 「選択してください」に戻す場合は未選択状態にリセット
+              onChange({ 
+                music_change_from_preliminary: undefined,
+                work_title: '',
+                work_title_kana: '',
+                work_character_story: '',
+                music_title: '',
+                cd_title: '',
+                artist: '',
+                record_number: '',
+                jasrac_code: '',
+                music_type: '',
+                copyright_permission: ''
+              })
             }
           }}
           disabled={!isEditable}

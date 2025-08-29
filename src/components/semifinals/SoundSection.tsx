@@ -78,6 +78,16 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
                   onFileDelete('chaser_song')
                 }
               }
+            } else if (e.target.value === '') {
+              // 「選択してください」に戻す場合はリセット
+              onChange({ chaser_song_designation: '', chaser_song: '' })
+              // 音源ファイルが存在する場合は削除
+              if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
+                console.log('[CHASER CHANGE] 「選択してください」選択 - チェイサー音源を削除')
+                if (onFileDelete) {
+                  onFileDelete('chaser_song')
+                }
+              }
             }
           }}
           disabled={!isEditable}
