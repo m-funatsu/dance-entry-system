@@ -172,6 +172,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   // 手動オプション変更時の即座同期用関数（UI用）
   const syncMusicData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    // 手動同期時に既存の音楽データファイルを削除
+    if (finalsInfo.music_data_path) {
+      try {
+        console.log('[MUSIC SYNC] 既存のmusic_data_pathファイルを削除中')
+        await handleFileDelete('music_data_path')
+      } catch (error) {
+        console.error('[MUSIC SYNC] music_data_path削除エラー:', error)
+        // 削除エラーがあっても同期処理は続行
+      }
+    }
+    
     setFinalsInfo(prev => ({
       ...prev,
       work_title: semifinalsData.work_title || '',
@@ -189,6 +200,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const syncSoundData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    // 手動同期時に既存の音楽ファイルを削除
+    if (finalsInfo.chaser_song) {
+      try {
+        console.log('[SOUND SYNC] 既存のchaser_songファイルを削除中')
+        await handleFileDelete('chaser_song')
+      } catch (error) {
+        console.error('[SOUND SYNC] chaser_song削除エラー:', error)
+        // 削除エラーがあっても同期処理は続行
+      }
+    }
+    
     const mapChaserSongDesignation = (value: string): string => {
       switch (value) {
         case 'included': return '自作曲に組み込み'
@@ -209,6 +231,21 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const syncLightingData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    // 手動同期時に既存の画像ファイルを削除
+    const imageFields = ['scene1_image', 'scene1_image_path', 'chaser_exit_image', 'chaser_exit_image_path']
+    
+    for (const field of imageFields) {
+      if (finalsInfo[field as keyof FinalsInfo]) {
+        try {
+          console.log(`[LIGHTING SYNC] 既存の${field}ファイルを削除中`)
+          await handleFileDelete(field)
+        } catch (error) {
+          console.error(`[LIGHTING SYNC] ${field}削除エラー:`, error)
+          // 削除エラーがあっても同期処理は続行
+        }
+      }
+    }
+    
     setFinalsInfo(prev => ({
       ...prev,
       dance_start_timing: semifinalsData.dance_start_timing || '',
@@ -218,12 +255,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       scene1_color_other: semifinalsData.scene1_color_other || '',
       scene1_image: semifinalsData.scene1_image || '',
       scene1_image_path: semifinalsData.scene1_image_path || '',
+      scene1_notes: semifinalsData.scene1_notes || '',
       chaser_exit_time: semifinalsData.chaser_exit_time || '',
       chaser_exit_trigger: semifinalsData.chaser_exit_trigger || '',
       chaser_exit_color_type: semifinalsData.chaser_exit_color_type || '',
       chaser_exit_color_other: semifinalsData.chaser_exit_color_other || '',
       chaser_exit_image: semifinalsData.chaser_exit_image || '',
-      chaser_exit_image_path: semifinalsData.chaser_exit_image_path || ''
+      chaser_exit_image_path: semifinalsData.chaser_exit_image_path || '',
+      chaser_exit_notes: semifinalsData.chaser_exit_notes || ''
     }))
   }
 
