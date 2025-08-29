@@ -27,6 +27,7 @@ interface EntryWithDetails {
   program_info_status?: string
   sns_info_status?: string
   applications_info_status?: string
+  consent_form_submitted?: boolean
   created_at: string
   updated_at: string
   users: {
@@ -158,20 +159,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
     const hasApplicationsInfo = !!applicationsInfoData
     const hasSnsInfo = !!snsInfoData
     
-    // 参加同意書の状況を確認（基本情報の同意項目で判定）
-    const hasConsentForm = (() => {
-      if (!entry.basic_info) return false
-      let basicInfo = null
-      if (Array.isArray(entry.basic_info) && entry.basic_info.length > 0) {
-        basicInfo = entry.basic_info[0]
-      } else if (!Array.isArray(entry.basic_info)) {
-        basicInfo = entry.basic_info
-      }
-      
-      if (!basicInfo) return false
-      const basicInfoRecord = basicInfo as Record<string, unknown>
-      return !!(basicInfoRecord.agreement_checked && basicInfoRecord.privacy_policy_checked && basicInfoRecord.media_consent_checked)
-    })()
+    // 参加同意書の状況を確認（consent_form_submittedで判定）
+    const hasConsentForm = !!(entry.consent_form_submitted)
 
     // デバッグログ（問題解決後は削除）
     const debugInfo = {
