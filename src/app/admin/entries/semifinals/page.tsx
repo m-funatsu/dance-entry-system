@@ -180,49 +180,29 @@ export default async function SemifinalsInfoListPage() {
               item.record_number || '未入力',
               item.jasrac_code || '未入力',
               getMusicTypeLabel(item.music_type || ''),
-              // 楽曲データ添付
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 音響情報
               item.sound_start_timing || '未入力',
               getChaserDesignationLabel(item.chaser_song_designation || ''),
               item.fade_out_start_time || '未入力',
               item.fade_out_complete_time || '未入力',
-              // チェイサー（退場）曲音源
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'audio' && file.purpose === 'chaser_song').map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 踊り出し
               item.dance_start_timing || '未入力',
               // 照明シーン1
               `時間:${item.scene1_time || '未入力'} きっかけ:${item.scene1_trigger || '未入力'} 色:${item.scene1_color_type || '未入力'} イメージ:${item.scene1_image || '未入力'} 備考:${item.scene1_notes || '未入力'}`,
-              // 照明シーン1イメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン2
               `時間:${item.scene2_time || '未入力'} きっかけ:${item.scene2_trigger || '未入力'} 色:${item.scene2_color_type || '未入力'} イメージ:${item.scene2_image || '未入力'} 備考:${item.scene2_notes || '未入力'}`,
-              // 照明シーン2イメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン3
               `時間:${item.scene3_time || '未入力'} きっかけ:${item.scene3_trigger || '未入力'} 色:${item.scene3_color_type || '未入力'} イメージ:${item.scene3_image || '未入力'} 備考:${item.scene3_notes || '未入力'}`,
-              // 照明シーン3イメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン4
               `時間:${item.scene4_time || '未入力'} きっかけ:${item.scene4_trigger || '未入力'} 色:${item.scene4_color_type || '未入力'} イメージ:${item.scene4_image || '未入力'} 備考:${item.scene4_notes || '未入力'}`,
-              // 照明シーン4イメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン5
               `時間:${item.scene5_time || '未入力'} きっかけ:${item.scene5_trigger || '未入力'} 色:${item.scene5_color_type || '未入力'} イメージ:${item.scene5_image || '未入力'} 備考:${item.scene5_notes || '未入力'}`,
-              // 照明シーン5イメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 照明シーン チェイサー
               `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
-              // 照明シーン チェイサーイメージ画像
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 振付師情報
               `①${item.choreographer_name || '未入力'} (${item.choreographer_furigana || '未入力'}) ②${item.choreographer2_name || '未入力'} (${item.choreographer2_furigana || '未入力'})`,
               // 小道具情報
               `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
-              // 振込確認
-              item.entry_files?.filter((file: { file_type: string; purpose?: string; file_name: string }) => 
-                file.purpose === 'semifinals_payment_slip'
-              ).map((file: { file_name: string }) => file.file_name).join(', ') || 'なし',
               // 賞金振込先情報
               `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
               // 選考ステータス
@@ -245,32 +225,23 @@ export default async function SemifinalsInfoListPage() {
               '4. 楽曲著作関連情報 - レコード番号',
               '4. 楽曲著作関連情報 - JASRAC作品コード',
               '4. 楽曲著作関連情報 - 楽曲種類',
-              '5. 楽曲データ添付',
               '6. 音響情報 - 音楽スタートのタイミング',
               '6. 音響情報 - チェイサー曲の指定',
               '6. 音響情報 - フェードアウト開始時間',
               '6. 音響情報 - フェードアウト完了時間',
-              '7. チェイサー（退場）曲音源',
               '8. 踊り出し - 準決勝 踊り出しタイミング',
               '9. 照明シーン1',
-              '10. 照明シーン1イメージ画像',
               '11. 照明シーン2',
-              '12. 照明シーン2イメージ画像',
               '13. 照明シーン3',
-              '14. 照明シーン3イメージ画像',
               '15. 照明シーン4',
-              '16. 照明シーン4イメージ画像',
               '17. 照明シーン5',
-              '18. 照明シーン5イメージ画像',
               '19. 照明シーン チェイサー',
-              '20. 照明シーン チェイサーイメージ画像',
               '21. 振付師情報',
               '22. 小道具情報',
-              '23. 振込確認',
               '24. 賞金振込先情報',
               '25. 選考ステータス'
             ]}
-            filename="semifinals_info_25columns"
+            filename="semifinals_info_16columns"
           />
         </div>
       </div>
