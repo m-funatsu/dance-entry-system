@@ -130,7 +130,7 @@ export default async function ApplicationsInfoListPage() {
       makeup_phone_final: relatedApplicationsInfo?.makeup_phone_final || '',
       makeup_notes_final: relatedApplicationsInfo?.makeup_notes_final || '',
       // 備考情報
-      notes: relatedApplicationsInfo?.notes || '',
+      applications_notes: relatedApplicationsInfo?.applications_notes || '',
       // エントリー情報
       entries: {
         ...entry,
@@ -200,7 +200,7 @@ export default async function ApplicationsInfoListPage() {
               // 選手同伴合計
               item.companion_total_amount || '0',
               // 備考
-              item.notes || '',
+              item.applications_notes || '',
               // メイク(準決勝)
               item.makeup_preferred_stylist || '',
               item.makeup_name || '',
@@ -412,7 +412,7 @@ export default async function ApplicationsInfoListPage() {
                     {/* 備考 */}
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        {applicationsInfo.notes || '未入力'}
+                        {applicationsInfo.applications_notes || '未入力'}
                       </div>
                     </td>
                     
