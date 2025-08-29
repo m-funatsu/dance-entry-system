@@ -10,8 +10,7 @@ import {
   checkProgramInfoCompletion,
   checkSemifinalsInfoCompletion,
   checkFinalsInfoCompletion,
-  checkSnsInfoCompletion,
-  checkApplicationsInfoCompletion
+  checkSnsInfoCompletion
 } from '@/lib/status-utils'
 import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
@@ -122,7 +121,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
     const isSemifinalsComplete = semifinalsInfoData ? checkSemifinalsInfoCompletion(semifinalsInfoData as Record<string, unknown>) : false
     const isFinalsComplete = finalsInfoData ? checkFinalsInfoCompletion(finalsInfoData as Record<string, unknown>) : false
     const isSnsComplete = snsInfoData ? checkSnsInfoCompletion(snsInfoData as Record<string, unknown>, hasPracticeVideo, hasIntroductionVideo) : false
-    const isApplicationsComplete = applicationsInfoData ? checkApplicationsInfoCompletion(applicationsInfoData as Record<string, unknown>) : false
 
     // データ存在チェック（完了チェックとは別）
     const hasBasicInfo = !!basicInfoData
@@ -198,57 +196,70 @@ export default function EntryTable({ entries }: EntryTableProps) {
 
     return (
       <div className="flex flex-wrap gap-1">
+        {/* 基本：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasBasicInfo ? 
-            (isBasicComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isBasicComplete ? 'bg-green-100 text-green-800' : 
+          hasBasicInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           基本
         </span>
+        
+        {/* 予選：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasPreliminaryInfo ? 
-            (isPreliminaryComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isPreliminaryComplete ? 'bg-green-100 text-green-800' : 
+          hasPreliminaryInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           予選
         </span>
+        
+        {/* プログラム：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasProgramInfo ? 
-            (isProgramComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isProgramComplete ? 'bg-green-100 text-green-800' : 
+          hasProgramInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           プログラム
         </span>
+        
+        {/* 準決勝：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasSemifinalsInfo ? 
-            (isSemifinalsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isSemifinalsComplete ? 'bg-green-100 text-green-800' : 
+          hasSemifinalsInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           準決勝
         </span>
+        
+        {/* 決勝：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasFinalsInfo ? 
-            (isFinalsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isFinalsComplete ? 'bg-green-100 text-green-800' : 
+          hasFinalsInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           決勝
         </span>
+        
+        {/* 申請：申請あり=緑、申請なし=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasApplicationsInfo ? 
-            (isApplicationsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          hasApplicationsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
         }`}>
           申請
         </span>
+        
+        {/* SNS：登録済み=緑、入力中=黄色、未入力=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasSnsInfo ? 
-            (isSnsComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') : 
-            'bg-gray-100 text-gray-400'
+          isSnsComplete ? 'bg-green-100 text-green-800' : 
+          hasSnsInfo ? 'bg-yellow-100 text-yellow-800' : 
+          'bg-gray-100 text-gray-400'
         }`}>
           SNS
         </span>
+        
+        {/* 同意書：提出済み=緑、未提出=グレー */}
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasConsentForm ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-400'
+          hasConsentForm ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
         }`}>
           同意書
         </span>
