@@ -318,256 +318,22 @@ export default async function DashboardPage() {
     })
   }
 
-  // 準決勝情報の完了判定関数
-  const checkSemifinalsInfoComplete = (semifinalsInfo: { [key: string]: unknown } | null) => {
+  // 準決勝情報の完了判定関数（status-utils.tsと統一）
+  const checkSemifinalsInfoComplete = async (semifinalsInfo: { [key: string]: unknown } | null) => {
     if (!semifinalsInfo) return false
     
-    console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック（ダッシュボード）===')
-    console.log('[DASHBOARD SEMIFINALS CHECK] semifinalsInfo:', semifinalsInfo)
-    
-    // *マークのついた必須項目すべて
-    const baseRequiredFields = [
-      // 音響指示情報
-      'sound_start_timing',      // 音楽スタートのタイミング *
-      'chaser_song_designation', // チェイサー曲の指定 *
-      'fade_out_start_time',     // フェードアウト開始時間 *
-      'fade_out_complete_time',  // フェードアウト完了時間 *
-      // 照明指示情報 
-      'dance_start_timing',      // 踊り出しタイミング *
-      'scene1_time',             // シーン1時間 *
-      'scene1_trigger',          // シーン1きっかけ *
-      'scene1_color_type',       // シーン1色系統 *
-      'scene1_color_other',      // シーン1色その他 *
-      'scene1_image',            // シーン1イメージ *
-      'scene1_image_path',       // シーン1イメージ画像 *
-      'chaser_exit_time',        // チェイサー時間 *
-      'chaser_exit_trigger',     // チェイサーきっかけ *
-      'chaser_exit_color_type',  // チェイサー色系統 *
-      'chaser_exit_color_other', // チェイサー色その他 *
-      'chaser_exit_image',       // チェイサーイメージ *
-      'chaser_exit_image_path',  // チェイサーイメージ画像 *
-      // 振付情報
-      'choreographer_name',      // 振付師氏名① *
-      'choreographer_furigana',  // 振付師フリガナ① *
-      'props_usage',             // 小道具の有無 *
-      // 賞金振込先情報（全て必須）
-      'bank_name',
-      'branch_name', 
-      'account_type',
-      'account_number',
-      'account_holder'
-    ]
-    
-    // 1. music_change_from_preliminary の選択チェック（boolean値として必須）
-    const musicChangeSelected = semifinalsInfo.music_change_from_preliminary !== null && 
-                               semifinalsInfo.music_change_from_preliminary !== undefined
-    
-    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲変更選択:', musicChangeSelected, semifinalsInfo.music_change_from_preliminary)
-    
-    if (!musicChangeSelected) {
-      console.log('[DASHBOARD SEMIFINALS CHECK] === 楽曲変更の選択が未完了 ===')
-      return false
-    }
-    
-    // 2. copyright_permission のチェック（必須） 
-    const copyrightPermissionValid = !!(semifinalsInfo.copyright_permission && 
-                                       semifinalsInfo.copyright_permission.toString().trim() !== '')
-    
-    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲著作権許可:', copyrightPermissionValid, semifinalsInfo.copyright_permission)
-    
-    if (!copyrightPermissionValid) {
-      console.log('[DASHBOARD SEMIFINALS CHECK] === 楽曲著作権許可が未完了 ===')
-      return false
-    }
-    
-    // 3. 基本必須フィールドチェック
-    const fieldResults: Record<string, boolean> = {}
-    const missingFields: string[] = []
-    
-    baseRequiredFields.forEach(field => {
-      const value = semifinalsInfo[field]
-      const isValid = !!(value && value.toString().trim() !== '')
-      
-      fieldResults[field] = isValid
-      console.log(`[DASHBOARD SEMIFINALS CHECK] ${field}: "${value}" -> ${isValid}`)
-      
-      if (!isValid) {
-        missingFields.push(field)
-      }
-    })
-    
-    // 4. 条件付き必須項目のチェック
-    // 小道具詳細（props_usageが「あり」の場合のみ必須）
-    if (semifinalsInfo.props_usage === 'あり') {
-      const propsDetailsValid = !!(semifinalsInfo.props_details && 
-                                 semifinalsInfo.props_details.toString().trim() !== '')
-      if (!propsDetailsValid) {
-        missingFields.push('props_details')
-        fieldResults['props_details'] = false
-        console.log('[DASHBOARD SEMIFINALS CHECK] props_details: 小道具ありのため詳細が必須')
-      }
-    }
-    
-    const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true) && 
-                                missingFields.length === 0
-    
-    console.log('[DASHBOARD SEMIFINALS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲変更選択:', musicChangeSelected)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲著作権許可:', copyrightPermissionValid)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 基本必須フィールド完了:', hasAllRequiredFields)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド数:', missingFields.length)
-    console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド:', missingFields)
-    console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック終了（ダッシュボード）===')
-    
-    return musicChangeSelected && copyrightPermissionValid && hasAllRequiredFields
+    // status-utils.tsのcheckSemifinalsInfoCompletion関数を使用
+    const { checkSemifinalsInfoCompletion } = await import('@/lib/status-utils')
+    return await checkSemifinalsInfoCompletion(semifinalsInfo, entry?.id)
   }
 
-  // 決勝情報の完了判定関数
-  const checkFinalsInfoComplete = (finalsInfo: { [key: string]: unknown } | null) => {
+  // 決勝情報の完了判定関数（status-utils.tsと統一）
+  const checkFinalsInfoComplete = async (finalsInfo: { [key: string]: unknown } | null) => {
     if (!finalsInfo) return false
     
-    console.log('[DASHBOARD FINALS CHECK] === 決勝情報完了チェック（ダッシュボード）===')
-    console.log('[DASHBOARD FINALS CHECK] finalsInfo:', finalsInfo)
-    
-    // status-utils.tsのcheckFinalsInfoCompletionと同じロジックを使用
-    let allSectionsValid = true
-    const missingFields: string[] = []
-
-    // 1. 楽曲情報セクション
-    const musicChange = finalsInfo.music_change
-    if (!musicChange && musicChange !== false) {
-      missingFields.push('楽曲情報の変更選択')
-      allSectionsValid = false
-    } else if (musicChange === true) {
-      const musicRequiredFields = [
-        'work_title', 'work_character_story', 'copyright_permission', 
-        'music_title', 'music_type', 'music_data_path'
-      ]
-      
-      musicRequiredFields.forEach(field => {
-        const value = finalsInfo[field]
-        if (!value || value.toString().trim() === '') {
-          missingFields.push(field)
-          allSectionsValid = false
-        }
-      })
-      
-      if (finalsInfo.copyright_permission === 'commercial') {
-        const jasracCode = finalsInfo.jasrac_code
-        if (!jasracCode || jasracCode.toString().trim() === '') {
-          missingFields.push('jasrac_code')
-          allSectionsValid = false
-        }
-      }
-    }
-
-    // 2. 音響指示セクション
-    const soundChange = finalsInfo.sound_change_from_semifinals
-    if (!soundChange && soundChange !== false) {
-      missingFields.push('準決勝との音響指示選択')
-      allSectionsValid = false
-    } else if (soundChange === true) {
-      const soundRequiredFields = [
-        'sound_start_timing', 'chaser_song_designation', 
-        'fade_out_start_time', 'fade_out_complete_time'
-      ]
-      
-      soundRequiredFields.forEach(field => {
-        const value = finalsInfo[field]
-        if (!value || value.toString().trim() === '') {
-          missingFields.push(field)
-          allSectionsValid = false
-        }
-      })
-      
-      if (finalsInfo.chaser_song_designation === '必要') {
-        const chaserSong = finalsInfo.chaser_song
-        if (!chaserSong || chaserSong.toString().trim() === '') {
-          missingFields.push('chaser_song')
-          allSectionsValid = false
-        }
-      }
-    }
-
-    // 3. 照明指示セクション
-    const lightingChange = finalsInfo.lighting_change_from_semifinals
-    if (!lightingChange && lightingChange !== false) {
-      missingFields.push('準決勝との照明指示変更選択')
-      allSectionsValid = false
-    } else if (lightingChange === true) {
-      const lightingRequiredFields = [
-        'dance_start_timing',
-        'scene1_time', 'scene1_trigger', 'scene1_color_type', 
-        'scene1_color_other', 'scene1_image', 'scene1_image_path',
-        'chaser_exit_time', 'chaser_exit_trigger', 'chaser_exit_color_type',
-        'chaser_exit_color_other', 'chaser_exit_image', 'chaser_exit_image_path'
-      ]
-      
-      lightingRequiredFields.forEach(field => {
-        const value = finalsInfo[field]
-        if (!value || value.toString().trim() === '') {
-          missingFields.push(field)
-          allSectionsValid = false
-        }
-      })
-    }
-
-    // 4. 振付師セクション
-    const choreographerChange = finalsInfo.choreographer_change
-    if (choreographerChange === null || choreographerChange === undefined) {
-      missingFields.push('振付師の変更選択')
-      allSectionsValid = false
-    } else if (choreographerChange === true) {
-      const choreographerName = finalsInfo.choreographer_name
-      if (!choreographerName || choreographerName.toString().trim() === '') {
-        missingFields.push('choreographer_name')
-        allSectionsValid = false
-      }
-    }
-    
-    // 5. 小道具情報は常に必須
-    const propsUsage = finalsInfo.props_usage
-    if (!propsUsage || propsUsage.toString().trim() === '') {
-      missingFields.push('props_usage')
-      allSectionsValid = false
-    } else if (propsUsage === 'あり') {
-      const propsDetails = finalsInfo.props_details
-      if (!propsDetails || propsDetails.toString().trim() === '') {
-        missingFields.push('props_details')
-        allSectionsValid = false
-      }
-    }
-    
-    // 6. 振付師出席情報は常に必須（写真は条件付き）
-    const choreographerAttendance = finalsInfo.choreographer_attendance
-    const choreographerPhotoPermission = finalsInfo.choreographer_photo_permission
-    
-    if (!choreographerAttendance || choreographerAttendance.toString().trim() === '') {
-      missingFields.push('choreographer_attendance')
-      allSectionsValid = false
-    }
-    
-    if (!choreographerPhotoPermission || choreographerPhotoPermission.toString().trim() === '') {
-      missingFields.push('choreographer_photo_permission')
-      allSectionsValid = false
-    }
-    
-    // 振付師写真は写真許可が「許可する」の場合のみ必須
-    if (choreographerPhotoPermission === '許可する') {
-      const choreographerPhotoPath = finalsInfo.choreographer_photo_path
-      if (!choreographerPhotoPath || choreographerPhotoPath.toString().trim() === '') {
-        missingFields.push('choreographer_photo_path')
-        allSectionsValid = false
-      }
-    }
-
-    console.log('[DASHBOARD FINALS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD FINALS CHECK] 全セクション有効:', allSectionsValid)
-    console.log('[DASHBOARD FINALS CHECK] 未入力フィールド数:', missingFields.length)
-    console.log('[DASHBOARD FINALS CHECK] 未入力フィールド:', missingFields)
-    console.log('[DASHBOARD FINALS CHECK] === 決勝情報完了チェック終了（ダッシュボード）===')
-    
-    return allSectionsValid
+    // status-utils.tsのcheckFinalsInfoCompletion関数を使用
+    const { checkFinalsInfoCompletion } = await import('@/lib/status-utils')
+    return checkFinalsInfoCompletion(finalsInfo)
   }
 
   const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null, practiceVideo: EntryFile | null, introductionVideo: EntryFile | null) => {
@@ -986,7 +752,7 @@ export default async function DashboardPage() {
                         準決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkSemifinalsInfoComplete(semifinalsInfo) ? '登録済み' : semifinalsInfo ? '入力中' : '未登録'}
+                        {await checkSemifinalsInfoComplete(semifinalsInfo) ? '登録済み' : semifinalsInfo ? '入力中' : '未登録'}
                       </dd>
                       <StartDateInline section="semifinals" />
                       {(() => {
@@ -1036,7 +802,7 @@ export default async function DashboardPage() {
                         決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkFinalsInfoComplete(finalsInfo) ? '登録済み' : finalsInfo ? '入力中' : '未登録'}
+                        {await checkFinalsInfoComplete(finalsInfo) ? '登録済み' : finalsInfo ? '入力中' : '未登録'}
                       </dd>
                       <StartDateInline section="finals" />
                       {(() => {
