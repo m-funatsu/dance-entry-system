@@ -692,6 +692,17 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         message: '保存処理完了',
         work_title_kana_saved: dataToSave.work_title_kana
       })
+      
+      // 準決勝保存後に決勝情報を同期
+      console.log('[SEMIFINALS SAVE] 決勝情報との同期を開始')
+      try {
+        const { syncFinalsFromSemifinals } = await import('@/lib/sync-finals')
+        await syncFinalsFromSemifinals(entry.id, dataToSave)
+        console.log('[SEMIFINALS SAVE] 決勝情報同期完了')
+      } catch (syncError) {
+        console.error('[SEMIFINALS SAVE] 決勝情報同期エラー:', syncError)
+        // 同期エラーは保存成功を阻害しない
+      }
     } catch (saveError) {
       trackBehaviorDifference('SEMIFINALS', 'SAVE_ERROR', 'error', {
         errorMessage: saveError instanceof Error ? saveError.message : String(saveError),

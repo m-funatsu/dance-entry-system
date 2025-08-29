@@ -125,20 +125,32 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
         }
+        console.log('[OPTION RESTORE] === オプション状態復元 ===')
+        console.log('[OPTION RESTORE] sound_change_from_semifinals:', data.sound_change_from_semifinals)
         if (data.sound_change_from_semifinals === false) {
           setSoundChangeOption('same')
+          console.log('[OPTION RESTORE] 音響指示: same')
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
+          console.log('[OPTION RESTORE] 音響指示: different')
         }
+        
+        console.log('[OPTION RESTORE] lighting_change_from_semifinals:', data.lighting_change_from_semifinals)
         if (data.lighting_change_from_semifinals === false) {
           setLightingChangeOption('same')
+          console.log('[OPTION RESTORE] 照明指示: same')
         } else if (data.lighting_change_from_semifinals === true) {
           setLightingChangeOption('different')
+          console.log('[OPTION RESTORE] 照明指示: different')
         }
+        
+        console.log('[OPTION RESTORE] choreographer_change:', data.choreographer_change)
         if (data.choreographer_change === false) {
           setChoreographerChangeOption('same')
+          console.log('[OPTION RESTORE] 振付師情報: same')
         } else if (data.choreographer_change === true) {
           setChoreographerChangeOption('different')
+          console.log('[OPTION RESTORE] 振付師情報: different')
         }
       }
     } catch (err) {
@@ -199,24 +211,39 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     console.log('[SYNC] 準決勝情報の更新を検出 - 決勝情報を同期中...')
 
     // 各セクションで「準決勝と同じ」が選択されている場合は自動更新
+    console.log('[SYNC] === 同期条件チェック ===')
+    console.log('[SYNC] musicChangeOption:', musicChangeOption)
+    console.log('[SYNC] soundChangeOption:', soundChangeOption)
+    console.log('[SYNC] lightingChangeOption:', lightingChangeOption)
+    console.log('[SYNC] choreographerChangeOption:', choreographerChangeOption)
+    
     if (musicChangeOption === 'unchanged') {
       console.log('[SYNC] 楽曲情報を自動更新')
       await syncMusicData(currentSemifinalsData)
+    } else {
+      console.log('[SYNC] 楽曲情報は同期対象外 (musicChangeOption =', musicChangeOption, ')')
     }
     
     if (soundChangeOption === 'same') {
       console.log('[SYNC] 音響指示を自動更新')
       await syncSoundData(currentSemifinalsData)
+    } else {
+      console.log('[SYNC] 音響指示は同期対象外 (soundChangeOption =', soundChangeOption, ')')
     }
     
     if (lightingChangeOption === 'same') {
-      console.log('[SYNC] 照明指示を自動更新')
+      console.log('[SYNC] 照明指示を自動更新 - 実行開始')
       await syncLightingData(currentSemifinalsData)
+      console.log('[SYNC] 照明指示を自動更新 - 実行完了')
+    } else {
+      console.log('[SYNC] 照明指示は同期対象外 (lightingChangeOption =', lightingChangeOption, ')')
     }
     
     if (choreographerChangeOption === 'same') {
       console.log('[SYNC] 振付師情報を自動更新')
       await syncChoreographerData(currentSemifinalsData)
+    } else {
+      console.log('[SYNC] 振付師情報は同期対象外 (choreographerChangeOption =', choreographerChangeOption, ')')
     }
 
     setLastSemifinalsData(currentSemifinalsData)
@@ -447,6 +474,9 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const handleLightingChangeOption = async (option: 'same' | 'different') => {
+    console.log('[LIGHTING OPTION] === 照明指示オプション変更開始 ===')
+    console.log('[LIGHTING OPTION] 選択されたオプション:', option)
+    console.log('[LIGHTING OPTION] 現在のlightingChangeOption:', lightingChangeOption)
     setLightingChangeOption(option)
     
     if (option === 'same') {
@@ -461,6 +491,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
+      console.log('[LIGHTING OPTION] 異なる照明指示選択 - フィールドをクリア開始')
       // 異なる照明指示の場合はフィールドをクリア
       const clearedData: Partial<FinalsInfo> = {
         lighting_change_from_semifinals: true,
@@ -487,7 +518,9 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       clearedData.chaser_exit_notes = ''
       
       setFinalsInfo(prev => ({ ...prev, ...clearedData }))
+      console.log('[LIGHTING OPTION] 照明指示データクリア完了 - lighting_change_from_semifinals:', true)
     }
+    console.log('[LIGHTING OPTION] === 照明指示オプション変更完了 ===')
   }
 
   const handleChoreographerChangeOption = async (option: 'same' | 'different') => {
@@ -763,6 +796,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const handleSave = async () => {
+    console.log('[FINALS SAVE] === 決勝情報保存開始 ===')
+    console.log('[FINALS SAVE] 保存データ:', finalsInfo)
+    console.log('[FINALS SAVE] lighting_change_from_semifinals:', finalsInfo.lighting_change_from_semifinals)
+    console.log('[FINALS SAVE] 現在のlightingChangeOption:', lightingChangeOption)
+    
     // 50文字制限のチェック
     if (finalsInfo.work_character_story && finalsInfo.work_character_story.length > 50) {
       return
@@ -776,6 +814,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     }
 
     await save(dataToSave)
+    console.log('[FINALS SAVE] データベース保存完了')
     
     // 必須項目が完了している場合はステータスを「登録済み」に更新
     const isComplete = checkFinalsInfoCompletion(finalsInfo)
