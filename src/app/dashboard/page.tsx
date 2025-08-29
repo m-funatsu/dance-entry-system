@@ -778,7 +778,7 @@ export default async function DashboardPage() {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="text-sm">
                   <EditButton href="/dashboard/semifinals">
-                    {isFormEditable('music_info_deadline')
+                    {isFormEditable('semifinals_deadline')
                       ? (semifinalsInfo ? '編集' : '登録')
                       : '確認（編集不可）'
                     } →
@@ -1130,7 +1130,7 @@ export default async function DashboardPage() {
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">準決勝情報</h3>
-                    {isFormEditable('music_info_deadline') ? (
+                    {isFormEditable('semifinals_deadline') ? (
                       <EditButton href="/dashboard/semifinals" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         編集
                       </EditButton>
