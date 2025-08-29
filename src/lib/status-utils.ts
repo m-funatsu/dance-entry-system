@@ -276,6 +276,9 @@ export async function checkSemifinalsInfoCompletion(
     'work_character_story',
     'copyright_permission',
     'music_title',
+    'cd_title', // 常時必須に変更
+    'artist', // 常時必須に変更
+    'record_number', // 常時必須に変更
     'music_type',
     'music_data_path',
     // Sound Section
@@ -310,10 +313,7 @@ export async function checkSemifinalsInfoCompletion(
   // 条件付き必須項目を追加
   const conditionallyRequired: string[] = []
   
-  // JASRAC作品コード（市販楽曲の場合のみ必須）
-  if (formData.copyright_permission === 'commercial') {
-    conditionallyRequired.push('jasrac_code')
-  }
+  // JASRAC作品コードは必須ではなくなった
   
   // チェイサー曲（必要な場合のみ必須）
   if (formData.chaser_song_designation === 'required') {
@@ -421,7 +421,7 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     // 楽曲変更ありの場合のみ必須
     const musicRequiredFields = [
       'work_title', 'work_character_story', 'copyright_permission', 
-      'music_title', 'music_type', 'music_data_path'
+      'music_title', 'cd_title', 'artist', 'record_number', 'music_type', 'music_data_path'
     ]
     
     musicRequiredFields.forEach(field => {
