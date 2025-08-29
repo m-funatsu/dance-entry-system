@@ -313,8 +313,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           console.log('[FINALS AUDIO DEBUG] 音声ファイル判定:', isAudioFile)
 
           if (isAudioFile) {
-            if (file.purpose === 'music_data_path' || file.purpose === 'chaser_song') {
-              console.log('[FINALS AUDIO DEBUG] Purpose一致でマッピング:', file.purpose)
+            // 決勝専用ファイルのみを処理（準決勝のファイルは除外）
+            const isFinalsFile = file.file_path.includes('/finals/')
+            const isSemifinalsFile = file.file_path.includes('/semifinals/')
+            
+            console.log('[FINALS AUDIO DEBUG] ファイルパス判定:', {
+              file_path: file.file_path,
+              isFinalsFile,
+              isSemifinalsFile
+            })
+            
+            if ((file.purpose === 'music_data_path' || file.purpose === 'chaser_song') && isFinalsFile) {
+              console.log('[FINALS AUDIO DEBUG] 決勝専用ファイルをマッピング:', file.purpose)
               filesMap[file.purpose] = { file_name: file.file_name }
 
               // 署名付きURLを取得
@@ -325,6 +335,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
               if (urlData?.signedUrl) {
                 urlUpdates[file.purpose] = urlData.signedUrl
               }
+            } else if (isSemifinalsFile) {
+              console.log('[FINALS AUDIO DEBUG] 準決勝ファイルをスキップ:', file.purpose)
             }
           }
         }
