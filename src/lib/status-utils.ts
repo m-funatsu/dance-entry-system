@@ -271,14 +271,18 @@ export async function checkSemifinalsInfoCompletion(
   console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
   console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
 
-  // *マーク付き必須フィールド（UIコンポーネントと完全一致）
+  // UIのrequired属性がある必須フィールド（*マーク+required両方）
   const baseRequiredFields = [
     // 楽曲情報セクション（MusicSection）
     'music_change_from_preliminary', // 予選との楽曲情報の変更 *
     'copyright_permission',          // 楽曲著作権許諾 *
     // 音響指示情報セクション（SoundSection）
+    'sound_start_timing',            // 音楽スタートのタイミング (required属性あり)
     'chaser_song_designation',       // チェイサー（退場）曲の指定 *
+    'fade_out_start_time',           // フェードアウト開始時間 (required属性あり)
+    'fade_out_complete_time',        // フェードアウト完了時間 (required属性あり)
     // 照明指示情報セクション（LightingSection）
+    'dance_start_timing',            // 準決勝 - 踊り出しタイミング (required属性あり)
     'scene1_time',                   // シーン1 時間 *（シーン1のみ必須）
     'scene1_trigger',                // シーン1 きっかけ *
     'scene1_color_type',             // シーン1 色・系統 *
