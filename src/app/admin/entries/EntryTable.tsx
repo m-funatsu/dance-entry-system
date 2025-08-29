@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailComposer } from '@/components/EmailComposer'
-import AdminLink from '@/components/admin/AdminLink'
 // status-utils のimportは削除（現在未使用のため）
 import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
@@ -544,9 +543,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 選考ステータス
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                詳細
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -588,14 +584,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(entry.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <AdminLink
-                      href={`/admin/entries/${entry.id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      詳細
-                    </AdminLink>
                   </td>
                 </tr>
             ))}
