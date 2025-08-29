@@ -81,12 +81,7 @@ export async function updateFormStatus(
     console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete}`)
     console.log(`[STATUS UPDATE] ${tableName} - データ存在: ${hasAnyData}`)
     
-    // basic_infoの場合は特別な処理（ステータス更新をスキップ）
-    if (tableName === 'basic_info') {
-      console.log(`[STATUS UPDATE] ${tableName} - 独立したテーブルのため、entriesでのステータス更新をスキップ`)
-      console.log(`[STATUS UPDATE] ${tableName} - 完了状況: ${isFormComplete} をログに記録（ダッシュボードは基本情報テーブルの存在で判定）`)
-      return
-    }
+    // 基本情報も他のフォームと同様にステータスを更新
     
     // ステータスを決定（申請情報は特別ロジック）
     let newStatus: string
@@ -107,6 +102,7 @@ export async function updateFormStatus(
     console.log(`[STATUS UPDATE] ${tableName} - 新しいステータス: ${newStatus}`)
     
     const statusFieldMap: Record<string, string> = {
+      'basic_info': 'basic_info_status',
       'preliminary_info': 'preliminary_info_status',
       'semifinals_info': 'semifinals_info_status',
       'finals_info': 'finals_info_status',
