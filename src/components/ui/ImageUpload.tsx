@@ -47,16 +47,18 @@ export default function ImageUpload({
     e.stopPropagation()
     setIsDragging(false)
 
-    // 既にファイルがある場合はアップロード不可
-    if (value) return
+    // 既にファイルがあるか無効化されている場合はアップロード不可
+    if (value || !isEditable) return
 
     const files = e.dataTransfer.files
     if (files && files[0]) {
       handleFile(files[0])
     }
-  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value, !isEditable]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFile = (file: File) => {
+    if (!isEditable) return // 無効化時は処理しない
+    
     if (!file.type.startsWith('image/')) {
       alert('画像ファイルを選択してください')
       return
@@ -72,13 +74,14 @@ export default function ImageUpload({
   }
 
   const handleClick = () => {
-    // 既にファイルがある場合はファイル選択不可
-    if (!value) {
+    // 既にファイルがあるか無効化されている場合はファイル選択不可
+    if (!value && !!isEditable) {
       fileInputRef.current?.click()
     }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEditable) return // 無効化時は処理しない
     const files = e.target.files
     if (files && files[0]) {
       handleFile(files[0])
@@ -86,6 +89,7 @@ export default function ImageUpload({
   }
 
   const handleRemove = (e: React.MouseEvent) => {
+    if (!isEditable) return // 無効化時は削除不可
     e.stopPropagation()
     setPreview(null)
     if (fileInputRef.current) {
@@ -119,7 +123,7 @@ export default function ImageUpload({
           type="file"
           accept={accept}
           onChange={handleFileSelect}
-          disabled={!!value}
+          disabled={!!value || !isEditable}
           className="hidden"
         />
 
@@ -137,18 +141,20 @@ export default function ImageUpload({
                 }}
               />
             </div>
-            {/* 削除ボタン - 常に表示 */}
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {/* 削除ボタン - 編集可能時のみ表示 */}
+            {!!isEditable && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
             <p className="mt-4 text-sm text-gray-600">
-              削除ボタンから削除できます
+              {!!isEditable ? '削除ボタンから削除できます' : '期限切れのため編集できません'}
             </p>
           </div>
         ) : imageError ? (
@@ -159,13 +165,15 @@ export default function ImageUpload({
               </svg>
               <p className="text-sm text-red-600 font-medium">画像の読み込みに失敗しました</p>
               <p className="text-xs text-red-500">URLの有効期限が切れている可能性があります</p>
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 cursor-pointer"
-              >
-                削除して再アップロード
-              </button>
+              {!!isEditable && (
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 cursor-pointer"
+                >
+                  削除して再アップロード
+                </button>
+              )}
             </div>
           </div>
         ) : (
