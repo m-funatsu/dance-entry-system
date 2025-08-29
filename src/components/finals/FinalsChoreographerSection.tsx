@@ -10,6 +10,7 @@ interface FinalsChoreographerSectionProps {
   onChange: (updates: Partial<FinalsInfo>) => void
   onChoreographerChangeOption: (option: 'same' | 'different') => void
   onFileUpload: (field: string, file: File) => void
+  onFileDelete?: (field: string) => Promise<void>
   isEditable?: boolean
 }
 
@@ -20,6 +21,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
   onChange,
   onChoreographerChangeOption,
   onFileUpload,
+  onFileDelete,
   isEditable = true
 }) => {
   return (
@@ -260,6 +262,8 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           <ImageUpload
             value={finalsInfo.choreographer_photo_path}
             onChange={(file) => onFileUpload('choreographer_photo_path', file)}
+            onDelete={onFileDelete ? () => onFileDelete('choreographer_photo_path') : undefined}
+            isEditable={isEditable}
             required
           />
         </div>

@@ -526,7 +526,10 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   const handleFileDelete = async (field: string) => {
     try {
-      console.log('[DELETE] Starting delete for field:', field)
+      console.log('[DELETE] === 削除処理開始 ===')
+      console.log('[DELETE] 削除対象フィールド:', field)
+      console.log('[DELETE] 現在のfinalsInfo:', finalsInfo)
+      console.log('[DELETE] フィールドの現在値:', finalsInfo[field as keyof typeof finalsInfo])
       
       // URLからファイルパスを抽出する関数（セキュリティチェック付き）
       const extractFilePathFromUrl = (urlOrPath: string): string | null => {
@@ -780,6 +783,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onChange={handleFieldChange}
           onChoreographerChangeOption={handleChoreographerChangeOption}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
           isEditable={isEditable}
         />
       )}
