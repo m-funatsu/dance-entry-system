@@ -70,27 +70,17 @@ export default async function ApplicationsInfoListPage() {
   console.log('[APPLICATIONS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[APPLICATIONS DEBUG] ファイルエラー:', filesError)
 
-  // 観覧席希望情報を取得
-  const { data: seatRequestsList, error: seatRequestsError } = await adminSupabase
-    .from('seat_request')
-    .select('*')
-
-  console.log('[APPLICATIONS DEBUG] 観覧席希望情報取得完了')
-  console.log('[APPLICATIONS DEBUG] 観覧席希望件数:', seatRequestsList?.length || 0)
-  console.log('[APPLICATIONS DEBUG] 観覧席希望エラー:', seatRequestsError)
 
   // データをマッピング（選考通過のみ表示）
   const mappedApplicationsInfoList = entriesList?.filter(entry => entry.status === 'selected').map(entry => {
     const relatedUser = usersList?.find(user => user.id === entry.user_id)
     const relatedApplicationsInfo = applicationsInfoList?.find(app => app.entry_id === entry.id)
     const relatedFiles = filesList?.filter(file => file.entry_id === entry.id)
-    const relatedSeatRequest = seatRequestsList?.find(seat => seat.entry_id === entry.id)
     
     console.log(`[APPLICATIONS DEBUG] エントリーID ${entry.id}:`, {
       hasUser: !!relatedUser,
       hasApplicationsInfo: !!relatedApplicationsInfo,
       fileCount: relatedFiles?.length || 0,
-      hasSeatRequest: !!relatedSeatRequest,
       status: entry.status
     })
     
@@ -143,14 +133,7 @@ export default async function ApplicationsInfoListPage() {
         ...entry,
         users: relatedUser || { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || [],
-      seat_request: relatedSeatRequest || {
-        premium_seats: 0,
-        ss_seats: 0,
-        s_seats: 0,
-        a_seats: 0,
-        b_seats: 0
-      }
+      entry_files: relatedFiles || []
     }
   }) || []
 
@@ -224,15 +207,8 @@ export default async function ApplicationsInfoListPage() {
               item.makeup_email_final || '',
               item.makeup_phone_final || '',
               item.makeup_notes_final || '',
-              // 観覧席希望
-              item.seat_request?.premium_seats?.toString() || '0',
-              item.seat_request?.ss_seats?.toString() || '0',
-              item.seat_request?.s_seats?.toString() || '0',
-              item.seat_request?.a_seats?.toString() || '0',
-              item.seat_request?.b_seats?.toString() || '0',
-              ((parseInt(item.seat_request?.premium_seats?.toString() || '0') + parseInt(item.seat_request?.ss_seats?.toString() || '0') + parseInt(item.seat_request?.s_seats?.toString() || '0') + parseInt(item.seat_request?.a_seats?.toString() || '0') + parseInt(item.seat_request?.b_seats?.toString() || '0'))).toString()
             ])}
-            headers={['ID', 'エントリーID', '提出ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考', 'プレミアム席', 'SS席', 'S席', 'A席', 'B席', '合計希望枚数']}
+            headers={['ID', 'エントリーID', '提出ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考']}
             filename="applications_info"
           />
         </div>
@@ -296,9 +272,6 @@ export default async function ApplicationsInfoListPage() {
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     メイク(決勝)希望スタイル添付
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    観覧席希望
                   </th>
                 </tr>
               </thead>
@@ -496,18 +469,6 @@ export default async function ApplicationsInfoListPage() {
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
-                      </div>
-                    </td>
-                    
-                    {/* 観覧席希望 */}
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div><strong>プレミアム席:</strong> {applicationsInfo.seat_request?.premium_seats || '0'}枚</div>
-                        <div><strong>SS席:</strong> {applicationsInfo.seat_request?.ss_seats || '0'}枚</div>
-                        <div><strong>S席:</strong> {applicationsInfo.seat_request?.s_seats || '0'}枚</div>
-                        <div><strong>A席:</strong> {applicationsInfo.seat_request?.a_seats || '0'}枚</div>
-                        <div><strong>B席:</strong> {applicationsInfo.seat_request?.b_seats || '0'}枚</div>
-                        <div className="mt-1 font-medium"><strong>合計:</strong> {(parseInt(applicationsInfo.seat_request?.premium_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.ss_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.s_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.a_seats?.toString() || '0') + parseInt(applicationsInfo.seat_request?.b_seats?.toString() || '0'))}枚</div>
                       </div>
                     </td>
                   </tr>
