@@ -63,11 +63,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   useEffect(() => {
     const initializeForm = async () => {
-      // 1. 決勝情報を読み込んでオプション状態を復元
+      // 決勝情報を読み込んでオプション状態を復元
       await loadFinalsInfo()
-      
-      // 2. 準決勝情報を読み込み（同期は実行しない）
-      await loadSemifinalsInfo()
       
       console.log('[FINALS INIT] 初期化完了')
       setIsInitializing(false)
