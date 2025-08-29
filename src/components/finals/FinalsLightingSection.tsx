@@ -169,6 +169,9 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
                 disabled={lightingChangeOption === 'same'}
                 rows={2}
               />
+              <p className="text-xs text-red-600 mt-1">
+                備考欄の中に細かく時間指定と照明指示をご記入することはお控えください。
+              </p>
             </div>
           </div>
         </div>
@@ -255,6 +258,9 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               disabled={lightingChangeOption === 'same'}
               rows={2}
             />
+            <p className="text-xs text-red-600 mt-1">
+              備考欄の中に細かく時間指定と照明指示をご記入することはお控えください。
+            </p>
           </div>
         </div>
       </div>
