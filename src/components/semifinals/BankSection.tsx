@@ -98,6 +98,43 @@ export const BankSection: React.FC<BankSectionProps> = ({
         return
       }
 
+      // 既存の振込確認用紙があれば削除する（1つのみアップロード可能）
+      console.log('[BANK SECTION] 既存ファイルチェック・削除処理開始')
+      const { data: existingFiles } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', semifinalsInfo.entry_id)
+        .eq('purpose', 'semifinals_payment_slip')
+
+      if (existingFiles && existingFiles.length > 0) {
+        console.log('[BANK SECTION] 既存ファイルを削除します:', existingFiles.length, '件')
+        
+        for (const existingFile of existingFiles) {
+          // ストレージからファイルを削除
+          const { error: storageDeleteError } = await supabase.storage
+            .from('files')
+            .remove([existingFile.file_path])
+          
+          if (storageDeleteError) {
+            console.warn('[BANK SECTION] ストレージ削除警告:', storageDeleteError)
+          }
+
+          // データベースからファイル情報を削除
+          const { error: dbDeleteError } = await supabase
+            .from('entry_files')
+            .delete()
+            .eq('id', existingFile.id)
+
+          if (dbDeleteError) {
+            console.warn('[BANK SECTION] データベース削除警告:', dbDeleteError)
+          }
+        }
+        
+        console.log('[BANK SECTION] 既存ファイル削除完了')
+      } else {
+        console.log('[BANK SECTION] 既存ファイルなし')
+      }
+
       // ファイルアップロード処理を実行
       console.log('[BANK SECTION] Supabaseアップロード開始...')
       
