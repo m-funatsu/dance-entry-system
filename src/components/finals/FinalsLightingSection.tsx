@@ -154,7 +154,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
                 onChange={(file) => onFileUpload(`scene${sceneNum}_image_path`, file)}
                 onDelete={onFileDelete ? () => onFileDelete(`scene${sceneNum}_image_path`) : undefined}
                 required={sceneNum === 1 && lightingChangeOption === 'different'}
-                disabled={lightingChangeOption === 'same'}
+                disabled={lightingChangeOption === 'same' || !isEditable || !!(finalsInfo[`scene${sceneNum}_image_path` as keyof FinalsInfo])}
                 isEditable={isEditable && lightingChangeOption !== 'same'}
               />
             </div>
@@ -240,7 +240,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               onChange={(file) => onFileUpload('chaser_exit_image_path', file)}
               onDelete={onFileDelete ? () => onFileDelete('chaser_exit_image_path') : undefined}
               required={lightingChangeOption === 'different'}
-              disabled={lightingChangeOption === 'same'}
+              disabled={lightingChangeOption === 'same' || !isEditable || !!finalsInfo.chaser_exit_image_path}
               isEditable={isEditable && lightingChangeOption !== 'same'}
             />
           </div>

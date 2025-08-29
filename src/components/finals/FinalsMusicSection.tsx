@@ -276,7 +276,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             console.log('[FINALS MUSIC DATA DELETE] === 決勝楽曲データ削除 ===')
             onFileDelete('music_data_path')
           } : undefined}
-          disabled={musicChangeOption === 'unchanged' || !isEditable}
+          disabled={musicChangeOption === 'unchanged' || !isEditable || !!finalsInfo.music_data_path}
           required={musicChangeOption === 'changed'}
           accept=".wav,.mp3,.m4a"
         />
