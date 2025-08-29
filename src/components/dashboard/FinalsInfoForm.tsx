@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
@@ -12,7 +12,7 @@ import {
   validateFinalsSection, 
   finalsSections 
 } from '@/utils/finalsValidation'
-import type { Entry, FinalsInfo } from '@/lib/types'
+import type { Entry, FinalsInfo, SemifinalsInfo } from '@/lib/types'
 
 interface FinalsInfoFormProps {
   entry: Entry
@@ -50,6 +50,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     choreographer_photo_permission: ''
   })
   const [audioFiles, setAudioFiles] = useState<Record<string, { file_name: string }>>({})
+  const [lastSemifinalsData, setLastSemifinalsData] = useState<Partial<SemifinalsInfo> | null>(null)
+  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -62,6 +64,30 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   useEffect(() => {
     loadFinalsInfo()
+    loadSemifinalsInfo() // 準決勝情報も初期読み込み
+    
+    // ページフォーカス時の同期
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('[SYNC] ページフォーカス - 準決勝情報を同期確認')
+        syncWithSemifinalsData()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // 定期的な同期チェック（30秒間隔）
+    syncIntervalRef.current = setInterval(() => {
+      console.log('[SYNC] 定期同期チェック実行')
+      syncWithSemifinalsData()
+    }, 30000)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (syncIntervalRef.current) {
+        clearInterval(syncIntervalRef.current)
+      }
+    }
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadFinalsInfo = async () => {
@@ -113,6 +139,176 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     } finally {
       setLoading(false)
     }
+  }
+
+  // 準決勝情報を読み込む関数
+  const loadSemifinalsInfo = async (): Promise<Partial<SemifinalsInfo> | null> => {
+    try {
+      console.log('[SYNC] 準決勝情報を読み込み中...')
+      const { data: semifinalsData, error } = await supabase
+        .from('semifinals_info')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .maybeSingle()
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('[SYNC] 準決勝情報読み込みエラー:', error)
+        return null
+      }
+
+      if (semifinalsData) {
+        console.log('[SYNC] 準決勝情報読み込み完了:', {
+          updated_at: semifinalsData.updated_at,
+          music_title: semifinalsData.music_title,
+          choreographer_name: semifinalsData.choreographer_name
+        })
+        setLastSemifinalsData(semifinalsData)
+        return semifinalsData
+      }
+      
+      return null
+    } catch (err) {
+      console.error('[SYNC] 準決勝情報読み込みエラー:', err)
+      return null
+    }
+  }
+
+  // 準決勝情報と同期する関数
+  const syncWithSemifinalsData = async () => {
+    const currentSemifinalsData = await loadSemifinalsInfo()
+    if (!currentSemifinalsData || !lastSemifinalsData) {
+      return
+    }
+
+    // 更新日時を比較して変更があったかチェック
+    const isDataUpdated = new Date(currentSemifinalsData.updated_at || '') > 
+                          new Date(lastSemifinalsData.updated_at || '')
+    
+    if (!isDataUpdated) {
+      console.log('[SYNC] 準決勝情報に変更なし')
+      return
+    }
+
+    console.log('[SYNC] 準決勝情報の更新を検出 - 決勝情報を同期中...')
+
+    // 各セクションで「準決勝と同じ」が選択されている場合は自動更新
+    if (musicChangeOption === 'unchanged') {
+      console.log('[SYNC] 楽曲情報を自動更新')
+      await syncMusicData(currentSemifinalsData)
+    }
+    
+    if (soundChangeOption === 'same') {
+      console.log('[SYNC] 音響指示を自動更新')
+      await syncSoundData(currentSemifinalsData)
+    }
+    
+    if (lightingChangeOption === 'same') {
+      console.log('[SYNC] 照明指示を自動更新')
+      await syncLightingData(currentSemifinalsData)
+    }
+    
+    if (choreographerChangeOption === 'same') {
+      console.log('[SYNC] 振付師情報を自動更新')
+      await syncChoreographerData(currentSemifinalsData)
+    }
+
+    setLastSemifinalsData(currentSemifinalsData)
+    showToast('準決勝情報の更新を反映しました', 'info')
+  }
+
+  // 楽曲情報を同期
+  const syncMusicData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    setFinalsInfo(prev => ({
+      ...prev,
+      work_title: semifinalsData.work_title || '',
+      work_title_kana: semifinalsData.work_title_kana || '',
+      work_character_story: semifinalsData.work_character_story || '',
+      copyright_permission: semifinalsData.copyright_permission || '',
+      music_title: semifinalsData.music_title || '',
+      artist: semifinalsData.artist || '',
+      cd_title: semifinalsData.cd_title || '',
+      record_number: semifinalsData.record_number || '',
+      jasrac_code: semifinalsData.jasrac_code || '',
+      music_type: semifinalsData.music_type || '',
+      music_data_path: semifinalsData.music_data_path || ''
+    }))
+  }
+
+  // 音響指示を同期
+  const syncSoundData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    const mapChaserSongDesignation = (value: string): string => {
+      switch (value) {
+        case 'included':
+          return '自作曲に組み込み'
+        case 'required':
+          return '必要'
+        case 'not_required':
+          return '不要（無音）'
+        default:
+          return value
+      }
+    }
+    
+    let chaserSongUrl = ''
+    if (semifinalsData.chaser_song && !semifinalsData.chaser_song.startsWith('http')) {
+      const { data: urlData } = await supabase.storage
+        .from('files')
+        .createSignedUrl(semifinalsData.chaser_song, 86400)
+      
+      if (urlData?.signedUrl) {
+        chaserSongUrl = urlData.signedUrl
+      }
+    } else if (semifinalsData.chaser_song) {
+      chaserSongUrl = semifinalsData.chaser_song
+    }
+    
+    setFinalsInfo(prev => ({
+      ...prev,
+      sound_start_timing: semifinalsData.sound_start_timing || '',
+      chaser_song_designation: mapChaserSongDesignation(semifinalsData.chaser_song_designation || ''),
+      chaser_song: chaserSongUrl,
+      fade_out_start_time: semifinalsData.fade_out_start_time || '',
+      fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
+    }))
+  }
+
+  // 照明指示を同期
+  const syncLightingData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    const lightingData: Record<string, string | undefined> = {
+      dance_start_timing: semifinalsData.dance_start_timing
+    }
+    
+    // シーン1-5とチェイサー情報をコピー
+    for (let i = 1; i <= 5; i++) {
+      lightingData[`scene${i}_time`] = semifinalsData[`scene${i}_time` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_trigger`] = semifinalsData[`scene${i}_trigger` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_color_type`] = semifinalsData[`scene${i}_color_type` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_color_other`] = semifinalsData[`scene${i}_color_other` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_image`] = semifinalsData[`scene${i}_image` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_image_path`] = semifinalsData[`scene${i}_image_path` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_notes`] = semifinalsData[`scene${i}_notes` as keyof typeof semifinalsData] || ''
+    }
+    
+    lightingData.chaser_exit_time = semifinalsData.chaser_exit_time || ''
+    lightingData.chaser_exit_trigger = semifinalsData.chaser_exit_trigger || ''
+    lightingData.chaser_exit_color_type = semifinalsData.chaser_exit_color_type || ''
+    lightingData.chaser_exit_color_other = semifinalsData.chaser_exit_color_other || ''
+    lightingData.chaser_exit_image = semifinalsData.chaser_exit_image || ''
+    lightingData.chaser_exit_image_path = semifinalsData.chaser_exit_image_path || ''
+    lightingData.chaser_exit_notes = semifinalsData.chaser_exit_notes || ''
+    
+    setFinalsInfo(prev => ({ ...prev, ...lightingData as Partial<FinalsInfo> }))
+  }
+
+  // 振付師情報を同期
+  const syncChoreographerData = async (semifinalsData: Partial<SemifinalsInfo>) => {
+    setFinalsInfo(prev => ({
+      ...prev,
+      choreographer_name: semifinalsData.choreographer_name || '',
+      choreographer_furigana: semifinalsData.choreographer_furigana || '',
+      choreographer2_name: semifinalsData.choreographer2_name || '',
+      choreographer2_furigana: semifinalsData.choreographer2_furigana || ''
+    }))
   }
 
   const loadAudioFiles = async () => {
@@ -185,33 +381,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     setMusicChangeOption(option)
     
     if (option === 'unchanged') {
-      // 準決勝からデータをコピー
-      try {
-        const { data: semifinalsData } = await supabase
-          .from('semifinals_info')
-          .select('*')
-          .eq('entry_id', entry.id)
-          .maybeSingle()
-
-        if (semifinalsData) {
-          setFinalsInfo(prev => ({
-            ...prev,
-            music_change: false,
-            work_title: semifinalsData.work_title,
-            work_title_kana: semifinalsData.work_title_kana,
-            work_character_story: semifinalsData.work_character_story,
-            copyright_permission: semifinalsData.copyright_permission,
-            music_title: semifinalsData.music_title,
-            artist: semifinalsData.artist,
-            cd_title: semifinalsData.cd_title,
-            record_number: semifinalsData.record_number,
-            jasrac_code: semifinalsData.jasrac_code,
-            music_type: semifinalsData.music_type,
-            music_data_path: semifinalsData.music_data_path
-          }))
-        }
-      } catch (err) {
-        console.error('準決勝情報の読み込みエラー:', err)
+      // 準決勝から最新データを取得してコピー
+      const semifinalsData = await loadSemifinalsInfo()
+      if (semifinalsData) {
+        console.log('[MUSIC OPTION] 準決勝情報を楽曲情報にコピー')
+        await syncMusicData(semifinalsData)
+        setFinalsInfo(prev => ({ ...prev, music_change: false }))
+        showToast('楽曲情報を準決勝からコピーしました', 'success')
+      } else {
+        showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'changed') {
       // 変更ありの場合はフィールドをクリア
@@ -237,69 +415,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     setSoundChangeOption(option)
     
     if (option === 'same') {
-      // 準決勝から音響指示データをコピー
-      try {
-        const { data: semifinalsData } = await supabase
-          .from('semifinals_info')
-          .select('*')
-          .eq('entry_id', entry.id)
-          .maybeSingle()
-
-        if (semifinalsData) {
-          console.log('[SOUND COPY] 準決勝データ:', {
-            sound_start_timing: semifinalsData.sound_start_timing,
-            chaser_song_designation: semifinalsData.chaser_song_designation,
-            chaser_song: semifinalsData.chaser_song,
-            fade_out_start_time: semifinalsData.fade_out_start_time,
-            fade_out_complete_time: semifinalsData.fade_out_complete_time
-          })
-          
-          // 準決勝の英語値を決勝の日本語値にマッピング
-          const mapChaserSongDesignation = (value: string): string => {
-            switch (value) {
-              case 'included':
-                return '自作曲に組み込み'
-              case 'required':
-                return '必要'
-              case 'not_required':
-                return '不要（無音）'
-              default:
-                return value // 既に日本語の場合はそのまま返す
-            }
-          }
-          
-          const mappedDesignation = mapChaserSongDesignation(semifinalsData.chaser_song_designation || '')
-          console.log('[SOUND COPY] マッピング後の値:', mappedDesignation)
-          
-          // チェイサー曲のファイルパスがある場合は署名付きURLを生成
-          let chaserSongUrl = ''
-          if (semifinalsData.chaser_song && !semifinalsData.chaser_song.startsWith('http')) {
-            // ファイルパスの場合、署名付きURLを生成
-            const { data: urlData } = await supabase.storage
-              .from('files')
-              .createSignedUrl(semifinalsData.chaser_song, 86400)
-            
-            if (urlData?.signedUrl) {
-              chaserSongUrl = urlData.signedUrl
-              console.log('[SOUND COPY] チェイサー曲の署名付きURL生成:', chaserSongUrl)
-            }
-          } else if (semifinalsData.chaser_song) {
-            // 既にURLの場合はそのまま使用
-            chaserSongUrl = semifinalsData.chaser_song
-          }
-          
-          setFinalsInfo(prev => ({
-            ...prev,
-            sound_change_from_semifinals: false,
-            sound_start_timing: semifinalsData.sound_start_timing || '',
-            chaser_song_designation: mappedDesignation,
-            chaser_song: chaserSongUrl,
-            fade_out_start_time: semifinalsData.fade_out_start_time || '',
-            fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
-          }))
-        }
-      } catch (err) {
-        console.error('準決勝情報の読み込みエラー:', err)
+      // 準決勝から最新データを取得してコピー
+      const semifinalsData = await loadSemifinalsInfo()
+      if (semifinalsData) {
+        console.log('[SOUND OPTION] 準決勝情報を音響指示にコピー')
+        await syncSoundData(semifinalsData)
+        setFinalsInfo(prev => ({ ...prev, sound_change_from_semifinals: false }))
+        showToast('音響指示を準決勝からコピーしました', 'success')
+      } else {
+        showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
       // 異なる音響指示の場合はフィールドをクリア
@@ -319,43 +443,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     setLightingChangeOption(option)
     
     if (option === 'same') {
-      // 準決勝から照明指示データをコピー
-      try {
-        const { data: semifinalsData } = await supabase
-          .from('semifinals_info')
-          .select('*')
-          .eq('entry_id', entry.id)
-          .maybeSingle()
-
-        if (semifinalsData) {
-          const lightingData: Partial<FinalsInfo> = {
-            lighting_change_from_semifinals: false,
-            dance_start_timing: semifinalsData.dance_start_timing
-          }
-          
-          // シーン1-5とチェイサー情報をコピー
-          for (let i = 1; i <= 5; i++) {
-            lightingData[`scene${i}_time` as keyof FinalsInfo] = semifinalsData[`scene${i}_time` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_trigger` as keyof FinalsInfo] = semifinalsData[`scene${i}_trigger` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_color_type` as keyof FinalsInfo] = semifinalsData[`scene${i}_color_type` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_color_other` as keyof FinalsInfo] = semifinalsData[`scene${i}_color_other` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_image` as keyof FinalsInfo] = semifinalsData[`scene${i}_image` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_image_path` as keyof FinalsInfo] = semifinalsData[`scene${i}_image_path` as keyof typeof semifinalsData]
-            lightingData[`scene${i}_notes` as keyof FinalsInfo] = semifinalsData[`scene${i}_notes` as keyof typeof semifinalsData]
-          }
-          
-          lightingData.chaser_exit_time = semifinalsData.chaser_exit_time
-          lightingData.chaser_exit_trigger = semifinalsData.chaser_exit_trigger
-          lightingData.chaser_exit_color_type = semifinalsData.chaser_exit_color_type
-          lightingData.chaser_exit_color_other = semifinalsData.chaser_exit_color_other
-          lightingData.chaser_exit_image = semifinalsData.chaser_exit_image
-          lightingData.chaser_exit_image_path = semifinalsData.chaser_exit_image_path
-          lightingData.chaser_exit_notes = semifinalsData.chaser_exit_notes
-          
-          setFinalsInfo(prev => ({ ...prev, ...lightingData }))
-        }
-      } catch (err) {
-        console.error('準決勝情報の読み込みエラー:', err)
+      // 準決勝から最新データを取得してコピー
+      const semifinalsData = await loadSemifinalsInfo()
+      if (semifinalsData) {
+        console.log('[LIGHTING OPTION] 準決勝情報を照明指示にコピー')
+        await syncLightingData(semifinalsData)
+        setFinalsInfo(prev => ({ ...prev, lighting_change_from_semifinals: false }))
+        showToast('照明指示を準決勝からコピーしました', 'success')
+      } else {
+        showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
       // 異なる照明指示の場合はフィールドをクリア
@@ -391,28 +487,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     setChoreographerChangeOption(option)
     
     if (option === 'same') {
-      // 準決勝から振付師データをコピー
-      try {
-        const { data: semifinalsData } = await supabase
-          .from('semifinals_info')
-          .select('*')
-          .eq('entry_id', entry.id)
-          .maybeSingle()
-
-        if (semifinalsData) {
-          console.log('[FINALS DEBUG] 準決勝データ:', semifinalsData)
-          setFinalsInfo(prev => ({
-            ...prev,
-            choreographer_change: false,
-            choreographer_name: semifinalsData.choreographer_name,
-            choreographer_furigana: semifinalsData.choreographer_furigana,
-            choreographer2_name: semifinalsData.choreographer2_name,
-            choreographer2_furigana: semifinalsData.choreographer2_furigana
-          }))
-          console.log('[FINALS DEBUG] 振付師情報をコピーしました')
-        }
-      } catch (err) {
-        console.error('準決勝情報の読み込みエラー:', err)
+      // 準決勝から最新データを取得してコピー
+      const semifinalsData = await loadSemifinalsInfo()
+      if (semifinalsData) {
+        console.log('[CHOREOGRAPHER OPTION] 準決勝情報を振付師情報にコピー')
+        await syncChoreographerData(semifinalsData)
+        setFinalsInfo(prev => ({ ...prev, choreographer_change: false }))
+        showToast('振付師情報を準決勝からコピーしました', 'success')
+      } else {
+        showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
       // 異なる振付師の場合はフィールドをクリア
