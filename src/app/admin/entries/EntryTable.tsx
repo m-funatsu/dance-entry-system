@@ -82,12 +82,6 @@ export default function EntryTable({ entries }: EntryTableProps) {
   const getSubmissionBadge = (entry: EntryWithDetails) => {
     // データベースのステータスカラムを使用（新しいアプローチ）
     
-    // 申請情報は特別ロジック（申請あり/なしのみ）
-    const hasApplicationsInfo = !!entry.applications_info && (
-      Array.isArray(entry.applications_info) 
-        ? entry.applications_info.length > 0 
-        : !!entry.applications_info
-    )
     
     // 参加同意書の状況を確認（consent_form_submittedで判定）
     const hasConsentForm = !!(entry.consent_form_submitted)
