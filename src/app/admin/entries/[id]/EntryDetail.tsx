@@ -838,7 +838,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div className="md:col-span-2">
                           <dt className="text-sm font-medium text-gray-500">作品キャラクター・ストーリー</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_story || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.work_character_story || '-'}</dd>
                         </div>
                       </div>
                     </div>
@@ -855,11 +855,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">振付師1</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer1_name || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_name || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">振付師1 フリガナ</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer1_furigana || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.choreographer_name_kana || '-'}</dd>
                         </div>
                         {semifinalsInfo.choreographer2_name && (
                           <>
@@ -957,7 +957,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <dt className="text-sm font-medium text-gray-500">音楽スタートのタイミング</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.music_start_timing || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.sound_start_timing || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">チェイサー曲の指定</dt>
@@ -969,7 +969,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">フェードアウト完了時間</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_completion_time || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{semifinalsInfo.fade_out_complete_time || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">音楽使用方法</dt>
@@ -1249,7 +1249,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div className="md:col-span-2">
                           <dt className="text-sm font-medium text-gray-500">作品キャラクター・ストーリー</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_story || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.work_character_story || '-'}</dd>
                         </div>
                       </div>
                     </div>
@@ -1266,11 +1266,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">振付師1</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer1_name || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_name || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">振付師1 フリガナ</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer1_furigana || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.choreographer_furigana || '-'}</dd>
                         </div>
                         {finalsInfo.choreographer2_name && (
                           <>
@@ -1434,7 +1434,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">音楽スタートのタイミング</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.music_start_timing || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.sound_start_timing || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">チェイサー曲の指定</dt>
@@ -1446,7 +1446,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">フェードアウト完了時間</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.fade_out_completion_time || '-'}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{finalsInfo.fade_out_complete_time || '-'}</dd>
                         </div>
                         <div>
                           <dt className="text-sm font-medium text-gray-500">音楽使用方法</dt>

@@ -78,18 +78,18 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         
         <FormField
           label="振付師 氏名①"
-          name="choreographer1_name"
-          value={finalsInfo.choreographer1_name || ''}
-          onChange={(e) => onChange({ choreographer1_name: e.target.value })}
+          name="choreographer_name"
+          value={finalsInfo.choreographer_name || ''}
+          onChange={(e) => onChange({ choreographer_name: e.target.value })}
           disabled={choreographerChangeOption === 'same'}
           required={choreographerChangeOption === 'different'}
         />
 
         <FormField
           label="振付師 氏名フリガナ①"
-          name="choreographer1_furigana"
-          value={finalsInfo.choreographer1_furigana || ''}
-          onChange={(e) => onChange({ choreographer1_furigana: e.target.value })}
+          name="choreographer_furigana"
+          value={finalsInfo.choreographer_furigana || ''}
+          onChange={(e) => onChange({ choreographer_furigana: e.target.value })}
           disabled={choreographerChangeOption === 'same'}
           required={choreographerChangeOption === 'different'}
           placeholder="ひらがなで入力"

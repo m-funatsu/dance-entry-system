@@ -666,7 +666,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
 
     // バリデーションはステータスチェック用のみ（保存は常に可能）
     // 50文字制限のチェックのみ実施
-    if (semifinalsInfo.work_story && semifinalsInfo.work_story.length > 50) {
+    if (semifinalsInfo.work_character_story && semifinalsInfo.work_character_story.length > 50) {
       showToast('作品キャラクター・ストーリー等は50文字以内で入力してください', 'error')
       return
     }

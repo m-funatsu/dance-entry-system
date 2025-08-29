@@ -44,9 +44,9 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
       
       <FormField
         label="音楽スタートのタイミング（きっかけ、ポーズなど）"
-        name="music_start_timing"
-        value={semifinalsInfo.music_start_timing || ''}
-        onChange={(e) => onChange({ music_start_timing: e.target.value })}
+        name="sound_start_timing"
+        value={semifinalsInfo.sound_start_timing || ''}
+        onChange={(e) => onChange({ sound_start_timing: e.target.value })}
         disabled={!isEditable}
         required
       />
@@ -162,9 +162,9 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
 
       <FormField
         label="フェードアウト完了時間"
-        name="fade_out_completion_time"
-        value={semifinalsInfo.fade_out_completion_time || ''}
-        onChange={(e) => onChange({ fade_out_completion_time: e.target.value })}
+        name="fade_out_complete_time"
+        value={semifinalsInfo.fade_out_complete_time || ''}
+        onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
         disabled={!isEditable}
         placeholder="例：4:00"
         required

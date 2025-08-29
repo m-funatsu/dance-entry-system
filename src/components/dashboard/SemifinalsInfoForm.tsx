@@ -44,17 +44,17 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         return userSelectedFields.has('music_change_from_preliminary')
       case 'sound':
         // 音響指示情報の必須項目
-        return !!semifinalsInfo.music_start_timing
+        return !!semifinalsInfo.sound_start_timing
       case 'lighting':
         // 照明指示情報の必須項目
         return !!semifinalsInfo.dance_start_timing
       case 'choreographer':
         // 振付情報の必須項目（振付師①の氏名とフリガナが必須）
         return userSelectedFields.has('choreographer_change_from_preliminary') &&
-               !!semifinalsInfo.choreographer1_name &&
-               semifinalsInfo.choreographer1_name.trim() !== '' &&
-               !!semifinalsInfo.choreographer1_furigana &&
-               semifinalsInfo.choreographer1_furigana.trim() !== ''
+               !!semifinalsInfo.choreographer_name &&
+               semifinalsInfo.choreographer_name.trim() !== '' &&
+               !!semifinalsInfo.choreographer_name_kana &&
+               semifinalsInfo.choreographer_name_kana.trim() !== ''
       case 'bank':
         // 賞金振込先情報の必須項目（全フィールドが必須）
         return !!(
@@ -133,7 +133,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
     try {
       // 50文字制限のチェック
-      if (semifinalsInfo.work_story && semifinalsInfo.work_story.length > 50) {
+      if (semifinalsInfo.work_character_story && semifinalsInfo.work_character_story.length > 50) {
         throw new Error('作品キャラクター・ストーリー等は50文字以内で入力してください')
       }
 
@@ -340,7 +340,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                       music_change_from_preliminary: true,
                       work_title: '',
                       work_title_kana: '',
-                      work_story: '',
+                      work_character_story: '',
                       music_title: '',
                       cd_title: '',
                       artist: '',
@@ -376,7 +376,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                           music_change_from_preliminary: false,
                           work_title: prelimData.work_title || '',
                           work_title_kana: prelimData.work_title_kana || '',
-                          work_story: prelimData.work_story || '',
+                          work_character_story: prelimData.work_character_story || '',
                           music_title: prelimData.music_title || '',
                           cd_title: prelimData.cd_title || '',
                           artist: prelimData.artist || '',
@@ -431,14 +431,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               作品キャラクター・ストーリー等（50字以内）
             </label>
             <textarea
-              value={semifinalsInfo.work_story || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_story: e.target.value }))}
+              value={semifinalsInfo.work_character_story || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, work_character_story: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               rows={2}
               maxLength={50}
             />
             <div className="text-sm text-gray-500 mt-1">
-              {semifinalsInfo.work_story?.length || 0}/50文字
+              {semifinalsInfo.work_character_story?.length || 0}/50文字
             </div>
           </div>
 
@@ -613,8 +613,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             </label>
             <input
               type="text"
-              value={semifinalsInfo.music_start_timing || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, music_start_timing: e.target.value }))}
+              value={semifinalsInfo.sound_start_timing || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, sound_start_timing: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -666,8 +666,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             </label>
             <input
               type="text"
-              value={semifinalsInfo.fade_out_completion_time || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, fade_out_completion_time: e.target.value }))}
+              value={semifinalsInfo.fade_out_complete_time || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, fade_out_complete_time: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="例：4:00"
             />
@@ -980,8 +980,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             </label>
             <input
               type="text"
-              value={semifinalsInfo.choreographer1_name || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer1_name: e.target.value }))}
+              value={semifinalsInfo.choreographer_name || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             />
@@ -993,8 +993,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             </label>
             <input
               type="text"
-              value={semifinalsInfo.choreographer1_furigana || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer1_furigana: e.target.value }))}
+              value={semifinalsInfo.choreographer_name_kana || ''}
+              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, choreographer_name_kana: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="ひらがなで入力"
               required

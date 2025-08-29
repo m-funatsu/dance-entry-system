@@ -21,8 +21,8 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       // 変更する場合：フィールドをクリア
       onChange({
         choreographer_change_from_preliminary: true,
-        choreographer1_name: '',
-        choreographer1_furigana: '',
+        choreographer_name: '',
+        choreographer_name_kana: '',
         choreographer2_name: '',
         choreographer2_furigana: ''
       })
@@ -30,8 +30,8 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
       // 変更しない場合：予選情報からコピー
       onChange({
         choreographer_change_from_preliminary: false,
-        choreographer1_name: preliminaryInfo?.choreographer1_name || '',
-        choreographer1_furigana: preliminaryInfo?.choreographer1_furigana || '',
+        choreographer_name: preliminaryInfo?.choreographer1_name || '',
+        choreographer_name_kana: preliminaryInfo?.choreographer1_furigana || '',
         choreographer2_name: preliminaryInfo?.choreographer2_name || '',
         choreographer2_furigana: preliminaryInfo?.choreographer2_furigana || ''
       })
@@ -63,18 +63,18 @@ export const ChoreographerSection: React.FC<ChoreographerSectionProps> = ({
 
       <FormField
         label="振付師 氏名①"
-        name="choreographer1_name"
-        value={semifinalsInfo.choreographer1_name || ''}
-        onChange={(e) => onChange({ choreographer1_name: e.target.value })}
+        name="choreographer_name"
+        value={semifinalsInfo.choreographer_name || ''}
+        onChange={(e) => onChange({ choreographer_name: e.target.value })}
         disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
         required
       />
 
       <FormField
         label="振付師 氏名フリガナ①"
-        name="choreographer1_furigana"
-        value={semifinalsInfo.choreographer1_furigana || ''}
-        onChange={(e) => onChange({ choreographer1_furigana: e.target.value })}
+        name="choreographer_name_kana"
+        value={semifinalsInfo.choreographer_name_kana || ''}
+        onChange={(e) => onChange({ choreographer_name_kana: e.target.value })}
         disabled={!semifinalsInfo.choreographer_change_from_preliminary || !isEditable}
         required
         placeholder="ひらがなで入力"

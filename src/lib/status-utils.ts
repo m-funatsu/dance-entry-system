@@ -277,7 +277,7 @@ export async function checkSemifinalsInfoCompletion(
     'music_change_from_preliminary',    // 予選との楽曲情報の変更
     'work_title',                       // 作品タイトル
     'work_title_kana',                  // 作品タイトル(ふりがな)
-    'work_story',                       // 作品キャラクター・ストーリー等（50字以内）
+    'work_character_story',             // 作品キャラクター・ストーリー等（50字以内）
     'copyright_permission',             // 楽曲著作権許諾
     'music_title',                      // 使用楽曲タイトル
     'cd_title',                         // 収録アルバムタイトル
@@ -285,10 +285,10 @@ export async function checkSemifinalsInfoCompletion(
     'record_number',                    // レコード番号
     'music_type',                       // 楽曲種類
     'music_data_path',                  // 楽曲データ
-    'music_start_timing',               // 音楽スタートのタイミング（きっかけ、ポーズなど）
+    'sound_start_timing',               // 音楽スタートのタイミング（きっかけ、ポーズなど）
     'chaser_song_designation',          // チェイサー（退場）曲の指定
     'fade_out_start_time',              // フェードアウト開始時間
-    'fade_out_completion_time',         // フェードアウト完了時間
+    'fade_out_complete_time',           // フェードアウト完了時間
     
     // 準決勝 - 踊り出しタイミング
     'scene1_time',                      // シーン1 時間
@@ -305,8 +305,8 @@ export async function checkSemifinalsInfoCompletion(
     'chaser_exit_image_path',           // チェイサー/退場 イメージ画像
     
     // 振付師情報
-    'choreographer1_name',              // 振付師 氏名①
-    'choreographer1_furigana',          // 振付師 氏名フリガナ①
+    'choreographer_name',               // 振付師 氏名①
+    'choreographer_name_kana',          // 振付師 氏名フリガナ①
     'props_usage',                      // 小道具の有無
     
     // 振込確認用紙

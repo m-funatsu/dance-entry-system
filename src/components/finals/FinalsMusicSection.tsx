@@ -98,10 +98,10 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <FormField
         label="作品キャラクター・ストーリー等（50字以内）"
-        name="work_story"
+        name="work_character_story"
         type="textarea"
-        value={finalsInfo.work_story || ''}
-        onChange={(e) => onChange({ work_story: e.target.value })}
+        value={finalsInfo.work_character_story || ''}
+        onChange={(e) => onChange({ work_character_story: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
         required={musicChangeOption === 'changed'}
         maxLength={50}
@@ -289,6 +289,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           } : undefined}
           disabled={musicChangeOption === 'unchanged' || !isEditable}
           required={musicChangeOption === 'changed'}
+          deletable={musicChangeOption === 'changed'} // 変更時のみ削除可能
           accept=".wav,.mp3,.m4a"
         />
       </div>

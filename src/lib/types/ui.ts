@@ -62,6 +62,7 @@ export interface ImageUploadProps extends FileUploadProps {
 export interface AudioUploadProps extends FileUploadProps {
   displayName?: string
   accept?: string
+  deletable?: boolean // 削除ボタンの表示制御
 }
 
 export interface VideoUploadProps extends FileUploadProps {

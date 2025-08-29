@@ -12,7 +12,8 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   disabled = false,
   required = false,
   maxSizeMB = 200,
-  accept = '.wav,.mp3,.m4a'
+  accept = '.wav,.mp3,.m4a',
+  deletable = true // デフォルトは削除可能
 }) => {
   console.log('[AUDIO UPLOAD DEBUG] === AudioUpload レンダリング ===')
   console.log('[AUDIO UPLOAD DEBUG] label:', label)
@@ -153,8 +154,8 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
               </div>
             )}
             
-            {/* 削除ボタン - valueがある場合は常に表示 */}
-            {onDelete && (
+            {/* 削除ボタン - deletableがtrueかつonDeleteがある場合のみ表示 */}
+            {onDelete && deletable && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -172,8 +173,8 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
               </button>
             )}
             
-            {!disabled && !onDelete && (
-              <p className="text-xs text-gray-500">クリックまたはドラッグ&ドロップで変更</p>
+            {!disabled && (!onDelete || !deletable) && (
+              <p className="text-xs text-gray-500">{!deletable ? '準決勝と同じ設定のため削除不可' : 'クリックまたはドラッグ&ドロップで変更'}</p>
             )}
           </div>
         ) : (
