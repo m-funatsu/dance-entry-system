@@ -570,9 +570,32 @@ export default async function DashboardPage() {
     console.log('[DASHBOARD APPLICATIONS CHECK] applicationsInfo:', !!applicationsInfo)
     
     if (!applicationsInfo) {
-      console.log('[DASHBOARD APPLICATIONS CHECK] applications_infoなし: true（申請なしでも完了とみなす）')
+      console.log('[DASHBOARD APPLICATIONS CHECK] applications_infoなし: false（申請なし）')
       console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
-      return true
+      return false
+    }
+    
+    // 何かひとつでもデータがあるかチェック
+    const hasAnyData = !!(
+      // 関係者チケット申請
+      applicationsInfo.related1_name || applicationsInfo.related2_name || applicationsInfo.related3_name ||
+      applicationsInfo.related4_name || applicationsInfo.related5_name || applicationsInfo.related_ticket_count ||
+      // 選手同伴申請
+      applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name ||
+      // メイク申請（準決勝）
+      applicationsInfo.makeup_name || applicationsInfo.makeup_email || applicationsInfo.makeup_phone ||
+      applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes ||
+      // メイク申請（決勝）
+      applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || applicationsInfo.makeup_phone_final ||
+      applicationsInfo.makeup_preferred_stylist_final || applicationsInfo.makeup_notes_final
+    )
+    
+    console.log('[DASHBOARD APPLICATIONS CHECK] 何らかのデータ入力:', hasAnyData)
+    
+    // データが何もない場合はfalse（申請なし）
+    if (!hasAnyData) {
+      console.log('[DASHBOARD APPLICATIONS CHECK] データなし -> false')
+      return false
     }
     
     // ApplicationsForm.tsxの必須項目と完全一致：
