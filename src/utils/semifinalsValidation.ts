@@ -9,7 +9,7 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
         errors.push('「予選との楽曲情報の変更」を選択してください')
       }
       if (!data.work_title) errors.push('作品タイトル')
-      if (!data.work_character_story) errors.push('作品キャラクター・ストーリー等')
+      if (!data.work_story) errors.push('作品キャラクター・ストーリー等')
       if (!data.copyright_permission) errors.push('楽曲著作権許諾')
       if (!data.music_title) errors.push('使用楽曲タイトル')
       // 収録CDタイトル、アーティスト、レコード番号を常時必須に変更
@@ -22,13 +22,13 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       break
 
     case 'sound':
-      if (!data.sound_start_timing) errors.push('音楽スタートのタイミング')
+      if (!data.music_start_timing) errors.push('音楽スタートのタイミング')
       if (!data.chaser_song_designation) errors.push('チェイサー（退場）曲の指定')
       if (data.chaser_song_designation === 'required' && !data.chaser_song) {
         errors.push('チェイサー（退場）曲音源')
       }
       if (!data.fade_out_start_time) errors.push('フェードアウト開始時間')
-      if (!data.fade_out_complete_time) errors.push('フェードアウト完了時間')
+      if (!data.fade_out_completion_time) errors.push('フェードアウト完了時間')
       break
 
     case 'lighting':

@@ -12,7 +12,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (data.music_change === true) {
         // 変更ありの場合のみチェック
         if (!data.work_title) errors.push('作品タイトル')
-        if (!data.work_character_story) errors.push('作品キャラクター・ストーリー等')
+        if (!data.work_story) errors.push('作品キャラクター・ストーリー等')
         if (!data.copyright_permission) errors.push('楽曲著作権許諾')
         if (!data.music_title) errors.push('使用楽曲タイトル')
         // 収録CDタイトル、アーティスト、レコード番号を常時必須に変更
@@ -32,13 +32,13 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       }
       if (data.sound_change_from_semifinals === true) {
         // 変更ありの場合のみチェック
-        if (!data.sound_start_timing) errors.push('音楽スタートのタイミング')
+        if (!data.music_start_timing) errors.push('音楽スタートのタイミング')
         if (!data.chaser_song_designation) errors.push('チェイサー（退場）曲の指定')
         if (data.chaser_song_designation === '必要' && !data.chaser_song) {
           errors.push('チェイサー（退場）曲音源')
         }
         if (!data.fade_out_start_time) errors.push('フェードアウト開始時間')
-        if (!data.fade_out_complete_time) errors.push('フェードアウト完了時間')
+        if (!data.fade_out_completion_time) errors.push('フェードアウト完了時間')
       }
       break
 
@@ -74,7 +74,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       }
       if (data.choreographer_change === true) {
         // 変更ありの場合、振付師名は必須
-        if (!data.choreographer_name) errors.push('決勝 - 振付師')
+        if (!data.choreographer1_name) errors.push('決勝 - 振付師')
         // 振付師2は任意項目のため必須チェックしない
         
         // 振付変更関連の必須項目

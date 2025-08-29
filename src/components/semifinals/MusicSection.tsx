@@ -46,7 +46,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         music_change_from_preliminary: false,
         work_title: preliminaryInfo?.work_title || '',
         work_title_kana: preliminaryInfo?.work_title_kana || '',
-        work_character_story: preliminaryInfo?.work_story || '',
+        work_story: preliminaryInfo?.work_story || '',
         music_title: preliminaryInfo?.music_title || '',
         cd_title: preliminaryInfo?.cd_title || '',
         artist: preliminaryInfo?.artist || '',
@@ -61,7 +61,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         music_change_from_preliminary: true,
         work_title: '',
         work_title_kana: '',
-        work_character_story: '',
+        work_story: '',
         music_title: '',
         cd_title: '',
         artist: '',
@@ -114,7 +114,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
                 music_change_from_preliminary: undefined,
                 work_title: '',
                 work_title_kana: '',
-                work_character_story: '',
+                work_story: '',
                 music_title: '',
                 cd_title: '',
                 artist: '',
@@ -171,10 +171,10 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
 
       <FormField
         label="作品キャラクター・ストーリー等（50字以内）"
-        name="work_character_story"
+        name="work_story"
         type="textarea"
-        value={semifinalsInfo.work_character_story || ''}
-        onChange={(e) => onChange({ work_character_story: e.target.value })}
+        value={semifinalsInfo.work_story || ''}
+        onChange={(e) => onChange({ work_story: e.target.value })}
         disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
         required
         maxLength={50}

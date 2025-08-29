@@ -204,7 +204,7 @@ export interface SemifinalsInfo {
   music_change_from_preliminary?: boolean
   work_title?: string
   work_title_kana?: string
-  work_character_story?: string
+  work_story?: string  // work_character_storyをwork_storyに統一
   copyright_permission?: string
   music_title?: string
   cd_title?: string
@@ -214,11 +214,11 @@ export interface SemifinalsInfo {
   music_type?: string
   music_data_path?: string
   music_usage_method?: string
-  sound_start_timing?: string
+  music_start_timing?: string  // sound_start_timingをmusic_start_timingに修正
   chaser_song_designation?: string
   chaser_song?: string
   fade_out_start_time?: string
-  fade_out_complete_time?: string
+  fade_out_completion_time?: string  // fade_out_complete_timeをfade_out_completion_timeに修正
   dance_start_timing?: string
   scene1_time?: string
   scene1_trigger?: string
@@ -263,12 +263,13 @@ export interface SemifinalsInfo {
   chaser_exit_image_path?: string
   chaser_exit_notes?: string
   choreographer_change_from_preliminary?: boolean
-  choreographer_name?: string
-  choreographer_furigana?: string
+  choreographer1_name?: string  // choreographer_nameをchoreographer1_nameに修正
+  choreographer1_furigana?: string  // choreographer_furiganaをchoreographer1_furiganaに修正
   choreographer2_name?: string
   choreographer2_furigana?: string
   props_usage?: string
   props_details?: string
+  payment_slip_path?: string  // 振込確認用紙フィールドを追加
   bank_name?: string
   branch_name?: string
   account_type?: string
@@ -287,7 +288,7 @@ export interface FinalsInfo {
   copy_preliminary_music?: boolean
   work_title?: string
   work_title_kana?: string
-  work_character_story?: string
+  work_story?: string
   copyright_permission?: string
   music_title?: string
   cd_title?: string
@@ -298,11 +299,11 @@ export interface FinalsInfo {
   music_data_path?: string
   music_usage_method?: string
   sound_change_from_semifinals?: boolean
-  sound_start_timing?: string
+  music_start_timing?: string
   chaser_song_designation?: string
   chaser_song?: string
   fade_out_start_time?: string
-  fade_out_complete_time?: string
+  fade_out_completion_time?: string
   lighting_change_from_semifinals?: boolean
   dance_start_timing?: string
   scene1_time?: string
@@ -351,8 +352,8 @@ export interface FinalsInfo {
   choreography_change_timing?: string
   choreography_before_change?: string
   choreography_after_change?: string
-  choreographer_name?: string
-  choreographer_furigana?: string
+  choreographer1_name?: string
+  choreographer1_furigana?: string
   choreographer2_name?: string
   choreographer2_furigana?: string
   props_usage?: string

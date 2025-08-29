@@ -271,55 +271,57 @@ export async function checkSemifinalsInfoCompletion(
   console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
   console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
 
-  // 実際の準決勝フォーム必須項目（全項目リスト）
+  // 正しい必須項目のみ（ユーザー指定の完全なリスト）
   const baseRequiredFields = [
     // 楽曲情報セクション
-    'work_title',                    // 作品タイトル
-    'work_title_kana',               // 作品タイトル(ふりがな)
-    'work_character_story',          // 作品キャラクター・ストーリー等（50字以内）
-    'music_change_from_preliminary', // 予選との楽曲情報の変更 *
-    'copyright_permission',          // 楽曲著作権許諾 *
-    'music_title',                   // 使用楽曲タイトル
-    'cd_title',                      // 収録アルバムタイトル
-    'artist',                        // アーティスト
-    'record_number',                 // レコード番号
-    'music_type',                    // 楽曲種類
-    'music_data_path',               // 楽曲データ
-    // 音響指示情報セクション
-    'sound_start_timing',            // 音楽スタートのタイミング（きっかけ、ポーズなど）
-    'chaser_song_designation',       // チェイサー（退場）曲の指定 *
-    'fade_out_start_time',           // フェードアウト開始時間
-    'fade_out_complete_time',        // フェードアウト完了時間
-    // 照明指示情報セクション
-    'dance_start_timing',            // 準決勝 - 踊り出しタイミング
-    'scene1_time',                   // シーン1 時間 *
-    'scene1_trigger',                // シーン1 きっかけ *
-    'scene1_color_type',             // シーン1 色・系統 *
-    'scene1_color_other',            // シーン1 色・系統その他 *
-    'scene1_image',                  // シーン1 イメージ *
-    'scene1_image_path',             // シーン1 イメージ画像 *
-    'chaser_exit_time',              // チェイサー/退場 時間 *
-    'chaser_exit_trigger',           // チェイサー/退場 きっかけ *
-    'chaser_exit_color_type',        // チェイサー/退場 色・系統 *
-    'chaser_exit_color_other',       // チェイサー/退場 色・系統その他 *
-    'chaser_exit_image',             // チェイサー/退場 イメージ *
-    'chaser_exit_image_path',        // チェイサー/退場 イメージ画像 *
-    // 振付師情報セクション
-    'choreographer_name',            // 振付師 氏名①
-    'choreographer_furigana',        // 振付師 氏名フリガナ①
-    'props_usage',                   // 小道具の有無 *
-    // 賞金振込先情報セクション
-    'bank_name',                     // 銀行名 *
-    'branch_name',                   // 支店名 *
-    'account_type',                  // 口座種類 *
-    'account_number',                // 口座番号 *
-    'account_holder'                 // 口座名義 *
+    'music_change_from_preliminary',    // 予選との楽曲情報の変更
+    'work_title',                       // 作品タイトル
+    'work_title_kana',                  // 作品タイトル(ふりがな)
+    'work_story',                       // 作品キャラクター・ストーリー等（50字以内）
+    'copyright_permission',             // 楽曲著作権許諾
+    'music_title',                      // 使用楽曲タイトル
+    'cd_title',                         // 収録アルバムタイトル
+    'artist',                           // アーティスト
+    'record_number',                    // レコード番号
+    'music_type',                       // 楽曲種類
+    'music_data_path',                  // 楽曲データ
+    'music_start_timing',               // 音楽スタートのタイミング（きっかけ、ポーズなど）
+    'chaser_song_designation',          // チェイサー（退場）曲の指定
+    'fade_out_start_time',              // フェードアウト開始時間
+    'fade_out_completion_time',         // フェードアウト完了時間
+    
+    // 準決勝 - 踊り出しタイミング
+    'scene1_time',                      // シーン1 時間
+    'scene1_trigger',                   // シーン1 きっかけ
+    'scene1_color_type',                // シーン1 色・系統
+    'scene1_color_other',               // シーン1 色・系統その他
+    'scene1_image',                     // シーン1 イメージ
+    'scene1_image_path',                // シーン1 イメージ画像
+    'chaser_exit_time',                 // チェイサー/退場 時間
+    'chaser_exit_trigger',              // チェイサー/退場 きっかけ
+    'chaser_exit_color_type',           // チェイサー/退場 色・系統
+    'chaser_exit_color_other',          // チェイサー/退場 色・系統その他
+    'chaser_exit_image',                // チェイサー/退場 イメージ
+    'chaser_exit_image_path',           // チェイサー/退場 イメージ画像
+    
+    // 振付師情報
+    'choreographer1_name',              // 振付師 氏名①
+    'choreographer1_furigana',          // 振付師 氏名フリガナ①
+    'props_usage',                      // 小道具の有無
+    
+    // 振込確認用紙
+    'payment_slip_path',                // 振込確認用紙
+    
+    // 賞金振込先情報
+    'bank_name',                        // 銀行名
+    'branch_name',                      // 支店名
+    'account_type',                     // 口座種類
+    'account_number',                   // 口座番号
+    'account_holder'                    // 口座名義
   ]
   
   // 条件付き必須項目を追加
   const conditionallyRequired: string[] = []
-  
-  // JASRAC作品コードは必須ではなくなった
   
   // チェイサー曲（必要な場合のみ必須）
   if (formData.chaser_song_designation === 'required') {
@@ -358,24 +360,24 @@ export async function checkSemifinalsInfoCompletion(
       
       if (allFiles) {
         // 1. 振込確認用紙（必須）
-        const hasPaymentSlip = allFiles.some(file => file.purpose === 'semifinals_payment_slip')
+        const hasPaymentSlip = allFiles.some(file => file.purpose === 'payment_slip_path' || file.purpose === 'semifinals_payment_slip')
         console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
         
-        // 2. 楽曲データ（*マーク付き必須、required属性あり）
+        // 2. 楽曲データ（常に必須）
         const hasMusicData = allFiles.some(file => 
           (file.file_type === 'music' || file.file_type === 'audio') && 
           (file.purpose === 'music_data_path' || file.file_path?.includes('music_data_path'))
         )
-        console.log(`[SEMIFINALS INFO COMPLETION] 楽曲データ（*必須）: ${hasMusicData}`)
+        console.log(`[SEMIFINALS INFO COMPLETION] 楽曲データ（必須）: ${hasMusicData}`)
         
-        // 3. シーン1イメージ画像（*必須）
+        // 3. シーン1イメージ画像（必須）
         const hasScene1Image = allFiles.some(file => 
           file.file_type === 'photo' && 
           (file.purpose === 'scene1_image_path' || file.file_path?.includes('scene1_image_path'))
         )
         console.log(`[SEMIFINALS INFO COMPLETION] シーン1イメージ画像: ${hasScene1Image}`)
         
-        // 4. チェイサー/退場イメージ画像（*必須）
+        // 4. チェイサー/退場イメージ画像（必須）
         const hasChaserImage = allFiles.some(file => 
           file.file_type === 'photo' && 
           (file.purpose === 'chaser_exit_image_path' || file.file_path?.includes('chaser_exit_image_path'))

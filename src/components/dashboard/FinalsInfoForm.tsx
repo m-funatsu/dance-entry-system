@@ -118,7 +118,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
         }
-        if (data.sound_change_from_semifinals === false && data.sound_start_timing) {
+        if (data.sound_change_from_semifinals === false && data.music_start_timing) {
           setSoundChangeOption('same')
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
@@ -128,7 +128,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         } else if (data.lighting_change_from_semifinals === true) {
           setLightingChangeOption('different')
         }
-        if (data.choreographer_change === false && data.choreographer_name) {
+        if (data.choreographer_change === false && data.choreographer1_name) {
           setChoreographerChangeOption('same')
         } else if (data.choreographer_change === true) {
           setChoreographerChangeOption('different')
@@ -160,7 +160,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         console.log('[SYNC] 準決勝情報読み込み完了:', {
           updated_at: semifinalsData.updated_at,
           music_title: semifinalsData.music_title,
-          choreographer_name: semifinalsData.choreographer_name
+          choreographer1_name: semifinalsData.choreographer1_name
         })
         setLastSemifinalsData(semifinalsData)
         return semifinalsData
@@ -222,7 +222,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       ...prev,
       work_title: semifinalsData.work_title || '',
       work_title_kana: semifinalsData.work_title_kana || '',
-      work_character_story: semifinalsData.work_character_story || '',
+      work_story: semifinalsData.work_story || '',
       copyright_permission: semifinalsData.copyright_permission || '',
       music_title: semifinalsData.music_title || '',
       artist: semifinalsData.artist || '',
@@ -264,11 +264,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     
     setFinalsInfo(prev => ({
       ...prev,
-      sound_start_timing: semifinalsData.sound_start_timing || '',
+      music_start_timing: semifinalsData.music_start_timing || '',
       chaser_song_designation: mapChaserSongDesignation(semifinalsData.chaser_song_designation || ''),
       chaser_song: chaserSongUrl,
       fade_out_start_time: semifinalsData.fade_out_start_time || '',
-      fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
+      fade_out_completion_time: semifinalsData.fade_out_completion_time || ''
     }))
   }
 
@@ -304,8 +304,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   const syncChoreographerData = async (semifinalsData: Partial<SemifinalsInfo>) => {
     setFinalsInfo(prev => ({
       ...prev,
-      choreographer_name: semifinalsData.choreographer_name || '',
-      choreographer_furigana: semifinalsData.choreographer_furigana || '',
+      choreographer1_name: semifinalsData.choreographer1_name || '',
+      choreographer1_furigana: semifinalsData.choreographer1_furigana || '',
       choreographer2_name: semifinalsData.choreographer2_name || '',
       choreographer2_furigana: semifinalsData.choreographer2_furigana || ''
     }))
@@ -398,7 +398,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         music_change: true,
         work_title: '',
         work_title_kana: '',
-        work_character_story: '',
+        work_story: '',
         copyright_permission: '',
         music_title: '',
         artist: '',
@@ -430,11 +430,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       setFinalsInfo(prev => ({
         ...prev,
         sound_change_from_semifinals: true,
-        sound_start_timing: '',
+        music_start_timing: '',
         chaser_song_designation: '',
         chaser_song: '',
         fade_out_start_time: '',
-        fade_out_complete_time: ''
+        fade_out_completion_time: ''
       }))
     }
   }
@@ -502,8 +502,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       setFinalsInfo(prev => ({
         ...prev,
         choreographer_change: true,
-        choreographer_name: '',
-        choreographer_furigana: '',
+        choreographer1_name: '',
+        choreographer1_furigana: '',
         choreographer2_name: '',
         choreographer2_furigana: ''
       }))
@@ -757,7 +757,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   const handleSave = async () => {
     // 50文字制限のチェック
-    if (finalsInfo.work_character_story && finalsInfo.work_character_story.length > 50) {
+    if (finalsInfo.work_story && finalsInfo.work_story.length > 50) {
       return
     }
 

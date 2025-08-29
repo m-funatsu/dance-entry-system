@@ -98,10 +98,10 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <FormField
         label="作品キャラクター・ストーリー等（50字以内）"
-        name="work_character_story"
+        name="work_story"
         type="textarea"
-        value={finalsInfo.work_character_story || ''}
-        onChange={(e) => onChange({ work_character_story: e.target.value })}
+        value={finalsInfo.work_story || ''}
+        onChange={(e) => onChange({ work_story: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
         required={musicChangeOption === 'changed'}
         maxLength={50}
