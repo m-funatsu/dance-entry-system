@@ -109,7 +109,7 @@ export default async function ProgramInfoListPage() {
       basic_info: relatedBasicInfo || null
     }
   })
-  .filter(item => item.entries?.status === 'selected')
+  .filter(item => ['pending', 'submitted', 'selected'].includes(item.entries?.status || ''))
   // ダンスジャンルでソート
   .sort((a, b) => {
     const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
@@ -158,6 +158,7 @@ export default async function ProgramInfoListPage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">プログラム掲載用情報一覧</h1>
         <p className="text-gray-600">エントリーのプログラム掲載用情報をまとめて確認できます（{mappedProgramInfoList?.length || 0}件）</p>
+        <p className="text-sm text-blue-600 mt-1">※ 未処理・提出済み・選考通過のエントリーを表示</p>
       </div>
 
       {mappedProgramInfoList && mappedProgramInfoList.length > 0 ? (
