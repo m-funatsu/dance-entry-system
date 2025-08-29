@@ -1258,7 +1258,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       className={`w-full mt-2 text-sm transition-colors ${
                         !isEditable
                           ? 'text-gray-400 cursor-not-allowed opacity-50'
-                          : 'text-red-600 hover:text-red-800'
+                          : 'text-red-600 hover:text-red-800 cursor-pointer'
                       }`}
                     >
                       画像を削除
@@ -1311,7 +1311,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                       className={`w-full mt-2 text-sm transition-colors ${
                         !isEditable
                           ? 'text-gray-400 cursor-not-allowed opacity-50'
-                          : 'text-red-600 hover:text-red-800'
+                          : 'text-red-600 hover:text-red-800 cursor-pointer'
                       }`}
                     >
                       画像を削除

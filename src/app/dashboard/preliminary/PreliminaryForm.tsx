@@ -510,7 +510,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     className={`ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full transition-colors duration-200 ${
                       !isEditable || uploading
                         ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-50'
-                        : 'text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                        : 'text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer'
                     }`}
                   >
                     <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
