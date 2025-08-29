@@ -63,8 +63,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   })
 
   useEffect(() => {
-    loadFinalsInfo()
-    loadSemifinalsInfo() // 準決勝情報も初期読み込み
+    const initializeForm = async () => {
+      // 1. まず決勝情報を読み込んでオプション状態を復元
+      await loadFinalsInfo()
+      
+      // 2. オプション状態が復元された後に準決勝情報を読み込み
+      await loadSemifinalsInfo()
+    }
+    
+    initializeForm()
     
     // ページフォーカス時の同期
     const handleVisibilityChange = () => {
@@ -774,12 +781,13 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     const isComplete = checkFinalsInfoCompletion(finalsInfo)
     await updateFormStatus('finals_info', entry.id, isComplete)
     
-    // 保存成功後にダッシュボードにリダイレクト
+    // 保存成功後にデータを再読み込み（リロードの代わり）
     setValidationErrors({})
     showToast('決勝情報を保存しました', 'success')
-    setTimeout(() => {
-      window.location.reload()
-    }, 1500)
+    
+    // データを再読み込み（同期を実行しないため）
+    await loadFinalsInfo()
+    await loadAudioFiles()
   }
 
   if (loading) {
