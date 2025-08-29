@@ -129,6 +129,8 @@ export default async function ApplicationsInfoListPage() {
       makeup_email_final: relatedApplicationsInfo?.makeup_email_final || '',
       makeup_phone_final: relatedApplicationsInfo?.makeup_phone_final || '',
       makeup_notes_final: relatedApplicationsInfo?.makeup_notes_final || '',
+      // 備考情報
+      notes: relatedApplicationsInfo?.notes || '',
       // エントリー情報
       entries: {
         ...entry,
@@ -197,6 +199,8 @@ export default async function ApplicationsInfoListPage() {
               item.companion3_purpose || '',
               // 選手同伴合計
               item.companion_total_amount || '0',
+              // 備考
+              item.notes || '',
               // メイク(準決勝)
               item.makeup_preferred_stylist || '',
               item.makeup_name || '',
@@ -210,7 +214,7 @@ export default async function ApplicationsInfoListPage() {
               item.makeup_phone_final || '',
               item.makeup_notes_final || '',
             ])}
-            headers={['ID', 'エントリーID', 'システム利用者名', '選考ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考']}
+            headers={['ID', 'エントリーID', 'システム利用者名', '選考ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', '備考', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考']}
             filename="applications_info"
           />
         </div>
@@ -262,6 +266,9 @@ export default async function ApplicationsInfoListPage() {
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     払込用紙添付
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    備考
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     メイク(準決勝)
@@ -399,6 +406,13 @@ export default async function ApplicationsInfoListPage() {
                         )) && (
                           <span className="text-xs text-gray-400">払込用紙なし</span>
                         )}
+                      </div>
+                    </td>
+                    
+                    {/* 備考 */}
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {applicationsInfo.notes || '未入力'}
                       </div>
                     </td>
                     

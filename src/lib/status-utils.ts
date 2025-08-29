@@ -382,7 +382,7 @@ export async function checkSemifinalsInfoCompletion(
   
   console.log(`[SEMIFINALS INFO COMPLETION] === チェック結果まとめ ===`)
   console.log(`[SEMIFINALS INFO COMPLETION] フィールド完了: ${fieldsComplete}`)
-  console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙アップロード: ${hasPaymentSlip}`)
+  console.log(`[SEMIFINALS INFO COMPLETION] ファイル完了: ${hasRequiredFiles}`)
   console.log(`[SEMIFINALS INFO COMPLETION] 最終結果: ${result}`)
   console.log(`[SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック終了 ===`)
   
