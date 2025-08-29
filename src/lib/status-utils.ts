@@ -271,18 +271,14 @@ export async function checkSemifinalsInfoCompletion(
   console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
   console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
 
-  // UIのrequired属性がある必須フィールド（*マーク+required両方）
+  // *マーク付き必須フィールドのみ（UIと完全一致）
   const baseRequiredFields = [
     // 楽曲情報セクション（MusicSection）
     'music_change_from_preliminary', // 予選との楽曲情報の変更 *
     'copyright_permission',          // 楽曲著作権許諾 *
     // 音響指示情報セクション（SoundSection）
-    'sound_start_timing',            // 音楽スタートのタイミング (required属性あり)
     'chaser_song_designation',       // チェイサー（退場）曲の指定 *
-    'fade_out_start_time',           // フェードアウト開始時間 (required属性あり)
-    'fade_out_complete_time',        // フェードアウト完了時間 (required属性あり)
     // 照明指示情報セクション（LightingSection）
-    'dance_start_timing',            // 準決勝 - 踊り出しタイミング (required属性あり)
     'scene1_time',                   // シーン1 時間 *（シーン1のみ必須）
     'scene1_trigger',                // シーン1 きっかけ *
     'scene1_color_type',             // シーン1 色・系統 *
@@ -329,32 +325,56 @@ export async function checkSemifinalsInfoCompletion(
   
   const { isComplete: fieldsComplete } = checkFormCompletion('SEMIFINALS INFO', formData, allRequiredFields)
   
-  // 振込確認用紙のチェック
-  let hasPaymentSlip = false
+  // 必須ファイルのチェック
+  let hasRequiredFiles = true
   if (entryId) {
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       
-      const { data: paymentSlipData, error: paymentSlipError } = await supabase
+      // 全ファイルを取得
+      const { data: allFiles, error: filesError } = await supabase
         .from('entry_files')
-        .select('id')
+        .select('*')
         .eq('entry_id', entryId)
-        .eq('purpose', 'semifinals_payment_slip')
-        .maybeSingle()
       
-      console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙検索結果:`, paymentSlipData)
-      console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙検索エラー:`, paymentSlipError)
+      console.log(`[SEMIFINALS INFO COMPLETION] ファイル検索結果:`, allFiles)
+      console.log(`[SEMIFINALS INFO COMPLETION] ファイル検索エラー:`, filesError)
       
-      hasPaymentSlip = !!paymentSlipData
+      if (allFiles) {
+        // 1. 振込確認用紙（必須）
+        const hasPaymentSlip = allFiles.some(file => file.purpose === 'semifinals_payment_slip')
+        console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
+        
+        // 2. 楽曲データ（楽曲変更時必須、*マークなし）
+        const hasMusicData = true // *マークがないため必須ではない
+        
+        // 3. シーン1イメージ画像（*必須）
+        const hasScene1Image = allFiles.some(file => 
+          file.file_type === 'photo' && 
+          (file.purpose === 'scene1_image_path' || file.file_path?.includes('scene1_image_path'))
+        )
+        console.log(`[SEMIFINALS INFO COMPLETION] シーン1イメージ画像: ${hasScene1Image}`)
+        
+        // 4. チェイサー/退場イメージ画像（*必須）
+        const hasChaserImage = allFiles.some(file => 
+          file.file_type === 'photo' && 
+          (file.purpose === 'chaser_exit_image_path' || file.file_path?.includes('chaser_exit_image_path'))
+        )
+        console.log(`[SEMIFINALS INFO COMPLETION] チェイサー/退場イメージ画像: ${hasChaserImage}`)
+        
+        hasRequiredFiles = hasPaymentSlip && hasMusicData && hasScene1Image && hasChaserImage
+      } else {
+        hasRequiredFiles = false
+      }
     } catch (error) {
-      console.log('[SEMIFINALS INFO COMPLETION] 振込確認用紙チェックエラー:', error)
-      hasPaymentSlip = false
+      console.log('[SEMIFINALS INFO COMPLETION] ファイルチェックエラー:', error)
+      hasRequiredFiles = false
     }
   }
   
-  // 振込確認用紙は準決勝情報の必須項目（BankSectionで確認ができる）
-  const result = fieldsComplete && hasPaymentSlip
+  // 全必須項目（フィールド + ファイル）の完了チェック
+  const result = fieldsComplete && hasRequiredFiles
   
   console.log(`[SEMIFINALS INFO COMPLETION] === チェック結果まとめ ===`)
   console.log(`[SEMIFINALS INFO COMPLETION] フィールド完了: ${fieldsComplete}`)
