@@ -108,7 +108,14 @@ export default async function SemifinalsInfoListPage() {
       entry_files: relatedFiles || [],
       basic_info: relatedBasicInfo || null
     }
-  }).filter(item => item.entries?.status === 'selected') || []
+  })
+  .filter(item => item.entries?.status === 'selected')
+  // ダンスジャンルでソート
+  .sort((a, b) => {
+    const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
+    const genreB = b.basic_info?.dance_style || 'ZZZ'
+    return genreA.localeCompare(genreB, 'ja')
+  }) || []
 
   console.log('[SEMIFINALS DEBUG] マッピング完了')
   console.log('[SEMIFINALS DEBUG] マッピング後データ件数:', mappedSemifinalsInfoList?.length || 0)

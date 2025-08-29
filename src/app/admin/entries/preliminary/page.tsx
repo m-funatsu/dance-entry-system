@@ -107,6 +107,12 @@ export default async function PreliminaryInfoListPage() {
       entry_files: relatedFiles || [],
       basic_info: relatedBasicInfo || null
     }
+  })
+  // ダンスジャンルでソート
+  .sort((a, b) => {
+    const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
+    const genreB = b.basic_info?.dance_style || 'ZZZ'
+    return genreA.localeCompare(genreB, 'ja')
   }) || []
 
   console.log('[PRELIMINARY DEBUG] マッピング完了')

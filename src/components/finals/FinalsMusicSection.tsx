@@ -195,6 +195,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         value={finalsInfo.cd_title || ''}
         onChange={(e) => onChange({ cd_title: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
+        required
       />
 
       <FormField
@@ -203,6 +204,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         value={finalsInfo.artist || ''}
         onChange={(e) => onChange({ artist: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
+        required
       />
 
       <FormField
@@ -211,6 +213,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         value={finalsInfo.record_number || ''}
         onChange={(e) => onChange({ record_number: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
+        required
       />
 
       <FormField
@@ -219,7 +222,6 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
         value={finalsInfo.jasrac_code || ''}
         onChange={(e) => onChange({ jasrac_code: e.target.value })}
         disabled={musicChangeOption === 'unchanged'}
-        required={musicChangeOption === 'changed' && finalsInfo.copyright_permission === 'commercial'}
       />
 
       <FormField
