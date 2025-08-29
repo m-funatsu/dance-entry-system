@@ -4,15 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailComposer } from '@/components/EmailComposer'
 import AdminLink from '@/components/admin/AdminLink'
-import { 
-  checkBasicInfoCompletion,
-  checkPreliminaryInfoCompletion, 
-  checkProgramInfoCompletion,
-  checkSemifinalsInfoCompletion,
-  checkFinalsInfoCompletion,
-  checkSnsInfoCompletion,
-  checkApplicationsInfoCompletion
-} from '@/lib/status-utils'
+// status-utils のimportは削除（現在未使用のため）
 import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 interface EntryWithDetails {
@@ -88,8 +80,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {
-    // データベースのステータスフィールドの値を基準とする
-    // status-utils.tsで設定される値: '未登録' | '入力中' | '登録済み'
+    // データベースのステータスカラムを使用（新しいアプローチ）
     
     // 申請情報は特別ロジック（申請あり/なしのみ）
     const hasApplicationsInfo = !!entry.applications_info && (
@@ -101,8 +92,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
     // 参加同意書の状況を確認（consent_form_submittedで判定）
     const hasConsentForm = !!(entry.consent_form_submitted)
     
-    // ステータスフィールドから色を決定する関数
-    const getStatusColor = (status: string | undefined) => {
+    // ステータスカラムの値から色を決定する関数
+    const getStatusColorFromValue = (status: string | undefined) => {
       switch (status) {
         case '登録済み': return 'bg-green-100 text-green-800'
         case '入力中': return 'bg-yellow-100 text-yellow-800'
@@ -111,44 +102,30 @@ export default function EntryTable({ entries }: EntryTableProps) {
       }
     }
 
-    // ステータスフィールドの値をデバッグ出力
-    console.log(`Entry ${entry.id} ステータス詳細:`, {
-      basic_info_status: entry.basic_info_status,
-      preliminary_info_status: entry.preliminary_info_status,
-      program_info_status: entry.program_info_status,
-      semifinals_info_status: entry.semifinals_info_status,
-      finals_info_status: entry.finals_info_status,
-      sns_info_status: entry.sns_info_status,
-      applications_info_status: entry.applications_info_status,
-      consent_form_submitted: entry.consent_form_submitted,
-      hasApplicationsInfo: hasApplicationsInfo,
-      hasConsentForm: hasConsentForm
-    })
-
     return (
       <div className="flex flex-wrap gap-1">
         {/* 基本：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.basic_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.basic_info_status)}`}>
           基本
         </span>
         
         {/* 予選：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.preliminary_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.preliminary_info_status)}`}>
           予選
         </span>
         
         {/* プログラム：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.program_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.program_info_status)}`}>
           プログラム
         </span>
         
         {/* 準決勝：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.semifinals_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.semifinals_info_status)}`}>
           準決勝
         </span>
         
         {/* 決勝：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.finals_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.finals_info_status)}`}>
           決勝
         </span>
         
@@ -160,7 +137,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
         </span>
         
         {/* SNS：登録済み=緑、入力中=黄色、未登録=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.sns_info_status)}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.sns_info_status)}`}>
           SNS
         </span>
         
