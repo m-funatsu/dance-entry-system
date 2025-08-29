@@ -122,7 +122,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 value={semifinalsInfo[`scene${sceneNum}_image_path` as keyof SemifinalsInfo] as string}
                 onChange={(file) => onFileUpload(`scene${sceneNum}_image_path`, file)}
                 onDelete={() => onFileDelete(`scene${sceneNum}_image_path`)}
-                disabled={!isEditable || !!(semifinalsInfo[`scene${sceneNum}_image_path` as keyof SemifinalsInfo])}
+                disabled={!isEditable}
                 isEditable={isEditable}
                 required={sceneNum === 1}
               />
@@ -208,7 +208,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               value={semifinalsInfo.chaser_exit_image_path}
               onChange={(file) => onFileUpload('chaser_exit_image_path', file)}
               onDelete={() => onFileDelete('chaser_exit_image_path')}
-              disabled={!isEditable || !!semifinalsInfo.chaser_exit_image_path}
+              disabled={!isEditable}
               isEditable={isEditable}
               required
             />

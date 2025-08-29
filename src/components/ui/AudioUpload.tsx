@@ -35,7 +35,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
-    if (!disabled) {
+    if (!disabled && !value) {
       setIsDragging(true)
     }
   }
@@ -49,7 +49,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
     e.preventDefault()
     setIsDragging(false)
     
-    if (disabled) return
+    if (disabled || value) return
     
     const files = e.dataTransfer.files
     if (files.length > 0) {
@@ -103,11 +103,11 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => !disabled && fileInputRef.current?.click()}
+        onClick={() => !disabled && !value && fileInputRef.current?.click()}
         className={`
           border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
           transition-all duration-200
-          ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'hover:border-indigo-400 hover:bg-indigo-50'}
+          ${disabled || value ? 'bg-gray-100 cursor-not-allowed' : 'hover:border-indigo-400 hover:bg-indigo-50'}
           ${isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}
           ${value ? 'bg-green-50 border-green-300' : ''}
         `}
@@ -117,7 +117,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
           type="file"
           accept={accept}
           onChange={handleFileSelect}
-          disabled={disabled}
+          disabled={disabled || !!value}
           className="hidden"
         />
         
@@ -153,8 +153,8 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
               </div>
             )}
             
-            {/* 削除ボタン */}
-            {!disabled && onDelete && (
+            {/* 削除ボタン - valueがある場合は常に表示 */}
+            {onDelete && (
               <button
                 type="button"
                 onClick={(e) => {

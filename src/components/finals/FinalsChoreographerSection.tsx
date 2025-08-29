@@ -263,7 +263,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
             value={finalsInfo.choreographer_photo_path}
             onChange={(file) => onFileUpload('choreographer_photo_path', file)}
             onDelete={onFileDelete ? () => onFileDelete('choreographer_photo_path') : undefined}
-            disabled={!isEditable || !!finalsInfo.choreographer_photo_path}
+            disabled={!isEditable}
             isEditable={isEditable}
             required
           />

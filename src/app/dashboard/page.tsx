@@ -306,12 +306,29 @@ export default async function DashboardPage() {
     console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック（ダッシュボード）===')
     console.log('[DASHBOARD SEMIFINALS CHECK] semifinalsInfo:', semifinalsInfo)
     
-    // 実際のフォームの必須項目に合わせた正しい必須フィールド
+    // *マークのついた必須項目すべて
     const baseRequiredFields = [
-      'sound_start_timing',  // 音楽スタートのタイミング（*必須）
-      'dance_start_timing',  // 踊り出しタイミング（*必須）
-      'choreographer_name',  // 振付師①氏名（*必須）
-      'choreographer_furigana', // 振付師①フリガナ（*必須）
+      // 音響指示情報
+      'sound_start_timing',      // 音楽スタートのタイミング *
+      'chaser_song_designation', // チェイサー曲の指定 *
+      // 照明指示情報 
+      'dance_start_timing',      // 踊り出しタイミング *
+      'scene1_time',             // シーン1時間 *
+      'scene1_trigger',          // シーン1きっかけ *
+      'scene1_color_type',       // シーン1色系統 *
+      'scene1_color_other',      // シーン1色その他 *
+      'scene1_image',            // シーン1イメージ *
+      'scene1_image_path',       // シーン1イメージ画像 *
+      'chaser_exit_time',        // チェイサー時間 *
+      'chaser_exit_trigger',     // チェイサーきっかけ *
+      'chaser_exit_color_type',  // チェイサー色系統 *
+      'chaser_exit_color_other', // チェイサー色その他 *
+      'chaser_exit_image',       // チェイサーイメージ *
+      'chaser_exit_image_path',  // チェイサーイメージ画像 *
+      // 振付情報
+      'choreographer_name',      // 振付師氏名① *
+      'choreographer_furigana',  // 振付師フリガナ① *
+      'props_usage',             // 小道具の有無 *
       // 賞金振込先情報（全て必須）
       'bank_name',
       'branch_name', 
@@ -320,7 +337,7 @@ export default async function DashboardPage() {
       'account_holder'
     ]
     
-    // music_change_from_preliminary の選択チェック（boolean値として必須）
+    // 1. music_change_from_preliminary の選択チェック（boolean値として必須）
     const musicChangeSelected = semifinalsInfo.music_change_from_preliminary !== null && 
                                semifinalsInfo.music_change_from_preliminary !== undefined
     
@@ -331,7 +348,18 @@ export default async function DashboardPage() {
       return false
     }
     
-    // 基本必須フィールドチェック
+    // 2. copyright_permission のチェック（必須） 
+    const copyrightPermissionValid = !!(semifinalsInfo.copyright_permission && 
+                                       semifinalsInfo.copyright_permission.toString().trim() !== '')
+    
+    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲著作権許可:', copyrightPermissionValid, semifinalsInfo.copyright_permission)
+    
+    if (!copyrightPermissionValid) {
+      console.log('[DASHBOARD SEMIFINALS CHECK] === 楽曲著作権許可が未完了 ===')
+      return false
+    }
+    
+    // 3. 基本必須フィールドチェック
     const fieldResults: Record<string, boolean> = {}
     const missingFields: string[] = []
     
@@ -347,16 +375,30 @@ export default async function DashboardPage() {
       }
     })
     
-    const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true)
+    // 4. 条件付き必須項目のチェック
+    // 小道具詳細（props_usageが「あり」の場合のみ必須）
+    if (semifinalsInfo.props_usage === 'あり') {
+      const propsDetailsValid = !!(semifinalsInfo.props_details && 
+                                 semifinalsInfo.props_details.toString().trim() !== '')
+      if (!propsDetailsValid) {
+        missingFields.push('props_details')
+        fieldResults['props_details'] = false
+        console.log('[DASHBOARD SEMIFINALS CHECK] props_details: 小道具ありのため詳細が必須')
+      }
+    }
+    
+    const hasAllRequiredFields = Object.values(fieldResults).every(result => result === true) && 
+                                missingFields.length === 0
     
     console.log('[DASHBOARD SEMIFINALS CHECK] === チェック結果まとめ ===')
     console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲変更選択:', musicChangeSelected)
+    console.log('[DASHBOARD SEMIFINALS CHECK] 楽曲著作権許可:', copyrightPermissionValid)
     console.log('[DASHBOARD SEMIFINALS CHECK] 基本必須フィールド完了:', hasAllRequiredFields)
     console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド数:', missingFields.length)
     console.log('[DASHBOARD SEMIFINALS CHECK] 未入力フィールド:', missingFields)
     console.log('[DASHBOARD SEMIFINALS CHECK] === 準決勝情報完了チェック終了（ダッシュボード）===')
     
-    return musicChangeSelected && hasAllRequiredFields
+    return musicChangeSelected && copyrightPermissionValid && hasAllRequiredFields
   }
 
   // 決勝情報の完了判定関数
@@ -462,9 +504,9 @@ export default async function DashboardPage() {
       }
     }
     
-    // 小道具情報は常に必須
+    // 5. 小道具情報は常に必須
     const propsUsage = finalsInfo.props_usage
-    if (!propsUsage) {
+    if (!propsUsage || propsUsage.toString().trim() === '') {
       missingFields.push('props_usage')
       allSectionsValid = false
     } else if (propsUsage === 'あり') {
@@ -475,7 +517,7 @@ export default async function DashboardPage() {
       }
     }
     
-    // 振付師出席情報は常に必須（写真は条件付き）
+    // 6. 振付師出席情報は常に必須（写真は条件付き）
     const choreographerAttendance = finalsInfo.choreographer_attendance
     const choreographerPhotoPermission = finalsInfo.choreographer_photo_permission
     

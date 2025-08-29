@@ -359,7 +359,7 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
               onFileDelete('music_data_path')
             }
           }}
-          disabled={!isEditable || !!semifinalsInfo.music_data_path}
+          disabled={!isEditable}
           required
           accept=".wav,.mp3,.m4a"
         />

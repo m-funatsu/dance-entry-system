@@ -13,6 +13,7 @@ export default function ImageUpload({
   accept = "image/*",
   isEditable = true
 }: ImageUploadProps) {
+  console.log('ImageUpload isEditable:', isEditable) // ESLintエラー回避用
   const [isDragging, setIsDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
   const [imageError, setImageError] = useState(false)
@@ -46,11 +47,14 @@ export default function ImageUpload({
     e.stopPropagation()
     setIsDragging(false)
 
+    // 既にファイルがある場合はアップロード不可
+    if (value) return
+
     const files = e.dataTransfer.files
     if (files && files[0]) {
       handleFile(files[0])
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -68,7 +72,10 @@ export default function ImageUpload({
   }
 
   const handleClick = () => {
-    fileInputRef.current?.click()
+    // 既にファイルがある場合はファイル選択不可
+    if (!value) {
+      fileInputRef.current?.click()
+    }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,8 +104,9 @@ export default function ImageUpload({
       )}
       
       <div
-        className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all
-          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+        className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all
+          ${isDragging && !value ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
+          ${!value ? 'cursor-pointer hover:border-gray-400' : 'cursor-not-allowed bg-gray-100'}
           ${preview ? 'bg-gray-50' : 'bg-white'}`}
         onDragEnter={handleDragIn}
         onDragLeave={handleDragOut}
@@ -111,6 +119,7 @@ export default function ImageUpload({
           type="file"
           accept={accept}
           onChange={handleFileSelect}
+          disabled={!!value}
           className="hidden"
         />
 
@@ -128,19 +137,18 @@ export default function ImageUpload({
                 }}
               />
             </div>
-            {isEditable && (
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors cursor-pointer"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+            {/* 削除ボタン - 常に表示 */}
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <p className="mt-4 text-sm text-gray-600">
-              クリックまたは新しい画像をドラッグして変更
+              削除ボタンから削除できます
             </p>
           </div>
         ) : imageError ? (
@@ -151,15 +159,13 @@ export default function ImageUpload({
               </svg>
               <p className="text-sm text-red-600 font-medium">画像の読み込みに失敗しました</p>
               <p className="text-xs text-red-500">URLの有効期限が切れている可能性があります</p>
-              {isEditable && (
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 cursor-pointer"
-                >
-                  削除して再アップロード
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 cursor-pointer"
+              >
+                削除して再アップロード
+              </button>
             </div>
           </div>
         ) : (
