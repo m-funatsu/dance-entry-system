@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
@@ -50,8 +50,6 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     choreographer_photo_permission: ''
   })
   const [audioFiles, setAudioFiles] = useState<Record<string, { file_name: string }>>({})
-  const [lastSemifinalsData, setLastSemifinalsData] = useState<Partial<SemifinalsInfo> | null>(null)
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -64,37 +62,16 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   useEffect(() => {
     const initializeForm = async () => {
-      // 1. まず決勝情報を読み込んでオプション状態を復元
+      // 1. 決勝情報を読み込んでオプション状態を復元
       await loadFinalsInfo()
       
-      // 2. オプション状態が復元された後に準決勝情報を読み込み
+      // 2. 準決勝情報を読み込み（同期は実行しない）
       await loadSemifinalsInfo()
+      
+      console.log('[FINALS INIT] 初期化完了 - 自動同期は無効（準決勝保存時のみ）')
     }
     
     initializeForm()
-    
-    // ページフォーカス時の同期
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log('[SYNC] ページフォーカス - 準決勝情報を同期確認')
-        syncWithSemifinalsData()
-      }
-    }
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    // 定期的な同期チェック（30秒間隔）
-    syncIntervalRef.current = setInterval(() => {
-      console.log('[SYNC] 定期同期チェック実行')
-      syncWithSemifinalsData()
-    }, 30000)
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (syncIntervalRef.current) {
-        clearInterval(syncIntervalRef.current)
-      }
-    }
   }, [entry.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadFinalsInfo = async () => {
@@ -181,7 +158,6 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           music_title: semifinalsData.music_title,
           choreographer_name: semifinalsData.choreographer_name
         })
-        setLastSemifinalsData(semifinalsData)
         return semifinalsData
       }
       
@@ -192,65 +168,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     }
   }
 
-  // 準決勝情報と同期する関数
-  const syncWithSemifinalsData = async () => {
-    const currentSemifinalsData = await loadSemifinalsInfo()
-    if (!currentSemifinalsData || !lastSemifinalsData) {
-      return
-    }
-
-    // 更新日時を比較して変更があったかチェック
-    const isDataUpdated = new Date(currentSemifinalsData.updated_at || '') > 
-                          new Date(lastSemifinalsData.updated_at || '')
-    
-    if (!isDataUpdated) {
-      console.log('[SYNC] 準決勝情報に変更なし')
-      return
-    }
-
-    console.log('[SYNC] 準決勝情報の更新を検出 - 決勝情報を同期中...')
-
-    // 各セクションで「準決勝と同じ」が選択されている場合は自動更新
-    console.log('[SYNC] === 同期条件チェック ===')
-    console.log('[SYNC] musicChangeOption:', musicChangeOption)
-    console.log('[SYNC] soundChangeOption:', soundChangeOption)
-    console.log('[SYNC] lightingChangeOption:', lightingChangeOption)
-    console.log('[SYNC] choreographerChangeOption:', choreographerChangeOption)
-    
-    if (musicChangeOption === 'unchanged') {
-      console.log('[SYNC] 楽曲情報を自動更新')
-      await syncMusicData(currentSemifinalsData)
-    } else {
-      console.log('[SYNC] 楽曲情報は同期対象外 (musicChangeOption =', musicChangeOption, ')')
-    }
-    
-    if (soundChangeOption === 'same') {
-      console.log('[SYNC] 音響指示を自動更新')
-      await syncSoundData(currentSemifinalsData)
-    } else {
-      console.log('[SYNC] 音響指示は同期対象外 (soundChangeOption =', soundChangeOption, ')')
-    }
-    
-    if (lightingChangeOption === 'same') {
-      console.log('[SYNC] 照明指示を自動更新 - 実行開始')
-      await syncLightingData(currentSemifinalsData)
-      console.log('[SYNC] 照明指示を自動更新 - 実行完了')
-    } else {
-      console.log('[SYNC] 照明指示は同期対象外 (lightingChangeOption =', lightingChangeOption, ')')
-    }
-    
-    if (choreographerChangeOption === 'same') {
-      console.log('[SYNC] 振付師情報を自動更新')
-      await syncChoreographerData(currentSemifinalsData)
-    } else {
-      console.log('[SYNC] 振付師情報は同期対象外 (choreographerChangeOption =', choreographerChangeOption, ')')
-    }
-
-    setLastSemifinalsData(currentSemifinalsData)
-    showToast('準決勝情報の更新を反映しました', 'info')
-  }
-
-  // 楽曲情報を同期
+  // 手動オプション変更時の即座同期用関数（UI用）
   const syncMusicData = async (semifinalsData: Partial<SemifinalsInfo>) => {
     setFinalsInfo(prev => ({
       ...prev,
@@ -268,73 +186,45 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     }))
   }
 
-  // 音響指示を同期
   const syncSoundData = async (semifinalsData: Partial<SemifinalsInfo>) => {
     const mapChaserSongDesignation = (value: string): string => {
       switch (value) {
-        case 'included':
-          return '自作曲に組み込み'
-        case 'required':
-          return '必要'
-        case 'not_required':
-          return '不要（無音）'
-        default:
-          return value
+        case 'included': return '自作曲に組み込み'
+        case 'required': return '必要'
+        case 'not_required': return '不要（無音）'
+        default: return value
       }
-    }
-    
-    let chaserSongUrl = ''
-    if (semifinalsData.chaser_song && !semifinalsData.chaser_song.startsWith('http')) {
-      const { data: urlData } = await supabase.storage
-        .from('files')
-        .createSignedUrl(semifinalsData.chaser_song, 86400)
-      
-      if (urlData?.signedUrl) {
-        chaserSongUrl = urlData.signedUrl
-      }
-    } else if (semifinalsData.chaser_song) {
-      chaserSongUrl = semifinalsData.chaser_song
     }
     
     setFinalsInfo(prev => ({
       ...prev,
       sound_start_timing: semifinalsData.sound_start_timing || '',
       chaser_song_designation: mapChaserSongDesignation(semifinalsData.chaser_song_designation || ''),
-      chaser_song: chaserSongUrl,
+      chaser_song: semifinalsData.chaser_song || '',
       fade_out_start_time: semifinalsData.fade_out_start_time || '',
       fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
     }))
   }
 
-  // 照明指示を同期
   const syncLightingData = async (semifinalsData: Partial<SemifinalsInfo>) => {
-    const lightingData: Record<string, string | undefined> = {
-      dance_start_timing: semifinalsData.dance_start_timing
-    }
-    
-    // シーン1-5とチェイサー情報をコピー
-    for (let i = 1; i <= 5; i++) {
-      lightingData[`scene${i}_time`] = String(semifinalsData[`scene${i}_time` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_trigger`] = String(semifinalsData[`scene${i}_trigger` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_color_type`] = String(semifinalsData[`scene${i}_color_type` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_color_other`] = String(semifinalsData[`scene${i}_color_other` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_image`] = String(semifinalsData[`scene${i}_image` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_image_path`] = String(semifinalsData[`scene${i}_image_path` as keyof typeof semifinalsData] || '')
-      lightingData[`scene${i}_notes`] = String(semifinalsData[`scene${i}_notes` as keyof typeof semifinalsData] || '')
-    }
-    
-    lightingData.chaser_exit_time = semifinalsData.chaser_exit_time || ''
-    lightingData.chaser_exit_trigger = semifinalsData.chaser_exit_trigger || ''
-    lightingData.chaser_exit_color_type = semifinalsData.chaser_exit_color_type || ''
-    lightingData.chaser_exit_color_other = semifinalsData.chaser_exit_color_other || ''
-    lightingData.chaser_exit_image = semifinalsData.chaser_exit_image || ''
-    lightingData.chaser_exit_image_path = semifinalsData.chaser_exit_image_path || ''
-    lightingData.chaser_exit_notes = semifinalsData.chaser_exit_notes || ''
-    
-    setFinalsInfo(prev => ({ ...prev, ...lightingData as Partial<FinalsInfo> }))
+    setFinalsInfo(prev => ({
+      ...prev,
+      dance_start_timing: semifinalsData.dance_start_timing || '',
+      scene1_time: semifinalsData.scene1_time || '',
+      scene1_trigger: semifinalsData.scene1_trigger || '',
+      scene1_color_type: semifinalsData.scene1_color_type || '',
+      scene1_color_other: semifinalsData.scene1_color_other || '',
+      scene1_image: semifinalsData.scene1_image || '',
+      scene1_image_path: semifinalsData.scene1_image_path || '',
+      chaser_exit_time: semifinalsData.chaser_exit_time || '',
+      chaser_exit_trigger: semifinalsData.chaser_exit_trigger || '',
+      chaser_exit_color_type: semifinalsData.chaser_exit_color_type || '',
+      chaser_exit_color_other: semifinalsData.chaser_exit_color_other || '',
+      chaser_exit_image: semifinalsData.chaser_exit_image || '',
+      chaser_exit_image_path: semifinalsData.chaser_exit_image_path || ''
+    }))
   }
 
-  // 振付師情報を同期
   const syncChoreographerData = async (semifinalsData: Partial<SemifinalsInfo>) => {
     setFinalsInfo(prev => ({
       ...prev,
