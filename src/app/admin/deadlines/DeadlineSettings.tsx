@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface Setting {
@@ -51,6 +51,11 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
   const [deadlines, setDeadlines] = useState(settingsMap)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // 設定キーの一覧（順番を調整）
   const deadlineKeys = [
@@ -129,6 +134,10 @@ export default function DeadlineSettings({ initialSettings }: DeadlineSettingsPr
       date.setHours(23, 59, 59, 999)
     }
     return date.toISOString()
+  }
+
+  if (!mounted) {
+    return <div className="text-center py-4">読み込み中...</div>
   }
 
   return (
