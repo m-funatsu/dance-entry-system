@@ -97,6 +97,8 @@ export default function EntryTable({ entries }: EntryTableProps) {
       switch (status) {
         case '登録済み': return 'bg-green-100 text-green-800'
         case '入力中': return 'bg-yellow-100 text-yellow-800'
+        case '申請あり': return 'bg-green-100 text-green-800'
+        case '申請なし': return 'bg-gray-100 text-gray-400'
         case '未登録': 
         default: return 'bg-gray-100 text-gray-400'
       }
@@ -130,9 +132,7 @@ export default function EntryTable({ entries }: EntryTableProps) {
         </span>
         
         {/* 申請：申請あり=緑、申請なし=グレー */}
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          hasApplicationsInfo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
-        }`}>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColorFromValue(entry.applications_info_status)}`}>
           申請
         </span>
         

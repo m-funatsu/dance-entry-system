@@ -88,14 +88,20 @@ export async function updateFormStatus(
       return
     }
     
-    // ステータスを決定
+    // ステータスを決定（申請情報は特別ロジック）
     let newStatus: string
-    if (!hasAnyData) {
-      newStatus = '未入力'
-    } else if (isFormComplete) {
-      newStatus = '登録済み'
+    if (tableName === 'applications_info') {
+      // 申請情報は申請あり/申請なしの2段階
+      newStatus = hasAnyData ? '申請あり' : '申請なし'
     } else {
-      newStatus = '入力中'
+      // その他は3段階
+      if (!hasAnyData) {
+        newStatus = '未登録'
+      } else if (isFormComplete) {
+        newStatus = '登録済み'
+      } else {
+        newStatus = '入力中'
+      }
     }
     
     console.log(`[STATUS UPDATE] ${tableName} - 新しいステータス: ${newStatus}`)

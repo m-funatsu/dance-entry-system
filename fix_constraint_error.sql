@@ -17,7 +17,7 @@ UPDATE entries SET program_info_status = '未登録' WHERE program_info_status I
 UPDATE entries SET semifinals_info_status = '未登録' WHERE semifinals_info_status IS NULL;
 UPDATE entries SET finals_info_status = '未登録' WHERE finals_info_status IS NULL;
 UPDATE entries SET sns_info_status = '未登録' WHERE sns_info_status IS NULL;
-UPDATE entries SET applications_info_status = '未登録' WHERE applications_info_status IS NULL;
+UPDATE entries SET applications_info_status = '申請なし' WHERE applications_info_status IS NULL;
 
 -- 3. カラムにNOT NULL制約を追加
 ALTER TABLE entries ALTER COLUMN basic_info_status SET NOT NULL;
@@ -28,7 +28,8 @@ ALTER TABLE entries ALTER COLUMN finals_info_status SET NOT NULL;
 ALTER TABLE entries ALTER COLUMN sns_info_status SET NOT NULL;
 ALTER TABLE entries ALTER COLUMN applications_info_status SET NOT NULL;
 
--- 4. CHECK制約を再追加
+-- 4. CHECK制約を再追加（項目別に適切な値を設定）
+-- 基本、予選、プログラム、準決勝、決勝、SNS：3段階
 ALTER TABLE entries ADD CONSTRAINT check_basic_info_status 
 CHECK (basic_info_status IN ('未登録', '入力中', '登録済み'));
 
@@ -47,5 +48,6 @@ CHECK (finals_info_status IN ('未登録', '入力中', '登録済み'));
 ALTER TABLE entries ADD CONSTRAINT check_sns_info_status 
 CHECK (sns_info_status IN ('未登録', '入力中', '登録済み'));
 
+-- 申請：2段階（申請なし/申請あり）
 ALTER TABLE entries ADD CONSTRAINT check_applications_info_status 
-CHECK (applications_info_status IN ('未登録', '入力中', '登録済み'));
+CHECK (applications_info_status IN ('申請なし', '申請あり'));

@@ -313,13 +313,13 @@ async function updateExistingStatuses() {
         console.log(`   SNS情報: 未登録`)
       }
       
-      // 申請情報ステータス
+      // 申請情報ステータス（申請あり/申請なし）
       if (entry.applications_info && entry.applications_info.length > 0) {
-        updates.applications_info_status = '入力中' // 申請は常に「入力中」扱い
-        console.log(`   申請情報: 入力中`)
+        updates.applications_info_status = '申請あり'
+        console.log(`   申請情報: 申請あり`)
       } else {
-        updates.applications_info_status = '未登録'
-        console.log(`   申請情報: 未登録`)
+        updates.applications_info_status = '申請なし'
+        console.log(`   申請情報: 申請なし`)
       }
       
       // エントリーを更新
