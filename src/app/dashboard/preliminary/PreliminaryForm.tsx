@@ -668,16 +668,19 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               error={errors.music_title}
             />
 
-            <FormField
-              label="収録CDタイトル"
-              name="cd_title"
-              value={formData.cd_title}
-              onChange={(e) => handleFieldChange('cd_title', e.target.value)}
-              required
-              disabled={!isEditable}
-              placeholder="CD/アルバム名"
-              error={errors.cd_title}
-            />
+            <div>
+              <FormField
+                label="収録アルバムタイトル"
+                name="cd_title"
+                value={formData.cd_title}
+                onChange={(e) => handleFieldChange('cd_title', e.target.value)}
+                required
+                disabled={!isEditable}
+                placeholder="CD/アルバム名"
+                error={errors.cd_title}
+              />
+              <p className="text-xs text-gray-500 mt-1">シングルの場合は楽曲名を記載ください</p>
+            </div>
 
             <FormField
               label="アーティスト"
@@ -690,27 +693,33 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               error={errors.artist}
             />
 
-            <FormField
-              label="レコード番号"
-              name="record_number"
-              value={formData.record_number}
-              onChange={(e) => handleFieldChange('record_number', e.target.value)}
-              required
-              disabled={!isEditable}
-              placeholder="例：ABCD-12345"
-              error={errors.record_number}
-            />
+            <div>
+              <FormField
+                label="レコード番号"
+                name="record_number"
+                value={formData.record_number}
+                onChange={(e) => handleFieldChange('record_number', e.target.value)}
+                required
+                disabled={!isEditable}
+                placeholder="例：ABCD-12345"
+                error={errors.record_number}
+              />
+              <p className="text-xs text-gray-500 mt-1">ダウンロード楽曲の場合は「ダウンロード」と記載ください</p>
+            </div>
 
-            <FormField
-              label="JASRAC作品コード"
-              name="jasrac_code"
-              value={formData.jasrac_code}
-              onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
-              required={false}
-              disabled={!isEditable}
-              placeholder="例：123-4567-8"
-              error={errors.jasrac_code}
-            />
+            <div>
+              <FormField
+                label="JASRAC作品コード"
+                name="jasrac_code"
+                value={formData.jasrac_code}
+                onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
+                required={false}
+                disabled={!isEditable}
+                placeholder="例：123-4567-8"
+                error={errors.jasrac_code}
+              />
+              <p className="text-xs text-gray-500 mt-1">既成楽曲の場合は必須とします。オリジナル楽曲は不要です。</p>
+            </div>
 
             <FormField
               label="楽曲種類"

@@ -271,14 +271,17 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         required
       />
 
-      <FormField
-        label="収録CDタイトル"
-        name="cd_title"
-        value={semifinalsInfo.cd_title || ''}
-        onChange={(e) => onChange({ cd_title: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
-        required
-      />
+      <div>
+        <FormField
+          label="収録アルバムタイトル"
+          name="cd_title"
+          value={semifinalsInfo.cd_title || ''}
+          onChange={(e) => onChange({ cd_title: e.target.value })}
+          disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
+          required
+        />
+        <p className="text-xs text-gray-500 mt-1">シングルの場合は楽曲名を記載ください</p>
+      </div>
 
       <FormField
         label="アーティスト"
@@ -289,22 +292,28 @@ export const MusicSection: React.FC<MusicSectionProps> = ({
         required
       />
 
-      <FormField
-        label="レコード番号"
-        name="record_number"
-        value={semifinalsInfo.record_number || ''}
-        onChange={(e) => onChange({ record_number: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
-        required
-      />
+      <div>
+        <FormField
+          label="レコード番号"
+          name="record_number"
+          value={semifinalsInfo.record_number || ''}
+          onChange={(e) => onChange({ record_number: e.target.value })}
+          disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
+          required
+        />
+        <p className="text-xs text-gray-500 mt-1">ダウンロード楽曲の場合は「ダウンロード」と記載ください</p>
+      </div>
 
-      <FormField
-        label="JASRAC作品コード"
-        name="jasrac_code"
-        value={semifinalsInfo.jasrac_code || ''}
-        onChange={(e) => onChange({ jasrac_code: e.target.value })}
-        disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
-      />
+      <div>
+        <FormField
+          label="JASRAC作品コード"
+          name="jasrac_code"
+          value={semifinalsInfo.jasrac_code || ''}
+          onChange={(e) => onChange({ jasrac_code: e.target.value })}
+          disabled={!semifinalsInfo.music_change_from_preliminary || !isEditable}
+        />
+        <p className="text-xs text-gray-500 mt-1">既成楽曲の場合は必須とします。オリジナル楽曲は不要です。</p>
+      </div>
 
       <FormField
         label="楽曲種類"
