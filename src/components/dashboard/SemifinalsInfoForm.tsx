@@ -324,14 +324,12 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         }
       }
 
-      // 決勝情報の同期チェック（一時保存でない場合のみ）
-      if (!isTemporary) {
-        try {
-          await syncToFinals()
-        } catch (syncError) {
-          console.error('決勝同期エラー:', syncError)
-          // 同期エラーがあっても保存は成功扱いにする
-        }
+      // 決勝情報の同期チェック（一時保存・正式保存両方で実行）
+      try {
+        await syncToFinals()
+      } catch (syncError) {
+        console.error('決勝同期エラー:', syncError)
+        // 同期エラーがあっても保存は成功扱いにする
       }
       
       setSuccess(isTemporary ? '準決勝情報を一時保存しました' : '準決勝情報を保存しました')
