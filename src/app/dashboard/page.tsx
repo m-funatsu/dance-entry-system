@@ -1133,7 +1133,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkApplicationsInfoComplete(applicationsInfo) ? '登録済み' : applicationsInfo ? '入力中' : '未登録'}
+                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請あり' : applicationsInfo ? '入力中' : '未登録'}
                       </dd>
                       <StartDateInline section="optional_request" />
                       {(() => {
