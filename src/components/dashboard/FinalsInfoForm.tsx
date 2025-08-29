@@ -50,6 +50,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     choreographer_photo_permission: ''
   })
   const [audioFiles, setAudioFiles] = useState<Record<string, { file_name: string }>>({})
+  const [isInitializing, setIsInitializing] = useState(true)
 
   // フォーム保存フック
   const { save, saving, error, success } = useFormSave({
@@ -69,6 +70,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       await loadSemifinalsInfo()
       
       console.log('[FINALS INIT] 初期化完了')
+      setIsInitializing(false)
     }
     
     initializeForm()
@@ -343,7 +345,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const handleMusicChangeOption = async (option: 'changed' | 'unchanged') => {
+    console.log('[MUSIC OPTION] === 楽曲情報オプション変更開始 ===')
+    console.log('[MUSIC OPTION] 選択されたオプション:', option)
+    console.log('[MUSIC OPTION] 初期化中:', isInitializing)
+    
     setMusicChangeOption(option)
+    
+    // 初期化中は同期処理をスキップ
+    if (isInitializing) {
+      console.log('[MUSIC OPTION] 初期化中のため同期をスキップ')
+      return
+    }
     
     if (option === 'unchanged') {
       // 準決勝から最新データを取得してコピー
@@ -377,7 +389,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const handleSoundChangeOption = async (option: 'same' | 'different') => {
+    console.log('[SOUND OPTION] === 音響指示オプション変更開始 ===')
+    console.log('[SOUND OPTION] 選択されたオプション:', option)
+    console.log('[SOUND OPTION] 初期化中:', isInitializing)
+    
     setSoundChangeOption(option)
+    
+    // 初期化中は同期処理をスキップ
+    if (isInitializing) {
+      console.log('[SOUND OPTION] 初期化中のため同期をスキップ')
+      return
+    }
     
     if (option === 'same') {
       // 準決勝から最新データを取得してコピー
@@ -408,7 +430,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     console.log('[LIGHTING OPTION] === 照明指示オプション変更開始 ===')
     console.log('[LIGHTING OPTION] 選択されたオプション:', option)
     console.log('[LIGHTING OPTION] 現在のlightingChangeOption:', lightingChangeOption)
+    console.log('[LIGHTING OPTION] 初期化中:', isInitializing)
+    
     setLightingChangeOption(option)
+    
+    // 初期化中は同期処理をスキップ
+    if (isInitializing) {
+      console.log('[LIGHTING OPTION] 初期化中のため同期をスキップ')
+      return
+    }
     
     if (option === 'same') {
       // 準決勝から最新データを取得してコピー
@@ -455,7 +485,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }
 
   const handleChoreographerChangeOption = async (option: 'same' | 'different') => {
+    console.log('[CHOREOGRAPHER OPTION] === 振付師情報オプション変更開始 ===')
+    console.log('[CHOREOGRAPHER OPTION] 選択されたオプション:', option)
+    console.log('[CHOREOGRAPHER OPTION] 初期化中:', isInitializing)
+    
     setChoreographerChangeOption(option)
+    
+    // 初期化中は同期処理をスキップ
+    if (isInitializing) {
+      console.log('[CHOREOGRAPHER OPTION] 初期化中のため同期をスキップ')
+      return
+    }
     
     if (option === 'same') {
       // 準決勝から最新データを取得してコピー
