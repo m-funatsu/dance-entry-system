@@ -280,13 +280,13 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     
     // シーン1-5とチェイサー情報をコピー
     for (let i = 1; i <= 5; i++) {
-      lightingData[`scene${i}_time`] = semifinalsData[`scene${i}_time` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_trigger`] = semifinalsData[`scene${i}_trigger` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_color_type`] = semifinalsData[`scene${i}_color_type` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_color_other`] = semifinalsData[`scene${i}_color_other` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_image`] = semifinalsData[`scene${i}_image` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_image_path`] = semifinalsData[`scene${i}_image_path` as keyof typeof semifinalsData] || ''
-      lightingData[`scene${i}_notes`] = semifinalsData[`scene${i}_notes` as keyof typeof semifinalsData] || ''
+      lightingData[`scene${i}_time`] = String(semifinalsData[`scene${i}_time` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_trigger`] = String(semifinalsData[`scene${i}_trigger` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_color_type`] = String(semifinalsData[`scene${i}_color_type` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_color_other`] = String(semifinalsData[`scene${i}_color_other` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_image`] = String(semifinalsData[`scene${i}_image` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_image_path`] = String(semifinalsData[`scene${i}_image_path` as keyof typeof semifinalsData] || '')
+      lightingData[`scene${i}_notes`] = String(semifinalsData[`scene${i}_notes` as keyof typeof semifinalsData] || '')
     }
     
     lightingData.chaser_exit_time = semifinalsData.chaser_exit_time || ''

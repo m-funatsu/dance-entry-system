@@ -71,11 +71,21 @@ export default async function PreliminaryInfoListPage() {
   console.log('[PRELIMINARY DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[PRELIMINARY DEBUG] ファイルエラー:', filesError)
 
+  // 基本情報を取得（ダンスジャンル用）
+  const { data: basicInfoList, error: basicInfoError } = await adminSupabase
+    .from('basic_info')
+    .select('*')
+
+  console.log('[PRELIMINARY DEBUG] 基本情報取得完了')
+  console.log('[PRELIMINARY DEBUG] 基本情報件数:', basicInfoList?.length || 0)
+  console.log('[PRELIMINARY DEBUG] 基本情報エラー:', basicInfoError)
+
   // データをマッピング（全データを表示）
   const mappedPreliminaryInfoList = preliminaryInfoList?.map(preliminaryInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === preliminaryInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === preliminaryInfo.entry_id)
+    const relatedBasicInfo = basicInfoList?.find(basicInfo => basicInfo.entry_id === preliminaryInfo.entry_id)
     
     console.log(`[PRELIMINARY DEBUG] エントリーID ${preliminaryInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
@@ -94,7 +104,8 @@ export default async function PreliminaryInfoListPage() {
         status: 'unknown',
         users: { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || []
+      entry_files: relatedFiles || [],
+      basic_info: relatedBasicInfo || null
     }
   }) || []
 
@@ -151,6 +162,8 @@ export default async function PreliminaryInfoListPage() {
             data={mappedPreliminaryInfoList.map(item => [
               item.id,
               item.entry_id,
+              item.entries?.users?.name || '不明なユーザー',
+              item.basic_info?.dance_style || '未入力',
               item.work_title || '',
               item.work_title_kana || '',
               item.work_story || '',
@@ -167,7 +180,7 @@ export default async function PreliminaryInfoListPage() {
               item.choreographer2_furigana || '',
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '楽曲著作権許諾', 'レコード番号', '楽曲種類', '振付師1名前', '振付師1フリガナ', '振付師2名前', '振付師2フリガナ', '選考ステータス']}
+            headers={['ID', 'エントリーID', 'システム利用者名', 'ダンスジャンル', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '楽曲著作権許諾', 'レコード番号', '楽曲種類', '振付師1名前', '振付師1フリガナ', '振付師2名前', '振付師2フリガナ', '選考ステータス']}
             filename="preliminary_info"
           />
         </div>
@@ -186,6 +199,9 @@ export default async function PreliminaryInfoListPage() {
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     システム利用者名
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ダンスジャンル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     作品情報
@@ -219,6 +235,11 @@ export default async function PreliminaryInfoListPage() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {preliminaryInfo.entries?.participant_names || 'エントリー名なし'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-900">
+                        {preliminaryInfo.basic_info?.dance_style || '未入力'}
                       </div>
                     </td>
                     <td className="px-2 py-3">
