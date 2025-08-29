@@ -70,11 +70,21 @@ export default async function FinalsInfoListPage() {
   console.log('[FINALS DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[FINALS DEBUG] ファイルエラー:', filesError)
 
+  // 基本情報を取得（ダンスジャンル用）
+  const { data: basicInfoList, error: basicInfoError } = await adminSupabase
+    .from('basic_info')
+    .select('*')
+
+  console.log('[FINALS DEBUG] 基本情報取得完了')
+  console.log('[FINALS DEBUG] 基本情報件数:', basicInfoList?.length || 0)
+  console.log('[FINALS DEBUG] 基本情報エラー:', basicInfoError)
+
   // データをマッピング（選考通過のみ表示）
   const mappedFinalsInfoList = finalsInfoList?.map(finalsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === finalsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === finalsInfo.entry_id)
+    const relatedBasicInfo = basicInfoList?.find(basicInfo => basicInfo.entry_id === finalsInfo.entry_id)
     
     console.log(`[FINALS DEBUG] エントリーID ${finalsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
@@ -94,7 +104,8 @@ export default async function FinalsInfoListPage() {
         status: 'unknown',
         users: { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || []
+      entry_files: relatedFiles || [],
+      basic_info: relatedBasicInfo || null
     }
   }).filter(item => item.entries?.status === 'selected') || []
 
@@ -131,6 +142,7 @@ export default async function FinalsInfoListPage() {
             data={mappedFinalsInfoList.map(item => [
               // 基本項目
               item.entries?.users?.name || '不明なユーザー',
+              item.basic_info?.dance_style || '未入力',
               // 作品情報
               item.music_change ? 'あり' : 'なし',
               item.work_title || '',
@@ -213,43 +225,44 @@ export default async function FinalsInfoListPage() {
             ])}
             headers={[
               '1. システム利用者名',
-              '2. 作品情報 - 楽曲情報の変更',
-              '2. 作品情報 - 作品タイトル', 
-              '2. 作品情報 - 作品タイトル(ふりがな)', 
-              '2. 作品情報 - 作品キャラクター・ストーリー等',
-              '3. 楽曲著作関連情報 - 楽曲著作権許諾', 
-              '3. 楽曲著作関連情報 - 使用楽曲タイトル', 
-              '3. 楽曲著作関連情報 - 収録CDタイトル', 
-              '3. 楽曲著作関連情報 - アーティスト', 
-              '3. 楽曲著作関連情報 - レコード番号', 
-              '3. 楽曲著作関連情報 - JASRAC作品コード', 
-              '3. 楽曲著作関連情報 - 楽曲種類',
-              '4. 楽曲データ添付',
-              '5. 音響情報 - 準決勝との音響指示変更の有無', 
-              '5. 音響情報 - 音楽スタートのタイミング', 
-              '5. 音響情報 - チェイサー（退場）曲の指定', 
-              '5. 音響情報 - フェードアウト開始時間', 
-              '5. 音響情報 - フェードアウト完了時間',
-              '6. 音響データ添付 - チェイサー（退場）曲音源',
-              '7. 照明情報 - 準決勝との照明指示変更の有無', 
-              '7. 照明情報 - 決勝-踊り出しタイミング',
-              '8. 照明シーン1',
-              '9. 照明シーン1イメージ画像',
-              '10. 照明シーン2',
-              '11. 照明シーン2イメージ画像',
-              '12. 照明シーン3',
-              '13. 照明シーン3イメージ画像',
-              '14. 照明シーン4',
-              '15. 照明シーン4イメージ画像',
-              '16. 照明シーン5',
-              '17. 照明シーン5イメージ画像',
-              '18. 照明シーン チェイサー',
-              '18-2. 照明シーン チェイサーイメージ画像',
-              '19. 振付変更情報',
-              '20. 振付師情報', 
-              '21. 小道具情報',
-              '22. 作品振付師出席情報',
-              '23. 振付師写真'
+              '2. ダンスジャンル',
+              '3. 作品情報 - 楽曲情報の変更',
+              '3. 作品情報 - 作品タイトル',
+              '3. 作品情報 - 作品タイトル(ふりがな)',
+              '3. 作品情報 - 作品キャラクター・ストーリー等',
+              '4. 楽曲著作関連情報 - 楽曲著作権許諾',
+              '4. 楽曲著作関連情報 - 使用楽曲タイトル',
+              '4. 楽曲著作関連情報 - 収録CDタイトル',
+              '4. 楽曲著作関連情報 - アーティスト',
+              '4. 楽曲著作関連情報 - レコード番号',
+              '4. 楽曲著作関連情報 - JASRAC作品コード',
+              '4. 楽曲著作関連情報 - 楽曲種類',
+              '5. 楽曲データ添付',
+              '6. 音響情報 - 準決勝との音響指示変更の有無',
+              '6. 音響情報 - 音楽スタートのタイミング',
+              '6. 音響情報 - チェイサー（退場）曲の指定',
+              '6. 音響情報 - フェードアウト開始時間',
+              '6. 音響情報 - フェードアウト完了時間',
+              '7. 音響データ添付 - チェイサー（退場）曲音源',
+              '8. 照明情報 - 準決勝との照明指示変更の有無',
+              '8. 照明情報 - 決勝-踊り出しタイミング',
+              '9. 照明シーン1',
+              '10. 照明シーン1イメージ画像',
+              '11. 照明シーン2',
+              '12. 照明シーン2イメージ画像',
+              '13. 照明シーン3',
+              '14. 照明シーン3イメージ画像',
+              '15. 照明シーン4',
+              '16. 照明シーン4イメージ画像',
+              '17. 照明シーン5',
+              '18. 照明シーン5イメージ画像',
+              '19. 照明シーン チェイサー',
+              '20. 照明シーン チェイサーイメージ画像',
+              '21. 振付変更情報',
+              '22. 振付師情報',
+              '23. 小道具情報',
+              '24. 作品振付師出席情報',
+              '25. 振付師写真'
             ]}
             filename="finals_info"
           />
@@ -271,74 +284,77 @@ export default async function FinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
                     1. システム利用者名
                   </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    2. ダンスジャンル
+                  </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-60">
-                    2. 作品情報
+                    3. 作品情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-72">
-                    3. 楽曲著作関連情報
+                    4. 楽曲著作関連情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    4. 楽曲データ添付
+                    5. 楽曲データ添付
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    5. 音響情報
+                    6. 音響情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    6. 音響データ添付
+                    7. 音響データ添付
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    7. 照明情報
+                    8. 照明情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    8. 照明シーン1
+                    9. 照明シーン1
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    9. 照明シーン1イメージ画像
+                    10. 照明シーン1イメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    10. 照明シーン2
+                    11. 照明シーン2
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    11. 照明シーン2イメージ画像
+                    12. 照明シーン2イメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    12. 照明シーン3
+                    13. 照明シーン3
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    13. 照明シーン3イメージ画像
+                    14. 照明シーン3イメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    14. 照明シーン4
+                    15. 照明シーン4
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    15. 照明シーン4イメージ画像
+                    16. 照明シーン4イメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    16. 照明シーン5
+                    17. 照明シーン5
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    17. 照明シーン5イメージ画像
+                    18. 照明シーン5イメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    18. 照明シーン チェイサー
+                    19. 照明シーン チェイサー
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    18-2. 照明シーン チェイサーイメージ画像
+                    20. 照明シーン チェイサーイメージ画像
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    19. 振付変更情報
+                    21. 振付変更情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    20. 振付師情報
+                    22. 振付師情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    21. 小道具情報
+                    23. 小道具情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    22. 作品振付師出席情報
+                    24. 作品振付師出席情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    23. 振付師写真
+                    25. 振付師写真
                   </th>
                 </tr>
               </thead>
@@ -348,6 +364,9 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3 whitespace-nowrap text-xs text-gray-900">
                       <div className="font-medium">{finalsInfo.entries?.users?.name || '不明なユーザー'}</div>
                       <div className="text-gray-500">{finalsInfo.entries?.participant_names || 'エントリー名なし'}</div>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap text-xs text-gray-900">
+                      <div className="font-medium">{finalsInfo.basic_info?.dance_style || '未入力'}</div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '240px'}}>
                       <div className="space-y-1 text-xs">

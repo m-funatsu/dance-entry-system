@@ -71,11 +71,21 @@ export default async function ProgramInfoListPage() {
   console.log('[PROGRAM DEBUG] ファイル件数:', filesList?.length || 0)
   console.log('[PROGRAM DEBUG] ファイルエラー:', filesError)
 
+  // 基本情報を取得（ダンスジャンル用）
+  const { data: basicInfoList, error: basicInfoError } = await adminSupabase
+    .from('basic_info')
+    .select('*')
+
+  console.log('[PROGRAM DEBUG] 基本情報取得完了')
+  console.log('[PROGRAM DEBUG] 基本情報件数:', basicInfoList?.length || 0)
+  console.log('[PROGRAM DEBUG] 基本情報エラー:', basicInfoError)
+
   // データをマッピング（選考通過のみ表示）
   const mappedProgramInfoList = programInfoList?.map(programInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === programInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === programInfo.entry_id)
+    const relatedBasicInfo = basicInfoList?.find(basicInfo => basicInfo.entry_id === programInfo.entry_id)
     
     console.log(`[PROGRAM DEBUG] エントリーID ${programInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
@@ -95,7 +105,8 @@ export default async function ProgramInfoListPage() {
         status: 'unknown',
         users: { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || []
+      entry_files: relatedFiles || [],
+      basic_info: relatedBasicInfo || null
     }
   }).filter(item => item.entries?.status === 'selected') || []
 
@@ -121,6 +132,8 @@ export default async function ProgramInfoListPage() {
             data={mappedProgramInfoList.map(item => [
               item.id,
               item.entry_id,
+              item.entries?.users?.name || '不明なユーザー',
+              item.basic_info?.dance_style || '未入力',
               item.song_count || '',
               item.semifinal_story || '',
               item.semifinal_highlight || '',
@@ -129,7 +142,7 @@ export default async function ProgramInfoListPage() {
               `準決勝: ${item.affiliation || '未入力'} / 決勝: ${item.final_affiliation || '未入力'}`,
               item.entries?.status || ''
             ])}
-            headers={['ID', 'エントリーID', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '所属教室または所属', '選考ステータス']}
+            headers={['ID', 'エントリーID', 'システム利用者名', 'ダンスジャンル', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '所属教室または所属', '選考ステータス']}
             filename="program_info"
           />
         </div>
@@ -148,6 +161,9 @@ export default async function ProgramInfoListPage() {
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     システム利用者名
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ダンスジャンル
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     楽曲数
@@ -184,6 +200,11 @@ export default async function ProgramInfoListPage() {
                       </div>
                       <div className="text-xs text-gray-500">
                         {programInfo.entries?.participant_names || 'エントリー名なし'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs font-medium text-gray-900">
+                        {programInfo.basic_info?.dance_style || '未入力'}
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
