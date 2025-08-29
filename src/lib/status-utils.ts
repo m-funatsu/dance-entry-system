@@ -346,8 +346,12 @@ export async function checkSemifinalsInfoCompletion(
         const hasPaymentSlip = allFiles.some(file => file.purpose === 'semifinals_payment_slip')
         console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
         
-        // 2. 楽曲データ（楽曲変更時必須、*マークなし）
-        const hasMusicData = true // *マークがないため必須ではない
+        // 2. 楽曲データ（*マーク付き必須、required属性あり）
+        const hasMusicData = allFiles.some(file => 
+          (file.file_type === 'music' || file.file_type === 'audio') && 
+          (file.purpose === 'music_data_path' || file.file_path?.includes('music_data_path'))
+        )
+        console.log(`[SEMIFINALS INFO COMPLETION] 楽曲データ（*必須）: ${hasMusicData}`)
         
         // 3. シーン1イメージ画像（*必須）
         const hasScene1Image = allFiles.some(file => 
