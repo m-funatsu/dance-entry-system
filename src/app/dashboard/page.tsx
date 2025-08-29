@@ -575,7 +575,7 @@ export default async function DashboardPage() {
     return result
   }
 
-  // 各種申請の完了判定関数
+  // 各種申請の完了判定関数（必須項目なし）
   const checkApplicationsInfoComplete = (applicationsInfo: { [key: string]: unknown } | null) => {
     console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック（ダッシュボード）===')
     console.log('[DASHBOARD APPLICATIONS CHECK] applicationsInfo:', !!applicationsInfo)
@@ -586,73 +586,29 @@ export default async function DashboardPage() {
       return false
     }
     
-    // 何かひとつでもデータがあるかチェック
+    // 何かひとつでもデータがあるかチェック（必須項目なしのため、任意項目のみ）
     const hasAnyData = !!(
-      // 関係者チケット申請
+      // 関係者チケット申請（任意）
       applicationsInfo.related1_name || applicationsInfo.related2_name || applicationsInfo.related3_name ||
       applicationsInfo.related4_name || applicationsInfo.related5_name || applicationsInfo.related_ticket_count ||
-      // 選手同伴申請
+      // 選手同伴申請（任意）
       applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name ||
-      // メイク申請（準決勝）
+      // メイク申請（準決勝）（任意）
       applicationsInfo.makeup_name || applicationsInfo.makeup_email || applicationsInfo.makeup_phone ||
       applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes ||
-      // メイク申請（決勝）
+      // メイク申請（決勝）（任意）
       applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || applicationsInfo.makeup_phone_final ||
       applicationsInfo.makeup_preferred_stylist_final || applicationsInfo.makeup_notes_final
     )
     
     console.log('[DASHBOARD APPLICATIONS CHECK] 何らかのデータ入力:', hasAnyData)
     
-    // データが何もない場合はfalse（申請なし）
-    if (!hasAnyData) {
-      console.log('[DASHBOARD APPLICATIONS CHECK] データなし -> false')
-      return false
-    }
-    
-    // ApplicationsForm.tsxの必須項目と完全一致：
-    // - メイク申請をする場合のみ条件付き必須項目がある
-    let hasRequiredIssues = false
-    const missingFields: string[] = []
-    
-    // メイク申請（準決勝）の条件付き必須チェック
-    const hasMakeupApplication = !!(
-      applicationsInfo.makeup_name ||
-      applicationsInfo.makeup_email ||
-      applicationsInfo.makeup_phone ||
-      applicationsInfo.makeup_preferred_stylist ||
-      applicationsInfo.makeup_notes
-    )
-    
-    console.log('[DASHBOARD APPLICATIONS CHECK] メイク申請（準決勝）の入力:', hasMakeupApplication)
-    
-    if (hasMakeupApplication) {
-      console.log('[DASHBOARD APPLICATIONS CHECK] === メイク申請（準決勝）必須項目チェック ===')
-      
-      const makeupRequiredFields = [
-        'makeup_name',     // 申請者氏名（*必須）
-        'makeup_email',    // メールアドレス（*必須）
-        'makeup_phone'     // ご連絡先電話番号（*必須）
-      ]
-      
-      makeupRequiredFields.forEach(field => {
-        const value = applicationsInfo[field]
-        const isValid = !!(value && value.toString().trim() !== '')
-        console.log(`[DASHBOARD APPLICATIONS CHECK] ${field}: "${value}" -> ${isValid}`)
-        
-        if (!isValid) {
-          hasRequiredIssues = true
-          missingFields.push(field)
-        }
-      })
-    }
-    
-    const result = !hasRequiredIssues
+    // 必須項目なしのため、データがある場合は常に「申請あり」状態
+    const result = hasAnyData
     
     console.log('[DASHBOARD APPLICATIONS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD APPLICATIONS CHECK] メイク申請入力:', hasMakeupApplication)
-    console.log('[DASHBOARD APPLICATIONS CHECK] 必須項目問題:', hasRequiredIssues)
-    console.log('[DASHBOARD APPLICATIONS CHECK] 未入力フィールド:', missingFields)
-    console.log('[DASHBOARD APPLICATIONS CHECK] 最終完了判定:', result)
+    console.log('[DASHBOARD APPLICATIONS CHECK] データ入力有無:', hasAnyData)
+    console.log('[DASHBOARD APPLICATIONS CHECK] 最終判定:', result, '（必須項目なしのためデータあり=申請あり）')
     console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
     
     return result
@@ -1163,7 +1119,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請あり' : applicationsInfo ? '入力中' : '未登録'}
+                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請あり' : '申請なし'}
                       </dd>
                       <StartDateInline section="optional_request" />
                       {(() => {

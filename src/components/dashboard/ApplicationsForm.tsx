@@ -934,7 +934,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              申請者氏名 <span className="text-red-500">*</span>
+              申請者氏名
             </label>
             <select
               value={makeupApplicant}
@@ -989,7 +989,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              メールアドレス <span className="text-red-500">*</span>
+              メールアドレス
             </label>
             <input
               type="email"
@@ -1004,7 +1004,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              ご連絡先電話番号 <span className="text-red-500">*</span>
+              ご連絡先電話番号
             </label>
             <input
               type="tel"
