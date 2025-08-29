@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 import DownloadButton from '@/components/admin/DownloadButton'
+import { getStatusLabel } from '@/lib/status-labels'
 
 export default async function ApplicationsInfoListPage() {
   const supabase = await createClient()
@@ -157,7 +158,8 @@ export default async function ApplicationsInfoListPage() {
             data={mappedApplicationsInfoList.map(item => [
               item.id,
               item.entry_id,
-              item.entries?.status || '',
+              item.entries?.users?.name || '不明なユーザー', // システム利用者名を追加
+              getStatusLabel(item.entries?.status), // ステータスを日本語ラベルに変更
               // 関係者チケット1
               item.related1_relationship || '',
               item.related1_name || '',
@@ -208,7 +210,7 @@ export default async function ApplicationsInfoListPage() {
               item.makeup_phone_final || '',
               item.makeup_notes_final || '',
             ])}
-            headers={['ID', 'エントリーID', '提出ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考']}
+            headers={['ID', 'エントリーID', 'システム利用者名', '選考ステータス', '関係者1関係', '関係者1氏名', '関係者1フリガナ', '関係者2関係', '関係者2氏名', '関係者2フリガナ', '関係者3関係', '関係者3氏名', '関係者3フリガナ', '関係者4関係', '関係者4氏名', '関係者4フリガナ', '関係者5関係', '関係者5氏名', '関係者5フリガナ', '関係者チケット合計枚数', '関係者チケット合計金額', '同伴1氏名', '同伴1フリガナ', '同伴1目的', '同伴2氏名', '同伴2フリガナ', '同伴2目的', '同伴3氏名', '同伴3フリガナ', '同伴3目的', '同伴合計金額', 'メイク準決勝希望美容師', 'メイク準決勝申請者氏名', 'メイク準決勝メール', 'メイク準決勝電話', 'メイク準決勝備考', 'メイク決勝希望美容師', 'メイク決勝申請者氏名', 'メイク決勝メール', 'メイク決勝電話', 'メイク決勝備考']}
             filename="applications_info"
           />
         </div>
