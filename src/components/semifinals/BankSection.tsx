@@ -231,7 +231,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
             label="振込確認用紙"
             value={paymentSlipUrl}
             onChange={handleFileUpload}
-            disabled={!isEditable}
+            disabled={!!paymentSlipUrl || !isEditable}
             accept=".jpg,.jpeg,.png,.gif,.pdf"
             maxSizeMB={10}
             category="document"
@@ -261,6 +261,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
                 </a>
               </div>
               <p className="text-sm text-green-700 mt-1">ファイル名: {paymentSlipFileName}</p>
+              <p className="text-xs text-green-600 mt-1">変更する場合は削除ボタンを使用してください</p>
             </div>
           )}
           
