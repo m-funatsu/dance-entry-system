@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 import DownloadButton from '@/components/admin/DownloadButton'
+import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 
 export default async function SemifinalsInfoListPage() {
@@ -206,10 +207,7 @@ export default async function SemifinalsInfoListPage() {
               // 賞金振込先情報
               `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
               // 選考ステータス
-              item.entries?.status === 'pending' ? '審査待ち' :
-              item.entries?.status === 'submitted' ? '提出済み' :
-              item.entries?.status === 'selected' ? '選考通過' :
-              item.entries?.status === 'rejected' ? '不選考' : '不明'
+              getStatusLabel(item.entries?.status)
             ])}
             headers={[
               '1. システム利用者名',
@@ -732,16 +730,8 @@ export default async function SemifinalsInfoListPage() {
                     
                     {/* 24. 選考ステータス */}
                     <td className="px-3 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        semifinalsInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        semifinalsInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        semifinalsInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {semifinalsInfo.entries?.status === 'pending' && '審査待ち'}
-                        {semifinalsInfo.entries?.status === 'submitted' && '提出済み'}
-                        {semifinalsInfo.entries?.status === 'selected' && '選考通過'}
-                        {semifinalsInfo.entries?.status === 'rejected' && '不選考'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(semifinalsInfo.entries?.status)}`}>
+                        {getStatusLabel(semifinalsInfo.entries?.status)}
                       </span>
                     </td>
                   </tr>

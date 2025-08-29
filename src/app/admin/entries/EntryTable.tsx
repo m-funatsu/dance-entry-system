@@ -13,6 +13,7 @@ import {
   checkSnsInfoCompletion,
   checkApplicationsInfoCompletion
 } from '@/lib/status-utils'
+import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 interface EntryWithDetails {
   id: string
@@ -79,38 +80,11 @@ export default function EntryTable({ entries }: EntryTableProps) {
   }, [entries])
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            未処理
-          </span>
-        )
-      case 'submitted':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            提出済み
-          </span>
-        )
-      case 'selected':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            予選通過
-          </span>
-        )
-      case 'rejected':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            予選敗退
-          </span>
-        )
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            未設定
-          </span>
-        )
-    }
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+        {getStatusLabel(status)}
+      </span>
+    )
   }
 
   const getSubmissionBadge = (entry: EntryWithDetails) => {

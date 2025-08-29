@@ -10,6 +10,7 @@ import EditButton from '@/components/dashboard/EditButton'
 import URLCleaner from '@/components/URLCleaner'
 import SiteTitle from '@/components/SiteTitle'
 import { StartDateInline } from '@/components/dashboard/StartDateInline'
+import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 import FilePreview from '@/components/FilePreview'
 
 // Dynamic renderingを強制（cookiesやauth使用のため）
@@ -493,16 +494,8 @@ export default async function DashboardPage() {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">選考状況</h3>
                     <div className="mt-1 flex items-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        entry.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        entry.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        entry.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {entry.status === 'pending' && '審査待ち'}
-                        {entry.status === 'submitted' && '提出済み'}
-                        {entry.status === 'selected' && '選考通過'}
-                        {entry.status === 'rejected' && '不選考'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entry.status)}`}>
+                        {getStatusLabel(entry.status)}
                       </span>
                       <span className="ml-3 text-sm text-gray-600">
                         {entry.status === 'pending' && '審査をお待ちください'}

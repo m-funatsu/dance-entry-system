@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 import DownloadButton from '@/components/admin/DownloadButton'
+import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 
 export default async function PreliminaryInfoListPage() {
@@ -184,7 +185,7 @@ export default async function PreliminaryInfoListPage() {
               item.choreographer1_furigana || '',
               item.choreographer2_name || '',
               item.choreographer2_furigana || '',
-              item.entries?.status || ''
+              getStatusLabel(item.entries?.status)
             ])}
             headers={['ID', 'エントリーID', 'システム利用者名', 'ダンスジャンル', '作品タイトル', '作品タイトルカナ', '作品ストーリー', '楽曲タイトル', 'アーティスト', 'CDタイトル', 'JASRAC作品コード', '楽曲著作権許諾', 'レコード番号', '楽曲種類', '振付師1名前', '振付師1フリガナ', '振付師2名前', '振付師2フリガナ', '選考ステータス']}
             filename="preliminary_info"
@@ -322,16 +323,8 @@ export default async function PreliminaryInfoListPage() {
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        preliminaryInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        preliminaryInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        preliminaryInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {preliminaryInfo.entries?.status === 'pending' && '審査待ち'}
-                        {preliminaryInfo.entries?.status === 'submitted' && '提出済み'}
-                        {preliminaryInfo.entries?.status === 'selected' && '選考通過'}
-                        {preliminaryInfo.entries?.status === 'rejected' && '不選考'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(preliminaryInfo.entries?.status)}`}>
+                        {getStatusLabel(preliminaryInfo.entries?.status)}
                       </span>
                     </td>
                   </tr>

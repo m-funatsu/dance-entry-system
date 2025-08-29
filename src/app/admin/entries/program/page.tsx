@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 import DownloadButton from '@/components/admin/DownloadButton'
+import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 
 export default async function ProgramInfoListPage() {
@@ -147,7 +148,7 @@ export default async function ProgramInfoListPage() {
               item.final_story || '',
               item.final_highlight || '',
               `準決勝: ${item.affiliation || '未入力'} / 決勝: ${item.final_affiliation || '未入力'}`,
-              item.entries?.status || ''
+              getStatusLabel(item.entries?.status)
             ])}
             headers={['ID', 'エントリーID', 'システム利用者名', 'ダンスジャンル', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '所属教室または所属', '選考ステータス']}
             filename="program_info"
@@ -363,16 +364,8 @@ export default async function ProgramInfoListPage() {
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        programInfo.entries?.status === 'selected' ? 'bg-green-100 text-green-800' :
-                        programInfo.entries?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        programInfo.entries?.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {programInfo.entries?.status === 'pending' && '審査待ち'}
-                        {programInfo.entries?.status === 'submitted' && '提出済み'}
-                        {programInfo.entries?.status === 'selected' && '選考通過'}
-                        {programInfo.entries?.status === 'rejected' && '不選考'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(programInfo.entries?.status)}`}>
+                        {getStatusLabel(programInfo.entries?.status)}
                       </span>
                     </td>
                   </tr>
