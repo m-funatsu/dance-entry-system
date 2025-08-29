@@ -117,12 +117,6 @@ export const finalsSections = [
 ]
 
 export const finalsColorTypes = [
-  '赤系',
-  '青系',
-  '緑系',
-  '黄系',
-  '紫系',
-  '白系',
   '暖色系',
   '寒色系',
   'その他'
