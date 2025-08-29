@@ -139,7 +139,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 rows={2}
               />
               <p className="text-xs text-red-600 mt-1">
-                備考欄の中に細かく時間指定と照明指示をご記入することはお控えください。
+                備考欄の中に細かく時間指定をご記入することはお控えください。
               </p>
             </div>
           </div>
@@ -228,7 +228,7 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               rows={2}
             />
             <p className="text-xs text-red-600 mt-1">
-              備考欄の中に細かく時間指定と照明指示をご記入することはお控えください。
+              備考欄の中に細かく時間指定をご記入することはお控えください。
             </p>
           </div>
         </div>

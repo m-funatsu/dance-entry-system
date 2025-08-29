@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailComposer } from '@/components/EmailComposer'
 import AdminLink from '@/components/admin/AdminLink'
+import { 
+  checkBasicInfoCompletion,
+  checkPreliminaryInfoCompletion, 
+  checkProgramInfoCompletion,
+  checkSemifinalsInfoCompletion,
+  checkFinalsInfoCompletion,
+  checkSnsInfoCompletion,
+  checkApplicationsInfoCompletion
+} from '@/lib/status-utils'
 import { getStatusLabel, getStatusColor } from '@/lib/status-labels'
 
 interface EntryWithDetails {
