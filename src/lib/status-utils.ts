@@ -271,15 +271,28 @@ export async function checkSemifinalsInfoCompletion(
   console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
   console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
 
-  // *マーク付き必須フィールドのみ（UIと完全一致）
+  // 実際の準決勝フォーム必須項目（全項目リスト）
   const baseRequiredFields = [
-    // 楽曲情報セクション（MusicSection）
+    // 楽曲情報セクション
+    'work_title',                    // 作品タイトル
+    'work_title_kana',               // 作品タイトル(ふりがな)
+    'work_character_story',          // 作品キャラクター・ストーリー等（50字以内）
     'music_change_from_preliminary', // 予選との楽曲情報の変更 *
     'copyright_permission',          // 楽曲著作権許諾 *
-    // 音響指示情報セクション（SoundSection）
+    'music_title',                   // 使用楽曲タイトル
+    'cd_title',                      // 収録アルバムタイトル
+    'artist',                        // アーティスト
+    'record_number',                 // レコード番号
+    'music_type',                    // 楽曲種類
+    'music_data_path',               // 楽曲データ
+    // 音響指示情報セクション
+    'sound_start_timing',            // 音楽スタートのタイミング（きっかけ、ポーズなど）
     'chaser_song_designation',       // チェイサー（退場）曲の指定 *
-    // 照明指示情報セクション（LightingSection）
-    'scene1_time',                   // シーン1 時間 *（シーン1のみ必須）
+    'fade_out_start_time',           // フェードアウト開始時間
+    'fade_out_complete_time',        // フェードアウト完了時間
+    // 照明指示情報セクション
+    'dance_start_timing',            // 準決勝 - 踊り出しタイミング
+    'scene1_time',                   // シーン1 時間 *
     'scene1_trigger',                // シーン1 きっかけ *
     'scene1_color_type',             // シーン1 色・系統 *
     'scene1_color_other',            // シーン1 色・系統その他 *
@@ -291,9 +304,11 @@ export async function checkSemifinalsInfoCompletion(
     'chaser_exit_color_other',       // チェイサー/退場 色・系統その他 *
     'chaser_exit_image',             // チェイサー/退場 イメージ *
     'chaser_exit_image_path',        // チェイサー/退場 イメージ画像 *
-    // 振付師情報セクション（ChoreographerSection）
+    // 振付師情報セクション
+    'choreographer_name',            // 振付師 氏名①
+    'choreographer_furigana',        // 振付師 氏名フリガナ①
     'props_usage',                   // 小道具の有無 *
-    // 賞金振込先情報セクション（BankSection）
+    // 賞金振込先情報セクション
     'bank_name',                     // 銀行名 *
     'branch_name',                   // 支店名 *
     'account_type',                  // 口座種類 *
