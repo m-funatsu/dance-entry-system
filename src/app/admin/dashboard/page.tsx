@@ -65,16 +65,20 @@ export default async function AdminDashboardPage() {
   const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
+    // フォームの必須項目（新しい要件に基づく）
     const requiredFields = [
       'work_title',
+      'work_title_kana',
       'work_story',
-      'music_rights_cleared',
       'music_title',
-      'cd_title',
-      'artist',
-      'record_number',
-      'jasrac_code',
-      'music_type'
+      'cd_title', // 常時必須に変更
+      'artist', // 常時必須に変更
+      'record_number', // 常時必須に変更
+      'music_type',
+      'music_rights_cleared',
+      'choreographer1_name',
+      'choreographer1_furigana'
+      // jasrac_code は必須から除外
     ]
     return requiredFields.every(field => {
       const value = preliminaryInfo[field]

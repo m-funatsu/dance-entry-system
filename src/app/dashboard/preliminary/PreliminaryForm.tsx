@@ -673,6 +673,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="cd_title"
               value={formData.cd_title}
               onChange={(e) => handleFieldChange('cd_title', e.target.value)}
+              required
               disabled={!isEditable}
               placeholder="CD/アルバム名"
               error={errors.cd_title}
@@ -683,6 +684,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="artist"
               value={formData.artist}
               onChange={(e) => handleFieldChange('artist', e.target.value)}
+              required
               disabled={!isEditable}
               placeholder="アーティスト名"
               error={errors.artist}
@@ -693,6 +695,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="record_number"
               value={formData.record_number}
               onChange={(e) => handleFieldChange('record_number', e.target.value)}
+              required
               disabled={!isEditable}
               placeholder="例：ABCD-12345"
               error={errors.record_number}
@@ -703,7 +706,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               name="jasrac_code"
               value={formData.jasrac_code}
               onChange={(e) => handleFieldChange('jasrac_code', e.target.value)}
-              required={formData.music_rights_cleared === 'A'}
+              required={false}
               disabled={!isEditable}
               placeholder="例：123-4567-8"
               error={errors.jasrac_code}
