@@ -50,11 +50,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     work_title_kana: { required: true },
     work_story: { required: true, maxLength: 50 },
     music_title: { required: true },
-    cd_title: { required: false }, // 必須を外す
-    artist: { required: false }, // 必須を外す
-    record_number: { required: false }, // 必須を外す
+    cd_title: { required: true }, // 常時必須に変更
+    artist: { required: true }, // 常時必須に変更
+    record_number: { required: true }, // 常時必須に変更
     jasrac_code: { 
-      required: formData.music_rights_cleared === 'A' // A.市販の楽曲を使用する場合のみ必須
+      required: false // 必須を解除
     },
     music_type: { required: true },
     music_rights_cleared: { required: true },

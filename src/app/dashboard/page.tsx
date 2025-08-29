@@ -277,27 +277,23 @@ export default async function DashboardPage() {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
     
-    // フォームの必須項目のみ（任意項目は除外）
-    const baseRequiredFields = [
+    // フォームの必須項目（新しい要件に基づく）
+    const requiredFields = [
       'work_title',
       'work_title_kana',
       'work_story',
       'music_title',
+      'cd_title', // 常時必須に変更
+      'artist', // 常時必須に変更
+      'record_number', // 常時必須に変更
       'music_type',
       'music_rights_cleared',
       'choreographer1_name',
       'choreographer1_furigana'
+      // jasrac_code は必須から除外
     ]
     
-    // 条件付き必須: JASRAC作品コード（A.市販の楽曲を使用する場合のみ）
-    const conditionallyRequired: string[] = []
-    if (preliminaryInfo.music_rights_cleared === 'A') {
-      conditionallyRequired.push('jasrac_code')
-    }
-    
-    const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
-    
-    return allRequiredFields.every(field => {
+    return requiredFields.every(field => {
       const value = preliminaryInfo[field]
       return value && value.toString().trim() !== ''
     })
