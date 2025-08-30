@@ -189,6 +189,12 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       }
     }
     
+    console.log('[SYNC MUSIC] === 楽曲データ同期処理 ===')
+    console.log('[SYNC MUSIC] 準決勝データ:', {
+      music_data_path: semifinalsData.music_data_path,
+      work_title: semifinalsData.work_title
+    })
+    
     setFinalsInfo(prev => ({
       ...prev,
       work_title: semifinalsData.work_title || '',
@@ -201,8 +207,10 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       record_number: semifinalsData.record_number || '',
       jasrac_code: semifinalsData.jasrac_code || '',
       music_type: semifinalsData.music_type || '',
-      music_data_path: semifinalsData.music_data_path || ''
+      music_data_path: semifinalsData.music_data_path || ''  // ここで準決勝のパスがコピーされる
     }))
+    
+    console.log('[SYNC MUSIC] 決勝フォームにコピー完了 - music_data_path:', semifinalsData.music_data_path)
   }
 
   const syncSoundData = async (semifinalsData: Partial<SemifinalsInfo>) => {
