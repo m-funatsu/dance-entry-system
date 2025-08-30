@@ -71,12 +71,20 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (!data.choreographer_furigana) errors.push('振付師 氏名フリガナ①')
       // 振付師2は任意項目のため必須チェックしない
       
+      // 振付変更詳細項目（常時必須）
+      if (!data.choreography_change_timing) errors.push('振付変更部分（曲が始まってから何分何秒の部分か）')
+      if (!data.choreography_before_change) errors.push('変更前（準決勝振付）')
+      if (!data.choreography_after_change) errors.push('変更後（決勝振付）')
+      
       // 小道具の有無は必須
       if (!data.props_usage) errors.push('小道具の有無')
       // 小道具ありの場合は詳細が必須
       if (data.props_usage === 'あり' && !data.props_details) {
         errors.push('利用する小道具')
       }
+      
+      // 作品振付師出席情報（常時必須）
+      if (!data.choreographer_attendance) errors.push('作品振付師出席予定')
       if (!data.choreographer_photo_permission) errors.push('作品振付師写真掲載')
       if (!data.choreographer_photo_path) errors.push('作品振付師写真')
       break
