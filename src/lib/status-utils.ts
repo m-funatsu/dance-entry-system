@@ -41,9 +41,10 @@ export function checkFormCompletion(
   
   requiredFields.forEach(field => {
     const value = formData[field]
-    const isValid = !!(value && value.toString().trim() !== '')
+    // boolean値の場合は true/false どちらも有効とする
+    const isValid = typeof value === 'boolean' ? true : !!(value && value.toString().trim() !== '')
     fieldResults[field] = isValid
-    console.log(`[${formName.toUpperCase()} CHECK] ${field}: "${value}" -> ${isValid}`)
+    console.log(`[${formName.toUpperCase()} CHECK] ${field}: "${value}" (${typeof value}) -> ${isValid}`)
     
     if (!isValid) {
       missingFields.push(field)

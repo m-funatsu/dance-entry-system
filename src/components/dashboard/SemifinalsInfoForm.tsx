@@ -247,9 +247,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         // データベースからのデータを設定
         // boolean型のフィールドがfalseの場合、未選択として扱うためにundefinedに設定
         const processedData = {
-          ...data,
-          music_change_from_preliminary: data.music_change_from_preliminary === false ? undefined : data.music_change_from_preliminary,
-          choreographer_change_from_preliminary: data.choreographer_change_from_preliminary === false ? undefined : data.choreographer_change_from_preliminary
+          ...data
         }
         setSemifinalsInfo(processedData)
         
