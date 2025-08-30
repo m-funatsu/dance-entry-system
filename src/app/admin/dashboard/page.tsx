@@ -25,17 +25,20 @@ export default async function AdminDashboardPage() {
 
   // 管理者クライアントでデータを取得
   const adminSupabase = createAdminClient()
-  const [entriesResult, usersResult] = await Promise.all([
+  const [entriesResult, usersResult, basicInfoResult] = await Promise.all([
     adminSupabase.from('entries').select('*').order('created_at', { ascending: false }),
-    adminSupabase.from('users').select('id, name, email')
+    adminSupabase.from('users').select('id, name, email'),
+    adminSupabase.from('basic_info').select('entry_id, dance_style')
   ])
   
   const { data: entries } = entriesResult
   const { data: allUsers } = usersResult
+  const { data: basicInfoList } = basicInfoResult
 
-  // 手動でユーザーデータをマッピング（安全な処理）
+  // 手動でユーザーデータと基本情報をマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
     const user = allUsers?.find(u => u.id === entry.user_id)
+    const basicInfo = basicInfoList?.find(b => b.entry_id === entry.id)
     
     return {
       ...entry,
@@ -43,7 +46,8 @@ export default async function AdminDashboardPage() {
         name: user.name || '不明なユーザー' 
       } : { 
         name: '不明なユーザー' 
-      }
+      },
+      dance_style: basicInfo?.dance_style || null
     }
   }) || []
 
