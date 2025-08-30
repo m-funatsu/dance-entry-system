@@ -79,12 +79,51 @@ export default async function FinalsInfoListPage() {
   console.log('[FINALS DEBUG] 基本情報件数:', basicInfoList?.length || 0)
   console.log('[FINALS DEBUG] 基本情報エラー:', basicInfoError)
 
+  // 署名付きURLを生成する関数
+  const generateSignedUrl = async (path: string | null | undefined) => {
+    if (!path) return null
+    
+    // すでにURLの場合はそのまま返す
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path
+    }
+    
+    try {
+      const { data } = await adminSupabase.storage
+        .from('files')
+        .createSignedUrl(path, 3600) // 1時間有効
+      return data?.signedUrl || null
+    } catch (error) {
+      console.error('Error generating signed URL:', error)
+      return null
+    }
+  }
+
   // データをマッピング（選考通過のみ表示）
-  const mappedFinalsInfoList = finalsInfoList?.map(finalsInfo => {
+  const mappedFinalsInfoListRaw = await Promise.all(finalsInfoList?.map(async finalsInfo => {
     const relatedEntry = entriesList?.find(entry => entry.id === finalsInfo.entry_id)
     const relatedUser = usersList?.find(user => user.id === relatedEntry?.user_id)
     const relatedFiles = filesList?.filter(file => file.entry_id === finalsInfo.entry_id)
     const relatedBasicInfo = basicInfoList?.find(basicInfo => basicInfo.entry_id === finalsInfo.entry_id)
+    
+    // 関連ファイルの署名付きURLを生成
+    const filesWithUrls = await Promise.all(relatedFiles?.map(async (file) => ({
+      ...file,
+      signed_url: await generateSignedUrl(file.file_path)
+    })) || [])
+
+    // finals_info内のファイルパスも署名付きURLに変換
+    const finalsFileUrls = {
+      music_data_path: await generateSignedUrl(finalsInfo.music_data_path),
+      chaser_song: await generateSignedUrl(finalsInfo.chaser_song),
+      scene1_image_path: await generateSignedUrl(finalsInfo.scene1_image_path),
+      scene2_image_path: await generateSignedUrl(finalsInfo.scene2_image_path),
+      scene3_image_path: await generateSignedUrl(finalsInfo.scene3_image_path),
+      scene4_image_path: await generateSignedUrl(finalsInfo.scene4_image_path),
+      scene5_image_path: await generateSignedUrl(finalsInfo.scene5_image_path),
+      chaser_exit_image_path: await generateSignedUrl(finalsInfo.chaser_exit_image_path),
+      choreographer_photo_path: await generateSignedUrl(finalsInfo.choreographer_photo_path)
+    }
     
     console.log(`[FINALS DEBUG] エントリーID ${finalsInfo.entry_id}:`, {
       hasEntry: !!relatedEntry,
@@ -104,17 +143,20 @@ export default async function FinalsInfoListPage() {
         status: 'unknown',
         users: { name: '不明なユーザー', email: '不明' }
       },
-      entry_files: relatedFiles || [],
-      basic_info: relatedBasicInfo || null
+      entry_files: filesWithUrls,
+      basic_info: relatedBasicInfo || null,
+      file_urls: finalsFileUrls
     }
-  })
-  .filter(item => item.entries?.status === 'selected')
-  // ダンスジャンルでソート
-  .sort((a, b) => {
-    const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
-    const genreB = b.basic_info?.dance_style || 'ZZZ'
-    return genreA.localeCompare(genreB, 'ja')
-  }) || []
+  }) || [])
+
+  const mappedFinalsInfoList = mappedFinalsInfoListRaw
+    .filter(item => item.entries?.status === 'selected')
+    // ダンスジャンルでソート
+    .sort((a, b) => {
+      const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
+      const genreB = b.basic_info?.dance_style || 'ZZZ'
+      return genreA.localeCompare(genreB, 'ja')
+    }) || []
 
   console.log('[FINALS DEBUG] マッピング完了')
   console.log('[FINALS DEBUG] マッピング後データ件数:', mappedFinalsInfoList?.length || 0)
@@ -394,10 +436,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>楽曲種類:</strong> {getMusicTypeLabel(finalsInfo.music_type || '')}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
-                      ).length > 0 ? '添付あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.music_data_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🎵 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.music_data_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.music_data_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🎵 決勝楽曲データ
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('finals')
+                        )) && !finalsInfo.file_urls?.music_data_path && (
+                          <span className="text-xs text-gray-400">楽曲データなし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
@@ -408,10 +482,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>FO完了:</strong> {finalsInfo.fade_out_complete_time || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
-                      ).length > 0 ? '添付あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.chaser_song}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🔊 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.chaser_song && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.chaser_song}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🔊 チェイサー曲
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                        )) && !finalsInfo.file_urls?.chaser_song && (
+                          <span className="text-xs text-gray-400">チェイサー音源なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
@@ -427,10 +533,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.scene1_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.scene1_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.scene1_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.scene1_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ シーン1画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                        )) && !finalsInfo.file_urls?.scene1_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -440,10 +578,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.scene2_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.scene2_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.scene2_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.scene2_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ シーン2画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                        )) && !finalsInfo.file_urls?.scene2_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -453,10 +623,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.scene3_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.scene3_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.scene3_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.scene3_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ シーン3画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                        )) && !finalsInfo.file_urls?.scene3_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -466,10 +668,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.scene4_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.scene4_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.scene4_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.scene4_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ シーン4画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                        )) && !finalsInfo.file_urls?.scene4_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -479,10 +713,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.scene5_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.scene5_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.scene5_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.scene5_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ シーン5画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                        )) && !finalsInfo.file_urls?.scene5_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -492,10 +758,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>イメージ:</strong> {finalsInfo.chaser_exit_image || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
-                      ).length > 0 ? '画像あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.chaser_exit_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.chaser_exit_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.chaser_exit_image_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              🖼️ チェイサー画像
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                        )) && !finalsInfo.file_urls?.chaser_exit_image_path && (
+                          <span className="text-xs text-gray-400">画像なし</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="text-xs">
@@ -521,10 +819,42 @@ export default async function FinalsInfoListPage() {
                         <div><strong>写真:</strong> {finalsInfo.choreographer_photo_permission || '未入力'}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-xs text-gray-900">
-                      {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { file_type: string; purpose?: string }) => 
-                        file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
-                      ).length > 0 ? '写真あり' : 'なし'}
+                    <td className="px-3 py-3">
+                      <div className="space-y-1">
+                        {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
+                          <div key={file.id}>
+                            <a
+                              href={file.signed_url || finalsInfo.file_urls?.choreographer_photo_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📷 {file.file_name}
+                            </a>
+                          </div>
+                        ))}
+                        {finalsInfo.file_urls?.choreographer_photo_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                        )) && (
+                          <div>
+                            <a
+                              href={finalsInfo.file_urls.choreographer_photo_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
+                            >
+                              📷 振付師写真
+                            </a>
+                          </div>
+                        )}
+                        {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
+                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                        )) && !finalsInfo.file_urls?.choreographer_photo_path && (
+                          <span className="text-xs text-gray-400">写真なし</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
