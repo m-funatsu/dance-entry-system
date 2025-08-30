@@ -151,6 +151,20 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
                 file_path: file.file_path
               })
               
+              // 決勝専用ファイルを除外
+              const isFinalsFile = file.purpose && file.purpose.startsWith('finals_')
+              const isFinalsPath = file.file_path && file.file_path.includes('/finals/')
+              
+              if (isFinalsFile || isFinalsPath) {
+                console.log('[MUSIC DEBUG] 決勝ファイルをスキップ:', {
+                  purpose: file.purpose,
+                  file_path: file.file_path,
+                  isFinalsFile,
+                  isFinalsPath
+                })
+                continue
+              }
+              
               // 音楽関連のファイルを適切なフィールドにマッピング
               // ファイル拡張子でもチェックして、誤ったfile_typeを除外
               const isAudioFile = (file.file_type === 'music' || file.file_type === 'audio') && 
