@@ -488,7 +488,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')
+                          file.file_type === 'photo' && file.purpose === 'scene1_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -502,7 +502,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1_image')
+                          file.file_type === 'photo' && file.purpose === 'scene1_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -525,7 +525,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')
+                          file.file_type === 'photo' && file.purpose === 'scene2_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -539,7 +539,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2_image')
+                          file.file_type === 'photo' && file.purpose === 'scene2_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -562,7 +562,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')
+                          file.file_type === 'photo' && file.purpose === 'scene3_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -576,7 +576,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3_image')
+                          file.file_type === 'photo' && file.purpose === 'scene3_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -599,7 +599,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')
+                          file.file_type === 'photo' && file.purpose === 'scene4_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -613,7 +613,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4_image')
+                          file.file_type === 'photo' && file.purpose === 'scene4_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -636,7 +636,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')
+                          file.file_type === 'photo' && file.purpose === 'scene5_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -650,7 +650,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5_image')
+                          file.file_type === 'photo' && file.purpose === 'scene5_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -673,7 +673,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')
+                          file.file_type === 'photo' && file.purpose === 'chaser_exit_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -687,7 +687,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser_exit_image')
+                          file.file_type === 'photo' && file.purpose === 'chaser_exit_image_path'
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
