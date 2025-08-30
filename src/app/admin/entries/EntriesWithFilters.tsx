@@ -64,58 +64,39 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const [genreFilter, setGenreFilter] = useState<string>('')
   const [formFilter, setFormFilter] = useState<string>('')
 
-  // デバッグ: 取得されたエントリーデータのステータス値を確認
-  console.log('[ENTRIES FILTER DEBUG] エントリー総数:', entries.length)
-  console.log('[ENTRIES FILTER DEBUG] 全エントリーのステータス値:')
-  entries.slice(0, 3).forEach((entry, index) => {
-    console.log(`  エントリー${index + 1}:`, {
-      id: entry.id,
-      basic_info_status: entry.basic_info_status,
-      preliminary_info_status: entry.preliminary_info_status,
-      program_info_status: entry.program_info_status,
-      semifinals_info_status: entry.semifinals_info_status,
-      finals_info_status: entry.finals_info_status,
-      sns_info_status: entry.sns_info_status,
-      applications_info_status: entry.applications_info_status,
-      consent_form_submitted: entry.consent_form_submitted
+  // デバッグログ（開発環境のみ）
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ENTRIES FILTER DEBUG] エントリー総数:', entries.length)
+    const allStatusValues = new Set()
+    entries.forEach(entry => {
+      if (entry.basic_info_status) allStatusValues.add(`basic_info: ${entry.basic_info_status}`)
+      if (entry.preliminary_info_status) allStatusValues.add(`preliminary_info: ${entry.preliminary_info_status}`)
+      if (entry.program_info_status) allStatusValues.add(`program_info: ${entry.program_info_status}`)
+      if (entry.semifinals_info_status) allStatusValues.add(`semifinals_info: ${entry.semifinals_info_status}`)
+      if (entry.finals_info_status) allStatusValues.add(`finals_info: ${entry.finals_info_status}`)
+      if (entry.sns_info_status) allStatusValues.add(`sns_info: ${entry.sns_info_status}`)
+      if (entry.applications_info_status) allStatusValues.add(`applications_info: ${entry.applications_info_status}`)
     })
-  })
-
-  // デバッグ: 全ステータス値の種類を確認
-  const allStatusValues = new Set()
-  entries.forEach(entry => {
-    if (entry.basic_info_status) allStatusValues.add(`basic_info: ${entry.basic_info_status}`)
-    if (entry.preliminary_info_status) allStatusValues.add(`preliminary_info: ${entry.preliminary_info_status}`)
-    if (entry.program_info_status) allStatusValues.add(`program_info: ${entry.program_info_status}`)
-    if (entry.semifinals_info_status) allStatusValues.add(`semifinals_info: ${entry.semifinals_info_status}`)
-    if (entry.finals_info_status) allStatusValues.add(`finals_info: ${entry.finals_info_status}`)
-    if (entry.sns_info_status) allStatusValues.add(`sns_info: ${entry.sns_info_status}`)
-    if (entry.applications_info_status) allStatusValues.add(`applications_info: ${entry.applications_info_status}`)
-  })
-  console.log('[ENTRIES FILTER DEBUG] 全ステータス値:', Array.from(allStatusValues))
+    console.log('[ENTRIES FILTER DEBUG] 発見されたステータス値:', Array.from(allStatusValues))
+  }
 
   // DBのステータスフィールドを使用してフォーム提出状況をチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
-    console.log(`[FILTER DEBUG] ${formType} チェック:`, {
-      entryId: entry.id,
-      basic_info_status: entry.basic_info_status,
-      preliminary_info_status: entry.preliminary_info_status,
-      program_info_status: entry.program_info_status,
-      semifinals_info_status: entry.semifinals_info_status,
-      finals_info_status: entry.finals_info_status,
-      sns_info_status: entry.sns_info_status,
-      applications_info_status: entry.applications_info_status,
-      consent_form_submitted: entry.consent_form_submitted
-    })
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[FILTER DEBUG] ${formType} チェック:`, {
+        entryId: entry.id,
+        [`${formType}_status`]: entry[`${formType}_info_status` as keyof EntryWithDetails] || entry.consent_form_submitted
+      })
+    }
     
     switch(formType) {
-      case 'basic': return entry.basic_info_status === '提出済み'
-      case 'preliminary': return entry.preliminary_info_status === '提出済み'
-      case 'program': return entry.program_info_status === '提出済み'
-      case 'semifinals': return entry.semifinals_info_status === '提出済み'
-      case 'finals': return entry.finals_info_status === '提出済み'
-      case 'applications': return entry.applications_info_status === '提出済み'
-      case 'sns': return entry.sns_info_status === '提出済み'
+      case 'basic': return entry.basic_info_status === '登録済み'
+      case 'preliminary': return entry.preliminary_info_status === '登録済み'
+      case 'program': return entry.program_info_status === '登録済み'
+      case 'semifinals': return entry.semifinals_info_status === '登録済み'
+      case 'finals': return entry.finals_info_status === '登録済み'
+      case 'applications': return entry.applications_info_status === '申請あり'
+      case 'sns': return entry.sns_info_status === '登録済み'
       case 'consent': return entry.consent_form_submitted === true
       default: return true
     }
