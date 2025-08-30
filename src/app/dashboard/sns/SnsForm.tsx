@@ -431,7 +431,8 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                   </button>
                 </div>
                 <p className="text-xs text-gray-600 mt-2">
-                  練習風景動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                  動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600 font-semibold">保存ボタンをクリック</span>してください。<br />
+                  注意書きに4Kで撮影するとファイルサイズをオーバーすることがあるため<span className="text-red-600 font-semibold">解像度はフルHD(1920×1080)以下</span>での撮影を推奨いたします。
                 </p>
               </div>
             </div>
@@ -551,7 +552,8 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                   </button>
                 </div>
                 <p className="text-xs text-gray-600 mt-2">
-                  選手紹介・見所動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                  動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600 font-semibold">保存ボタンをクリック</span>してください。<br />
+                  注意書きに4Kで撮影するとファイルサイズをオーバーすることがあるため<span className="text-red-600 font-semibold">解像度はフルHD(1920×1080)以下</span>での撮影を推奨いたします。
                 </p>
               </div>
             </div>
