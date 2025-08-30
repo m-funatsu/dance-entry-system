@@ -823,13 +823,20 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
-          onSave={async (isTemporary) => {
+          onSave={async (isTemporary, customData) => {
             if (isTemporary && entry?.id) {
-              // 一時保存用の関数
-              const tempSaveData = {
+              // 一時保存用の関数（カスタムデータがある場合はそれを使用）
+              const tempSaveData = customData || {
                 ...semifinalsInfo,
                 entry_id: entry.id
               }
+              
+              // entry_idが確実に含まれるように
+              if (!tempSaveData.entry_id) {
+                tempSaveData.entry_id = entry.id
+              }
+              
+              console.log('[SEMIFINALS SAVE] 一時保存データ:', tempSaveData)
               await save(tempSaveData)
             } else {
               await handleSave()

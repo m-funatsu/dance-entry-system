@@ -9,7 +9,7 @@ interface SoundSectionProps {
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
-  onSave?: (isTemporary?: boolean) => Promise<void>
+  onSave?: (isTemporary?: boolean, customData?: Partial<SemifinalsInfo>) => Promise<void>
   audioFiles?: Record<string, { file_name: string }>
   isEditable?: boolean
 }
@@ -61,23 +61,30 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
           value={semifinalsInfo.chaser_song_designation || ''}
           onChange={async (e) => {
             if (e.target.value === 'included') {
-              onChange({ chaser_song_designation: 'included', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
+              console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - 状態変更と保存を実行')
+              
+              // 音源ファイルが存在する場合は削除前に保存処理（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
                 const chaserUrl = semifinalsInfo.chaser_song || ''
                 // 決勝ファイルは削除しない
                 if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - 削除前に一時保存')
-                  // 削除前に一時保存
+                  // 先に新しい状態でデータベースを更新
                   if (onSave) {
                     try {
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
-                      await onSave(true)
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
-                      // 保存後少し待機
-                      await new Promise(resolve => setTimeout(resolve, 200))
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新実行中...')
+                      const updatedData = {
+                        ...semifinalsInfo,
+                        chaser_song_designation: 'included',
+                        chaser_song: ''
+                      }
+                      
+                      // onSaveに明示的に新しいデータを渡すため、一時的にカスタムSave関数を作成
+                      await onSave(true, updatedData)
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新完了')
+                      // データベース反映待機時間を長くする
+                      await new Promise(resolve => setTimeout(resolve, 500))
                     } catch (saveError) {
-                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
+                      console.error('[CHASER CHANGE] データベース更新エラー:', saveError)
                     }
                   }
                   
@@ -89,56 +96,71 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
                   console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
                 }
               }
+              
+              // UI状態を最後に更新（データベース更新後）
+              onChange({ chaser_song_designation: 'included', chaser_song: '' })
             } else if (e.target.value === 'required') {
               onChange({ chaser_song_designation: 'required' })
             } else if (e.target.value === 'not_required') {
+              console.log('[CHASER CHANGE] 「不要（無音）」選択 - 状態変更と保存を実行')
+              
+              // 音源ファイルが存在する場合は削除前に保存処理（準決勝ファイルのみ）
+              if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
+                const chaserUrl = semifinalsInfo.chaser_song || ''
+                // 決勝ファイルは削除しない
+                if (!chaserUrl.includes('/finals/')) {
+                  // 先に新しい状態でデータベースを更新
+                  if (onSave) {
+                    try {
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新実行中...')
+                      const updatedData = {
+                        ...semifinalsInfo,
+                        chaser_song_designation: 'not_required',
+                        chaser_song: ''
+                      }
+                      
+                      await onSave(true, updatedData)
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新完了')
+                      await new Promise(resolve => setTimeout(resolve, 500))
+                    } catch (saveError) {
+                      console.error('[CHASER CHANGE] データベース更新エラー:', saveError)
+                    }
+                  }
+                  
+                  console.log('[CHASER CHANGE] チェイサー音源を削除')
+                  if (onFileDelete) {
+                    onFileDelete('chaser_song')
+                  }
+                } else {
+                  console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
+                }
+              }
+              
+              // UI状態を最後に更新
               onChange({ chaser_song_designation: 'not_required', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
-              if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
-                const chaserUrl = semifinalsInfo.chaser_song || ''
-                // 決勝ファイルは削除しない
-                if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「不要（無音）」選択 - 削除前に一時保存')
-                  // 削除前に一時保存
-                  if (onSave) {
-                    try {
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
-                      await onSave(true)
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
-                      // 保存後少し待機
-                      await new Promise(resolve => setTimeout(resolve, 200))
-                    } catch (saveError) {
-                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
-                    }
-                  }
-                  
-                  console.log('[CHASER CHANGE] チェイサー音源を削除')
-                  if (onFileDelete) {
-                    onFileDelete('chaser_song')
-                  }
-                } else {
-                  console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
-                }
-              }
             } else if (e.target.value === '') {
-              // 「選択してください」に戻す場合はリセット
-              onChange({ chaser_song_designation: '', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
+              console.log('[CHASER CHANGE] 「選択してください」選択 - 状態変更と保存を実行')
+              
+              // 音源ファイルが存在する場合は削除前に保存処理（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
                 const chaserUrl = semifinalsInfo.chaser_song || ''
                 // 決勝ファイルは削除しない
                 if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「選択してください」選択 - 削除前に一時保存')
-                  // 削除前に一時保存
+                  // 先に新しい状態でデータベースを更新
                   if (onSave) {
                     try {
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
-                      await onSave(true)
-                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
-                      // 保存後少し待機
-                      await new Promise(resolve => setTimeout(resolve, 200))
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新実行中...')
+                      const updatedData = {
+                        ...semifinalsInfo,
+                        chaser_song_designation: '',
+                        chaser_song: ''
+                      }
+                      
+                      await onSave(true, updatedData)
+                      console.log('[CHASER CHANGE] 新しい状態でデータベース更新完了')
+                      await new Promise(resolve => setTimeout(resolve, 500))
                     } catch (saveError) {
-                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
+                      console.error('[CHASER CHANGE] データベース更新エラー:', saveError)
                     }
                   }
                   
@@ -150,6 +172,9 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
                   console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
                 }
               }
+              
+              // UI状態を最後に更新
+              onChange({ chaser_song_designation: '', chaser_song: '' })
             }
           }}
           disabled={!isEditable}
