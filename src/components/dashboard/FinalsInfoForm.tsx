@@ -107,30 +107,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         if (data.music_change === false && data.music_title) {
           setMusicChangeOption('unchanged')
           
-          // 「準決勝から変更なし」状態の場合、楽曲データのファイル名を取得
-          if (data.music_data_path) {
-            console.log('[OPTION RESTORE] 準決勝楽曲データのファイル名を取得中')
-            try {
-              // 決勝用のentry_filesレコードが存在するかチェック
-              const { data: finalsFile } = await supabase
-                .from('entry_files')
-                .select('*')
-                .eq('entry_id', entry.id)
-                .eq('purpose', 'finals_music_data_path')
-                .maybeSingle()
-
-              if (finalsFile) {
-                console.log('[OPTION RESTORE] 決勝用楽曲データレコード存在:', finalsFile.file_name)
-                setAudioFiles(prev => ({
-                  ...prev,
-                  music_data_path: { file_name: finalsFile.file_name }
-                }))
-              } else {
-                console.log('[OPTION RESTORE] 決勝用楽曲データレコードが未作成')
-              }
-            } catch (error) {
-              console.error('[OPTION RESTORE] 楽曲データファイル名取得エラー:', error)
+          // 「準決勝から変更なし」状態の場合、準決勝データを自動同期
+          console.log('[OPTION RESTORE] 初期化時の楽曲情報同期を実行中')
+          try {
+            const semifinalsData = await loadSemifinalsInfo()
+            if (semifinalsData) {
+              console.log('[OPTION RESTORE] 準決勝情報を楽曲情報に自動同期')
+              await syncMusicData(semifinalsData)
+            } else {
+              console.log('[OPTION RESTORE] 準決勝情報が見つかりません')
             }
+          } catch (error) {
+            console.error('[OPTION RESTORE] 楽曲情報自動同期エラー:', error)
           }
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
@@ -141,30 +129,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           setSoundChangeOption('same')
           console.log('[OPTION RESTORE] 音響指示: same')
           
-          // 「準決勝と同じ」状態の場合、チェイサー曲のファイル名を取得
-          if (data.chaser_song) {
-            console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
-            try {
-              // 決勝用のentry_filesレコードが存在するかチェック
-              const { data: finalsFile } = await supabase
-                .from('entry_files')
-                .select('*')
-                .eq('entry_id', entry.id)
-                .eq('purpose', 'finals_chaser_song')
-                .maybeSingle()
-
-              if (finalsFile) {
-                console.log('[OPTION RESTORE] 決勝用チェイサー曲レコード存在:', finalsFile.file_name)
-                setAudioFiles(prev => ({
-                  ...prev,
-                  chaser_song: { file_name: finalsFile.file_name }
-                }))
-              } else {
-                console.log('[OPTION RESTORE] 決勝用チェイサー曲レコードが未作成 - 次回の音響指示同期で作成される')
-              }
-            } catch (error) {
-              console.error('[OPTION RESTORE] チェイサー曲ファイル名取得エラー:', error)
+          // 「準決勝と同じ」状態の場合、準決勝データを自動同期
+          console.log('[OPTION RESTORE] 初期化時の音響指示同期を実行中')
+          try {
+            const semifinalsData = await loadSemifinalsInfo()
+            if (semifinalsData) {
+              console.log('[OPTION RESTORE] 準決勝情報を音響指示に自動同期')
+              await syncSoundData(semifinalsData)
+            } else {
+              console.log('[OPTION RESTORE] 準決勝情報が見つかりません')
             }
+          } catch (error) {
+            console.error('[OPTION RESTORE] 音響指示自動同期エラー:', error)
           }
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
