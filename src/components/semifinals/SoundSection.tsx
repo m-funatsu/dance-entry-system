@@ -9,6 +9,7 @@ interface SoundSectionProps {
   onChange: (updates: Partial<SemifinalsInfo>) => void
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
+  onSave?: (isTemporary?: boolean) => Promise<void>
   audioFiles?: Record<string, { file_name: string }>
   isEditable?: boolean
 }
@@ -19,6 +20,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
   onChange,
   onFileUpload,
   onFileDelete,
+  onSave,
   audioFiles,
   isEditable = true
 }) => {
@@ -155,7 +157,7 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)
             }}
-            onDelete={() => {
+            onDelete={async () => {
               console.log('[SOUND SECTION] AudioUpload削除ボタンがクリックされました')
               const chaserUrl = semifinalsInfo.chaser_song || ''
               console.log('[SOUND SECTION] 現在のchaser_song URL:', chaserUrl)
@@ -164,6 +166,18 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               // 決勝ファイルは削除しない
               if (!chaserUrl.includes('/finals/')) {
                 console.log('[SOUND SECTION] 準決勝ファイルのため削除実行')
+                
+                // 削除前に保存
+                if (onSave) {
+                  console.log('[SOUND SECTION] 削除前に一時保存実行中...')
+                  try {
+                    await onSave(true)
+                    console.log('[SOUND SECTION] 一時保存完了')
+                  } catch (saveError) {
+                    console.error('[SOUND SECTION] 一時保存エラー:', saveError)
+                  }
+                }
+                
                 if (onFileDelete) {
                   onFileDelete('chaser_song')
                 }
