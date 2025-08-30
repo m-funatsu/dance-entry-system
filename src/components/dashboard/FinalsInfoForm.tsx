@@ -800,13 +800,9 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     const isComplete = checkFinalsInfoCompletion(finalsInfo)
     await updateFormStatus('finals_info', entry.id, isComplete)
     
-    // 保存成功後にデータを再読み込み（リロードの代わり）
+    // 保存成功後の処理
     setValidationErrors({})
     showToast('決勝情報を保存しました', 'success')
-    
-    // データを再読み込み（同期を実行しないため）
-    await loadFinalsInfo()
-    await loadAudioFiles()
   }
 
   if (loading) {
