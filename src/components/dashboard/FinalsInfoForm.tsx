@@ -106,6 +106,32 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         // オプションの状態を復元
         if (data.music_change === false && data.music_title) {
           setMusicChangeOption('unchanged')
+          
+          // 「準決勝から変更なし」状態の場合、楽曲データのファイル名を取得
+          if (data.music_data_path) {
+            console.log('[OPTION RESTORE] 準決勝楽曲データのファイル名を取得中')
+            try {
+              // 決勝用のentry_filesレコードが存在するかチェック
+              const { data: finalsFile } = await supabase
+                .from('entry_files')
+                .select('*')
+                .eq('entry_id', entry.id)
+                .eq('purpose', 'finals_music_data_path')
+                .maybeSingle()
+
+              if (finalsFile) {
+                console.log('[OPTION RESTORE] 決勝用楽曲データレコード存在:', finalsFile.file_name)
+                setAudioFiles(prev => ({
+                  ...prev,
+                  music_data_path: { file_name: finalsFile.file_name }
+                }))
+              } else {
+                console.log('[OPTION RESTORE] 決勝用楽曲データレコードが未作成')
+              }
+            } catch (error) {
+              console.error('[OPTION RESTORE] 楽曲データファイル名取得エラー:', error)
+            }
+          }
         } else if (data.music_change === true) {
           setMusicChangeOption('changed')
         }
@@ -119,28 +145,22 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           if (data.chaser_song) {
             console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
             try {
-              // URLからファイル名を抽出する方法を試行
-              const chaserUrl = data.chaser_song
-              console.log('[OPTION RESTORE] チェイサー曲URL:', chaserUrl)
-              
-              // URLからファイル名を抽出
-              if (chaserUrl && typeof chaserUrl === 'string') {
-                const fileName = chaserUrl.split('/').pop()?.split('?')[0] || ''
-                const fileNameWithoutTimestamp = fileName.replace(/_\d+\./, '.') // timestamp部分を除去
-                console.log('[OPTION RESTORE] URL抽出ファイル名:', fileName, '→', fileNameWithoutTimestamp)
-                
-                // URLが有効で、ファイル名が抽出できた場合
-                if (fileName && fileName.includes('.')) {
-                  setAudioFiles(prev => ({
-                    ...prev,
-                    chaser_song: { file_name: fileNameWithoutTimestamp || fileName }
-                  }))
-                  console.log('[OPTION RESTORE] URLからファイル名を設定:', fileNameWithoutTimestamp || fileName)
-                } else {
-                  console.log('[OPTION RESTORE] ファイル名の抽出に失敗')
-                }
+              // 決勝用のentry_filesレコードが存在するかチェック
+              const { data: finalsFile } = await supabase
+                .from('entry_files')
+                .select('*')
+                .eq('entry_id', entry.id)
+                .eq('purpose', 'finals_chaser_song')
+                .maybeSingle()
+
+              if (finalsFile) {
+                console.log('[OPTION RESTORE] 決勝用チェイサー曲レコード存在:', finalsFile.file_name)
+                setAudioFiles(prev => ({
+                  ...prev,
+                  chaser_song: { file_name: finalsFile.file_name }
+                }))
               } else {
-                console.log('[OPTION RESTORE] チェイサー曲URLが無効')
+                console.log('[OPTION RESTORE] 決勝用チェイサー曲レコードが未作成 - 次回の音響指示同期で作成される')
               }
             } catch (error) {
               console.error('[OPTION RESTORE] チェイサー曲ファイル名取得エラー:', error)
@@ -242,30 +262,62 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       music_data_path: semifinalsData.music_data_path || ''  // ここで準決勝のパスがコピーされる
     }))
     
-    // 準決勝の楽曲データファイル情報も取得してコピー
+    // 準決勝の楽曲データファイル情報を決勝用として複製
     if (semifinalsData.music_data_path) {
       try {
-        console.log('[SYNC MUSIC] 準決勝の楽曲ファイル情報を取得中')
-        const { data: fileData, error: fileError } = await supabase
+        console.log('[SYNC MUSIC] 準決勝の楽曲データを決勝用として複製中')
+        
+        // 準決勝のentry_filesから楽曲データ情報を取得
+        const { data: semifinalsFile } = await supabase
           .from('entry_files')
-          .select('file_name')
+          .select('*')
           .eq('entry_id', entry.id)
           .eq('purpose', 'music_data_path')
           .order('uploaded_at', { ascending: false })
           .limit(1)
           .maybeSingle()
 
-        if (fileError) {
-          console.error('[SYNC MUSIC] ファイル情報取得エラー:', fileError)
-        } else if (fileData) {
-          console.log('[SYNC MUSIC] 準決勝楽曲ファイル名:', fileData.file_name)
+        if (semifinalsFile) {
+          console.log('[SYNC MUSIC] 準決勝楽曲ファイル情報:', semifinalsFile)
+          
+          // 決勝用のentry_filesレコードを作成
+          const finalsFileData = {
+            entry_id: entry.id,
+            file_type: semifinalsFile.file_type,
+            file_name: semifinalsFile.file_name,
+            file_path: semifinalsFile.file_path,
+            purpose: 'finals_music_data_path',  // 決勝用purpose
+            uploaded_at: new Date().toISOString()
+          }
+          
+          // 既存の決勝楽曲データレコードを削除
+          await supabase
+            .from('entry_files')
+            .delete()
+            .eq('entry_id', entry.id)
+            .eq('purpose', 'finals_music_data_path')
+          
+          // 新しい決勝用レコードを挿入
+          const { error: insertError } = await supabase
+            .from('entry_files')
+            .insert(finalsFileData)
+          
+          if (insertError) {
+            console.error('[SYNC MUSIC] 決勝ファイルレコード作成エラー:', insertError)
+          } else {
+            console.log('[SYNC MUSIC] 決勝用ファイルレコード作成完了')
+          }
+          
+          // audioFiles状態を更新
           setAudioFiles(prev => ({
             ...prev,
-            music_data_path: { file_name: fileData.file_name }
+            music_data_path: { file_name: semifinalsFile.file_name }
           }))
+        } else {
+          console.log('[SYNC MUSIC] 準決勝の楽曲ファイル情報が見つかりません')
         }
       } catch (error) {
-        console.error('[SYNC MUSIC] ファイル情報取得失敗:', error)
+        console.error('[SYNC MUSIC] ファイル複製処理エラー:', error)
       }
     }
     
@@ -302,34 +354,62 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
     }))
     
-    // 準決勝のチェイサー曲ファイル情報も取得してコピー
+    // 準決勝のチェイサー曲ファイル情報を決勝用として複製
     if (semifinalsData.chaser_song) {
       try {
-        console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報を取得中')
-        // URLからファイル名を抽出
-        const chaserUrl = semifinalsData.chaser_song
-        console.log('[SYNC SOUND] チェイサー曲URL:', chaserUrl)
+        console.log('[SYNC SOUND] 準決勝のチェイサー曲を決勝用として複製中')
         
-        if (chaserUrl && typeof chaserUrl === 'string') {
-          const fileName = chaserUrl.split('/').pop()?.split('?')[0] || ''
-          const fileNameWithoutTimestamp = fileName.replace(/_\d+\./, '.') // timestamp部分を除去
-          console.log('[SYNC SOUND] URL抽出ファイル名:', fileName, '→', fileNameWithoutTimestamp)
+        // 準決勝のentry_filesからチェイサー曲情報を取得
+        const { data: semifinalsFile } = await supabase
+          .from('entry_files')
+          .select('*')
+          .eq('entry_id', entry.id)
+          .eq('purpose', 'chaser_song')
+          .order('uploaded_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (semifinalsFile) {
+          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル情報:', semifinalsFile)
           
-          // URLが有効で、ファイル名が抽出できた場合
-          if (fileName && fileName.includes('.')) {
-            setAudioFiles(prev => ({
-              ...prev,
-              chaser_song: { file_name: fileNameWithoutTimestamp || fileName }
-            }))
-            console.log('[SYNC SOUND] URLからファイル名を設定:', fileNameWithoutTimestamp || fileName)
-          } else {
-            console.log('[SYNC SOUND] ファイル名の抽出に失敗')
+          // 決勝用のentry_filesレコードを作成
+          const finalsFileData = {
+            entry_id: entry.id,
+            file_type: semifinalsFile.file_type,
+            file_name: semifinalsFile.file_name,
+            file_path: semifinalsFile.file_path,
+            purpose: 'finals_chaser_song',  // 決勝用purpose
+            uploaded_at: new Date().toISOString()
           }
+          
+          // 既存の決勝チェイサー曲レコードを削除
+          await supabase
+            .from('entry_files')
+            .delete()
+            .eq('entry_id', entry.id)
+            .eq('purpose', 'finals_chaser_song')
+          
+          // 新しい決勝用レコードを挿入
+          const { error: insertError } = await supabase
+            .from('entry_files')
+            .insert(finalsFileData)
+          
+          if (insertError) {
+            console.error('[SYNC SOUND] 決勝ファイルレコード作成エラー:', insertError)
+          } else {
+            console.log('[SYNC SOUND] 決勝用ファイルレコード作成完了')
+          }
+          
+          // audioFiles状態を更新
+          setAudioFiles(prev => ({
+            ...prev,
+            chaser_song: { file_name: semifinalsFile.file_name }
+          }))
         } else {
-          console.log('[SYNC SOUND] チェイサー曲URLが無効')
+          console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報が見つかりません')
         }
       } catch (error) {
-        console.error('[SYNC SOUND] ファイル情報取得失敗:', error)
+        console.error('[SYNC SOUND] ファイル複製処理エラー:', error)
       }
     } else {
       console.log('[SYNC SOUND] 準決勝にchaser_songデータがありません')
