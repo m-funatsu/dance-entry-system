@@ -39,6 +39,16 @@ export default async function SemifinalsInfoListPage() {
   console.log('[SEMIFINALS DEBUG] 準決勝情報取得完了')
   console.log('[SEMIFINALS DEBUG] 準決勝情報件数:', semifinalsInfoList?.length || 0)
   console.log('[SEMIFINALS DEBUG] 準決勝情報エラー:', semifinalsError)
+  
+  // 準決勝データの振付師フリガナフィールドをチェック
+  semifinalsInfoList?.forEach((item, index) => {
+    console.log(`[SEMIFINALS DEBUG] 生データ${index + 1}:`)
+    console.log(`  - entry_id: "${item.entry_id}"`)
+    console.log(`  - choreographer_name: "${item.choreographer_name || 'null'}"`)
+    console.log(`  - choreographer_furigana: "${item.choreographer_furigana || 'null'}"`)
+    console.log(`  - choreographer2_name: "${item.choreographer2_name || 'null'}"`)
+    console.log(`  - choreographer2_furigana: "${item.choreographer2_furigana || 'null'}"`)
+  })
 
   if (semifinalsError) {
     console.error('準決勝情報取得エラー:', semifinalsError)
@@ -120,6 +130,16 @@ export default async function SemifinalsInfoListPage() {
 
   console.log('[SEMIFINALS DEBUG] マッピング完了')
   console.log('[SEMIFINALS DEBUG] マッピング後データ件数:', mappedSemifinalsInfoList?.length || 0)
+  
+  // 振付師フリガナのデバッグ
+  mappedSemifinalsInfoList?.forEach((item, index) => {
+    console.log(`[SEMIFINALS DEBUG] アイテム${index + 1}:`)
+    console.log(`  - choreographer_name: "${item.choreographer_name || 'null'}"`)
+    console.log(`  - choreographer_furigana: "${item.choreographer_furigana || 'null'}"`)
+    console.log(`  - choreographer2_name: "${item.choreographer2_name || 'null'}"`)
+    console.log(`  - choreographer2_furigana: "${item.choreographer2_furigana || 'null'}"`)
+  })
+  
   console.log('[SEMIFINALS DEBUG] マッピング後データ:', JSON.stringify(mappedSemifinalsInfoList, null, 2))
 
   // コード値を名称に変換する関数
