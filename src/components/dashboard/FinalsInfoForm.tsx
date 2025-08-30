@@ -274,14 +274,22 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     if (semifinalsData.chaser_song) {
       try {
         console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報を取得中')
+        console.log('[SYNC SOUND] 検索条件:', {
+          entry_id: entry.id,
+          purpose: 'chaser_song',
+          semifinals_chaser_song: semifinalsData.chaser_song
+        })
+        
         const { data: fileData, error: fileError } = await supabase
           .from('entry_files')
-          .select('file_name')
+          .select('file_name, purpose, file_path')
           .eq('entry_id', entry.id)
           .eq('purpose', 'chaser_song')
           .order('uploaded_at', { ascending: false })
           .limit(1)
           .maybeSingle()
+
+        console.log('[SYNC SOUND] チェイサー曲ファイル検索結果:', { fileData, fileError })
 
         if (fileError) {
           console.error('[SYNC SOUND] ファイル情報取得エラー:', fileError)
@@ -291,10 +299,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
             ...prev,
             chaser_song: { file_name: fileData.file_name }
           }))
+        } else {
+          console.log('[SYNC SOUND] チェイサー曲ファイルが見つかりません')
         }
       } catch (error) {
         console.error('[SYNC SOUND] ファイル情報取得失敗:', error)
       }
+    } else {
+      console.log('[SYNC SOUND] 準決勝にchaser_songデータがありません')
     }
   }
 
