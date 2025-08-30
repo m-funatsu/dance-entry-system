@@ -238,7 +238,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   const syncLightingData = async (semifinalsData: Partial<SemifinalsInfo>) => {
     // 手動同期時に既存の画像ファイルを削除
-    const imageFields = ['scene1_image', 'scene1_image_path', 'chaser_exit_image', 'chaser_exit_image_path']
+    const imageFields = [
+      'scene1_image', 'scene1_image_path',
+      'scene2_image', 'scene2_image_path', 
+      'scene3_image', 'scene3_image_path',
+      'scene4_image', 'scene4_image_path',
+      'scene5_image', 'scene5_image_path',
+      'chaser_exit_image', 'chaser_exit_image_path'
+    ]
     
     for (const field of imageFields) {
       if (finalsInfo[field as keyof FinalsInfo]) {
@@ -262,6 +269,34 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       scene1_image: semifinalsData.scene1_image || '',
       scene1_image_path: semifinalsData.scene1_image_path || '',
       scene1_notes: semifinalsData.scene1_notes || '',
+      scene2_time: semifinalsData.scene2_time || '',
+      scene2_trigger: semifinalsData.scene2_trigger || '',
+      scene2_color_type: semifinalsData.scene2_color_type || '',
+      scene2_color_other: semifinalsData.scene2_color_other || '',
+      scene2_image: semifinalsData.scene2_image || '',
+      scene2_image_path: semifinalsData.scene2_image_path || '',
+      scene2_notes: semifinalsData.scene2_notes || '',
+      scene3_time: semifinalsData.scene3_time || '',
+      scene3_trigger: semifinalsData.scene3_trigger || '',
+      scene3_color_type: semifinalsData.scene3_color_type || '',
+      scene3_color_other: semifinalsData.scene3_color_other || '',
+      scene3_image: semifinalsData.scene3_image || '',
+      scene3_image_path: semifinalsData.scene3_image_path || '',
+      scene3_notes: semifinalsData.scene3_notes || '',
+      scene4_time: semifinalsData.scene4_time || '',
+      scene4_trigger: semifinalsData.scene4_trigger || '',
+      scene4_color_type: semifinalsData.scene4_color_type || '',
+      scene4_color_other: semifinalsData.scene4_color_other || '',
+      scene4_image: semifinalsData.scene4_image || '',
+      scene4_image_path: semifinalsData.scene4_image_path || '',
+      scene4_notes: semifinalsData.scene4_notes || '',
+      scene5_time: semifinalsData.scene5_time || '',
+      scene5_trigger: semifinalsData.scene5_trigger || '',
+      scene5_color_type: semifinalsData.scene5_color_type || '',
+      scene5_color_other: semifinalsData.scene5_color_other || '',
+      scene5_image: semifinalsData.scene5_image || '',
+      scene5_image_path: semifinalsData.scene5_image_path || '',
+      scene5_notes: semifinalsData.scene5_notes || '',
       chaser_exit_time: semifinalsData.chaser_exit_time || '',
       chaser_exit_trigger: semifinalsData.chaser_exit_trigger || '',
       chaser_exit_color_type: semifinalsData.chaser_exit_color_type || '',
