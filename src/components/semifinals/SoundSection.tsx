@@ -155,19 +155,22 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)
             }}
-            onDelete={(() => {
+            onDelete={() => {
+              console.log('[SOUND SECTION] AudioUpload削除ボタンがクリックされました')
               const chaserUrl = semifinalsInfo.chaser_song || ''
-              // 決勝ファイルの場合は削除機能を無効化
-              if (chaserUrl.includes('/finals/')) {
-                return undefined // 削除ボタンを無効化
-              }
-              return () => {
-                console.log('[SOUND SECTION] Deleting chaser_song')
+              console.log('[SOUND SECTION] 現在のchaser_song URL:', chaserUrl)
+              console.log('[SOUND SECTION] 決勝ファイル判定:', chaserUrl.includes('/finals/'))
+              
+              // 決勝ファイルは削除しない
+              if (!chaserUrl.includes('/finals/')) {
+                console.log('[SOUND SECTION] 準決勝ファイルのため削除実行')
                 if (onFileDelete) {
                   onFileDelete('chaser_song')
                 }
+              } else {
+                console.log('[SOUND SECTION] 決勝ファイルのため削除をスキップ')
               }
-            })()}
+            }}
             disabled={!isEditable}
             required
             accept=".wav,.mp3,.m4a"
