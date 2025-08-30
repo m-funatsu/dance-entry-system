@@ -636,10 +636,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   const handleFileDelete = async (field: string) => {
     try {
-      console.log('[DELETE] === 削除処理開始 ===')
+      console.log('[DELETE] === 画像削除ボタンが押されました ===')
       console.log('[DELETE] 削除対象フィールド:', field)
       console.log('[DELETE] 現在のfinalsInfo:', finalsInfo)
       console.log('[DELETE] フィールドの現在値:', finalsInfo[field as keyof typeof finalsInfo])
+      console.log('[DELETE] この削除処理は UI上でのクリアのみ - 保存ボタンを押してデータベースに反映する必要があります')
       
       // URLからファイルパスを抽出する関数（セキュリティチェック付き）
       const extractFilePathFromUrl = (urlOrPath: string): string | null => {
@@ -761,7 +762,10 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         })
       }
 
-      console.log('[DELETE] File deleted successfully')
+      console.log('[DELETE] === 削除処理完了 ===')
+      console.log('[DELETE] UI状態更新完了 - フィールド:', field)
+      console.log('[DELETE] 更新後のfinalsInfo[field]:', finalsInfo[field])
+      console.log('[DELETE] 注意: この変更をデータベースに保存するには保存ボタンを押してください')
     } catch (err) {
       console.error('[DELETE] File deletion error:', err)
     }
