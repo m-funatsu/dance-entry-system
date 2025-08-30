@@ -379,14 +379,14 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
             user_id: userId,
             participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
             status: 'pending',
-            // 各ステータスフィールドにデフォルト値を設定（チェック制約に合わせて「入力中」に統一）
+            // 各ステータスフィールドにデフォルト値を設定
             basic_info_status: '入力中',
-            preliminary_info_status: '入力中',
-            semifinals_info_status: '入力中',
-            finals_info_status: '入力中',
-            program_info_status: '入力中',
-            sns_info_status: '入力中',
-            applications_info_status: '入力中'
+            preliminary_info_status: '未登録',
+            semifinals_info_status: '未登録',
+            finals_info_status: '未登録',
+            program_info_status: '未登録',
+            sns_info_status: '未登録',
+            applications_info_status: '申請なし'
           })
           .select()
           .maybeSingle()
@@ -887,14 +887,14 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                         user_id: userId,
                         participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
                         status: 'pending',
-                        // ステータスフィールドのデフォルト値を設定（チェック制約に合わせて「入力中」に統一）
+                        // ステータスフィールドのデフォルト値を設定
                         basic_info_status: '入力中',
-                        preliminary_info_status: '入力中',
-                        semifinals_info_status: '入力中',
-                        finals_info_status: '入力中',
-                        program_info_status: '入力中',
-                        sns_info_status: '入力中',
-                        applications_info_status: '入力中'
+                        preliminary_info_status: '未登録',
+                        semifinals_info_status: '未登録',
+                        finals_info_status: '未登録',
+                        program_info_status: '未登録',
+                        sns_info_status: '未登録',
+                        applications_info_status: '申請なし'
                       })
                       .select()
                       .maybeSingle()
