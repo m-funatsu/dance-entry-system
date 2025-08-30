@@ -400,6 +400,16 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       console.log('[SEMIFINALS DELETE] === ファイル削除開始 ===')
       console.log('[SEMIFINALS DELETE] 削除対象フィールド:', field)
       
+      const currentValue = semifinalsInfo[field as keyof SemifinalsInfo] as string
+      console.log('[SEMIFINALS DELETE] 現在の値:', currentValue)
+      
+      // 決勝のファイル（/finals/パス）は削除しない
+      if (currentValue && currentValue.includes('/finals/')) {
+        console.log('[SEMIFINALS DELETE] 決勝ファイルのため削除をスキップ')
+        setError('決勝のファイルは準決勝フォームから削除できません')
+        return
+      }
+      
       // 削除前に現在のデータを保存
       console.log('[SEMIFINALS DELETE] 削除前にデータを保存中...')
       await handleSave(true) // 一時保存
