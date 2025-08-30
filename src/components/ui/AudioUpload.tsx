@@ -129,7 +129,19 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
             </svg>
             <p className="text-sm font-medium text-green-700">アップロード済み</p>
             <p className="text-xs text-gray-600 mt-1">
-              {displayName || (typeof value === 'string' && value.includes('http') ? 'ファイル名取得中...' : (typeof value === 'string' ? value : value?.name || 'ファイル名不明'))}
+              {displayName || (() => {
+                if (typeof value === 'string' && value.includes('http')) {
+                  // URLからファイル名を抽出
+                  const fileName = value.split('/').pop()?.split('?')[0] || ''
+                  if (fileName && fileName.includes('.')) {
+                    // タイムスタンプを除去して元のファイル名に近づける
+                    const cleanFileName = fileName.replace(/_\d+\./, '.')
+                    return cleanFileName !== fileName ? cleanFileName : fileName
+                  }
+                  return 'ファイル名取得中...'
+                }
+                return typeof value === 'string' ? value : value?.name || 'ファイル名不明'
+              })()}
             </p>
             {uploadingFile && (
               <p className="text-xs text-gray-500 mt-1">
