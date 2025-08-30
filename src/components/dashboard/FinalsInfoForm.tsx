@@ -505,25 +505,24 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     } else if (option === 'different') {
       console.log('[LIGHTING OPTION] 異なる照明指示選択 - フィールドをクリア開始')
       // 異なる照明指示の場合はフィールドをクリア
-      const clearedData: Partial<FinalsInfo> = {
+      const clearedData: Record<string, string | boolean> = {
         lighting_change_from_semifinals: true,
         dance_start_timing: ''
       }
       
       // シーン1-5とチェイサー情報をクリア
-      const clearValue = '' as string | undefined
       for (let i = 1; i <= 5; i++) {
-        clearedData[`scene${i}_time` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_image` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = clearValue
-        clearedData[`scene${i}_notes` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_time`] = ''
+        clearedData[`scene${i}_trigger`] = ''
+        clearedData[`scene${i}_color_type`] = ''
+        clearedData[`scene${i}_color_other`] = ''
+        clearedData[`scene${i}_image`] = ''
+        clearedData[`scene${i}_image_path`] = ''
+        clearedData[`scene${i}_notes`] = ''
       }
       
-      clearedData.chaser_exit_time = clearValue
-      clearedData.chaser_exit_trigger = clearValue
+      clearedData.chaser_exit_time = ''
+      clearedData.chaser_exit_trigger = ''
       clearedData.chaser_exit_color_type = ''
       clearedData.chaser_exit_color_other = ''
       clearedData.chaser_exit_image = ''
