@@ -829,14 +829,29 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              チェイサー（退場）曲
+              チェイサー（退場）曲音源
             </label>
             <input
-              type="text"
-              value={semifinalsInfo.chaser_song || ''}
-              onChange={(e) => setSemifinalsInfo(prev => ({ ...prev, chaser_song: e.target.value }))}
+              type="file"
+              accept="audio/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleFileUpload('chaser_song', file)
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
+            {semifinalsInfo.chaser_song && (
+              <div className="mt-2 flex items-center justify-between bg-gray-50 p-2 rounded">
+                <span className="text-sm text-gray-600">アップロード済み</span>
+                <button
+                  type="button"
+                  onClick={() => handleFileDelete('chaser_song')}
+                  className="text-red-600 hover:text-red-800 text-sm underline"
+                >
+                  削除
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
