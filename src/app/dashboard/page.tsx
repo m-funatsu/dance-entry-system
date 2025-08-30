@@ -17,9 +17,12 @@ import FilePreview from '@/components/FilePreview'
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
+  console.log('💥💥💥 DASHBOARD PAGE START 💥💥💥')
+  
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
+  console.log('💥 DASHBOARD: user.id:', user?.id)
   
   if (!user) {
     redirect('/auth/login')
@@ -42,14 +45,19 @@ export default async function DashboardPage() {
   try {
 
   // エントリー情報の取得（最新のエントリー）
-  const { data: entries } = await supabase
+  console.log('💥 DASHBOARD: エントリー情報取得開始')
+  const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
 
+  console.log('💥 DASHBOARD: エントリー取得結果:', entries)
+  console.log('💥 DASHBOARD: エントリー取得エラー:', entriesError)
+
   const entry = entries && entries.length > 0 ? entries[0] : null
+  console.log('💥 DASHBOARD: 使用するentry:', entry?.id)
 
   // 基本情報の取得
   let basicInfo = null
