@@ -49,18 +49,6 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
             <input
               type="radio"
               name="choreographer_change_option"
-              value="same"
-              checked={choreographerChangeOption === 'same'}
-              onChange={() => onChoreographerChangeOption('same')}
-              disabled={!isEditable}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            準決勝と同じ振付師
-          </label>
-          <label className="flex items-center text-gray-900">
-            <input
-              type="radio"
-              name="choreographer_change_option"
               value="different"
               checked={choreographerChangeOption === 'different'}
               onChange={() => onChoreographerChangeOption('different')}
@@ -68,6 +56,18 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝とは異なる振付師
+          </label>
+          <label className="flex items-center text-gray-900">
+            <input
+              type="radio"
+              name="choreographer_change_option"
+              value="same"
+              checked={choreographerChangeOption === 'same'}
+              onChange={() => onChoreographerChangeOption('same')}
+              disabled={!isEditable}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            準決勝と同じ振付師
           </label>
         </div>
       </div>

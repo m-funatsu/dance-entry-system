@@ -54,18 +54,6 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
             <input
               type="radio"
               name="music_change_option"
-              value="unchanged"
-              checked={musicChangeOption === 'unchanged'}
-              onChange={() => onMusicChangeOption('unchanged')}
-              disabled={!isEditable}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            準決勝から変更なし
-          </label>
-          <label className="flex items-center text-gray-900">
-            <input
-              type="radio"
-              name="music_change_option"
               value="changed"
               checked={musicChangeOption === 'changed'}
               onChange={() => onMusicChangeOption('changed')}
@@ -73,6 +61,18 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝から変更あり
+          </label>
+          <label className="flex items-center text-gray-900">
+            <input
+              type="radio"
+              name="music_change_option"
+              value="unchanged"
+              checked={musicChangeOption === 'unchanged'}
+              onChange={() => onMusicChangeOption('unchanged')}
+              disabled={!isEditable}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            準決勝から変更なし
           </label>
         </div>
       </div>

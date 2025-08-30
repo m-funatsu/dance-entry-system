@@ -49,22 +49,6 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             <input
               type="radio"
               name="lighting_change_option"
-              value="same"
-              checked={lightingChangeOption === 'same'}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  onLightingChangeOption('same')
-                }
-              }}
-              disabled={!isEditable}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            準決勝と同じ照明指示
-          </label>
-          <label className="flex items-center text-gray-900">
-            <input
-              type="radio"
-              name="lighting_change_option"
               value="different"
               checked={lightingChangeOption === 'different'}
               onChange={(e) => {
@@ -76,6 +60,22 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と異なる照明指示
+          </label>
+          <label className="flex items-center text-gray-900">
+            <input
+              type="radio"
+              name="lighting_change_option"
+              value="same"
+              checked={lightingChangeOption === 'same'}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onLightingChangeOption('same')
+                }
+              }}
+              disabled={!isEditable}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            準決勝と同じ照明指示
           </label>
         </div>
       </div>

@@ -55,18 +55,6 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             <input
               type="radio"
               name="sound_change_option"
-              value="same"
-              checked={soundChangeOption === 'same'}
-              onChange={() => onSoundChangeOption('same')}
-              disabled={!isEditable}
-              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-            />
-            準決勝と同じ音響指示
-          </label>
-          <label className="flex items-center text-gray-900">
-            <input
-              type="radio"
-              name="sound_change_option"
               value="different"
               checked={soundChangeOption === 'different'}
               onChange={() => onSoundChangeOption('different')}
@@ -74,6 +62,18 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
             準決勝と異なる音響指示
+          </label>
+          <label className="flex items-center text-gray-900">
+            <input
+              type="radio"
+              name="sound_change_option"
+              value="same"
+              checked={soundChangeOption === 'same'}
+              onChange={() => onSoundChangeOption('same')}
+              disabled={!isEditable}
+              className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+            />
+            準決勝と同じ音響指示
           </label>
         </div>
       </div>

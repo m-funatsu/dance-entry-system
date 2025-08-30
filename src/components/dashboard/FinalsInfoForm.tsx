@@ -34,18 +34,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   }, [])
   
   // オプション管理のステート（デフォルト値設定）
-  const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('unchanged')
-  const [soundChangeOption, setSoundChangeOption] = useState<'same' | 'different' | ''>('same')
-  const [lightingChangeOption, setLightingChangeOption] = useState<'same' | 'different' | ''>('same')
-  const [choreographerChangeOption, setChoreographerChangeOption] = useState<'same' | 'different' | ''>('same')
+  const [musicChangeOption, setMusicChangeOption] = useState<'changed' | 'unchanged' | ''>('changed')
+  const [soundChangeOption, setSoundChangeOption] = useState<'same' | 'different' | ''>('different')
+  const [lightingChangeOption, setLightingChangeOption] = useState<'same' | 'different' | ''>('different')
+  const [choreographerChangeOption, setChoreographerChangeOption] = useState<'same' | 'different' | ''>('different')
   
   const [finalsInfo, setFinalsInfo] = useState<Partial<FinalsInfo>>({
     entry_id: entry.id,
-    music_change: false, // デフォルト: 準決勝から変更なし
+    music_change: true, // デフォルト: 準決勝から変更あり
     copyright_permission: '',
-    sound_change_from_semifinals: false, // デフォルト: 準決勝と同じ音響指示
-    lighting_change_from_semifinals: false, // デフォルト: 準決勝と同じ照明指示
-    choreographer_change: false, // デフォルト: 準決勝と同じ振付師
+    sound_change_from_semifinals: true, // デフォルト: 準決勝と異なる音響指示
+    lighting_change_from_semifinals: true, // デフォルト: 準決勝と異なる照明指示
+    choreographer_change: true, // デフォルト: 準決勝とは異なる振付師
     choreographer_attendance: '',
     choreographer_photo_permission: ''
   })
