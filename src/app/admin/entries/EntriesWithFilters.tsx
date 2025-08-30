@@ -21,6 +21,7 @@ interface EntryWithDetails {
   program_info_status?: string
   sns_info_status?: string
   applications_info_status?: string
+  consent_form_submitted?: boolean
   created_at: string
   updated_at: string
   users: {
@@ -64,16 +65,17 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const [formFilter, setFormFilter] = useState<string>('')
 
 
-  // 特定のフォームが提出済みかチェック（従来の方式、将来的にステータスフィールド対応予定）
+  // DBのステータスフィールドを使用してフォーム提出状況をチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
     switch(formType) {
-      case 'basic': return entry.basic_info && (Array.isArray(entry.basic_info) ? entry.basic_info.length > 0 : !!entry.basic_info)
-      case 'preliminary': return entry.preliminary_info && (Array.isArray(entry.preliminary_info) ? entry.preliminary_info.length > 0 : !!entry.preliminary_info)
-      case 'program': return entry.program_info && (Array.isArray(entry.program_info) ? entry.program_info.length > 0 : !!entry.program_info)
-      case 'semifinals': return entry.semifinals_info && (Array.isArray(entry.semifinals_info) ? entry.semifinals_info.length > 0 : !!entry.semifinals_info)
-      case 'finals': return entry.finals_info && (Array.isArray(entry.finals_info) ? entry.finals_info.length > 0 : !!entry.finals_info)
-      case 'applications': return entry.applications_info && (Array.isArray(entry.applications_info) ? entry.applications_info.length > 0 : !!entry.applications_info)
-      case 'sns': return entry.sns_info && (Array.isArray(entry.sns_info) ? entry.sns_info.length > 0 : !!entry.sns_info)
+      case 'basic': return entry.basic_info_status === 'submitted'
+      case 'preliminary': return entry.preliminary_info_status === 'submitted'
+      case 'program': return entry.program_info_status === 'submitted'
+      case 'semifinals': return entry.semifinals_info_status === 'submitted'
+      case 'finals': return entry.finals_info_status === 'submitted'
+      case 'applications': return entry.applications_info_status === 'submitted'
+      case 'sns': return entry.sns_info_status === 'submitted'
+      case 'consent': return entry.consent_form_submitted === true
       default: return true
     }
   }
@@ -198,7 +200,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               </select>
             </div>
             <div className="flex flex-col space-y-1">
-              <label className="text-xs font-medium text-gray-700">フォーム提出状況</label>
+              <label className="text-xs font-medium text-gray-700">提出ステータス</label>
               <select 
                 className="rounded-md border-gray-300 text-sm cursor-pointer"
                 value={formFilter}
@@ -213,6 +215,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                   <option value="has_finals">決勝情報あり</option>
                   <option value="has_applications">申請情報あり</option>
                   <option value="has_sns">SNS情報あり</option>
+                  <option value="has_consent">参加同意書あり</option>
                 </optgroup>
                 <optgroup label="未提出">
                   <option value="no_basic">基本情報なし</option>
@@ -222,6 +225,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
                   <option value="no_finals">決勝情報なし</option>
                   <option value="no_applications">申請情報なし</option>
                   <option value="no_sns">SNS情報なし</option>
+                  <option value="no_consent">参加同意書なし</option>
                 </optgroup>
               </select>
             </div>
