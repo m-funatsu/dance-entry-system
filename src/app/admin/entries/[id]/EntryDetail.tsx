@@ -1338,7 +1338,16 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                             <p className="text-xs text-gray-500 text-center mt-2">
                               プログラム掲載用振付師写真
                             </p>
-                            <div className="text-center mt-3">
+                            <div className="flex items-center justify-center space-x-2 mt-3">
+                              <button
+                                onClick={() => mediaUrls.choreographer_photo_path && window.open(mediaUrls.choreographer_photo_path, '_blank')}
+                                className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              >
+                                <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                                プレビュー
+                              </button>
                               <a
                                 href={mediaUrls.choreographer_photo_path}
                                 download="振付師写真.jpg"
@@ -1372,16 +1381,30 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               {finalsMusicFile && (
                                 <p className="text-xs text-gray-600">ファイル: {finalsMusicFile.file_name}</p>
                               )}
-                              <a
-                                href={mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url}
-                                download={finalsMusicFile?.file_name || '決勝_楽曲.mp3'}
-                                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                              >
-                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                </svg>
-                                ダウンロード
-                              </a>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => {
+                                    const url = mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url;
+                                    if (url) window.open(url, '_blank');
+                                  }}
+                                  className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                  </svg>
+                                  プレビュー
+                                </button>
+                                <a
+                                  href={mediaUrls.finals_music_data_path || finalsMusicFile?.signed_url}
+                                  download={finalsMusicFile?.file_name || '決勝_楽曲.mp3'}
+                                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                  <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                  </svg>
+                                  ダウンロード
+                                </a>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1400,8 +1423,21 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                               {finalsChaserFile && (
                                 <p className="text-xs text-gray-600">ファイル: {finalsChaserFile.file_name}</p>
                               )}
-                              <a
-                                href={mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url}
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => {
+                                    const url = mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url;
+                                    if (url) window.open(url, '_blank');
+                                  }}
+                                  className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                  </svg>
+                                  プレビュー
+                                </button>
+                                <a
+                                  href={mediaUrls.finals_chaser_song || finalsChaserFile?.signed_url}
                                 download={finalsChaserFile?.file_name || '決勝_チェイサー.mp3'}
                                 className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                               >
@@ -1410,6 +1446,7 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                                 </svg>
                                 ダウンロード
                               </a>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1562,7 +1599,19 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                                 <p className="mt-1 text-xs text-gray-600 text-center">
                                   {index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}
                                 </p>
-                                <div className="text-center mt-2">
+                                <div className="flex items-center justify-center space-x-2 mt-2">
+                                  <button
+                                    onClick={() => {
+                                      const url = mediaUrls[key];
+                                      if (url) window.open(url, '_blank');
+                                    }}
+                                    className="inline-flex items-center px-2 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100"
+                                  >
+                                    <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                    表示
+                                  </button>
                                   <a
                                     href={mediaUrls[key]}
                                     download={`${key.includes('finals') ? '決勝' : '準決勝'}_${index === 5 ? 'チェイサー退場' : `シーン${index + 1}`}.jpg`}
