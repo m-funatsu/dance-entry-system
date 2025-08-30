@@ -496,6 +496,14 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
         }))
       }
 
+      // ステータスを再計算・更新
+      const updatedData = { ...applicationsInfo }
+      if (paymentSlipFiles.length === 1) {
+        updatedData.payment_slip_path = ''
+      }
+      const isComplete = checkApplicationsInfoCompletion(updatedData)
+      await updateFormStatus('applications_info', entry.id, isComplete, true)
+
       setSuccess('払込用紙を削除しました')
     } catch (err) {
       console.error('ファイル削除エラー:', err)
@@ -627,6 +635,11 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
           setMakeupStyle2Url('')
         }
       }
+
+      // ステータスを再計算・更新
+      const updatedData = { ...applicationsInfo }
+      const isComplete = checkApplicationsInfoCompletion(updatedData)
+      await updateFormStatus('applications_info', entry.id, isComplete, true)
 
       setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像を削除しました`)
     } catch (err) {
@@ -963,12 +976,19 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   }))
                 } else {
                   console.log('[MAKEUP DEBUG] 申請者をクリア')
-                  setApplicationsInfo(prev => ({
-                    ...prev,
+                  const updatedInfo = {
+                    ...applicationsInfo,
                     makeup_name: '',
                     makeup_email: '',
                     makeup_phone: ''
-                  }))
+                  }
+                  setApplicationsInfo(updatedInfo)
+                  
+                  // ステータスを再計算・更新
+                  const isComplete = checkApplicationsInfoCompletion(updatedInfo)
+                  updateFormStatus('applications_info', entry.id, isComplete, true).catch(err => {
+                    console.error('メイク申請クリア後のステータス更新エラー:', err)
+                  })
                 }
               }}
               disabled={!isEditable}
@@ -1186,10 +1206,17 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     }))
                   } else {
                     console.log('[MAKEUP DEBUG] 決勝申請者をクリア')
-                    setApplicationsInfo(prev => ({
-                      ...prev,
+                    const updatedInfo = {
+                      ...applicationsInfo,
                       makeup_name_final: ''
-                    }))
+                    }
+                    setApplicationsInfo(updatedInfo)
+                    
+                    // ステータスを再計算・更新
+                    const isComplete = checkApplicationsInfoCompletion(updatedInfo)
+                    updateFormStatus('applications_info', entry.id, isComplete, true).catch(err => {
+                      console.error('決勝メイク申請クリア後のステータス更新エラー:', err)
+                    })
                   }
                 }}
                 disabled={!isEditable}
