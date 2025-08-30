@@ -412,13 +412,21 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       
       // 削除前に現在のデータを保存
       console.log('[SEMIFINALS DELETE] 削除前にデータを保存中...')
+      console.log('[SEMIFINALS DELETE] 保存前のsemifinalsInfo:', semifinalsInfo)
+      
       await handleSave(true) // 一時保存
+      console.log('[SEMIFINALS DELETE] 一時保存完了')
       
       // UIからファイルをクリア
-      setSemifinalsInfo(prev => ({
-        ...prev,
-        [field]: ''
-      }))
+      console.log('[SEMIFINALS DELETE] UIからファイルをクリア中...')
+      setSemifinalsInfo(prev => {
+        const updated = {
+          ...prev,
+          [field]: ''
+        }
+        console.log('[SEMIFINALS DELETE] 更新後のsemifinalsInfo:', updated)
+        return updated
+      })
       
       console.log('[SEMIFINALS DELETE] ファイル削除完了')
     } catch (err) {
@@ -845,7 +853,11 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                 <span className="text-sm text-gray-600">アップロード済み</span>
                 <button
                   type="button"
-                  onClick={() => handleFileDelete('chaser_song')}
+                  onClick={() => {
+                    console.log('[CHASER DELETE BUTTON] チェイサー曲削除ボタンがクリックされました')
+                    console.log('[CHASER DELETE BUTTON] 現在のchaser_song値:', semifinalsInfo.chaser_song)
+                    handleFileDelete('chaser_song')
+                  }}
                   className="text-red-600 hover:text-red-800 text-sm underline"
                 >
                   削除
