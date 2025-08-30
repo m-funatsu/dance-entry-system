@@ -60,32 +60,50 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
           onChange={(e) => {
             if (e.target.value === 'included') {
               onChange({ chaser_song_designation: 'included', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除
+              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
-                console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - チェイサー音源を削除')
-                if (onFileDelete) {
-                  onFileDelete('chaser_song')
+                const chaserUrl = semifinalsInfo.chaser_song || ''
+                // 決勝ファイルは削除しない
+                if (!chaserUrl.includes('/finals/')) {
+                  console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - チェイサー音源を削除')
+                  if (onFileDelete) {
+                    onFileDelete('chaser_song')
+                  }
+                } else {
+                  console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
                 }
               }
             } else if (e.target.value === 'required') {
               onChange({ chaser_song_designation: 'required' })
             } else if (e.target.value === 'not_required') {
               onChange({ chaser_song_designation: 'not_required', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除
+              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
-                console.log('[CHASER CHANGE] 「不要（無音）」選択 - チェイサー音源を削除')
-                if (onFileDelete) {
-                  onFileDelete('chaser_song')
+                const chaserUrl = semifinalsInfo.chaser_song || ''
+                // 決勝ファイルは削除しない
+                if (!chaserUrl.includes('/finals/')) {
+                  console.log('[CHASER CHANGE] 「不要（無音）」選択 - チェイサー音源を削除')
+                  if (onFileDelete) {
+                    onFileDelete('chaser_song')
+                  }
+                } else {
+                  console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
                 }
               }
             } else if (e.target.value === '') {
               // 「選択してください」に戻す場合はリセット
               onChange({ chaser_song_designation: '', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除
+              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
-                console.log('[CHASER CHANGE] 「選択してください」選択 - チェイサー音源を削除')
-                if (onFileDelete) {
-                  onFileDelete('chaser_song')
+                const chaserUrl = semifinalsInfo.chaser_song || ''
+                // 決勝ファイルは削除しない
+                if (!chaserUrl.includes('/finals/')) {
+                  console.log('[CHASER CHANGE] 「選択してください」選択 - チェイサー音源を削除')
+                  if (onFileDelete) {
+                    onFileDelete('chaser_song')
+                  }
+                } else {
+                  console.log('[CHASER CHANGE] 決勝ファイルのため削除をスキップ')
                 }
               }
             }
@@ -139,8 +157,14 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
             }}
             onDelete={() => {
               console.log('[SOUND SECTION] Deleting chaser_song')
-              if (onFileDelete) {
-                onFileDelete('chaser_song')
+              const chaserUrl = semifinalsInfo.chaser_song || ''
+              // 決勝ファイルは削除しない
+              if (!chaserUrl.includes('/finals/')) {
+                if (onFileDelete) {
+                  onFileDelete('chaser_song')
+                }
+              } else {
+                console.log('[SOUND SECTION] 決勝ファイルのため削除をスキップ')
               }
             }}
             disabled={!isEditable}
