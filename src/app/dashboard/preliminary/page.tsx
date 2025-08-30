@@ -4,7 +4,6 @@ import PreliminaryForm from './PreliminaryForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { BackButton } from '@/components/dashboard/BackButton'
 import { isFormEditable, getDeadlineInfo } from '@/lib/deadline-check'
-import Link from 'next/link'
 
 // 動的レンダリングを強制（編集時の確実なデータ再取得のため）
 export const dynamic = 'force-dynamic'
@@ -56,14 +55,6 @@ export default async function PreliminaryPage() {
             <p className="text-gray-600">
               エントリー情報が見つかりません。先に基本情報を登録してください。
             </p>
-            <div className="mt-4">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                ダッシュボードに戻る
-              </Link>
-            </div>
           </div>
         </main>
       </div>

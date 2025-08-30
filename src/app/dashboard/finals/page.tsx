@@ -53,7 +53,7 @@ export default async function FinalsPage() {
         <main className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="bg-white shadow sm:rounded-lg p-6">
             <p className="text-gray-600">
-              エントリー情報が見つかりません。まず基本情報を登録してください。
+              エントリー情報が見つかりません。先に基本情報を登録してください。
             </p>
           </div>
         </main>
