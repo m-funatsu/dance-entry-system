@@ -119,20 +119,29 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           if (data.chaser_song) {
             console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
             try {
-              const { data: fileData } = await supabase
+              // まず、このエントリーの全音声ファイルを確認
+              const { data: allFiles } = await supabase
                 .from('entry_files')
-                .select('file_name')
+                .select('file_name, purpose, file_path, file_type')
                 .eq('entry_id', entry.id)
-                .eq('purpose', 'chaser_song')
-                .order('uploaded_at', { ascending: false })
-                .limit(1)
-                .maybeSingle()
+                .eq('file_type', 'audio')
 
-              if (fileData) {
-                console.log('[OPTION RESTORE] チェイサー曲ファイル名取得:', fileData.file_name)
+              console.log('[OPTION RESTORE] 全音声ファイル:', allFiles)
+              
+              // chaser_songに関連するファイルを検索
+              const chaserFile = allFiles?.find(file => 
+                file.purpose === 'chaser_song' || 
+                file.file_path?.includes('chaser_song') ||
+                file.purpose?.includes('chaser')
+              )
+
+              console.log('[OPTION RESTORE] チェイサー曲ファイル検索結果:', chaserFile)
+
+              if (chaserFile) {
+                console.log('[OPTION RESTORE] チェイサー曲ファイル名取得:', chaserFile.file_name)
                 setAudioFiles(prev => ({
                   ...prev,
-                  chaser_song: { file_name: fileData.file_name }
+                  chaser_song: { file_name: chaserFile.file_name }
                 }))
               } else {
                 console.log('[OPTION RESTORE] チェイサー曲ファイル情報なし')
@@ -301,30 +310,29 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     if (semifinalsData.chaser_song) {
       try {
         console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報を取得中')
-        console.log('[SYNC SOUND] 検索条件:', {
-          entry_id: entry.id,
-          purpose: 'chaser_song',
-          semifinals_chaser_song: semifinalsData.chaser_song
-        })
-        
-        const { data: fileData, error: fileError } = await supabase
+        // まず、このエントリーの全音声ファイルを確認
+        const { data: allFiles } = await supabase
           .from('entry_files')
-          .select('file_name, purpose, file_path')
+          .select('file_name, purpose, file_path, file_type')
           .eq('entry_id', entry.id)
-          .eq('purpose', 'chaser_song')
-          .order('uploaded_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
+          .eq('file_type', 'audio')
 
-        console.log('[SYNC SOUND] チェイサー曲ファイル検索結果:', { fileData, fileError })
+        console.log('[SYNC SOUND] 全音声ファイル:', allFiles)
+        
+        // chaser_songに関連するファイルを検索
+        const chaserFile = allFiles?.find(file => 
+          file.purpose === 'chaser_song' || 
+          file.file_path?.includes('chaser_song') ||
+          file.purpose?.includes('chaser')
+        )
 
-        if (fileError) {
-          console.error('[SYNC SOUND] ファイル情報取得エラー:', fileError)
-        } else if (fileData) {
-          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル名:', fileData.file_name)
+        console.log('[SYNC SOUND] チェイサー曲ファイル検索結果:', chaserFile)
+
+        if (chaserFile) {
+          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル名:', chaserFile.file_name)
           setAudioFiles(prev => ({
             ...prev,
-            chaser_song: { file_name: fileData.file_name }
+            chaser_song: { file_name: chaserFile.file_name }
           }))
         } else {
           console.log('[SYNC SOUND] チェイサー曲ファイルが見つかりません')
