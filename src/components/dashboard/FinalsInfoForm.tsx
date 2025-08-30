@@ -119,32 +119,28 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           if (data.chaser_song) {
             console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
             try {
-              // まず、このエントリーの全音声ファイルを確認
-              const { data: allFiles } = await supabase
-                .from('entry_files')
-                .select('file_name, purpose, file_path, file_type')
-                .eq('entry_id', entry.id)
-                .eq('file_type', 'audio')
-
-              console.log('[OPTION RESTORE] 全音声ファイル:', allFiles)
+              // URLからファイル名を抽出する方法を試行
+              const chaserUrl = data.chaser_song
+              console.log('[OPTION RESTORE] チェイサー曲URL:', chaserUrl)
               
-              // chaser_songに関連するファイルを検索
-              const chaserFile = allFiles?.find(file => 
-                file.purpose === 'chaser_song' || 
-                file.file_path?.includes('chaser_song') ||
-                file.purpose?.includes('chaser')
-              )
-
-              console.log('[OPTION RESTORE] チェイサー曲ファイル検索結果:', chaserFile)
-
-              if (chaserFile) {
-                console.log('[OPTION RESTORE] チェイサー曲ファイル名取得:', chaserFile.file_name)
-                setAudioFiles(prev => ({
-                  ...prev,
-                  chaser_song: { file_name: chaserFile.file_name }
-                }))
+              // URLからファイル名を抽出
+              if (chaserUrl && typeof chaserUrl === 'string') {
+                const fileName = chaserUrl.split('/').pop()?.split('?')[0] || ''
+                const fileNameWithoutTimestamp = fileName.replace(/_\d+\./, '.') // timestamp部分を除去
+                console.log('[OPTION RESTORE] URL抽出ファイル名:', fileName, '→', fileNameWithoutTimestamp)
+                
+                // URLが有効で、ファイル名が抽出できた場合
+                if (fileName && fileName.includes('.')) {
+                  setAudioFiles(prev => ({
+                    ...prev,
+                    chaser_song: { file_name: fileNameWithoutTimestamp || fileName }
+                  }))
+                  console.log('[OPTION RESTORE] URLからファイル名を設定:', fileNameWithoutTimestamp || fileName)
+                } else {
+                  console.log('[OPTION RESTORE] ファイル名の抽出に失敗')
+                }
               } else {
-                console.log('[OPTION RESTORE] チェイサー曲ファイル情報なし')
+                console.log('[OPTION RESTORE] チェイサー曲URLが無効')
               }
             } catch (error) {
               console.error('[OPTION RESTORE] チェイサー曲ファイル名取得エラー:', error)
@@ -310,32 +306,27 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     if (semifinalsData.chaser_song) {
       try {
         console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報を取得中')
-        // まず、このエントリーの全音声ファイルを確認
-        const { data: allFiles } = await supabase
-          .from('entry_files')
-          .select('file_name, purpose, file_path, file_type')
-          .eq('entry_id', entry.id)
-          .eq('file_type', 'audio')
-
-        console.log('[SYNC SOUND] 全音声ファイル:', allFiles)
+        // URLからファイル名を抽出
+        const chaserUrl = semifinalsData.chaser_song
+        console.log('[SYNC SOUND] チェイサー曲URL:', chaserUrl)
         
-        // chaser_songに関連するファイルを検索
-        const chaserFile = allFiles?.find(file => 
-          file.purpose === 'chaser_song' || 
-          file.file_path?.includes('chaser_song') ||
-          file.purpose?.includes('chaser')
-        )
-
-        console.log('[SYNC SOUND] チェイサー曲ファイル検索結果:', chaserFile)
-
-        if (chaserFile) {
-          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル名:', chaserFile.file_name)
-          setAudioFiles(prev => ({
-            ...prev,
-            chaser_song: { file_name: chaserFile.file_name }
-          }))
+        if (chaserUrl && typeof chaserUrl === 'string') {
+          const fileName = chaserUrl.split('/').pop()?.split('?')[0] || ''
+          const fileNameWithoutTimestamp = fileName.replace(/_\d+\./, '.') // timestamp部分を除去
+          console.log('[SYNC SOUND] URL抽出ファイル名:', fileName, '→', fileNameWithoutTimestamp)
+          
+          // URLが有効で、ファイル名が抽出できた場合
+          if (fileName && fileName.includes('.')) {
+            setAudioFiles(prev => ({
+              ...prev,
+              chaser_song: { file_name: fileNameWithoutTimestamp || fileName }
+            }))
+            console.log('[SYNC SOUND] URLからファイル名を設定:', fileNameWithoutTimestamp || fileName)
+          } else {
+            console.log('[SYNC SOUND] ファイル名の抽出に失敗')
+          }
         } else {
-          console.log('[SYNC SOUND] チェイサー曲ファイルが見つかりません')
+          console.log('[SYNC SOUND] チェイサー曲URLが無効')
         }
       } catch (error) {
         console.error('[SYNC SOUND] ファイル情報取得失敗:', error)
