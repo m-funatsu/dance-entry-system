@@ -210,6 +210,33 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       music_data_path: semifinalsData.music_data_path || ''  // ここで準決勝のパスがコピーされる
     }))
     
+    // 準決勝の楽曲データファイル情報も取得してコピー
+    if (semifinalsData.music_data_path) {
+      try {
+        console.log('[SYNC MUSIC] 準決勝の楽曲ファイル情報を取得中')
+        const { data: fileData, error: fileError } = await supabase
+          .from('entry_files')
+          .select('file_name')
+          .eq('entry_id', entry.id)
+          .eq('purpose', 'music_data_path')
+          .order('uploaded_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (fileError) {
+          console.error('[SYNC MUSIC] ファイル情報取得エラー:', fileError)
+        } else if (fileData) {
+          console.log('[SYNC MUSIC] 準決勝楽曲ファイル名:', fileData.file_name)
+          setAudioFiles(prev => ({
+            ...prev,
+            music_data_path: { file_name: fileData.file_name }
+          }))
+        }
+      } catch (error) {
+        console.error('[SYNC MUSIC] ファイル情報取得失敗:', error)
+      }
+    }
+    
     console.log('[SYNC MUSIC] 決勝フォームにコピー完了 - music_data_path:', semifinalsData.music_data_path)
   }
 
@@ -242,6 +269,33 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       fade_out_start_time: semifinalsData.fade_out_start_time || '',
       fade_out_complete_time: semifinalsData.fade_out_complete_time || ''
     }))
+    
+    // 準決勝のチェイサー曲ファイル情報も取得してコピー
+    if (semifinalsData.chaser_song) {
+      try {
+        console.log('[SYNC SOUND] 準決勝のチェイサー曲ファイル情報を取得中')
+        const { data: fileData, error: fileError } = await supabase
+          .from('entry_files')
+          .select('file_name')
+          .eq('entry_id', entry.id)
+          .eq('purpose', 'chaser_song')
+          .order('uploaded_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (fileError) {
+          console.error('[SYNC SOUND] ファイル情報取得エラー:', fileError)
+        } else if (fileData) {
+          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル名:', fileData.file_name)
+          setAudioFiles(prev => ({
+            ...prev,
+            chaser_song: { file_name: fileData.file_name }
+          }))
+        }
+      } catch (error) {
+        console.error('[SYNC SOUND] ファイル情報取得失敗:', error)
+      }
+    }
   }
 
   const syncLightingData = async (semifinalsData: Partial<SemifinalsInfo>) => {
