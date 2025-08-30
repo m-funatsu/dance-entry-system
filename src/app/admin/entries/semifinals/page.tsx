@@ -406,7 +406,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose === 'music_data_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -421,7 +421,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('music_data')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose === 'music_data_path'
                         )) && (
                           <span className="text-xs text-gray-400">楽曲データなし</span>
                         )}
