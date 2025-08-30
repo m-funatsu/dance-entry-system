@@ -169,9 +169,11 @@ export default function ImageUpload({
                 </svg>
               </button>
             )}
-            <p className="mt-4 text-sm text-gray-600">
-              {!!isEditable ? '削除ボタンから削除できます' : '期限切れのため編集できません'}
-            </p>
+            {!!isEditable && (
+              <p className="mt-4 text-sm text-gray-600">
+                削除ボタンから削除できます
+              </p>
+            )}
           </div>
         ) : imageError ? (
           <div className="space-y-2 bg-red-50 border border-red-200 rounded-md p-4">
