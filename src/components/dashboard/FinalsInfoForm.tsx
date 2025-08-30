@@ -262,53 +262,31 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       music_data_path: semifinalsData.music_data_path || ''  // ここで準決勝のパスがコピーされる
     }))
     
-    // 準決勝の楽曲データファイル情報を決勝用として複製
+    // 準決勝の楽曲データファイル情報をaudioFilesに設定
     if (semifinalsData.music_data_path) {
       try {
-        console.log('[SYNC MUSIC] 準決勝の楽曲データを決勝用として複製中')
+        console.log('[SYNC MUSIC] 準決勝の楽曲データファイル名を取得中')
         
         // 準決勝のentry_filesから楽曲データ情報を取得
-        const { data: semifinalsFile } = await supabase
+        const { data: semifinalsFile, error: fileError } = await supabase
           .from('entry_files')
-          .select('*')
+          .select('file_name, purpose')
           .eq('entry_id', entry.id)
           .eq('purpose', 'music_data_path')
           .order('uploaded_at', { ascending: false })
           .limit(1)
           .maybeSingle()
 
+        console.log('[SYNC MUSIC] 楽曲ファイル検索結果:', {
+          semifinalsFile,
+          fileError,
+          hasFile: !!semifinalsFile
+        })
+
         if (semifinalsFile) {
-          console.log('[SYNC MUSIC] 準決勝楽曲ファイル情報:', semifinalsFile)
+          console.log('[SYNC MUSIC] 準決勝楽曲ファイル名:', semifinalsFile.file_name)
           
-          // 決勝用のentry_filesレコードを作成
-          const finalsFileData = {
-            entry_id: entry.id,
-            file_type: semifinalsFile.file_type,
-            file_name: semifinalsFile.file_name,
-            file_path: semifinalsFile.file_path,
-            purpose: 'finals_music_data_path',  // 決勝用purpose
-            uploaded_at: new Date().toISOString()
-          }
-          
-          // 既存の決勝楽曲データレコードを削除
-          await supabase
-            .from('entry_files')
-            .delete()
-            .eq('entry_id', entry.id)
-            .eq('purpose', 'finals_music_data_path')
-          
-          // 新しい決勝用レコードを挿入
-          const { error: insertError } = await supabase
-            .from('entry_files')
-            .insert(finalsFileData)
-          
-          if (insertError) {
-            console.error('[SYNC MUSIC] 決勝ファイルレコード作成エラー:', insertError)
-          } else {
-            console.log('[SYNC MUSIC] 決勝用ファイルレコード作成完了')
-          }
-          
-          // audioFiles状態を更新
+          // audioFiles状態を更新（正しいファイル名で）
           setAudioFiles(prev => ({
             ...prev,
             music_data_path: { file_name: semifinalsFile.file_name }
@@ -317,7 +295,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           console.log('[SYNC MUSIC] 準決勝の楽曲ファイル情報が見つかりません')
         }
       } catch (error) {
-        console.error('[SYNC MUSIC] ファイル複製処理エラー:', error)
+        console.error('[SYNC MUSIC] ファイル名取得エラー:', error)
       }
     }
     
@@ -381,37 +359,9 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         })
 
         if (semifinalsFile) {
-          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル情報:', semifinalsFile)
+          console.log('[SYNC SOUND] 準決勝チェイサー曲ファイル名:', semifinalsFile.file_name)
           
-          // 決勝用のentry_filesレコードを作成
-          const finalsFileData = {
-            entry_id: entry.id,
-            file_type: semifinalsFile.file_type,
-            file_name: semifinalsFile.file_name,
-            file_path: semifinalsFile.file_path,
-            purpose: 'finals_chaser_song',  // 決勝用purpose
-            uploaded_at: new Date().toISOString()
-          }
-          
-          // 既存の決勝チェイサー曲レコードを削除
-          await supabase
-            .from('entry_files')
-            .delete()
-            .eq('entry_id', entry.id)
-            .eq('purpose', 'finals_chaser_song')
-          
-          // 新しい決勝用レコードを挿入
-          const { error: insertError } = await supabase
-            .from('entry_files')
-            .insert(finalsFileData)
-          
-          if (insertError) {
-            console.error('[SYNC SOUND] 決勝ファイルレコード作成エラー:', insertError)
-          } else {
-            console.log('[SYNC SOUND] 決勝用ファイルレコード作成完了')
-          }
-          
-          // audioFiles状態を更新
+          // audioFiles状態を更新（正しいファイル名で）
           setAudioFiles(prev => ({
             ...prev,
             chaser_song: { file_name: semifinalsFile.file_name }
