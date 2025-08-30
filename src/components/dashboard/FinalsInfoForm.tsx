@@ -119,7 +119,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           if (data.chaser_song) {
             console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
             try {
-              const { data: fileData, error: fileError } = await supabase
+              const { data: fileData } = await supabase
                 .from('entry_files')
                 .select('file_name')
                 .eq('entry_id', entry.id)
