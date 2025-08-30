@@ -511,18 +511,19 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       }
       
       // シーン1-5とチェイサー情報をクリア
+      const clearValue = '' as string | undefined
       for (let i = 1; i <= 5; i++) {
-        clearedData[`scene${i}_time` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_image` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_notes` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_time` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_image` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = clearValue
+        clearedData[`scene${i}_notes` as keyof FinalsInfo] = clearValue
       }
       
-      clearedData.chaser_exit_time = undefined
-      clearedData.chaser_exit_trigger = undefined
+      clearedData.chaser_exit_time = clearValue
+      clearedData.chaser_exit_trigger = clearValue
       clearedData.chaser_exit_color_type = ''
       clearedData.chaser_exit_color_other = ''
       clearedData.chaser_exit_image = ''
