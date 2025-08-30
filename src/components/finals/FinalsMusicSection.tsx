@@ -78,7 +78,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       </div>
 
       <FormField
-        label="作品タイトル"
+        label="作品タイトル *"
         name="work_title"
         value={finalsInfo.work_title || ''}
         onChange={(e) => onChange({ work_title: e.target.value })}
@@ -87,7 +87,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       />
 
       <FormField
-        label="作品タイトル(ふりがな)"
+        label="作品タイトル(ふりがな) *"
         name="work_title_kana"
         value={finalsInfo.work_title_kana || ''}
         onChange={(e) => onChange({ work_title_kana: e.target.value })}
@@ -97,7 +97,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       />
 
       <FormField
-        label="作品キャラクター・ストーリー等（50字以内）"
+        label="作品キャラクター・ストーリー等（50字以内） *"
         name="work_character_story"
         type="textarea"
         value={finalsInfo.work_character_story || ''}
@@ -110,7 +110,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
-          楽曲著作権許諾 {musicChangeOption === 'changed' && <span className="text-red-500">*</span>}
+          楽曲著作権許諾 <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
           <label className={`flex items-center ${musicChangeOption === 'unchanged' ? 'text-gray-500' : 'text-gray-800'}`}>
@@ -181,7 +181,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       </div>
 
       <FormField
-        label="使用楽曲タイトル"
+        label="使用楽曲タイトル *"
         name="music_title"
         value={finalsInfo.music_title || ''}
         onChange={(e) => onChange({ music_title: e.target.value })}
@@ -191,7 +191,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <div>
         <FormField
-          label="収録アルバムタイトル"
+          label="収録アルバムタイトル *"
           name="cd_title"
           value={finalsInfo.cd_title || ''}
           onChange={(e) => onChange({ cd_title: e.target.value })}
@@ -202,7 +202,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       </div>
 
       <FormField
-        label="アーティスト"
+        label="アーティスト *"
         name="artist"
         value={finalsInfo.artist || ''}
         onChange={(e) => onChange({ artist: e.target.value })}
@@ -212,7 +212,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <div>
         <FormField
-          label="レコード番号"
+          label="レコード番号 *"
           name="record_number"
           value={finalsInfo.record_number || ''}
           onChange={(e) => onChange({ record_number: e.target.value })}
@@ -234,7 +234,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
       </div>
 
       <FormField
-        label="楽曲種類"
+        label="楽曲種類 *"
         name="music_type"
         type="select"
         value={finalsInfo.music_type || ''}
@@ -272,7 +272,7 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          楽曲データ {musicChangeOption === 'changed' && <span className="text-red-500">*</span>}
+          楽曲データ <span className="text-red-500">*</span>
         </label>
         <AudioUpload
           label=""

@@ -81,7 +81,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
       </div>
 
       <FormField
-        label="決勝 - 踊り出しタイミング"
+        label="決勝 - 踊り出しタイミング *"
         name="dance_start_timing"
         type="select"
         value={finalsInfo.dance_start_timing || ''}
@@ -101,7 +101,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label={`時間${sceneNum === 1 && lightingChangeOption === 'different' ? ' *' : ''}`}
+              label={sceneNum === 1 ? `時間 *` : `時間`}
               name={`scene${sceneNum}_time`}
               value={finalsInfo[`scene${sceneNum}_time` as keyof FinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_time`]: e.target.value })}
@@ -111,7 +111,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             />
 
             <FormField
-              label={`きっかけ${sceneNum === 1 && lightingChangeOption === 'different' ? ' *' : ''}`}
+              label={sceneNum === 1 ? `きっかけ *` : `きっかけ`}
               name={`scene${sceneNum}_trigger`}
               value={finalsInfo[`scene${sceneNum}_trigger` as keyof FinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_trigger`]: e.target.value })}
@@ -120,7 +120,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             />
 
             <FormField
-              label={`色・系統${sceneNum === 1 && lightingChangeOption === 'different' ? ' *' : ''}`}
+              label={sceneNum === 1 ? `色・系統 *` : `色・系統`}
               name={`scene${sceneNum}_color_type`}
               type="select"
               value={finalsInfo[`scene${sceneNum}_color_type` as keyof FinalsInfo] as string || ''}
@@ -135,7 +135,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             </FormField>
 
             <FormField
-              label={`色・系統その他${sceneNum === 1 && lightingChangeOption === 'different' ? ' *' : ''}`}
+              label={sceneNum === 1 ? `色・系統その他 *` : `色・系統その他`}
               name={`scene${sceneNum}_color_other`}
               value={finalsInfo[`scene${sceneNum}_color_other` as keyof FinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_color_other`]: e.target.value })}
@@ -145,7 +145,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
             />
 
             <FormField
-              label={`イメージ${sceneNum === 1 && lightingChangeOption === 'different' ? ' *' : ''}`}
+              label={sceneNum === 1 ? `イメージ *` : `イメージ`}
               name={`scene${sceneNum}_image`}
               value={finalsInfo[`scene${sceneNum}_image` as keyof FinalsInfo] as string || ''}
               onChange={(e) => onChange({ [`scene${sceneNum}_image`]: e.target.value })}
@@ -155,7 +155,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                イメージ画像 {sceneNum === 1 && lightingChangeOption === 'different' && <span className="text-red-500">*</span>}
+                イメージ画像 {sceneNum === 1 && <span className="text-red-500">*</span>}
               </label>
               <ImageUpload
                 value={finalsInfo[`scene${sceneNum}_image_path` as keyof FinalsInfo] as string}
@@ -191,7 +191,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
-            label={`時間${lightingChangeOption === 'different' ? ' *' : ''}`}
+            label="時間 *"
             name="chaser_exit_time"
             value={finalsInfo.chaser_exit_time || ''}
             onChange={(e) => onChange({ chaser_exit_time: e.target.value })}
@@ -200,7 +200,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           />
 
           <FormField
-            label={`きっかけ${lightingChangeOption === 'different' ? ' *' : ''}`}
+            label="きっかけ *"
             name="chaser_exit_trigger"
             value={finalsInfo.chaser_exit_trigger || ''}
             onChange={(e) => onChange({ chaser_exit_trigger: e.target.value })}
@@ -209,7 +209,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           />
 
           <FormField
-            label={`色・系統${lightingChangeOption === 'different' ? ' *' : ''}`}
+            label="色・系統 *"
             name="chaser_exit_color_type"
             type="select"
             value={finalsInfo.chaser_exit_color_type || ''}
@@ -224,7 +224,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           </FormField>
 
           <FormField
-            label={`色・系統その他${lightingChangeOption === 'different' ? ' *' : ''}`}
+            label="色・系統その他 *"
             name="chaser_exit_color_other"
             value={finalsInfo.chaser_exit_color_other || ''}
             onChange={(e) => onChange({ chaser_exit_color_other: e.target.value })}
@@ -234,7 +234,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
           />
 
           <FormField
-            label={`イメージ${lightingChangeOption === 'different' ? ' *' : ''}`}
+            label="イメージ *"
             name="chaser_exit_image"
             value={finalsInfo.chaser_exit_image || ''}
             onChange={(e) => onChange({ chaser_exit_image: e.target.value })}
@@ -244,7 +244,7 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              イメージ画像 {lightingChangeOption === 'different' && <span className="text-red-500">*</span>}
+              イメージ画像 <span className="text-red-500">*</span>
             </label>
             <ImageUpload
               value={finalsInfo.chaser_exit_image_path}

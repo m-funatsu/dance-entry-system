@@ -77,7 +77,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
       </div>
 
       <FormField
-        label="音楽スタートのタイミング（きっかけ、ポーズなど）"
+        label="音楽スタートのタイミング（きっかけ、ポーズなど） *"
         name="sound_start_timing"
         value={finalsInfo.sound_start_timing || ''}
         onChange={(e) => onChange({ sound_start_timing: e.target.value })}
@@ -86,7 +86,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
       />
 
       <FormField
-        label="チェイサー（退場）曲の指定"
+        label="チェイサー（退場）曲の指定 *"
         name="chaser_song_designation"
         type="select"
         value={finalsInfo.chaser_song_designation || ''}
@@ -142,7 +142,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
           </div>
           
           <AudioUpload
-            label="チェイサー（退場）曲 音源"
+            label="チェイサー（退場）曲 音源 *"
             value={finalsInfo.chaser_song || ''}
             displayName={audioFiles?.chaser_song?.file_name}
             onChange={(file) => {
@@ -163,7 +163,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
       )}
 
       <FormField
-        label="フェードアウト開始時間"
+        label="フェードアウト開始時間 *"
         name="fade_out_start_time"
         value={finalsInfo.fade_out_start_time || ''}
         onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
@@ -173,7 +173,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
       />
 
       <FormField
-        label="フェードアウト完了時間"
+        label="フェードアウト完了時間 *"
         name="fade_out_complete_time"
         value={finalsInfo.fade_out_complete_time || ''}
         onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
