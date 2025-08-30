@@ -48,6 +48,8 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       break
 
     case 'choreographer':
+      if (!data.choreographer_name) errors.push('振付師 氏名①')
+      if (!data.choreographer_name_kana) errors.push('振付師 氏名フリガナ①')
       // 小道具の有無は必須
       if (!data.props_usage) errors.push('小道具の有無')
       // 小道具ありの場合は詳細が必須

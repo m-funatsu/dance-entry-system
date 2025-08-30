@@ -465,163 +465,86 @@ export function checkProgramInfoCompletion(formData: Record<string, unknown>): b
 
 /**
  * 決勝情報フォームの完了状況をチェック
- * バリデーションルール（finalsValidation.ts）と完全一致させた条件付き必須チェック
+ * 条件付き必須を削除し、すべて常時必須として扱う
  */
 export function checkFinalsInfoCompletion(formData: Record<string, unknown>): boolean {
   console.log('[FINALS INFO COMPLETION] === 決勝情報完了チェック開始 ===')
   console.log('[FINALS INFO COMPLETION] 受信したformData:', formData)
 
-  // 必須項目を動的に構築（バリデーションルールと完全一致）
-  const requiredFields: string[] = []
-  const missingFields: string[] = []
-  let allSectionsValid = true
-
-  // 1. 楽曲情報セクション - 楽曲変更の有無に関係なく、JASRAC作品コード以外すべて必須
-  console.log('[FINALS INFO COMPLETION] === 楽曲情報セクション ===')
-  const musicChange = formData.music_change
-  console.log('[FINALS INFO COMPLETION] music_change:', musicChange)
-  
-  // 楽曲情報の変更 * （必須選択）
-  if (musicChange === null || musicChange === undefined) {
-    missingFields.push('楽曲情報の変更選択')
-    allSectionsValid = false
-  }
-  
-  // JASRAC作品コード以外のすべての楽曲情報項目が必須
-  const musicRequiredFields = [
-    'work_title',              // 作品タイトル *
-    'work_title_kana',         // 作品タイトル(ふりがな) *
-    'work_character_story',    // 作品キャラクター・ストーリー等（50字以内） *
-    'music_title',             // 使用楽曲タイトル *
-    'cd_title',                // 収録アルバムタイトル *
-    'artist',                  // アーティスト *
-    'record_number',           // レコード番号 *
-    'music_type',              // 楽曲種類 *
-    'copyright_permission',    // 楽曲著作権許諾 *
-    'music_data_path'          // 楽曲データ *
-    // jasrac_code は除外（任意項目）
-  ]
-  
-  musicRequiredFields.forEach(field => {
-    const value = formData[field]
-    if (!value || value.toString().trim() === '') {
-      missingFields.push(field)
-      allSectionsValid = false
-    }
-  })
-  
-  requiredFields.push(...musicRequiredFields)
-
-  // 2. 音響指示セクション - すべて必須
-  console.log('[FINALS INFO COMPLETION] === 音響指示セクション ===')
-  const soundChange = formData.sound_change_from_semifinals
-  console.log('[FINALS INFO COMPLETION] sound_change_from_semifinals:', soundChange)
-  
-  // 準決勝との音響指示 * （必須選択）
-  if (soundChange === null || soundChange === undefined) {
-    missingFields.push('準決勝との音響指示選択')
-    allSectionsValid = false
-  }
-  
-  // 音響指示セクションのすべての項目が必須
-  const soundRequiredFields = [
-    'sound_start_timing',       // 音楽スタートのタイミング *
-    'chaser_song_designation',  // チェイサー（退場）曲の指定 *
-    'fade_out_start_time',      // フェードアウト開始時間 *
-    'fade_out_complete_time'    // フェードアウト完了時間 *
-  ]
-  
-  soundRequiredFields.forEach(field => {
-    const value = formData[field]
-    if (!value || value.toString().trim() === '') {
-      missingFields.push(field)
-      allSectionsValid = false
-    }
-  })
-  
-  requiredFields.push(...soundRequiredFields)
-
-  // 3. 照明指示セクション - 条件に関係なくすべて必須
-  console.log('[FINALS INFO COMPLETION] === 照明指示セクション ===')
-  const lightingChange = formData.lighting_change_from_semifinals
-  console.log('[FINALS INFO COMPLETION] lighting_change_from_semifinals:', lightingChange)
-  
-  // 準決勝との照明指示変更の有無 * （必須選択）
-  if (lightingChange === null || lightingChange === undefined) {
-    missingFields.push('準決勝との照明指示変更選択')
-    allSectionsValid = false
-  }
-  
-  // 照明指示セクションのすべての項目が必須（条件に関係なく）
-  const lightingRequiredFields = [
-    'dance_start_timing',       // 決勝 - 踊り出しタイミング *（追加）
-    // シーン1必須項目
-    'scene1_time', 'scene1_trigger', 'scene1_color_type', 
-    'scene1_color_other', 'scene1_image', 'scene1_image_path', // *
-    // チェイサー/退場必須項目
-    'chaser_exit_time', 'chaser_exit_trigger', 'chaser_exit_color_type',
-    'chaser_exit_color_other', 'chaser_exit_image', 'chaser_exit_image_path' // *
-  ]
-  
-  lightingRequiredFields.forEach(field => {
-    const value = formData[field]
-    if (!value || value.toString().trim() === '') {
-      missingFields.push(field)
-      allSectionsValid = false
-    }
-  })
-  
-  requiredFields.push(...lightingRequiredFields)
-
-  // 4. 振付師セクション
-  console.log('[FINALS INFO COMPLETION] === 振付師セクション ===')
-  const choreographerChange = formData.choreographer_change
-  console.log('[FINALS INFO COMPLETION] choreographer_change:', choreographerChange)
-  
-  // 振付師の変更 * （必須選択）
-  if (choreographerChange === null || choreographerChange === undefined) {
-    missingFields.push('振付師の変更選択')
-    allSectionsValid = false
-  }
-  
-  // 振付師セクションのすべての必須項目
-  const choreographerRequiredFields = [
-    'choreographer1_name',          // 振付師 氏名① *（追加）
-    'choreographer1_furigana',      // 振付師 氏名フリガナ① *（追加）
+  // 常時必須項目（JASRAC作品コードと条件付き項目以外すべて必須）
+  const baseRequiredFields = [
+    // 楽曲情報セクション（常時必須）
+    'music_change',                 // 楽曲情報の変更（選択必須）
+    'work_title',                   // 作品タイトル
+    'work_title_kana',              // 作品タイトル(ふりがな)
+    'work_character_story',         // 作品キャラクター・ストーリー等
+    'music_title',                  // 使用楽曲タイトル
+    'cd_title',                     // 収録CDタイトル
+    'artist',                       // アーティスト
+    'record_number',                // レコード番号
+    'music_type',                   // 楽曲種類
+    'copyright_permission',         // 楽曲著作権許諾
+    'music_data_path',              // 楽曲データ
+    
+    // 音響指示セクション（常時必須）
+    'sound_change_from_semifinals', // 準決勝との音響指示（選択必須）
+    'sound_start_timing',           // 音楽スタートのタイミング
+    'chaser_song_designation',      // チェイサー（退場）曲の指定
+    'fade_out_start_time',          // フェードアウト開始時間
+    'fade_out_complete_time',       // フェードアウト完了時間
+    
+    // 照明指示セクション（常時必須）
+    'lighting_change_from_semifinals', // 準決勝との照明指示変更の有無（選択必須）
+    'dance_start_timing',           // 決勝 - 踊り出しタイミング
+    'scene1_time',                  // シーン1 - 時間
+    'scene1_trigger',               // シーン1 - きっかけ
+    'scene1_color_type',            // シーン1 - 色・系統
+    'scene1_color_other',           // シーン1 - 色・系統その他
+    'scene1_image',                 // シーン1 - イメージ
+    'scene1_image_path',            // シーン1 - イメージ画像
+    'chaser_exit_time',             // チェイサー/退場 - 時間
+    'chaser_exit_trigger',          // チェイサー/退場 - きっかけ
+    'chaser_exit_color_type',       // チェイサー/退場 - 色・系統
+    'chaser_exit_color_other',      // チェイサー/退場 - 色・系統その他
+    'chaser_exit_image',            // チェイサー/退場 - イメージ
+    'chaser_exit_image_path',       // チェイサー/退場 - イメージ画像
+    
+    // 振付師セクション（常時必須）
+    'choreographer_change',         // 振付師の変更（選択必須）
+    'choreographer_name',           // 振付師 氏名①
+    'choreographer_furigana',       // 振付師 氏名フリガナ①
     'props_usage',                  // 小道具の有無
     'choreographer_photo_permission', // 作品振付師写真掲載
     'choreographer_photo_path'      // 作品振付師写真
   ]
   
-  choreographerRequiredFields.forEach(field => {
-    const value = formData[field]
-    if (!value || value.toString().trim() === '') {
-      missingFields.push(field)
-      allSectionsValid = false
-    }
-  })
+  // 条件付き必須項目を追加
+  const conditionallyRequired: string[] = []
   
-  // 小道具詳細は条件付き必須
-  const propsUsage = formData.props_usage
-  if (propsUsage === 'あり') {
-    const propsDetails = formData.props_details
-    if (!propsDetails || propsDetails.toString().trim() === '') {
-      missingFields.push('props_details')
-      allSectionsValid = false
-    }
-    choreographerRequiredFields.push('props_details')
+  // チェイサー曲（必要な場合のみ必須）
+  if (formData.chaser_song_designation === '必要') {
+    conditionallyRequired.push('chaser_song')
   }
   
-  requiredFields.push(...choreographerRequiredFields)
-
+  // 小道具詳細（小道具ありの場合のみ必須）
+  if (formData.props_usage === 'あり') {
+    conditionallyRequired.push('props_details')
+  }
+  
+  const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
+  
+  console.log(`[FINALS INFO COMPLETION] 基本必須フィールド数: ${baseRequiredFields.length}`)
+  console.log(`[FINALS INFO COMPLETION] 条件付き必須フィールド数: ${conditionallyRequired.length}`)
+  console.log(`[FINALS INFO COMPLETION] 全必須フィールド数: ${allRequiredFields.length}`)
+  
+  const { isComplete: fieldsComplete, missingFields } = checkFormCompletion('FINALS INFO', formData, allRequiredFields)
+  
   console.log('[FINALS INFO COMPLETION] === チェック結果まとめ ===')
-  console.log('[FINALS INFO COMPLETION] 全必須フィールド数:', requiredFields.length)
-  console.log('[FINALS INFO COMPLETION] 未入力フィールド数:', missingFields.length)
+  console.log('[FINALS INFO COMPLETION] フィールド完了:', fieldsComplete)
   console.log('[FINALS INFO COMPLETION] 未入力フィールド:', missingFields)
-  console.log('[FINALS INFO COMPLETION] 全セクション有効:', allSectionsValid)
   console.log('[FINALS INFO COMPLETION] === 決勝情報完了チェック終了 ===')
 
-  return allSectionsValid
+  return fieldsComplete
 }
 
 /**
