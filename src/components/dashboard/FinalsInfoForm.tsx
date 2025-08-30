@@ -895,6 +895,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onChange={handleFieldChange}
           onLightingChangeOption={handleLightingChangeOption}
           onFileUpload={handleFileUpload}
+          onFileDelete={handleFileDelete}
           isEditable={isEditable}
         />
       )}
