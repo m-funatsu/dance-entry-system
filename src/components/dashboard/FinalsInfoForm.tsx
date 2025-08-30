@@ -793,6 +793,13 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       entry_id: entry.id
     }
 
+    console.log('[FINALS SAVE] === 保存データ詳細 ===')
+    console.log('[FINALS SAVE] lighting_change_from_semifinals:', dataToSave.lighting_change_from_semifinals)
+    console.log('[FINALS SAVE] scene1_time:', dataToSave.scene1_time)
+    console.log('[FINALS SAVE] scene1_image_path:', dataToSave.scene1_image_path)
+    console.log('[FINALS SAVE] chaser_exit_time:', dataToSave.chaser_exit_time)
+    console.log('[FINALS SAVE] chaser_exit_image_path:', dataToSave.chaser_exit_image_path)
+
     await save(dataToSave)
     console.log('[FINALS SAVE] データベース保存完了')
     
