@@ -513,11 +513,46 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
-      console.log('[LIGHTING OPTION] 異なる照明指示選択 - フィールドをクリア開始')
+      console.log('[LIGHTING OPTION] 異なる照明指示選択 - フィールドとファイルをクリア開始')
+      
+      // 既存のファイルを削除
+      const filesToDelete = []
+      
+      // 照明画像ファイルを削除対象に追加
+      for (let i = 1; i <= 5; i++) {
+        if (finalsInfo[`scene${i}_image_path` as keyof FinalsInfo]) {
+          filesToDelete.push(`scene${i}_image_path`)
+        }
+      }
+      
+      // チェイサー退場画像ファイルを削除対象に追加
+      if (finalsInfo.chaser_exit_image_path) {
+        filesToDelete.push('chaser_exit_image_path')
+      }
+      
+      // チェイサー曲音源ファイルを削除対象に追加
+      if (finalsInfo.chaser_song) {
+        filesToDelete.push('chaser_song')
+      }
+      
+      console.log('[LIGHTING OPTION] 削除対象ファイル:', filesToDelete)
+      
+      // ファイル削除を実行
+      for (const field of filesToDelete) {
+        try {
+          console.log(`[LIGHTING OPTION] ${field} を削除中`)
+          await handleFileDelete(field)
+        } catch (error) {
+          console.error(`[LIGHTING OPTION] ${field} 削除エラー:`, error)
+          // エラーがあってもクリア処理は続行
+        }
+      }
+      
       // 異なる照明指示の場合はフィールドをクリア
       const clearedData: Record<string, string | boolean> = {
         lighting_change_from_semifinals: true,
-        dance_start_timing: ''
+        dance_start_timing: '',
+        chaser_song: ''  // チェイサー曲もクリア
       }
       
       // シーン1-5とチェイサー情報をクリア
@@ -540,10 +575,20 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       clearedData.chaser_exit_notes = ''
       
       setFinalsInfo(prev => ({ ...prev, ...clearedData }))
+      
+      // audioFiles状態も更新（チェイサー曲削除）
+      if (finalsInfo.chaser_song) {
+        setAudioFiles(prev => {
+          const newState = { ...prev }
+          delete newState.chaser_song
+          return newState
+        })
+      }
+      
       console.log('[LIGHTING OPTION] === 照明指示データクリア詳細 ===')
       console.log('[LIGHTING OPTION] クリアデータ:', clearedData)
+      console.log('[LIGHTING OPTION] 削除したファイル:', filesToDelete)
       console.log('[LIGHTING OPTION] lighting_change_from_semifinals:', true)
-      console.log('[LIGHTING OPTION] この後保存ボタンを押してデータベースに反映してください')
     }
     console.log('[LIGHTING OPTION] === 照明指示オプション変更完了 ===')
   }
