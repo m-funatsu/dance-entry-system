@@ -59,15 +59,29 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         </label>
         <select
           value={semifinalsInfo.chaser_song_designation || ''}
-          onChange={(e) => {
+          onChange={async (e) => {
             if (e.target.value === 'included') {
               onChange({ chaser_song_designation: 'included', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
+              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
                 const chaserUrl = semifinalsInfo.chaser_song || ''
                 // 決勝ファイルは削除しない
                 if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - チェイサー音源を削除')
+                  console.log('[CHASER CHANGE] 「自作曲に組み込む」選択 - 削除前に一時保存')
+                  // 削除前に一時保存
+                  if (onSave) {
+                    try {
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
+                      await onSave(true)
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
+                      // 保存後少し待機
+                      await new Promise(resolve => setTimeout(resolve, 200))
+                    } catch (saveError) {
+                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
+                    }
+                  }
+                  
+                  console.log('[CHASER CHANGE] チェイサー音源を削除')
                   if (onFileDelete) {
                     onFileDelete('chaser_song')
                   }
@@ -79,12 +93,26 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
               onChange({ chaser_song_designation: 'required' })
             } else if (e.target.value === 'not_required') {
               onChange({ chaser_song_designation: 'not_required', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
+              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
                 const chaserUrl = semifinalsInfo.chaser_song || ''
                 // 決勝ファイルは削除しない
                 if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「不要（無音）」選択 - チェイサー音源を削除')
+                  console.log('[CHASER CHANGE] 「不要（無音）」選択 - 削除前に一時保存')
+                  // 削除前に一時保存
+                  if (onSave) {
+                    try {
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
+                      await onSave(true)
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
+                      // 保存後少し待機
+                      await new Promise(resolve => setTimeout(resolve, 200))
+                    } catch (saveError) {
+                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
+                    }
+                  }
+                  
+                  console.log('[CHASER CHANGE] チェイサー音源を削除')
                   if (onFileDelete) {
                     onFileDelete('chaser_song')
                   }
@@ -95,12 +123,26 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
             } else if (e.target.value === '') {
               // 「選択してください」に戻す場合はリセット
               onChange({ chaser_song_designation: '', chaser_song: '' })
-              // 音源ファイルが存在する場合は削除（準決勝ファイルのみ）
+              // 音源ファイルが存在する場合は削除前に一時保存（準決勝ファイルのみ）
               if ((semifinalsInfo.chaser_song && semifinalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
                 const chaserUrl = semifinalsInfo.chaser_song || ''
                 // 決勝ファイルは削除しない
                 if (!chaserUrl.includes('/finals/')) {
-                  console.log('[CHASER CHANGE] 「選択してください」選択 - チェイサー音源を削除')
+                  console.log('[CHASER CHANGE] 「選択してください」選択 - 削除前に一時保存')
+                  // 削除前に一時保存
+                  if (onSave) {
+                    try {
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存実行中...')
+                      await onSave(true)
+                      console.log('[CHASER CHANGE] ファイル削除前の一時保存完了')
+                      // 保存後少し待機
+                      await new Promise(resolve => setTimeout(resolve, 200))
+                    } catch (saveError) {
+                      console.error('[CHASER CHANGE] ファイル削除前の一時保存エラー:', saveError)
+                    }
+                  }
+                  
+                  console.log('[CHASER CHANGE] チェイサー音源を削除')
                   if (onFileDelete) {
                     onFileDelete('chaser_song')
                   }

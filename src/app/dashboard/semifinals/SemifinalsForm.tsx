@@ -288,10 +288,10 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         return
       }
 
-      // ファイルアップロード前に現在の入力データを一時保存
+      // ファイルアップロード前に現在の入力データを一時保存（リロード対策）
       console.log('[UPLOAD DEBUG] 現在の入力データを一時保存中...')
       try {
-        // 一時保存（work_title_kanaも含める）
+        // 一時保存（すべての変更内容を保存）
         const tempSaveData = {
           ...semifinalsInfo,
           entry_id: entry.id
@@ -302,6 +302,9 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         
         await save(tempSaveData)
         console.log('[UPLOAD DEBUG] 一時保存完了')
+        
+        // 保存成功後に少し待機（データベース反映を確実にする）
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (tempSaveError) {
         console.log('[UPLOAD DEBUG] 一時保存に失敗（続行）:', tempSaveError)
       }
@@ -310,6 +313,19 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       const hasExistingFile = audioFiles[field] || semifinalsInfo[field as keyof SemifinalsInfo]
       if (hasExistingFile) {
         console.log('[UPLOAD DEBUG] Existing file detected, deleting:', hasExistingFile)
+        // ファイル削除前にも一時保存（削除でリロードが発生する可能性のため）
+        try {
+          console.log('[UPLOAD DEBUG] ファイル削除前の追加一時保存...')
+          const preDeletionSaveData = {
+            ...semifinalsInfo,
+            entry_id: entry.id
+          }
+          await save(preDeletionSaveData)
+          console.log('[UPLOAD DEBUG] ファイル削除前の追加一時保存完了')
+        } catch (preDeletionError) {
+          console.log('[UPLOAD DEBUG] ファイル削除前の追加一時保存に失敗（続行）:', preDeletionError)
+        }
+        
         await handleFileDelete(field)
       }
 
@@ -807,6 +823,18 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onChange={handleFieldChange}
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
+          onSave={async (isTemporary) => {
+            if (isTemporary && entry?.id) {
+              // 一時保存用の関数
+              const tempSaveData = {
+                ...semifinalsInfo,
+                entry_id: entry.id
+              }
+              await save(tempSaveData)
+            } else {
+              await handleSave()
+            }
+          }}
           audioFiles={audioFiles}
           isEditable={isEditable}
         />
