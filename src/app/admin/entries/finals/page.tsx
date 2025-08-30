@@ -292,7 +292,7 @@ export default async function FinalsInfoListPage() {
               '6. 音響情報 - チェイサー（退場）曲の指定',
               '6. 音響情報 - フェードアウト開始時間',
               '6. 音響情報 - フェードアウト完了時間',
-              '7. 音響データ添付 - チェイサー（退場）曲音源',
+              '7. チェイサー（退場）曲音源',
               '8. 照明情報 - 準決勝との照明指示変更の有無',
               '8. 照明情報 - 決勝-踊り出しタイミング',
               '9. 照明シーン1',
@@ -349,7 +349,7 @@ export default async function FinalsInfoListPage() {
                     6. 音響情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    7. 音響データ添付
+                    7. チェイサー（退場）曲音源
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     8. 照明情報
