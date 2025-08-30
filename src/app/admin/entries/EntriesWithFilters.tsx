@@ -64,9 +64,25 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
   const [genreFilter, setGenreFilter] = useState<string>('')
   const [formFilter, setFormFilter] = useState<string>('')
 
+  // デバッグ: 取得されたエントリーデータの最初の項目を確認
+  console.log('[ENTRIES FILTER DEBUG] 最初のエントリーデータ:', entries[0])
+  console.log('[ENTRIES FILTER DEBUG] エントリー総数:', entries.length)
+
 
   // DBのステータスフィールドを使用してフォーム提出状況をチェック
   const hasSpecificForm = (entry: EntryWithDetails, formType: string) => {
+    console.log(`[FILTER DEBUG] ${formType} チェック:`, {
+      entryId: entry.id,
+      basic_info_status: entry.basic_info_status,
+      preliminary_info_status: entry.preliminary_info_status,
+      program_info_status: entry.program_info_status,
+      semifinals_info_status: entry.semifinals_info_status,
+      finals_info_status: entry.finals_info_status,
+      sns_info_status: entry.sns_info_status,
+      applications_info_status: entry.applications_info_status,
+      consent_form_submitted: entry.consent_form_submitted
+    })
+    
     switch(formType) {
       case 'basic': return entry.basic_info_status === 'submitted'
       case 'preliminary': return entry.preliminary_info_status === 'submitted'
