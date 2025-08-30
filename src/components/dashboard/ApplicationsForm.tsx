@@ -343,27 +343,47 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
       }
 
       // 申請情報の完了判定とステータス更新
-      const isComplete = checkApplicationsInfoCompletion(applicationsInfo)
+      console.log('🔍🔍🔍 [APPLICATIONS DEBUG] === 保存時デバッグ開始 === 🔍🔍🔍')
+      console.log('🔍 [APPLICATIONS DEBUG] applicationsInfo全体:', applicationsInfo)
       
-      // データがあるかどうかを判定（申請情報は特別処理）
-      const hasAnyApplicationData = !!(
-        // 関係者チケット申請（名前のみチェック）
-        applicationsInfo.related1_name || applicationsInfo.related2_name || 
-        applicationsInfo.related3_name || applicationsInfo.related4_name || applicationsInfo.related5_name ||
-        // 選手同伴申請
-        applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name ||
-        // メイク申請（準決勝）
-        applicationsInfo.makeup_name || applicationsInfo.makeup_email || applicationsInfo.makeup_phone ||
-        applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes ||
-        // メイク申請（決勝）
-        applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || 
+      // 各カテゴリーのデータ有無を詳細チェック
+      const relatedTickets = !!(applicationsInfo.related1_name || applicationsInfo.related2_name || 
+        applicationsInfo.related3_name || applicationsInfo.related4_name || applicationsInfo.related5_name)
+      const companions = !!(applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name)
+      const makeupSemifinals = !!(applicationsInfo.makeup_name || applicationsInfo.makeup_email || 
+        applicationsInfo.makeup_phone || applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes)
+      const makeupFinals = !!(applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || 
         applicationsInfo.makeup_phone_final || applicationsInfo.makeup_preferred_stylist_final || 
-        applicationsInfo.makeup_notes_final ||
-        // 払込用紙
-        applicationsInfo.payment_slip_path
-      )
+        applicationsInfo.makeup_notes_final)
+      const paymentSlip = !!(applicationsInfo.payment_slip_path)
+      
+      console.log('🔍 [APPLICATIONS DEBUG] === カテゴリー別データ有無 ===')
+      console.log('🔍 [APPLICATIONS DEBUG] 関係者チケット:', relatedTickets)
+      console.log('🔍 [APPLICATIONS DEBUG] 選手同伴:', companions)
+      console.log('🔍 [APPLICATIONS DEBUG] メイク申請（準決勝）:', makeupSemifinals)
+      console.log('🔍 [APPLICATIONS DEBUG] メイク申請（決勝）:', makeupFinals)
+      console.log('🔍 [APPLICATIONS DEBUG] 払込用紙:', paymentSlip)
+      
+      const hasAnyApplicationData = relatedTickets || companions || makeupSemifinals || makeupFinals || paymentSlip
+      console.log('🔍 [APPLICATIONS DEBUG] 最終データ有無判定:', hasAnyApplicationData)
+      
+      // 各フィールドの詳細値もログ出力
+      console.log('🔍 [APPLICATIONS DEBUG] === フィールド詳細値 ===')
+      console.log('🔍 [APPLICATIONS DEBUG] related1_name:', `"${applicationsInfo.related1_name}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] related2_name:', `"${applicationsInfo.related2_name}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] companion1_name:', `"${applicationsInfo.companion1_name}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] makeup_name:', `"${applicationsInfo.makeup_name}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] makeup_name_final:', `"${applicationsInfo.makeup_name_final}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] payment_slip_path:', `"${applicationsInfo.payment_slip_path}"`)
+      console.log('🔍 [APPLICATIONS DEBUG] related_ticket_count:', applicationsInfo.related_ticket_count)
+      console.log('🔍 [APPLICATIONS DEBUG] companion_total_amount:', applicationsInfo.companion_total_amount)
+      
+      const isComplete = checkApplicationsInfoCompletion(applicationsInfo)
+      console.log('🔍 [APPLICATIONS DEBUG] checkApplicationsInfoCompletion結果:', isComplete)
       
       await updateFormStatus('applications_info', entry.id, isComplete, hasAnyApplicationData)
+      
+      console.log('🔍🔍🔍 [APPLICATIONS DEBUG] === 保存時デバッグ終了 === 🔍🔍🔍')
 
       setSuccess('各種申請情報を保存しました')
       setTimeout(() => {
