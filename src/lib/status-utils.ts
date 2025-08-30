@@ -267,9 +267,9 @@ export async function checkSemifinalsInfoCompletion(
   formData: Record<string, unknown>, 
   entryId?: string
 ): Promise<boolean> {
-  console.log(`[SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック開始 ===`)
-  console.log(`[SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
-  console.log(`[SEMIFINALS INFO COMPLETION] entryId:`, entryId)
+  console.log(`🔥🔥🔥 [SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック開始 === 🔥🔥🔥`)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] 受信したformData:`, formData)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] entryId:`, entryId)
 
   // 正しい必須項目のみ（ユーザー指定の完全なリスト）
   const baseRequiredFields = [
@@ -341,15 +341,15 @@ export async function checkSemifinalsInfoCompletion(
   const { isComplete: fieldsComplete, missingFields } = checkFormCompletion('SEMIFINALS INFO', formData, allRequiredFields)
   
   // 不足フィールドの詳細ログ
-  console.log(`[SEMIFINALS INFO COMPLETION] === 不足フィールド詳細ログ ===`)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] === 不足フィールド詳細ログ === 🔥`)
   if (missingFields.length > 0) {
-    console.log(`[SEMIFINALS INFO COMPLETION] ❌ 不足している必須フィールド (${missingFields.length}個):`, missingFields)
+    console.log(`🔥 [SEMIFINALS INFO COMPLETION] ❌ 不足している必須フィールド (${missingFields.length}個):`, missingFields)
     missingFields.forEach(field => {
       const value = formData[field]
-      console.log(`[SEMIFINALS INFO COMPLETION]   - ${field}: "${value}" (${typeof value})`)
+      console.log(`🔥 [SEMIFINALS INFO COMPLETION]   - ${field}: "${value}" (${typeof value})`)
     })
   } else {
-    console.log(`[SEMIFINALS INFO COMPLETION] ✅ 全必須フィールド入力済み`)
+    console.log(`🔥 [SEMIFINALS INFO COMPLETION] ✅ 全必須フィールド入力済み`)
   }
   
   // 必須ファイルのチェック
@@ -409,9 +409,9 @@ export async function checkSemifinalsInfoCompletion(
         if (!hasChaserImage) missingFiles.push('チェイサー/退場イメージ画像')
         
         if (missingFiles.length > 0) {
-          console.log(`[SEMIFINALS INFO COMPLETION] ❌ 不足している必須ファイル (${missingFiles.length}個):`, missingFiles)
+          console.log(`🔥 [SEMIFINALS INFO COMPLETION] ❌ 不足している必須ファイル (${missingFiles.length}個):`, missingFiles)
         } else {
-          console.log(`[SEMIFINALS INFO COMPLETION] ✅ 全必須ファイルアップロード済み`)
+          console.log(`🔥 [SEMIFINALS INFO COMPLETION] ✅ 全必須ファイルアップロード済み`)
         }
         
         hasRequiredFiles = hasPaymentSlip && hasMusicData && hasScene1Image && hasChaserImage
@@ -427,11 +427,11 @@ export async function checkSemifinalsInfoCompletion(
   // 全必須項目（フィールド + ファイル）の完了チェック
   const result = fieldsComplete && hasRequiredFiles
   
-  console.log(`[SEMIFINALS INFO COMPLETION] === チェック結果まとめ ===`)
-  console.log(`[SEMIFINALS INFO COMPLETION] フィールド完了: ${fieldsComplete}`)
-  console.log(`[SEMIFINALS INFO COMPLETION] ファイル完了: ${hasRequiredFiles}`)
-  console.log(`[SEMIFINALS INFO COMPLETION] 最終結果: ${result}`)
-  console.log(`[SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック終了 ===`)
+  console.log(`🔥🔥🔥 [SEMIFINALS INFO COMPLETION] === チェック結果まとめ === 🔥🔥🔥`)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] フィールド完了: ${fieldsComplete}`)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] ファイル完了: ${hasRequiredFiles}`)
+  console.log(`🔥 [SEMIFINALS INFO COMPLETION] 最終結果: ${result}`)
+  console.log(`🔥🔥🔥 [SEMIFINALS INFO COMPLETION] === 準決勝情報完了チェック終了 === 🔥🔥🔥`)
   
   return result
 }

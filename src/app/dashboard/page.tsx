@@ -326,17 +326,18 @@ export default async function DashboardPage() {
       return false
     }
     
-    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック開始 ===')
-    console.log('[DASHBOARD SEMIFINALS] entry?.id:', entry?.id)
-    console.log('[DASHBOARD SEMIFINALS] semifinalsInfo keys:', Object.keys(semifinalsInfo))
+    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック開始 === 🔍🔍🔍')
+    console.log('🔍 [DASHBOARD SEMIFINALS] entry?.id:', entry?.id)
+    console.log('🔍 [DASHBOARD SEMIFINALS] semifinalsInfo keys:', Object.keys(semifinalsInfo))
+    console.log('🔍 [DASHBOARD SEMIFINALS] semifinalsInfo data:', semifinalsInfo)
     
     // status-utils.tsのcheckSemifinalsInfoCompletion関数を使用
     const { checkSemifinalsInfoCompletion } = await import('@/lib/status-utils')
     const result = await checkSemifinalsInfoCompletion(semifinalsInfo, entry?.id)
     
-    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック結果 ===')
-    console.log('[DASHBOARD SEMIFINALS] 最終結果:', result ? '登録済み' : '入力中')
-    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック終了 ===')
+    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック結果 === 🔍🔍🔍')
+    console.log('🔍 [DASHBOARD SEMIFINALS] 最終結果:', result ? '登録済み' : '入力中')
+    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック終了 === 🔍🔍🔍')
     
     return result
   }
