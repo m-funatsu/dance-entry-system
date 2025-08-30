@@ -46,6 +46,10 @@ export const useFormSave = ({
         const updateData = { ...data }
         delete updateData.id // Remove id from update data
         
+        console.log('[useFormSave] === UPDATE処理詳細 ===')
+        console.log('[useFormSave] テーブル名:', tableName)
+        console.log('[useFormSave] 更新データ:', updateData)
+        
         const { error: updateError } = await supabase
           .from(tableName)
           .update({
