@@ -36,6 +36,28 @@ export default async function ConsentFormPage() {
   }, {} as Record<string, string>) || {}
   const deadlineInfo = await getDeadlineInfo(settingsMap['consent_form_deadline'])
 
+  if (!entry) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader user={user}>
+          <div className="flex items-center">
+            <BackButton />
+            <h1 className="text-2xl font-bold text-gray-900">
+              参加同意書
+            </h1>
+          </div>
+        </DashboardHeader>
+        <main className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="bg-white shadow sm:rounded-lg p-6">
+            <p className="text-gray-600">
+              エントリー情報が見つかりません。先に基本情報を登録してください。
+            </p>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader user={user}>
