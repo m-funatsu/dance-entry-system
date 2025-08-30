@@ -987,12 +987,13 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         // ストレージエラーがあってもUIは更新する
       }
 
-      // entry_filesテーブルからも削除を試みる
+      // entry_filesテーブルからも削除を試みる（決勝専用のレコードのみ）
       const { error: dbError } = await supabase
         .from('entry_files')
         .delete()
         .eq('entry_id', entry.id)
         .eq('file_path', storagePath)
+        .like('purpose', 'finals_%')
 
       if (dbError) {
         console.log('[DELETE] Database delete error (may not exist):', dbError)
