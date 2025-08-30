@@ -130,11 +130,10 @@ export default async function DashboardPage() {
   }
 
   // SNS情報の取得
-  let _snsInfo = null
   let practiceVideo: EntryFile | null = null
   let introductionVideo: EntryFile | null = null
   if (entry) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('sns_info')
       .select('*')
       .eq('entry_id', entry.id)
@@ -143,8 +142,6 @@ export default async function DashboardPage() {
     if (error) {
       console.error('SNS情報取得エラー:', error)
     }
-    
-    _snsInfo = data
     
     // SNS動画ファイルの確認
     const { data: snsFiles, error: filesError } = await supabase
@@ -177,26 +174,26 @@ export default async function DashboardPage() {
   }
 
 
-  // プログラム掲載用情報の完了判定関数
-  const _checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
-    if (!programInfo) return false
-    
-    // フォームの実際の必須項目のみ
-    const requiredFields = [
-      'player_photo_path',
-      'semifinal_story'
-    ]
-    
-    // 楽曲数による条件付き必須項目
-    if (programInfo['song_count'] === '2曲') {
-      requiredFields.push('final_story')
-    }
-    
-    return requiredFields.every(field => {
-      const value = programInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
+  // プログラム掲載用情報の完了判定関数（現在未使用）
+  // const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
+  //   if (!programInfo) return false
+  //   
+  //   // フォームの実際の必須項目のみ
+  //   const requiredFields = [
+  //     'player_photo_path',
+  //     'semifinal_story'
+  //   ]
+  //   
+  //   // 楽曲数による条件付き必須項目
+  //   if (programInfo['song_count'] === '2曲') {
+  //     requiredFields.push('final_story')
+  //   }
+  //   
+  //   return requiredFields.every(field => {
+  //     const value = programInfo[field]
+  //     return value && value.toString().trim() !== ''
+  //   })
+  // }
 
   // ファイル情報の取得（振込確認用紙を含む）
   const fileStats = { music: 0, video: 0, photo: 0, preliminaryVideo: 0, bankSlip: 0 }
@@ -227,75 +224,75 @@ export default async function DashboardPage() {
     }
   }
 
-  // 必須項目のチェック関数  
-  const _checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
-    if (!basicInfo) return false
-    
-    // 基本必須フィールド（フォームのvalidationRulesと一致）
-    const baseRequiredFields = [
-      'dance_style',
-      'category_division', 
-      'representative_name',
-      'representative_furigana',
-      'representative_romaji',
-      'representative_birthdate',
-      'representative_email',
-      'phone_number',
-      'emergency_contact_name_1',
-      'emergency_contact_phone_1',
-      'partner_name',
-      'partner_furigana', 
-      'partner_romaji',
-      'partner_birthdate'
-    ]
-    
-    // 年齢による動的必須チェック
-    const calculateAge = (birthdate: string): number => {
-      const today = new Date()
-      const birth = new Date(birthdate)
-      let age = today.getFullYear() - birth.getFullYear()
-      const monthDiff = today.getMonth() - birth.getMonth()
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--
-      }
-      return age
-    }
-
-    const requiredFields = [...baseRequiredFields]
-    
-    // 代表者18歳未満の場合、保護者情報を必須に追加
-    const repAge = basicInfo.representative_birthdate ? calculateAge(basicInfo.representative_birthdate as string) : 999
-    if (repAge < 18) {
-      requiredFields.push('guardian_name', 'guardian_phone', 'guardian_email')
-    }
-    
-    // パートナー18歳未満の場合、保護者情報を必須に追加  
-    const partnerAge = basicInfo.partner_birthdate ? calculateAge(basicInfo.partner_birthdate as string) : 999
-    if (partnerAge < 18) {
-      requiredFields.push('partner_guardian_name', 'partner_guardian_phone', 'partner_guardian_email')
-    }
-
-    // 必須同意チェックボックス
-    const requiredAgreements = [
-      'agreement_checked',
-      'privacy_policy_checked',
-      'media_consent_checked'
-    ]
-    
-    // 必須フィールドのチェック
-    const hasAllRequiredFields = requiredFields.every(field => {
-      const value = basicInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-    
-    // 必須同意のチェック
-    const hasAllAgreements = requiredAgreements.every(field => {
-      const value = basicInfo[field]
-      return value === true
-    })
-    
-    return hasAllRequiredFields && hasAllAgreements
-  }
+  // 必須項目のチェック関数（現在未使用）
+  // const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
+  //   if (!basicInfo) return false
+  //   
+  //   // 基本必須フィールド（フォームのvalidationRulesと一致）
+  //   const baseRequiredFields = [
+  //     'dance_style',
+  //     'category_division', 
+  //     'representative_name',
+  //     'representative_furigana',
+  //     'representative_romaji',
+  //     'representative_birthdate',
+  //     'representative_email',
+  //     'phone_number',
+  //     'emergency_contact_name_1',
+  //     'emergency_contact_phone_1',
+  //     'partner_name',
+  //     'partner_furigana', 
+  //     'partner_romaji',
+  //     'partner_birthdate'
+  //   ]
+  //   
+  //   // 年齢による動的必須チェック
+  //   const calculateAge = (birthdate: string): number => {
+  //     const today = new Date()
+  //     const birth = new Date(birthdate)
+  //     let age = today.getFullYear() - birth.getFullYear()
+  //     const monthDiff = today.getMonth() - birth.getMonth()
+  //     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+  //       age--
+  //     }
+  //     return age
+  //   }
+  //
+  //   const requiredFields = [...baseRequiredFields]
+  //   
+  //   // 代表者18歳未満の場合、保護者情報を必須に追加
+  //   const repAge = basicInfo.representative_birthdate ? calculateAge(basicInfo.representative_birthdate as string) : 999
+  //   if (repAge < 18) {
+  //     requiredFields.push('guardian_name', 'guardian_phone', 'guardian_email')
+  //   }
+  //   
+  //   // パートナー18歳未満の場合、保護者情報を必須に追加  
+  //   const partnerAge = basicInfo.partner_birthdate ? calculateAge(basicInfo.partner_birthdate as string) : 999
+  //   if (partnerAge < 18) {
+  //     requiredFields.push('partner_guardian_name', 'partner_guardian_phone', 'partner_guardian_email')
+  //   }
+  //
+  //   // 必須同意チェックボックス
+  //   const requiredAgreements = [
+  //     'agreement_checked',
+  //     'privacy_policy_checked',
+  //     'media_consent_checked'
+  //   ]
+  //   
+  //   // 必須フィールドのチェック
+  //   const hasAllRequiredFields = requiredFields.every(field => {
+  //     const value = basicInfo[field]
+  //     return value && value.toString().trim() !== ''
+  //   })
+  //   
+  //   // 必須同意のチェック
+  //   const hasAllAgreements = requiredAgreements.every(field => {
+  //     const value = basicInfo[field]
+  //     return value === true
+  //   })
+  //   
+  //   return hasAllRequiredFields && hasAllAgreements
+  // }
   
   // 振込確認用紙の状態確認
   let hasBankSlip = false
@@ -310,32 +307,32 @@ export default async function DashboardPage() {
     console.log('[DASHBOARD BASIC INFO] 振込確認用紙チェック:', hasBankSlip)
   }
 
-  const _checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
-    if (!preliminaryInfo) return false
-    if (!hasVideo) return false
-    
-    // 予選フォームの*マーク付き必須項目
-    const requiredFields = [
-      'work_title',              // 作品タイトル *
-      'work_title_kana',         // 作品タイトルかな *
-      'work_story',              // 作品ストーリー *
-      'music_title',             // 楽曲タイトル *
-      'cd_title',                // CDタイトル *
-      'artist',                  // アーティスト *
-      'record_number',           // レコード番号 *
-      'music_type',              // 楽曲種類 *
-      'music_rights_cleared',    // 楽曲著作権許可 *
-      'choreographer1_name',     // 振付師1氏名 *
-      'choreographer1_furigana'  // 振付師1フリガナ *
-      // 予選提出動画はhasVideoパラメータでチェック
-      // jasrac_code は任意項目
-    ]
-    
-    return requiredFields.every(field => {
-      const value = preliminaryInfo[field]
-      return value && value.toString().trim() !== ''
-    })
-  }
+  // const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
+  //   if (!preliminaryInfo) return false
+  //   if (!hasVideo) return false
+  //   
+  //   // 予選フォームの*マーク付き必須項目
+  //   const requiredFields = [
+  //     'work_title',              // 作品タイトル *
+  //     'work_title_kana',         // 作品タイトルかな *
+  //     'work_story',              // 作品ストーリー *
+  //     'music_title',             // 楽曲タイトル *
+  //     'cd_title',                // CDタイトル *
+  //     'artist',                  // アーティスト *
+  //     'record_number',           // レコード番号 *
+  //     'music_type',              // 楽曲種類 *
+  //     'music_rights_cleared',    // 楽曲著作権許可 *
+  //     'choreographer1_name',     // 振付師1氏名 *
+  //     'choreographer1_furigana'  // 振付師1フリガナ *
+  //     // 予選提出動画はhasVideoパラメータでチェック
+  //     // jasrac_code は任意項目
+  //   ]
+  //   
+  //   return requiredFields.every(field => {
+  //     const value = preliminaryInfo[field]
+  //     return value && value.toString().trim() !== ''
+  //   })
+  // }
 
   // ステータス情報はentriesテーブルから直接取得するため、判定関数は不要
 
