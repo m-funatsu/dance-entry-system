@@ -859,6 +859,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     // 保存成功後の処理
     setValidationErrors({})
     showToast('決勝情報を保存しました', 'success')
+    
+    // 保存後にリロードして最新状態を反映
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   if (loading) {
