@@ -267,6 +267,9 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
             isEditable={isEditable}
             required
           />
+          <p className="text-xs text-gray-600 mt-2">
+            作品振付師写真の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+          </p>
         </div>
       </div>
     </div>

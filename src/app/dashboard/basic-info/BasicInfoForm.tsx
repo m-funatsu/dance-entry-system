@@ -1098,6 +1098,9 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                     削除
                   </button>
                 </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  振込確認用紙の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                </p>
               </div>
             ) : (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">

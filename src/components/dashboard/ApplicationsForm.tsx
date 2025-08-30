@@ -1112,6 +1112,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   <p className="mt-1 text-xs text-gray-500">
                     参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
                   </p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    準決勝用 希望スタイル② （画像アップロード）の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                  </p>
                 </div>
               )}
             </div>
@@ -1164,6 +1167,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   )}
                   <p className="mt-1 text-xs text-gray-500">
                     参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
+                  </p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    準決勝用 希望スタイル③ （画像アップロード）の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
                   </p>
                 </div>
               )}
@@ -1330,6 +1336,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     <p className="mt-1 text-xs text-gray-500">
                       参考にしたいメイク・ヘアスタイルの画像をアップロードしてください
                     </p>
+                    <p className="text-xs text-gray-600 mt-2">
+                      決勝用 希望スタイル② （画像アップロード）の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                    </p>
                   </div>
                 )}
               </div>
@@ -1446,6 +1455,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                 formats: "JPG, PNG, GIF, WEBP, PDF（最大10MB）"
               }}
             />
+            <p className="text-xs text-gray-600 mt-2">
+              払込用紙のアップロード（複数枚可）の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+            </p>
 
             {/* アップロード済みファイルのプレビューと管理 */}
             {paymentSlipFiles.length > 0 && (

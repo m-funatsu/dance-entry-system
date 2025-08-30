@@ -262,6 +262,9 @@ export const BankSection: React.FC<BankSectionProps> = ({
               </div>
               <p className="text-sm text-green-700 mt-1">ファイル名: {paymentSlipFileName}</p>
               <p className="text-xs text-green-600 mt-1">変更する場合は削除ボタンを使用してください</p>
+              <p className="text-xs text-gray-600 mt-2">
+                振込確認用紙の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+              </p>
             </div>
           )}
           

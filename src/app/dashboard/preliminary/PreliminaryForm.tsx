@@ -539,6 +539,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     <p className="mt-1 text-sm font-medium text-green-800">
                       この動画は予選提出に必須です。
                     </p>
+                    <p className="text-xs text-gray-600 mt-2">
+                      予選提出動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+                    </p>
                   </div>
                 </div>
               </div>

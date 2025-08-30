@@ -335,6 +335,9 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
               <li className="font-medium">※基本的に、腰から上の画像にカットします。</li>
             </ul>
           </div>
+          <p className="text-xs text-gray-600 mt-2">
+            選手紹介用画像の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+          </p>
         </div>
 
         {/* 所属教室または所属 */}
