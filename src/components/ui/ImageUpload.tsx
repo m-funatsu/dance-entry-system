@@ -11,6 +11,7 @@ export default function ImageUpload({
   label, 
   required = false,
   accept = "image/*",
+  maxSizeMB = 10,
   isEditable = true
 }: ImageUploadProps) {
   console.log('ImageUpload isEditable:', isEditable) // ESLintエラー回避用
@@ -61,6 +62,13 @@ export default function ImageUpload({
     
     if (!file.type.startsWith('image/')) {
       alert('画像ファイルを選択してください')
+      return
+    }
+
+    // ファイルサイズチェック
+    const maxSizeBytes = maxSizeMB * 1024 * 1024
+    if (file.size > maxSizeBytes) {
+      alert(`ファイルサイズが${maxSizeMB}MBを超えています。ファイルサイズを確認してください。`)
       return
     }
 
@@ -215,7 +223,7 @@ export default function ImageUpload({
               <p className="text-sm text-blue-600 hover:text-blue-700">クリックして選択</p>
             </div>
             <p className="text-xs text-gray-500">
-              PNG, JPG, JPEG (最大10MB)
+              {`PNG, JPG, JPEG (最大${maxSizeMB}MB)`}
             </p>
           </div>
         )}
