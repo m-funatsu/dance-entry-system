@@ -324,7 +324,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         .from('entry_files')
         .select('*')
         .eq('entry_id', entry.id)
-        .in('purpose', ['music_data_path', 'chaser_song'])
+        .in('purpose', ['finals_music_data_path', 'finals_chaser_song'])
         .order('uploaded_at', { ascending: false })
 
       if (filesError) {
@@ -365,9 +365,11 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
               isSemifinalsFile
             })
             
-            if ((file.purpose === 'music_data_path' || file.purpose === 'chaser_song') && isFinalsFile) {
+            if ((file.purpose === 'finals_music_data_path' || file.purpose === 'finals_chaser_song') && isFinalsFile) {
               console.log('[FINALS AUDIO DEBUG] 決勝専用ファイルをマッピング:', file.purpose)
-              filesMap[file.purpose] = { file_name: file.file_name }
+              // purposeから'finals_'プレフィックスを除去してマッピング
+              const fieldName = file.purpose.replace('finals_', '')
+              filesMap[fieldName] = { file_name: file.file_name }
 
               // 署名付きURLを取得
               const { data: urlData } = await supabase.storage
@@ -375,7 +377,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
                 .createSignedUrl(file.file_path, 86400)
 
               if (urlData?.signedUrl) {
-                urlUpdates[file.purpose] = urlData.signedUrl
+                urlUpdates[fieldName] = urlData.signedUrl
               }
             } else if (isSemifinalsFile) {
               console.log('[FINALS AUDIO DEBUG] 準決勝ファイルをスキップ:', file.purpose)
@@ -616,7 +618,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         file_type: fileType,
         file_name: file.name,
         file_path: fileName,
-        purpose: field,
+        purpose: `finals_${field}`,  // 決勝専用のpurposeを使用
         uploaded_at: new Date().toISOString()
       }
       
