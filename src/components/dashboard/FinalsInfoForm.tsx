@@ -114,6 +114,33 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         if (data.sound_change_from_semifinals === false) {
           setSoundChangeOption('same')
           console.log('[OPTION RESTORE] 音響指示: same')
+          
+          // 「準決勝と同じ」状態の場合、チェイサー曲のファイル名を取得
+          if (data.chaser_song) {
+            console.log('[OPTION RESTORE] 準決勝チェイサー曲のファイル名を取得中')
+            try {
+              const { data: fileData, error: fileError } = await supabase
+                .from('entry_files')
+                .select('file_name')
+                .eq('entry_id', entry.id)
+                .eq('purpose', 'chaser_song')
+                .order('uploaded_at', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+
+              if (fileData) {
+                console.log('[OPTION RESTORE] チェイサー曲ファイル名取得:', fileData.file_name)
+                setAudioFiles(prev => ({
+                  ...prev,
+                  chaser_song: { file_name: fileData.file_name }
+                }))
+              } else {
+                console.log('[OPTION RESTORE] チェイサー曲ファイル情報なし')
+              }
+            } catch (error) {
+              console.error('[OPTION RESTORE] チェイサー曲ファイル名取得エラー:', error)
+            }
+          }
         } else if (data.sound_change_from_semifinals === true) {
           setSoundChangeOption('different')
           console.log('[OPTION RESTORE] 音響指示: different')
