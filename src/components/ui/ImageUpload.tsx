@@ -89,14 +89,30 @@ export default function ImageUpload({
   }
 
   const handleRemove = (e: React.MouseEvent) => {
-    if (!isEditable) return // 無効化時は削除不可
+    console.log('[IMAGE UPLOAD DELETE] === 削除ボタンがクリックされました ===')
+    console.log('[IMAGE UPLOAD DELETE] isEditable:', isEditable)
+    console.log('[IMAGE UPLOAD DELETE] value:', value)
+    console.log('[IMAGE UPLOAD DELETE] onDelete exists:', !!onDelete)
+    
+    if (!isEditable) {
+      console.log('[IMAGE UPLOAD DELETE] 編集無効のため削除をスキップ')
+      return
+    }
+    
     e.stopPropagation()
     setPreview(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
+    
+    console.log('[IMAGE UPLOAD DELETE] 親コンポーネントのonDeleteを呼び出し中...')
     // 親コンポーネントの削除処理を呼び出し
-    onDelete?.()
+    if (onDelete) {
+      onDelete()
+      console.log('[IMAGE UPLOAD DELETE] onDelete実行完了')
+    } else {
+      console.log('[IMAGE UPLOAD DELETE] onDeleteが未定義です')
+    }
   }
 
   return (
