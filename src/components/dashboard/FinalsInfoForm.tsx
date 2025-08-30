@@ -91,6 +91,13 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       if (data) {
         console.log('[FINALS DEBUG] === 決勝情報データ読み込み完了 ===')
         console.log('[FINALS DEBUG] 取得データ:', data)
+        console.log('[FINALS DEBUG] === 照明指示データの詳細確認 ===')
+        console.log('[FINALS DEBUG] lighting_change_from_semifinals:', data.lighting_change_from_semifinals)
+        console.log('[FINALS DEBUG] scene1_time:', data.scene1_time)
+        console.log('[FINALS DEBUG] scene1_trigger:', data.scene1_trigger)
+        console.log('[FINALS DEBUG] scene1_image_path:', data.scene1_image_path)
+        console.log('[FINALS DEBUG] chaser_exit_time:', data.chaser_exit_time)
+        console.log('[FINALS DEBUG] chaser_exit_image_path:', data.chaser_exit_image_path)
         setFinalsInfo(data)
         
         // ファイル情報を読み込み
