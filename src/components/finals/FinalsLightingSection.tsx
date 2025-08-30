@@ -165,6 +165,9 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
                 disabled={lightingChangeOption === 'same' || !isEditable}
                 isEditable={isEditable && lightingChangeOption !== 'same'}
               />
+              <p className="text-xs text-gray-600 mt-2">
+                シーン{sceneNum} イメージ画像の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+              </p>
             </div>
 
             <div className="md:col-span-2">
@@ -254,6 +257,9 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               disabled={lightingChangeOption === 'same' || !isEditable}
               isEditable={isEditable && lightingChangeOption !== 'same'}
             />
+            <p className="text-xs text-gray-600 mt-2">
+              チェイサー/退場 イメージ画像の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+            </p>
           </div>
 
           <div className="md:col-span-2">

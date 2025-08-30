@@ -161,6 +161,9 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             deletable={soundChangeOption === 'different'} // 異なる音響指示時のみ削除可能
             accept=".wav,.mp3,.m4a"
           />
+          <p className="text-xs text-gray-600 mt-2">
+            チェイサー（退場）曲音源の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
+          </p>
         </div>
       )}
 
