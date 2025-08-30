@@ -290,7 +290,8 @@ export async function checkSemifinalsInfoCompletion(
     'fade_out_start_time',              // フェードアウト開始時間
     'fade_out_complete_time',           // フェードアウト完了時間
     
-    // 準決勝 - 踊り出しタイミング
+    // 照明指示情報セクション
+    'dance_start_timing',               // 準決勝 - 踊り出しタイミング ★追加
     'scene1_time',                      // シーン1 時間
     'scene1_trigger',                   // シーン1 きっかけ
     'scene1_color_type',                // シーン1 色・系統
@@ -308,9 +309,6 @@ export async function checkSemifinalsInfoCompletion(
     'choreographer_name',               // 振付師 氏名①
     'choreographer_name_kana',          // 振付師 氏名フリガナ①
     'props_usage',                      // 小道具の有無
-    
-    // 振込確認用紙
-    'payment_slip_path',                // 振込確認用紙
     
     // 賞金振込先情報
     'bank_name',                        // 銀行名
@@ -360,7 +358,13 @@ export async function checkSemifinalsInfoCompletion(
       
       if (allFiles) {
         // 1. 振込確認用紙（必須）
-        const hasPaymentSlip = allFiles.some(file => file.purpose === 'payment_slip_path' || file.purpose === 'semifinals_payment_slip')
+        const hasPaymentSlip = allFiles.some(file => 
+          file.purpose === 'payment_slip_path' || 
+          file.purpose === 'semifinals_payment_slip' ||
+          file.purpose === 'bank_slip' ||
+          file.file_path?.includes('payment_slip') ||
+          file.file_path?.includes('bank_slip')
+        )
         console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
         
         // 2. 楽曲データ（常に必須）
