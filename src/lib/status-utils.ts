@@ -595,9 +595,9 @@ export function checkApplicationsInfoCompletion(
   
   // 何かひとつでもデータがあるかチェック
   const hasAnyData = !!(
-    // 関係者チケット申請
+    // 関係者チケット申請（名前のみチェック、自動計算項目は除外）
     formData.related1_name || formData.related2_name || formData.related3_name ||
-    formData.related4_name || formData.related5_name || formData.related_ticket_count ||
+    formData.related4_name || formData.related5_name ||
     // 選手同伴申請
     formData.companion1_name || formData.companion2_name || formData.companion3_name ||
     // メイク申請（準決勝）
@@ -605,7 +605,9 @@ export function checkApplicationsInfoCompletion(
     formData.makeup_preferred_stylist || formData.makeup_notes ||
     // メイク申請（決勝）
     formData.makeup_name_final || formData.makeup_email_final || formData.makeup_phone_final ||
-    formData.makeup_preferred_stylist_final || formData.makeup_notes_final
+    formData.makeup_preferred_stylist_final || formData.makeup_notes_final ||
+    // 払込用紙（重要：追加）
+    formData.payment_slip_path
   )
   
   console.log(`[APPLICATIONS INFO CHECK] 何らかのデータ入力: ${hasAnyData}`)

@@ -344,7 +344,26 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
 
       // 申請情報の完了判定とステータス更新
       const isComplete = checkApplicationsInfoCompletion(applicationsInfo)
-      await updateFormStatus('applications_info', entry.id, isComplete, true)
+      
+      // データがあるかどうかを判定（申請情報は特別処理）
+      const hasAnyApplicationData = !!(
+        // 関係者チケット申請（名前のみチェック）
+        applicationsInfo.related1_name || applicationsInfo.related2_name || 
+        applicationsInfo.related3_name || applicationsInfo.related4_name || applicationsInfo.related5_name ||
+        // 選手同伴申請
+        applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name ||
+        // メイク申請（準決勝）
+        applicationsInfo.makeup_name || applicationsInfo.makeup_email || applicationsInfo.makeup_phone ||
+        applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes ||
+        // メイク申請（決勝）
+        applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || 
+        applicationsInfo.makeup_phone_final || applicationsInfo.makeup_preferred_stylist_final || 
+        applicationsInfo.makeup_notes_final ||
+        // 払込用紙
+        applicationsInfo.payment_slip_path
+      )
+      
+      await updateFormStatus('applications_info', entry.id, isComplete, hasAnyApplicationData)
 
       setSuccess('各種申請情報を保存しました')
       setTimeout(() => {
