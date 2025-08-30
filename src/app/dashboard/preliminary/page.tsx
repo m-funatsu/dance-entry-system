@@ -4,6 +4,7 @@ import PreliminaryForm from './PreliminaryForm'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { BackButton } from '@/components/dashboard/BackButton'
 import { isFormEditable, getDeadlineInfo } from '@/lib/deadline-check'
+import Link from 'next/link'
 
 // 動的レンダリングを強制（編集時の確実なデータ再取得のため）
 export const dynamic = 'force-dynamic'
@@ -27,8 +28,46 @@ export default async function PreliminaryPage() {
 
   const entry = entries && entries.length > 0 ? entries[0] : null
 
+  // 期限チェック
+  const musicInfoEditable = await isFormEditable('music_info_deadline')
+  
+  // 期限情報を取得（エラーメッセージ用）
+  const supabase2 = await createClient()
+  const { data: settings } = await supabase2.from('settings').select('*')
+  const settingsMap = settings?.reduce((acc, setting) => {
+    acc[setting.key] = setting.value
+    return acc
+  }, {} as Record<string, string>) || {}
+  const deadlineInfo = await getDeadlineInfo(settingsMap['music_info_deadline'])
+
   if (!entry) {
-    redirect('/dashboard/basic-info')
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader user={user}>
+          <div className="flex items-center">
+            <BackButton />
+            <h1 className="text-2xl font-bold text-gray-900">
+              予選情報
+            </h1>
+          </div>
+        </DashboardHeader>
+        <main className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="bg-white shadow sm:rounded-lg p-6">
+            <p className="text-gray-600">
+              エントリー情報が見つかりません。先に基本情報を登録してください。
+            </p>
+            <div className="mt-4">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              >
+                ダッシュボードに戻る
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   // 予選情報の取得
@@ -48,18 +87,6 @@ export default async function PreliminaryPage() {
     .order('uploaded_at', { ascending: false })
 
   const preliminaryVideo = files && files.length > 0 ? files[0] : null
-
-  // 期限チェック
-  const musicInfoEditable = await isFormEditable('music_info_deadline')
-  
-  // 期限情報を取得（エラーメッセージ用）
-  const supabase2 = await createClient()
-  const { data: settings } = await supabase2.from('settings').select('*')
-  const settingsMap = settings?.reduce((acc, setting) => {
-    acc[setting.key] = setting.value
-    return acc
-  }, {} as Record<string, string>) || {}
-  const deadlineInfo = await getDeadlineInfo(settingsMap['music_info_deadline'])
 
   return (
     <div className="min-h-screen bg-gray-50">
