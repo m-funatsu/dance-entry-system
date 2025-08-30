@@ -53,33 +53,37 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
 
   // 関数定義（useEffectより前に配置）
   const calculateTicketTotal = useCallback(() => {
-    let count = 0
-    for (let i = 1; i <= 5; i++) {
-      if (applicationsInfo[`related${i}_name` as keyof ApplicationsInfo]) {
-        count++
+    setApplicationsInfo(prev => {
+      let count = 0
+      for (let i = 1; i <= 5; i++) {
+        if (prev[`related${i}_name` as keyof ApplicationsInfo]) {
+          count++
+        }
       }
-    }
-    const total = count * TICKET_PRICE
-    setApplicationsInfo(prev => ({
-      ...prev,
-      related_ticket_count: count,
-      related_ticket_total_amount: total
-    }))
-  }, [applicationsInfo])
+      const total = count * TICKET_PRICE
+      return {
+        ...prev,
+        related_ticket_count: count,
+        related_ticket_total_amount: total
+      }
+    })
+  }, [])
 
   const calculateCompanionTotal = useCallback(() => {
-    let count = 0
-    for (let i = 1; i <= 3; i++) {
-      if (applicationsInfo[`companion${i}_name` as keyof ApplicationsInfo]) {
-        count++
+    setApplicationsInfo(prev => {
+      let count = 0
+      for (let i = 1; i <= 3; i++) {
+        if (prev[`companion${i}_name` as keyof ApplicationsInfo]) {
+          count++
+        }
       }
-    }
-    const total = count * COMPANION_FEE
-    setApplicationsInfo(prev => ({
-      ...prev,
-      companion_total_amount: total
-    }))
-  }, [applicationsInfo])
+      const total = count * COMPANION_FEE
+      return {
+        ...prev,
+        companion_total_amount: total
+      }
+    })
+  }, [])
 
   useEffect(() => {
     loadApplicationsInfo()
@@ -976,19 +980,12 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   }))
                 } else {
                   console.log('[MAKEUP DEBUG] 申請者をクリア')
-                  const updatedInfo = {
-                    ...applicationsInfo,
+                  setApplicationsInfo(prev => ({
+                    ...prev,
                     makeup_name: '',
                     makeup_email: '',
                     makeup_phone: ''
-                  }
-                  setApplicationsInfo(updatedInfo)
-                  
-                  // ステータスを再計算・更新
-                  const isComplete = checkApplicationsInfoCompletion(updatedInfo)
-                  updateFormStatus('applications_info', entry.id, isComplete, true).catch(err => {
-                    console.error('メイク申請クリア後のステータス更新エラー:', err)
-                  })
+                  }))
                 }
               }}
               disabled={!isEditable}
@@ -1206,17 +1203,10 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                     }))
                   } else {
                     console.log('[MAKEUP DEBUG] 決勝申請者をクリア')
-                    const updatedInfo = {
-                      ...applicationsInfo,
+                    setApplicationsInfo(prev => ({
+                      ...prev,
                       makeup_name_final: ''
-                    }
-                    setApplicationsInfo(updatedInfo)
-                    
-                    // ステータスを再計算・更新
-                    const isComplete = checkApplicationsInfoCompletion(updatedInfo)
-                    updateFormStatus('applications_info', entry.id, isComplete, true).catch(err => {
-                      console.error('決勝メイク申請クリア後のステータス更新エラー:', err)
-                    })
+                    }))
                   }
                 }}
                 disabled={!isEditable}
