@@ -485,7 +485,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose === 'finals_chaser_song'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -499,7 +499,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.chaser_song && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose === 'finals_chaser_song'
                         )) && (
                           <div>
                             <a
@@ -513,7 +513,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose && file.purpose.includes('chaser')
+                          (file.file_type === 'music' || file.file_type === 'audio') && file.purpose === 'finals_chaser_song'
                         )) && !finalsInfo.file_urls?.chaser_song && (
                           <span className="text-xs text-gray-400">チェイサー音源なし</span>
                         )}
@@ -536,7 +536,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene1_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -550,7 +550,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.scene1_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene1_image_path'
                         )) && (
                           <div>
                             <a
@@ -564,7 +564,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene1')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene1_image_path'
                         )) && !finalsInfo.file_urls?.scene1_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -581,7 +581,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene2_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -595,7 +595,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.scene2_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene2_image_path'
                         )) && (
                           <div>
                             <a
@@ -609,7 +609,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene2')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene2_image_path'
                         )) && !finalsInfo.file_urls?.scene2_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -626,7 +626,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene3_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -640,7 +640,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.scene3_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene3_image_path'
                         )) && (
                           <div>
                             <a
@@ -654,7 +654,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene3')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene3_image_path'
                         )) && !finalsInfo.file_urls?.scene3_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -671,7 +671,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene4_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -685,7 +685,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.scene4_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene4_image_path'
                         )) && (
                           <div>
                             <a
@@ -699,7 +699,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene4')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene4_image_path'
                         )) && !finalsInfo.file_urls?.scene4_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -716,7 +716,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene5_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -730,7 +730,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.scene5_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene5_image_path'
                         )) && (
                           <div>
                             <a
@@ -744,7 +744,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('scene5')
+                          file.file_type === 'photo' && file.purpose === 'finals_scene5_image_path'
                         )) && !finalsInfo.file_urls?.scene5_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -761,7 +761,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                          file.file_type === 'photo' && file.purpose === 'finals_chaser_exit_image_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -775,7 +775,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.chaser_exit_image_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                          file.file_type === 'photo' && file.purpose === 'finals_chaser_exit_image_path'
                         )) && (
                           <div>
                             <a
@@ -789,7 +789,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('chaser')
+                          file.file_type === 'photo' && file.purpose === 'finals_chaser_exit_image_path'
                         )) && !finalsInfo.file_urls?.chaser_exit_image_path && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
@@ -822,7 +822,7 @@ export default async function FinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(finalsInfo.entry_files) && finalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                          file.file_type === 'photo' && file.purpose === 'finals_choreographer_photo_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string; signed_url?: string }) => (
                           <div key={file.id}>
                             <a
@@ -836,7 +836,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         ))}
                         {finalsInfo.file_urls?.choreographer_photo_path && (!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                          file.file_type === 'photo' && file.purpose === 'finals_choreographer_photo_path'
                         )) && (
                           <div>
                             <a
@@ -850,7 +850,7 @@ export default async function FinalsInfoListPage() {
                           </div>
                         )}
                         {(!Array.isArray(finalsInfo.entry_files) || !finalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.file_type === 'photo' && file.purpose && file.purpose.includes('choreographer')
+                          file.file_type === 'photo' && file.purpose === 'finals_choreographer_photo_path'
                         )) && !finalsInfo.file_urls?.choreographer_photo_path && (
                           <span className="text-xs text-gray-400">写真なし</span>
                         )}
