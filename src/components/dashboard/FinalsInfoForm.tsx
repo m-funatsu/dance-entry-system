@@ -512,17 +512,17 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       
       // シーン1-5とチェイサー情報をクリア
       for (let i = 1; i <= 5; i++) {
-        clearedData[`scene${i}_time` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_image` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = undefined
-        clearedData[`scene${i}_notes` as keyof FinalsInfo] = undefined
+        clearedData[`scene${i}_time` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_trigger` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_color_type` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_color_other` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_image` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_image_path` as keyof FinalsInfo] = null
+        clearedData[`scene${i}_notes` as keyof FinalsInfo] = null
       }
       
-      clearedData.chaser_exit_time = undefined
-      clearedData.chaser_exit_trigger = undefined
+      clearedData.chaser_exit_time = null
+      clearedData.chaser_exit_trigger = null
       clearedData.chaser_exit_color_type = ''
       clearedData.chaser_exit_color_other = ''
       clearedData.chaser_exit_image = ''
@@ -530,7 +530,10 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       clearedData.chaser_exit_notes = ''
       
       setFinalsInfo(prev => ({ ...prev, ...clearedData }))
-      console.log('[LIGHTING OPTION] 照明指示データクリア完了 - lighting_change_from_semifinals:', true)
+      console.log('[LIGHTING OPTION] === 照明指示データクリア詳細 ===')
+      console.log('[LIGHTING OPTION] クリアデータ:', clearedData)
+      console.log('[LIGHTING OPTION] lighting_change_from_semifinals:', true)
+      console.log('[LIGHTING OPTION] この後保存ボタンを押してデータベースに反映してください')
     }
     console.log('[LIGHTING OPTION] === 照明指示オプション変更完了 ===')
   }
