@@ -430,6 +430,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'changed') {
+      console.log('[MUSIC OPTION] 楽曲変更あり選択 - 楽曲データファイルを削除')
+      
+      // 既存の楽曲データファイルを削除
+      if (finalsInfo.music_data_path) {
+        try {
+          console.log('[MUSIC OPTION] music_data_path を削除中')
+          await handleFileDelete('music_data_path')
+        } catch (error) {
+          console.error('[MUSIC OPTION] music_data_path 削除エラー:', error)
+        }
+      }
+      
       // 変更ありの場合はフィールドをクリア
       setFinalsInfo(prev => ({
         ...prev,
@@ -446,6 +458,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         music_type: '',
         music_data_path: ''
       }))
+      
+      // audioFiles状態も更新（楽曲データ削除）
+      if (finalsInfo.music_data_path) {
+        setAudioFiles(prev => {
+          const newState = { ...prev }
+          delete newState.music_data_path
+          return newState
+        })
+      }
     }
   }
 
@@ -474,6 +495,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
+      console.log('[SOUND OPTION] 異なる音響指示選択 - チェイサー曲ファイルを削除')
+      
+      // 既存のチェイサー曲ファイルを削除
+      if (finalsInfo.chaser_song) {
+        try {
+          console.log('[SOUND OPTION] chaser_song を削除中')
+          await handleFileDelete('chaser_song')
+        } catch (error) {
+          console.error('[SOUND OPTION] chaser_song 削除エラー:', error)
+        }
+      }
+      
       // 異なる音響指示の場合はフィールドをクリア
       setFinalsInfo(prev => ({
         ...prev,
@@ -484,6 +517,15 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         fade_out_start_time: '',
         fade_out_complete_time: ''
       }))
+      
+      // audioFiles状態も更新（チェイサー曲削除）
+      if (finalsInfo.chaser_song) {
+        setAudioFiles(prev => {
+          const newState = { ...prev }
+          delete newState.chaser_song
+          return newState
+        })
+      }
     }
   }
 
@@ -618,6 +660,18 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         showToast('準決勝情報が見つかりません', 'error')
       }
     } else if (option === 'different') {
+      console.log('[CHOREOGRAPHER OPTION] 異なる振付師選択 - 振付師写真ファイルを削除')
+      
+      // 既存の振付師写真ファイルを削除
+      if (finalsInfo.choreographer_photo_path) {
+        try {
+          console.log('[CHOREOGRAPHER OPTION] choreographer_photo_path を削除中')
+          await handleFileDelete('choreographer_photo_path')
+        } catch (error) {
+          console.error('[CHOREOGRAPHER OPTION] choreographer_photo_path 削除エラー:', error)
+        }
+      }
+      
       // 異なる振付師の場合はフィールドをクリア
       setFinalsInfo(prev => ({
         ...prev,
@@ -625,7 +679,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         choreographer_name: '',
         choreographer_furigana: '',
         choreographer2_name: '',
-        choreographer2_furigana: ''
+        choreographer2_furigana: '',
+        choreographer_photo_path: ''
       }))
     }
   }
