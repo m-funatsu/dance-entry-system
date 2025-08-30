@@ -90,13 +90,22 @@ export default async function DashboardPage() {
   // 準決勝情報の取得
   let semifinalsInfo = null
   if (entry) {
-    const { data } = await supabase
+    console.log('🚨🚨🚨 EMERGENCY LOG: 準決勝情報取得開始 🚨🚨🚨')
+    console.log('🚨 EMERGENCY LOG: entry.id:', entry.id)
+    
+    const { data, error } = await supabase
       .from('semifinals_info')
       .select('*')
       .eq('entry_id', entry.id)
       .maybeSingle()
     
+    console.log('🚨 EMERGENCY LOG: 準決勝情報取得結果:', data)
+    console.log('🚨 EMERGENCY LOG: 準決勝情報取得エラー:', error)
+    console.log('🚨 EMERGENCY LOG: データが存在するか:', !!data)
+    
     semifinalsInfo = data
+  } else {
+    console.log('🚨🚨🚨 EMERGENCY LOG: entryがnullのため準決勝情報取得スキップ 🚨🚨🚨')
   }
 
   // 決勝情報の取得
