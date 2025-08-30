@@ -529,8 +529,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.scene1_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.scene1_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.scene1_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.scene1_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.scene1_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.scene1_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.scene1_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -574,8 +576,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.scene2_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.scene2_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.scene2_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.scene2_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.scene2_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.scene2_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.scene2_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -619,8 +623,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.scene3_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.scene3_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.scene3_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.scene3_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.scene3_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.scene3_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.scene3_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -664,8 +670,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.scene4_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.scene4_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.scene4_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.scene4_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.scene4_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.scene4_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.scene4_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -709,8 +717,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.scene5_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.scene5_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.scene5_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.scene5_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.scene5_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.scene5_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.scene5_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -754,8 +764,10 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs">
                         <div><strong>時間:</strong> {finalsInfo.chaser_exit_time || '未入力'}</div>
                         <div><strong>きっかけ:</strong> {finalsInfo.chaser_exit_trigger || '未入力'}</div>
-                        <div><strong>色:</strong> {finalsInfo.chaser_exit_color_type || '未入力'}</div>
+                        <div><strong>色・系統:</strong> {finalsInfo.chaser_exit_color_type || '未入力'}</div>
+                        <div><strong>その他:</strong> {finalsInfo.chaser_exit_color_other || '未入力'}</div>
                         <div><strong>イメージ:</strong> {finalsInfo.chaser_exit_image || '未入力'}</div>
+                        <div><strong>備考:</strong> {finalsInfo.chaser_exit_notes || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -796,15 +808,19 @@ export default async function FinalsInfoListPage() {
                       </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
-                      <div className="text-xs">
-                        {finalsInfo.choreography_change_timing || '未入力'}
+                      <div className="space-y-1 text-xs">
+                        <div><strong>変更時期:</strong> {finalsInfo.choreography_change_timing || '未入力'}</div>
+                        <div><strong>変更前（準決勝振付）:</strong> {finalsInfo.choreography_before_change || '未入力'}</div>
+                        <div><strong>変更後（決勝振付）:</strong> {finalsInfo.choreography_after_change || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
                         <div><strong>変更:</strong> {finalsInfo.choreographer_change ? 'あり' : 'なし'}</div>
-                        <div><strong>①:</strong> {finalsInfo.choreographer_name || '未入力'}</div>
-                        <div><strong>②:</strong> {finalsInfo.choreographer2_name || '未入力'}</div>
+                        <div><strong>①氏名:</strong> {finalsInfo.choreographer_name || '未入力'}</div>
+                        <div><strong>①フリガナ:</strong> {finalsInfo.choreographer_furigana || '未入力'}</div>
+                        <div><strong>②氏名:</strong> {finalsInfo.choreographer2_name || '未入力'}</div>
+                        <div><strong>②フリガナ:</strong> {finalsInfo.choreographer2_furigana || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '150px'}}>
