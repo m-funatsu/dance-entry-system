@@ -395,6 +395,28 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     }
   }
 
+  const handleFileDelete = async (field: string) => {
+    try {
+      console.log('[SEMIFINALS DELETE] === ファイル削除開始 ===')
+      console.log('[SEMIFINALS DELETE] 削除対象フィールド:', field)
+      
+      // 削除前に現在のデータを保存
+      console.log('[SEMIFINALS DELETE] 削除前にデータを保存中...')
+      await handleSave(true) // 一時保存
+      
+      // UIからファイルをクリア
+      setSemifinalsInfo(prev => ({
+        ...prev,
+        [field]: ''
+      }))
+      
+      console.log('[SEMIFINALS DELETE] ファイル削除完了')
+    } catch (err) {
+      console.error('[SEMIFINALS DELETE] ファイル削除エラー:', err)
+      setError('ファイルの削除に失敗しました')
+    }
+  }
+
   if (loading) {
     return <div className="text-center p-4">読み込み中...</div>
   }
@@ -726,8 +748,15 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
             {semifinalsInfo.music_data_path && (
-              <div className="mt-2 text-sm text-gray-600">
-                アップロード済み
+              <div className="mt-2 flex items-center justify-between bg-gray-50 p-2 rounded">
+                <span className="text-sm text-gray-600">アップロード済み</span>
+                <button
+                  type="button"
+                  onClick={() => handleFileDelete('music_data_path')}
+                  className="text-red-600 hover:text-red-800 text-sm underline"
+                >
+                  削除
+                </button>
               </div>
             )}
           </div>
