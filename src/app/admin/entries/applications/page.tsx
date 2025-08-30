@@ -441,7 +441,7 @@ export default async function ApplicationsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              📸 {file.purpose?.includes('style1') ? '希望スタイル①' : '希望スタイル②'}
+                              📸 {file.purpose === 'makeup_style1' ? '希望スタイル①' : '希望スタイル②'}
                             </a>
                           </div>
                         ))}
@@ -479,7 +479,7 @@ export default async function ApplicationsInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              📸 {file.purpose?.includes('style1') ? '希望スタイル①' : '希望スタイル②'}
+                              📸 {file.purpose === 'makeup_style1' ? '希望スタイル①' : '希望スタイル②'}
                             </a>
                           </div>
                         ))}

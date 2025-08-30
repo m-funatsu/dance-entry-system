@@ -166,7 +166,7 @@ export default async function SnsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('practice')
+                          file.file_type === 'video' && file.purpose === 'sns_practice_video'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -180,7 +180,7 @@ export default async function SnsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('practice')
+                          file.file_type === 'video' && file.purpose === 'sns_practice_video'
                         )) && (
                           <span className="text-xs text-gray-400">練習風景動画なし</span>
                         )}
@@ -189,7 +189,7 @@ export default async function SnsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(snsInfo.entry_files) && snsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('introduction')
+                          file.file_type === 'video' && file.purpose === 'sns_introduction_highlight'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -203,7 +203,7 @@ export default async function SnsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(snsInfo.entry_files) || !snsInfo.entry_files.some((file: { file_type?: string; purpose?: string }) => 
-                          file.file_type === 'video' && file.purpose && file.purpose.includes('introduction')
+                          file.file_type === 'video' && file.purpose === 'sns_introduction_highlight'
                         )) && (
                           <span className="text-xs text-gray-400">選手紹介動画なし</span>
                         )}
