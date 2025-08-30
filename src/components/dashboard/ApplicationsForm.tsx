@@ -416,10 +416,10 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
         throw new Error(`許可されていないファイル形式です。JPG、PNG、GIF、WEBP、PDFのみアップロード可能です。(現在のファイル: ${file.type || '不明'})`)
       }
       
-      // ファイルサイズの検証（10MB以下）
-      const maxSize = 10 * 1024 * 1024 // 10MB
+      // ファイルサイズの検証（20MB以下）
+      const maxSize = 20 * 1024 * 1024 // 20MB
       if (file.size > maxSize) {
-        throw new Error('ファイルサイズが10MBを超えています')
+        throw new Error('ファイルサイズが20MBを超えています')
       }
       
       const fileExt = file.name.split('.').pop()?.toLowerCase()
@@ -1446,13 +1446,13 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               label="払込用紙のアップロード（複数枚可）"
               category="document"
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
-              maxSizeMB={10}
+              maxSizeMB={20}
               onChange={handleFileUpload}
               disabled={uploadingFile || !isEditable}
               placeholder={{
                 title: "払込用紙をアップロード",
                 subtitle: "複数枚の画像やPDFをアップロード可能",
-                formats: "JPG, PNG, GIF, WEBP, PDF（最大10MB）"
+                formats: "JPG, PNG, GIF, WEBP, PDF（最大20MB）"
               }}
             />
             <p className="text-xs text-gray-600 mt-2">

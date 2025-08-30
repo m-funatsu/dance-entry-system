@@ -465,7 +465,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 category="video"
                 disabled={uploading || !!practiceVideoFile || !entry || !isEditable}
                 required
-                maxSizeMB={100}
+                maxSizeMB={200}
                 accept="video/*"
                 placeholder={{
                   title: "練習風景動画をドラッグ&ドロップ",
@@ -585,7 +585,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 category="video"
                 disabled={uploading || !!introVideoFile || !entry || !isEditable}
                 required
-                maxSizeMB={100}
+                maxSizeMB={200}
                 accept="video/*"
                 placeholder={{
                   title: "選手紹介・見所動画をドラッグ&ドロップ",

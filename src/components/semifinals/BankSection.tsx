@@ -233,7 +233,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
             onChange={handleFileUpload}
             disabled={!!paymentSlipUrl || !isEditable}
             accept=".jpg,.jpeg,.png,.gif,.pdf"
-            maxSizeMB={10}
+            maxSizeMB={20}
             category="document"
             required
             placeholder={{
@@ -344,7 +344,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
             ※振込明細書、振込確認画面のスクリーンショット、PDFファイル等をアップロードしてください
           </p>
           <p className="text-xs text-gray-500">
-            <strong>対応ファイル形式:</strong> JPEG, JPG, PNG, GIF, PDF（最大10MB）
+            <strong>対応ファイル形式:</strong> JPEG, JPG, PNG, GIF, PDF（最大20MB）
           </p>
         </div>
       </div>
