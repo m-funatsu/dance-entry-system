@@ -44,11 +44,20 @@ export default async function DashboardPage() {
 
   try {
 
-  // エントリー情報の取得（最新のエントリー）
+  // エントリー情報の取得（最新のエントリー + 全ステータス）
   console.log('💥 DASHBOARD: エントリー情報取得開始')
   const { data: entries, error: entriesError } = await supabase
     .from('entries')
-    .select('*')
+    .select(`
+      *,
+      basic_info_status,
+      preliminary_info_status,
+      semifinals_info_status,
+      finals_info_status,
+      program_info_status,
+      sns_info_status,
+      applications_info_status
+    `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -58,6 +67,7 @@ export default async function DashboardPage() {
 
   const entry = entries && entries.length > 0 ? entries[0] : null
   console.log('💥 DASHBOARD: 使用するentry:', entry?.id)
+  console.log('💥 DASHBOARD: 準決勝ステータス:', entry?.semifinals_info_status)
 
   // 基本情報の取得
   let basicInfo = null
@@ -95,25 +105,16 @@ export default async function DashboardPage() {
     programInfo = data
   }
 
-  // 準決勝情報の取得
+  // 準決勝情報の取得（表示用）
   let semifinalsInfo = null
   if (entry) {
-    console.log('🚨🚨🚨 EMERGENCY LOG: 準決勝情報取得開始 🚨🚨🚨')
-    console.log('🚨 EMERGENCY LOG: entry.id:', entry.id)
-    
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('semifinals_info')
       .select('*')
       .eq('entry_id', entry.id)
       .maybeSingle()
     
-    console.log('🚨 EMERGENCY LOG: 準決勝情報取得結果:', data)
-    console.log('🚨 EMERGENCY LOG: 準決勝情報取得エラー:', error)
-    console.log('🚨 EMERGENCY LOG: データが存在するか:', !!data)
-    
     semifinalsInfo = data
-  } else {
-    console.log('🚨🚨🚨 EMERGENCY LOG: entryがnullのため準決勝情報取得スキップ 🚨🚨🚨')
   }
 
   // 決勝情報の取得
@@ -129,7 +130,7 @@ export default async function DashboardPage() {
   }
 
   // SNS情報の取得
-  let snsInfo = null
+  let _snsInfo = null
   let practiceVideo: EntryFile | null = null
   let introductionVideo: EntryFile | null = null
   if (entry) {
@@ -143,7 +144,7 @@ export default async function DashboardPage() {
       console.error('SNS情報取得エラー:', error)
     }
     
-    snsInfo = data
+    _snsInfo = data
     
     // SNS動画ファイルの確認
     const { data: snsFiles, error: filesError } = await supabase
@@ -177,7 +178,7 @@ export default async function DashboardPage() {
 
 
   // プログラム掲載用情報の完了判定関数
-  const checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
+  const _checkProgramInfoComplete = (programInfo: { [key: string]: unknown } | null) => {
     if (!programInfo) return false
     
     // フォームの実際の必須項目のみ
@@ -227,7 +228,7 @@ export default async function DashboardPage() {
   }
 
   // 必須項目のチェック関数  
-  const checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
+  const _checkBasicInfoComplete = (basicInfo: { [key: string]: unknown } | null) => {
     if (!basicInfo) return false
     
     // 基本必須フィールド（フォームのvalidationRulesと一致）
@@ -309,7 +310,7 @@ export default async function DashboardPage() {
     console.log('[DASHBOARD BASIC INFO] 振込確認用紙チェック:', hasBankSlip)
   }
 
-  const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
+  const _checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
     if (!preliminaryInfo) return false
     if (!hasVideo) return false
     
@@ -336,99 +337,9 @@ export default async function DashboardPage() {
     })
   }
 
-  // 準決勝情報の完了判定関数（status-utils.tsと統一）
-  const checkSemifinalsInfoComplete = async (semifinalsInfo: { [key: string]: unknown } | null) => {
-    if (!semifinalsInfo) {
-      console.log('[DASHBOARD SEMIFINALS] semifinalsInfo is null - returning false')
-      return false
-    }
-    
-    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック開始 === 🔍🔍🔍')
-    console.log('🔍 [DASHBOARD SEMIFINALS] entry?.id:', entry?.id)
-    console.log('🔍 [DASHBOARD SEMIFINALS] semifinalsInfo keys:', Object.keys(semifinalsInfo))
-    console.log('🔍 [DASHBOARD SEMIFINALS] semifinalsInfo data:', semifinalsInfo)
-    
-    // status-utils.tsのcheckSemifinalsInfoCompletion関数を使用
-    const { checkSemifinalsInfoCompletion } = await import('@/lib/status-utils')
-    const result = await checkSemifinalsInfoCompletion(semifinalsInfo, entry?.id)
-    
-    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック結果 === 🔍🔍🔍')
-    console.log('🔍 [DASHBOARD SEMIFINALS] 最終結果:', result ? '登録済み' : '入力中')
-    console.log('🔍🔍🔍 [DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック終了 === 🔍🔍🔍')
-    
-    return result
-  }
+  // ステータス情報はentriesテーブルから直接取得するため、判定関数は不要
 
-  // 決勝情報の完了判定関数（status-utils.tsと統一）
-  const checkFinalsInfoComplete = async (finalsInfo: { [key: string]: unknown } | null) => {
-    if (!finalsInfo) return false
-    
-    // status-utils.tsのcheckFinalsInfoCompletion関数を使用
-    const { checkFinalsInfoCompletion } = await import('@/lib/status-utils')
-    return checkFinalsInfoCompletion(finalsInfo)
-  }
-
-  const checkSnsInfoComplete = (snsInfo: { [key: string]: unknown } | null, practiceVideo: EntryFile | null, introductionVideo: EntryFile | null) => {
-    console.log('[DASHBOARD SNS CHECK] === SNS情報完了チェック（ダッシュボード）===')
-    console.log('[DASHBOARD SNS CHECK] snsInfo:', !!snsInfo)
-    console.log('[DASHBOARD SNS CHECK] 練習動画:', !!practiceVideo)
-    console.log('[DASHBOARD SNS CHECK] 紹介動画:', !!introductionVideo)
-    
-    // SNSInfoForm.tsxの必須項目と完全一致：
-    // - 練習動画（約30秒）横長動画（*必須）
-    // - 選手紹介・見どころ（30秒）（*必須）
-    const hasPracticeVideo = !!practiceVideo
-    const hasIntroductionVideo = !!introductionVideo
-    
-    const result = hasPracticeVideo && hasIntroductionVideo
-    
-    console.log('[DASHBOARD SNS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD SNS CHECK] 練習動画（必須）:', hasPracticeVideo)
-    console.log('[DASHBOARD SNS CHECK] 紹介動画（必須）:', hasIntroductionVideo)
-    console.log('[DASHBOARD SNS CHECK] 最終完了判定:', result)
-    console.log('[DASHBOARD SNS CHECK] === SNS情報完了チェック終了（ダッシュボード）===')
-    
-    return result
-  }
-
-  // 各種申請の完了判定関数（必須項目なし）
-  const checkApplicationsInfoComplete = (applicationsInfo: { [key: string]: unknown } | null) => {
-    console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック（ダッシュボード）===')
-    console.log('[DASHBOARD APPLICATIONS CHECK] applicationsInfo:', !!applicationsInfo)
-    
-    if (!applicationsInfo) {
-      console.log('[DASHBOARD APPLICATIONS CHECK] applications_infoなし: false（申請なし）')
-      console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
-      return false
-    }
-    
-    // 何かひとつでもデータがあるかチェック（必須項目なしのため、任意項目のみ）
-    const hasAnyData = !!(
-      // 関係者チケット申請（任意）
-      applicationsInfo.related1_name || applicationsInfo.related2_name || applicationsInfo.related3_name ||
-      applicationsInfo.related4_name || applicationsInfo.related5_name || applicationsInfo.related_ticket_count ||
-      // 選手同伴申請（任意）
-      applicationsInfo.companion1_name || applicationsInfo.companion2_name || applicationsInfo.companion3_name ||
-      // メイク申請（準決勝）（任意）
-      applicationsInfo.makeup_name || applicationsInfo.makeup_email || applicationsInfo.makeup_phone ||
-      applicationsInfo.makeup_preferred_stylist || applicationsInfo.makeup_notes ||
-      // メイク申請（決勝）（任意）
-      applicationsInfo.makeup_name_final || applicationsInfo.makeup_email_final || applicationsInfo.makeup_phone_final ||
-      applicationsInfo.makeup_preferred_stylist_final || applicationsInfo.makeup_notes_final
-    )
-    
-    console.log('[DASHBOARD APPLICATIONS CHECK] 何らかのデータ入力:', hasAnyData)
-    
-    // 必須項目なしのため、データがある場合は常に「申請あり」状態
-    const result = hasAnyData
-    
-    console.log('[DASHBOARD APPLICATIONS CHECK] === チェック結果まとめ ===')
-    console.log('[DASHBOARD APPLICATIONS CHECK] データ入力有無:', hasAnyData)
-    console.log('[DASHBOARD APPLICATIONS CHECK] 最終判定:', result, '（必須項目なしのためデータあり=申請あり）')
-    console.log('[DASHBOARD APPLICATIONS CHECK] === 申請情報完了チェック終了（ダッシュボード）===')
-    
-    return result
-  }
+  // 全ステータス情報はentriesテーブルから直接取得するため、個別判定関数は不要
 
 
   // システム設定から期限を取得
@@ -579,7 +490,7 @@ export default async function DashboardPage() {
                         基本情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {(checkBasicInfoComplete(basicInfo) && hasBankSlip) ? '登録済み' : basicInfo ? '入力中' : '未登録'}
+                        {entry?.basic_info_status || '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.basic_info_deadline)
@@ -628,7 +539,7 @@ export default async function DashboardPage() {
                         予選情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkPreliminaryInfoComplete(preliminaryInfo, fileStats.preliminaryVideo > 0) ? '登録済み' : preliminaryInfo ? '入力中' : '未登録'}
+                        {entry?.preliminary_info_status || '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.music_info_deadline)
@@ -677,7 +588,7 @@ export default async function DashboardPage() {
                         プログラム掲載用情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkProgramInfoComplete(programInfo) ? '登録済み' : programInfo ? '入力中' : '未登録'}
+                        {entry?.program_info_status || '未登録'}
                       </dd>
                       {(() => {
                         const deadline = getDeadlineInfo(settingsMap.program_info_deadline)
@@ -776,7 +687,7 @@ export default async function DashboardPage() {
                         準決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {await checkSemifinalsInfoComplete(semifinalsInfo) ? '登録済み' : semifinalsInfo ? '入力中' : '未登録'}
+                        {entry?.semifinals_info_status || '未登録'}
                       </dd>
                       <StartDateInline section="semifinals" />
                       {(() => {
@@ -826,7 +737,7 @@ export default async function DashboardPage() {
                         決勝情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {await checkFinalsInfoComplete(finalsInfo) ? '登録済み' : finalsInfo ? '入力中' : '未登録'}
+                        {entry?.finals_info_status || '未登録'}
                       </dd>
                       <StartDateInline section="finals" />
                       {(() => {
@@ -876,7 +787,7 @@ export default async function DashboardPage() {
                         SNS情報
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkSnsInfoComplete(snsInfo, practiceVideo, introductionVideo) ? '登録済み' : '未登録'}
+                        {entry?.sns_info_status || '未登録'}
                       </dd>
                       <StartDateInline section="sns" />
                       {(() => {
@@ -927,7 +838,7 @@ export default async function DashboardPage() {
                         各種申請
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {checkApplicationsInfoComplete(applicationsInfo) ? '申請あり' : '申請なし'}
+                        {entry?.applications_info_status || '申請なし'}
                       </dd>
                       <StartDateInline section="optional_request" />
                       {(() => {
