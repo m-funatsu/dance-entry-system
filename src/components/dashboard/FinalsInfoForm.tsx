@@ -323,6 +323,12 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
       }
     }
     
+    console.log('[SYNC SOUND] === 音響データコピー詳細 ===')
+    console.log('[SYNC SOUND] 準決勝chaser_song_designation:', semifinalsData.chaser_song_designation)
+    console.log('[SYNC SOUND] マッピング後chaser_song_designation:', mapChaserSongDesignation(semifinalsData.chaser_song_designation || ''))
+    console.log('[SYNC SOUND] 準決勝sound_start_timing:', semifinalsData.sound_start_timing)
+    console.log('[SYNC SOUND] 準決勝chaser_song:', semifinalsData.chaser_song)
+    
     setFinalsInfo(prev => ({
       ...prev,
       sound_start_timing: semifinalsData.sound_start_timing || '',
