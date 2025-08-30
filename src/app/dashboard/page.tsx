@@ -321,11 +321,24 @@ export default async function DashboardPage() {
 
   // 準決勝情報の完了判定関数（status-utils.tsと統一）
   const checkSemifinalsInfoComplete = async (semifinalsInfo: { [key: string]: unknown } | null) => {
-    if (!semifinalsInfo) return false
+    if (!semifinalsInfo) {
+      console.log('[DASHBOARD SEMIFINALS] semifinalsInfo is null - returning false')
+      return false
+    }
+    
+    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック開始 ===')
+    console.log('[DASHBOARD SEMIFINALS] entry?.id:', entry?.id)
+    console.log('[DASHBOARD SEMIFINALS] semifinalsInfo keys:', Object.keys(semifinalsInfo))
     
     // status-utils.tsのcheckSemifinalsInfoCompletion関数を使用
     const { checkSemifinalsInfoCompletion } = await import('@/lib/status-utils')
-    return await checkSemifinalsInfoCompletion(semifinalsInfo, entry?.id)
+    const result = await checkSemifinalsInfoCompletion(semifinalsInfo, entry?.id)
+    
+    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック結果 ===')
+    console.log('[DASHBOARD SEMIFINALS] 最終結果:', result ? '登録済み' : '入力中')
+    console.log('[DASHBOARD SEMIFINALS] === ダッシュボード準決勝ステータスチェック終了 ===')
+    
+    return result
   }
 
   // 決勝情報の完了判定関数（status-utils.tsと統一）
