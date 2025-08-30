@@ -764,7 +764,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
       console.log('[DELETE] === 削除処理完了 ===')
       console.log('[DELETE] UI状態更新完了 - フィールド:', field)
-      console.log('[DELETE] 更新後のfinalsInfo[field]:', finalsInfo[field])
+      console.log('[DELETE] 更新後のfinalsInfo[field]:', finalsInfo[field as keyof FinalsInfo])
       console.log('[DELETE] 注意: この変更をデータベースに保存するには保存ボタンを押してください')
     } catch (err) {
       console.error('[DELETE] File deletion error:', err)
