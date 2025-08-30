@@ -94,8 +94,6 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
       
       const genreMatch = !genreFilter || entryGenre === genreFilter
       const formMatch = !formFilter || (
-        formFilter === 'has_' ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
-        formFilter === 'no_' ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
         formFilter.startsWith('has_') ? hasSpecificForm(entry, formFilter.replace('has_', '')) :
         formFilter.startsWith('no_') ? !hasSpecificForm(entry, formFilter.replace('no_', '')) :
         true
@@ -200,7 +198,7 @@ export default function EntriesWithFilters({ entries }: EntriesWithFiltersProps)
               </select>
             </div>
             <div className="flex flex-col space-y-1">
-              <label className="text-xs font-medium text-gray-700">提出ステータス</label>
+              <label className="text-xs font-medium text-gray-700">フォーム提出状況</label>
               <select 
                 className="rounded-md border-gray-300 text-sm cursor-pointer"
                 value={formFilter}
