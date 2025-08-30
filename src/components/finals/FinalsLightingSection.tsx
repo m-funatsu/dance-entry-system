@@ -51,7 +51,11 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               name="lighting_change_option"
               value="same"
               checked={lightingChangeOption === 'same'}
-              onChange={() => onLightingChangeOption('same')}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onLightingChangeOption('same')
+                }
+              }}
               disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
@@ -63,7 +67,11 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
               name="lighting_change_option"
               value="different"
               checked={lightingChangeOption === 'different'}
-              onChange={() => onLightingChangeOption('different')}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onLightingChangeOption('different')
+                }
+              }}
               disabled={!isEditable}
               className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
             />
