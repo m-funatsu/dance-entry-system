@@ -860,7 +860,6 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
           <div className="space-y-4">
             <FileUploadField
               label="振込確認用紙 *"
-              helperText="振込確認用紙のアップロードを行うには一度基本情報を保存してからアップロードしてください。"
               value={null}
               onChange={async (file) => {
                 console.log('[BANK SLIP UPLOAD] === 振込確認用紙アップロード開始 ===')
