@@ -29,6 +29,8 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   console.log('[FINALS SOUND SECTION DEBUG] === FinalsSoundSection レンダリング ===')
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles:', audioFiles)
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.chaser_song:', audioFiles?.chaser_song)
+  console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.music_data_path:', audioFiles?.music_data_path)
+  console.log('[FINALS SOUND SECTION DEBUG] finalsInfo.chaser_song:', finalsInfo.chaser_song)
   return (
     <div className="space-y-4">
       <h4 className="font-medium text-gray-900">音響指示情報</h4>

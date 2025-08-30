@@ -821,8 +821,9 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         [field]: urlData?.signedUrl || fileName
       }))
       
-      // audioFiles状態も更新（音声ファイルの場合）
-      if (fileType === 'audio') {
+      // audioFiles状態も更新（特定の音声ファイルフィールドの場合のみ）
+      const audioFields = ['music_data_path', 'chaser_song']
+      if (fileType === 'audio' && audioFields.includes(field)) {
         console.log('[UPLOAD] Updating audioFiles state for field:', field)
         setAudioFiles(prev => ({
           ...prev,
