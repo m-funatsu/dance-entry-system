@@ -89,6 +89,20 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
     loadApplicationsInfo()
   }, [entry.id]) // eslint-disable-line
 
+  // applicationsInfoの変更を監視してステータスを自動更新
+  useEffect(() => {
+    const updateApplicationsStatus = async () => {
+      if (!applicationsInfo.entry_id) return // 初期化前はスキップ
+      
+      const isComplete = checkApplicationsInfoCompletion(applicationsInfo)
+      await updateFormStatus('applications_info', entry.id, isComplete, true)
+    }
+    
+    // デバウンス処理（500ms後に実行）
+    const timeoutId = setTimeout(updateApplicationsStatus, 500)
+    return () => clearTimeout(timeoutId)
+  }, [applicationsInfo, entry.id])
+
   // 同伴者情報が変更されたときに合計金額を再計算
   useEffect(() => {
     calculateCompanionTotal()
@@ -501,12 +515,22 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
       }
 
       // ステータスを再計算・更新
+      // 削除後の状態を正確に反映したデータを作成
       const updatedData = { ...applicationsInfo }
       if (paymentSlipFiles.length === 1) {
         updatedData.payment_slip_path = ''
       }
-      const isComplete = checkApplicationsInfoCompletion(updatedData)
-      await updateFormStatus('applications_info', entry.id, isComplete, true)
+      
+      // 最新のapplicationsInfoを取得して再チェック
+      setTimeout(async () => {
+        // 状態更新後の最新データでステータス判定
+        const currentData = { ...applicationsInfo }
+        if (paymentSlipFiles.length === 1) {
+          currentData.payment_slip_path = ''
+        }
+        const isComplete = checkApplicationsInfoCompletion(currentData)
+        await updateFormStatus('applications_info', entry.id, isComplete, true)
+      }, 100)
 
       setSuccess('払込用紙を削除しました')
     } catch (err) {
@@ -641,9 +665,12 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
       }
 
       // ステータスを再計算・更新
-      const updatedData = { ...applicationsInfo }
-      const isComplete = checkApplicationsInfoCompletion(updatedData)
-      await updateFormStatus('applications_info', entry.id, isComplete, true)
+      // 状態更新後の最新データでステータス判定（遅延実行）
+      setTimeout(async () => {
+        const currentData = { ...applicationsInfo }
+        const isComplete = checkApplicationsInfoCompletion(currentData)
+        await updateFormStatus('applications_info', entry.id, isComplete, true)
+      }, 100)
 
       setSuccess(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像を削除しました`)
     } catch (err) {
