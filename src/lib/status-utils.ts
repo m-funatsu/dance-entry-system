@@ -338,7 +338,19 @@ export async function checkSemifinalsInfoCompletion(
   console.log(`[SEMIFINALS INFO COMPLETION] 条件付き必須フィールド:`, conditionallyRequired)
   console.log(`[SEMIFINALS INFO COMPLETION] 全必須フィールド数: ${allRequiredFields.length}`)
   
-  const { isComplete: fieldsComplete } = checkFormCompletion('SEMIFINALS INFO', formData, allRequiredFields)
+  const { isComplete: fieldsComplete, missingFields } = checkFormCompletion('SEMIFINALS INFO', formData, allRequiredFields)
+  
+  // 不足フィールドの詳細ログ
+  console.log(`[SEMIFINALS INFO COMPLETION] === 不足フィールド詳細ログ ===`)
+  if (missingFields.length > 0) {
+    console.log(`[SEMIFINALS INFO COMPLETION] ❌ 不足している必須フィールド (${missingFields.length}個):`, missingFields)
+    missingFields.forEach(field => {
+      const value = formData[field]
+      console.log(`[SEMIFINALS INFO COMPLETION]   - ${field}: "${value}" (${typeof value})`)
+    })
+  } else {
+    console.log(`[SEMIFINALS INFO COMPLETION] ✅ 全必須フィールド入力済み`)
+  }
   
   // 必須ファイルのチェック
   let hasRequiredFiles = true
@@ -387,6 +399,20 @@ export async function checkSemifinalsInfoCompletion(
           (file.purpose === 'chaser_exit_image_path' || file.file_path?.includes('chaser_exit_image_path'))
         )
         console.log(`[SEMIFINALS INFO COMPLETION] チェイサー/退場イメージ画像: ${hasChaserImage}`)
+        
+        // ファイル不足の詳細ログ
+        console.log(`[SEMIFINALS INFO COMPLETION] === 必須ファイル詳細チェック ===`)
+        const missingFiles: string[] = []
+        if (!hasPaymentSlip) missingFiles.push('振込確認用紙')
+        if (!hasMusicData) missingFiles.push('楽曲データ')
+        if (!hasScene1Image) missingFiles.push('シーン1イメージ画像')
+        if (!hasChaserImage) missingFiles.push('チェイサー/退場イメージ画像')
+        
+        if (missingFiles.length > 0) {
+          console.log(`[SEMIFINALS INFO COMPLETION] ❌ 不足している必須ファイル (${missingFiles.length}個):`, missingFiles)
+        } else {
+          console.log(`[SEMIFINALS INFO COMPLETION] ✅ 全必須ファイルアップロード済み`)
+        }
         
         hasRequiredFiles = hasPaymentSlip && hasMusicData && hasScene1Image && hasChaserImage
       } else {
