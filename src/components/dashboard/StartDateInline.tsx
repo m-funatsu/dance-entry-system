@@ -58,7 +58,7 @@ export function StartDateInline({ section }: StartDateInlineProps) {
 
   return (
     <dd className="text-xs mt-1 text-yellow-600">
-      ⏳ 入力開始前（9/1から利用可能）
+      ⏳ 入力開始前（{startStatus.message}）
     </dd>
   )
 }
