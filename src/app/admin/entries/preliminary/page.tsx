@@ -262,9 +262,9 @@ export default async function PreliminaryInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="font-medium">{preliminaryInfo.music_title || '未入力'}</div>
-                        <div className="text-gray-500">{preliminaryInfo.artist || ''}</div>
-                        <div className="text-gray-500">{preliminaryInfo.cd_title || ''}</div>
+                        <div className="font-medium">使用楽曲タイトル: {preliminaryInfo.music_title || '未入力'}</div>
+                        <div className="text-gray-500">アーティスト: {preliminaryInfo.artist || '未入力'}</div>
+                        <div className="text-gray-500">収録アルバムタイトル: {preliminaryInfo.cd_title || '未入力'}</div>
                         <div className="text-gray-500">JASRAC: {preliminaryInfo.jasrac_code || '未入力'}</div>
                         <div className="text-gray-500">楽曲著作権許諾: {getMusicRightsLabel(preliminaryInfo.music_rights_cleared)}</div>
                         <div className="text-gray-500">レコード番号: {preliminaryInfo.record_number || '未入力'}</div>
