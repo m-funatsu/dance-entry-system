@@ -370,34 +370,56 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
     try {
       let currentEntryId = entryId
 
-      // エントリーが存在しない場合は作成
+      // エントリーが存在しない場合は作成（既存エントリーをチェック）
       if (!currentEntryId) {
-        console.log('[BASIC INFO SUBMIT] === 新規エントリー作成開始 ===')
-        const { data: newEntry, error: entryError } = await supabase
+        console.log('[BASIC INFO SUBMIT] === エントリー作成開始 ===')
+        
+        // 同一ユーザーの既存エントリーをチェック
+        const { data: existingEntry, error: existingError } = await supabase
           .from('entries')
-          .insert({
-            user_id: userId,
-            participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
-            status: 'pending',
-            // 各ステータスフィールドにデフォルト値を設定
-            basic_info_status: '入力中',
-            preliminary_info_status: '未登録',
-            semifinals_info_status: '未登録',
-            finals_info_status: '未登録',
-            program_info_status: '未登録',
-            sns_info_status: '未登録',
-            applications_info_status: '申請なし'
-          })
-          .select()
+          .select('id')
+          .eq('user_id', userId)
           .maybeSingle()
-
-        if (entryError) {
-          console.error('[BASIC INFO SUBMIT] エントリー作成エラー:', entryError)
-          throw entryError
+        
+        if (existingError && existingError.code !== 'PGRST116') {
+          console.error('[BASIC INFO SUBMIT] 既存エントリーチェックエラー:', existingError)
+          throw existingError
         }
         
-        console.log('[BASIC INFO SUBMIT] 新規エントリー作成成功:', newEntry)
-        currentEntryId = newEntry.id
+        if (existingEntry) {
+          // 既存エントリーを使用
+          currentEntryId = existingEntry.id
+          console.log('[BASIC INFO SUBMIT] 既存エントリーを使用:', currentEntryId)
+        } else {
+          // 新規エントリー作成
+          console.log('[BASIC INFO SUBMIT] 新規エントリー作成')
+          const { data: newEntry, error: entryError } = await supabase
+            .from('entries')
+            .insert({
+              user_id: userId,
+              participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
+              status: 'pending',
+              // 各ステータスフィールドにデフォルト値を設定
+              basic_info_status: '入力中',
+              preliminary_info_status: '未登録',
+              semifinals_info_status: '未登録',
+              finals_info_status: '未登録',
+              program_info_status: '未登録',
+              sns_info_status: '未登録',
+              applications_info_status: '申請なし'
+            })
+            .select()
+            .maybeSingle()
+
+          if (entryError) {
+            console.error('[BASIC INFO SUBMIT] エントリー作成エラー:', entryError)
+            throw entryError
+          }
+          
+          console.log('[BASIC INFO SUBMIT] 新規エントリー作成成功:', newEntry)
+          currentEntryId = newEntry.id
+        }
+        
         console.log('[BASIC INFO SUBMIT] currentEntryId設定:', currentEntryId)
         
         // handleFieldChangeは非同期更新のため、直接formDataを更新
@@ -882,29 +904,51 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                 let useEntryId = entryId
                 
                 try {
-                  // エントリーが存在しない場合は作成
+                  // エントリーが存在しない場合は作成（既存エントリーをチェック）
                   if (!useEntryId) {
-                    console.log('[BANK SLIP UPLOAD] 新規エントリー作成')
-                    const { data: newEntry, error: entryError } = await supabase
+                    console.log('[BANK SLIP UPLOAD] 既存エントリーチェック開始')
+                    
+                    // 同一ユーザーの既存エントリーをチェック
+                    const { data: existingEntry, error: existingError } = await supabase
                       .from('entries')
-                      .insert({
-                        user_id: userId,
-                        participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
-                        status: 'pending',
-                        // ステータスフィールドのデフォルト値を設定
-                        basic_info_status: '入力中',
-                        preliminary_info_status: '未登録',
-                        semifinals_info_status: '未登録',
-                        finals_info_status: '未登録',
-                        program_info_status: '未登録',
-                        sns_info_status: '未登録',
-                        applications_info_status: '申請なし'
-                      })
-                      .select()
+                      .select('id')
+                      .eq('user_id', userId)
                       .maybeSingle()
+                    
+                    if (existingError && existingError.code !== 'PGRST116') {
+                      console.error('[BANK SLIP UPLOAD] 既存エントリーチェックエラー:', existingError)
+                      throw existingError
+                    }
+                    
+                    if (existingEntry) {
+                      // 既存エントリーを使用
+                      useEntryId = existingEntry.id
+                      console.log('[BANK SLIP UPLOAD] 既存エントリーを使用:', useEntryId)
+                    } else {
+                      // 新規エントリー作成
+                      console.log('[BANK SLIP UPLOAD] 新規エントリー作成')
+                      const { data: newEntry, error: entryError } = await supabase
+                        .from('entries')
+                        .insert({
+                          user_id: userId,
+                          participant_names: `${formData.representative_name || '未入力'}\n${formData.partner_name || '未入力'}`,
+                          status: 'pending',
+                          // ステータスフィールドのデフォルト値を設定
+                          basic_info_status: '入力中',
+                          preliminary_info_status: '未登録',
+                          semifinals_info_status: '未登録',
+                          finals_info_status: '未登録',
+                          program_info_status: '未登録',
+                          sns_info_status: '未登録',
+                          applications_info_status: '申請なし'
+                        })
+                        .select()
+                        .maybeSingle()
 
-                    if (entryError) throw entryError
-                    useEntryId = newEntry.id
+                      if (entryError) throw entryError
+                      useEntryId = newEntry.id
+                      console.log('[BANK SLIP UPLOAD] 新規エントリー作成完了:', useEntryId)
+                    }
                   }
 
                   // 基本情報を保存（空文字列をnullに変換）
