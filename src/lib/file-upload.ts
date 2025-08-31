@@ -229,41 +229,35 @@ export async function uploadFile({
   const filePath = path || (config.generatePath ? config.generatePath(file.name) : file.name)
   
   try {
-    // プログレスのシミュレーション（Supabaseは現在プログレスをサポートしていない）
+    // 実際のアップロード時間測定とプログレス表示
     if (onProgress) {
-      // 開始時
-      onProgress(10)
-      
-      // ファイルサイズに基づいた動的プログレス計算
       const fileSize = file.size
       const sizeMB = fileSize / (1024 * 1024)
+      const startTime = Date.now()
       
-      // ファイルサイズに基づいた予想アップロード時間（秒）
-      const estimatedTimeSeconds = Math.max(2, Math.min(60, sizeMB / 10)) // 2秒〜60秒
-      const updateIntervalMs = Math.max(100, Math.min(1000, estimatedTimeSeconds * 100 / 90)) // 100ms〜1000ms
+      console.log(`[UPLOAD START] 開始: ${sizeMB.toFixed(1)}MB ファイル`)
+      onProgress(5) // 開始時
       
-      console.log(`[REALISTIC PROGRESS] ファイル: ${sizeMB.toFixed(1)}MB, 予想時間: ${estimatedTimeSeconds.toFixed(1)}秒, 更新間隔: ${updateIntervalMs.toFixed(0)}ms`)
-      
-      let currentProgress = 10
-      
-      const progressInterval = setInterval(() => {
-        // より現実的な進行速度（大きなファイルほど遅く）
-        const increment = sizeMB > 100 ? Math.random() * 3 + 1 :  // 100MB超: 1-4%
-                          sizeMB > 50  ? Math.random() * 5 + 2 :  // 50MB超: 2-7% 
-                          sizeMB > 10  ? Math.random() * 8 + 3 :  // 10MB超: 3-11%
-                                         Math.random() * 15 + 5   // 10MB以下: 5-20%
+      // 大きなファイルの場合は定期的にプログレス更新を開始
+      let progressUpdateInterval: NodeJS.Timeout | null = null
+      if (sizeMB > 10) { // 10MB以上のファイルの場合
+        let currentProgress = 5
+        const maxProgressBeforeComplete = 90 // 実際の完了まで90%で待機
+        const expectedDurationSeconds = Math.max(5, sizeMB / 20) // より現実的な予想時間
+        const incrementPerSecond = maxProgressBeforeComplete / expectedDurationSeconds
         
-        currentProgress += increment
+        progressUpdateInterval = setInterval(() => {
+          if (currentProgress < maxProgressBeforeComplete) {
+            currentProgress += incrementPerSecond
+            onProgress(Math.round(Math.min(currentProgress, maxProgressBeforeComplete)))
+            console.log(`[UPLOAD PROGRESS] 経過: ${Math.round(currentProgress)}%`)
+          }
+        }, 1000) // 1秒間隔で更新
         
-        if (currentProgress >= 95) {
-          clearInterval(progressInterval)
-          currentProgress = 95 // 実際のアップロード完了まで95%で待機
-        }
-        
-        onProgress(Math.round(currentProgress))
-      }, updateIntervalMs)
+        console.log(`[UPLOAD PROGRESS] 大きなファイル(${sizeMB.toFixed(1)}MB) - 予想時間: ${expectedDurationSeconds.toFixed(1)}秒`)
+      }
       
-      // アップロード実行
+      // アップロード実行（実際の処理）
       const { data, error } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file, {
@@ -272,13 +266,18 @@ export async function uploadFile({
         })
       
       // プログレス更新を停止
-      clearInterval(progressInterval)
+      if (progressUpdateInterval) {
+        clearInterval(progressUpdateInterval)
+      }
+      
+      const endTime = Date.now()
+      const actualDuration = (endTime - startTime) / 1000
       
       if (!error) {
-        onProgress(100) // 完了
-        console.log(`[REALISTIC PROGRESS] アップロード完了: ${sizeMB.toFixed(1)}MB`)
+        onProgress(100) // 実際の完了時に100%
+        console.log(`[UPLOAD COMPLETE] 完了: ${sizeMB.toFixed(1)}MB, 実時間: ${actualDuration.toFixed(1)}秒`)
       } else {
-        console.error(`[REALISTIC PROGRESS] アップロードエラー:`, error)
+        console.error(`[UPLOAD ERROR] エラー:`, error)
       }
       
       // エラーの場合は元の処理を継続

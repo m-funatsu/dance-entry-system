@@ -84,34 +84,35 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
   })
 
   // 統一ステータスバー管理
-  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
+  const { status, startUpload, completeUpload, failUpload } = useUploadStatus()
   
-  // アップロード状態の監視 - uploading状態の変化を追跡
+  // アップロード状態の監視と実時間追跡
   const [currentUploadId, setCurrentUploadId] = useState<string | null>(null)
+  const [uploadStartTime, setUploadStartTime] = useState<number | null>(null)
   
   useEffect(() => {
     // アップロード開始検出
     if (uploading && !currentUploadId) {
-      console.log('[UPLOAD START] アップロード開始を検出')
-      // アップロード開始時点でファイル情報が必要なため、一時的にダミーファイルでステータス開始
-      // 実際のファイル情報は handleFileUpload で設定される
+      const startTime = Date.now()
+      setUploadStartTime(startTime)
+      console.log('[UPLOAD START] 実際のアップロード開始を検出', new Date(startTime).toLocaleTimeString())
     }
     
-    // アップロード中のプログレス更新
-    if (uploading && currentUploadId && progress > 0) {
-      updateProgress(currentUploadId, progress)
-      console.log(`[UPLOAD PROGRESS] 進行状況: ${progress}%`)
-    }
-    
-    // アップロード完了検出
-    if (!uploading && currentUploadId) {
-      console.log('[UPLOAD COMPLETE] アップロード完了を検出')
+    // アップロード完了検出 - 実際にuploading=falseになった時点
+    if (!uploading && currentUploadId && uploadStartTime) {
+      const endTime = Date.now()
+      const actualDuration = (endTime - uploadStartTime) / 1000 // 秒
+      console.log(`[UPLOAD COMPLETE] 実際のアップロード完了検出 - 実時間: ${actualDuration.toFixed(1)}秒`)
+      
+      // 実際のアップロード完了後、データベース処理を待ってステータスバー完了
       setTimeout(() => {
+        console.log('[UPLOAD COMPLETE] ステータスバー完了処理実行')
         completeUpload(currentUploadId)
         setCurrentUploadId(null)
-      }, 1000) // データベース処理完了を待つ
+        setUploadStartTime(null)
+      }, 1500) // データベース保存・URL生成完了を確実に待つ
     }
-  }, [uploading, progress, currentUploadId, updateProgress, completeUpload])
+  }, [uploading, currentUploadId, uploadStartTime, completeUpload])
 
   // データを読み込む
   useEffect(() => {
