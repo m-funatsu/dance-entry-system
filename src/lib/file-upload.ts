@@ -26,7 +26,7 @@ export const FILE_UPLOAD_DEFAULTS = {
   allowedTypes: {
     image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
     video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime', 'video/webm', 'video/x-msvideo'],
-    audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg', 'audio/mp4', 'audio/x-m4a'],
+    audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'video/mp4'],
     document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
   },
   // 現在のSupabase課金後の制限
@@ -56,7 +56,14 @@ export function sanitizeFileName(fileName: string): string {
 // ファイルカテゴリーを判定
 export function getFileCategory(mimeType: string): FileCategory | null {
   if (mimeType.startsWith('image/')) return 'image'
-  if (mimeType.startsWith('video/')) return 'video'
+  if (mimeType.startsWith('video/')) {
+    // M4Aファイルがvideo/mp4として誤認識される場合があるため、音声として扱う
+    if (mimeType === 'video/mp4') {
+      // ファイル拡張子で最終判定が必要（実装時に考慮）
+      return 'video' // デフォルトは動画として扱う
+    }
+    return 'video'
+  }
   if (mimeType.startsWith('audio/')) return 'audio'
   if (mimeType.startsWith('application/')) return 'document'
   return null
@@ -102,11 +109,25 @@ export function validateFile(
     }
   }
 
-  const category = config.category || getFileCategory(file.type)
+  // M4Aファイルの特別処理（ファイル拡張子ベースでカテゴリを決定）
+  let category = config.category
+  if (!category) {
+    // ファイル拡張子で判定
+    const fileName = file.name.toLowerCase()
+    if (fileName.endsWith('.m4a')) {
+      category = 'audio'
+      console.log('[FILE VALIDATION] M4Aファイルを音声カテゴリとして強制判定')
+    } else {
+      category = getFileCategory(file.type) || undefined
+    }
+  }
+  
   console.log('[FILE VALIDATION] カテゴリ判定:', {
     configCategory: config.category,
     detectedCategory: getFileCategory(file.type),
-    finalCategory: category
+    finalCategory: category,
+    fileName: file.name,
+    isM4A: file.name.toLowerCase().endsWith('.m4a')
   })
   
   if (!category) {
@@ -141,14 +162,26 @@ export function validateFile(
     isAllowed: allowedTypes?.includes(file.type)
   })
   
-  if (!allowedTypes || !allowedTypes.includes(file.type)) {
+  // M4Aファイルの特別処理（拡張子ベースで許可）
+  const isM4AFile = file.name.toLowerCase().endsWith('.m4a')
+  const isMimeTypeAllowed = allowedTypes?.includes(file.type)
+  
+  if (!allowedTypes || (!isMimeTypeAllowed && !isM4AFile)) {
     console.log('[FILE VALIDATION] エラー: 許可されていないファイル形式')
     console.log('[FILE VALIDATION] 許可されている形式:', allowedTypes)
     console.log('[FILE VALIDATION] ファイル形式:', file.type)
-    return {
-      valid: false,
-      error: '許可されていないファイル形式です',
-      errorType: ErrorType.FILE_TYPE
+    console.log('[FILE VALIDATION] M4Aファイル判定:', isM4AFile)
+    console.log('[FILE VALIDATION] MIMEタイプ許可:', isMimeTypeAllowed)
+    
+    // M4Aファイルで音声カテゴリの場合は許可
+    if (isM4AFile && category === 'audio') {
+      console.log('[FILE VALIDATION] M4Aファイルを音声として許可')
+    } else {
+      return {
+        valid: false,
+        error: '許可されていないファイル形式です',
+        errorType: ErrorType.FILE_TYPE
+      }
     }
   }
 
