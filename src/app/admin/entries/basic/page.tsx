@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminLink from '@/components/admin/AdminLink'
 import DownloadButton from '@/components/admin/DownloadButton'
+import { getStatusLabel } from '@/lib/status-labels'
 
 
 export default async function BasicInfoListPage() {
@@ -148,7 +149,7 @@ export default async function BasicInfoListPage() {
               item.agreement_checked ? 'Yes' : 'No',
               item.privacy_policy_checked ? 'Yes' : 'No',
               item.media_consent_checked ? 'Yes' : 'No',
-              item.entries?.status || ''
+              getStatusLabel(item.entries?.status || '')
             ])}
             headers={['ID', 'エントリーID', 'ダンスジャンル', 'アマプロ区分', 'エントリー名', 'エントリー名フリガナ', 'エントリー名ローマ字', '代表者メール', '生年月日', 'パートナーエントリー名', 'パートナーエントリー名フリガナ', 'パートナーエントリー名ローマ字', 'パートナー生年月日', '代表者電話番号', '代表者本名', '代表者本名カナ', 'パートナー本名', 'パートナー本名カナ', '緊急連絡先1名前', '緊急連絡先1電話', '緊急連絡先2名前', '緊急連絡先2電話', '保護者名', '保護者電話', '保護者メール', 'パートナー保護者名', 'パートナー保護者電話', 'パートナー保護者メール', '参加資格', 'プライバシーポリシー', '写真・映像使用許諾', '選考ステータス']}
             filename="basic_info"
