@@ -64,7 +64,6 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   // ファイルアップロードフック（プログレスバー用）
   const { uploadAudio, uploadImage, uploading, progress } = useFileUploadV2({
-    category: 'audio', // デフォルト（実際のファイル種別は動的に変更）
     onError: (error: string) => showToast(error, 'error')
   })
 

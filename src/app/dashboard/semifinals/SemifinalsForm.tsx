@@ -53,7 +53,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
 
   // ファイルアップロードフック（プログレスバー用）
   const { uploadAudio, uploadImage, uploading, progress } = useFileUploadV2({
-    category: 'audio',
     onError: (error: string) => showToast(error, 'error')
   })
 

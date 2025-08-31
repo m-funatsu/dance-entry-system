@@ -29,7 +29,6 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
 
   // ファイルアップロードフック（SNS形式のプログレスバー用）
   const { uploadImage, uploading, progress } = useFileUploadV2({
-    category: 'document',
     onError: (error: string) => showToast(error, 'error')
   })
 
