@@ -390,7 +390,7 @@ export default async function ApplicationsInfoListPage() {
                     <td className="px-2 py-3">
                       <div className="space-y-1">
                         {Array.isArray(applicationsInfo.entry_files) && applicationsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose === 'payment_slip'
+                          file.purpose === 'payment_slip' || file.purpose === 'payment_slip_path'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -404,7 +404,7 @@ export default async function ApplicationsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(applicationsInfo.entry_files) || !applicationsInfo.entry_files.some((file: { purpose?: string }) => 
-                          file.purpose === 'payment_slip'
+                          file.purpose === 'payment_slip' || file.purpose === 'payment_slip_path'
                         )) && (
                           <span className="text-xs text-gray-400">払込用紙なし</span>
                         )}
