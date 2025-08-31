@@ -220,6 +220,8 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
             label="チェイサー（退場）曲音源"
             value={semifinalsInfo.chaser_song || ''}
             displayName={audioFiles?.chaser_song?.file_name}
+            showStatusBar={true}
+            hidePreviewUntilComplete={true}
             onChange={(file) => {
               console.log('[SOUND SECTION] Uploading chaser_song file:', file.name)
               onFileUpload('chaser_song', file)

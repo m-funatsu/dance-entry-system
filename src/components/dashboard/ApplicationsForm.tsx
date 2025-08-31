@@ -1449,6 +1449,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
               maxSizeMB={20}
               onChange={handleFileUpload}
               disabled={uploadingFile || !isEditable}
+              showStatusBar={true}
+              hidePreviewUntilComplete={true}
               placeholder={{
                 title: "払込用紙をアップロード",
                 subtitle: "複数枚の画像やPDFをアップロード可能",

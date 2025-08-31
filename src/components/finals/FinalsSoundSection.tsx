@@ -147,6 +147,8 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
             label="チェイサー（退場）曲 音源 *"
             value={finalsInfo.chaser_song || ''}
             displayName={audioFiles?.chaser_song?.file_name}
+            showStatusBar={true}
+            hidePreviewUntilComplete={true}
             onChange={(file) => {
               console.log('[FINALS CHASER UPLOAD] === 決勝チェイサー曲ファイル選択 ===')
               console.log('[FINALS CHASER UPLOAD] 選択されたファイル:', file.name)

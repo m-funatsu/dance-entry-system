@@ -1068,6 +1068,8 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
               maxSizeMB={20}
               required
               disabled={!!bankSlipFile || !isEditable}
+              showStatusBar={true}
+              hidePreviewUntilComplete={true}
               placeholder={{
                 title: bankSlipFile ? "既にアップロード済みです" : "振込確認用紙をアップロード",
                 formats: "JPG, PNG, GIF など（最大20MB、1件まで）"

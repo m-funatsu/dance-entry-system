@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { AudioUploadProps } from '@/lib/types'
+import { useUploadStatus } from '@/hooks/useUploadStatus'
+import { UploadStatusBar } from './UploadStatusBar'
 
 export const AudioUpload: React.FC<AudioUploadProps> = ({
   label,
@@ -13,7 +15,9 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   required = false,
   maxSizeMB = 200,
   accept = '.wav,.mp3,.m4a',
-  deletable = true // デフォルトは削除可能
+  deletable = true, // デフォルトは削除可能
+  showStatusBar = false,
+  hidePreviewUntilComplete = false
 }) => {
   console.log('[AUDIO UPLOAD DEBUG] === AudioUpload レンダリング ===')
   console.log('[AUDIO UPLOAD DEBUG] label:', label)
@@ -21,7 +25,11 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   console.log('[AUDIO UPLOAD DEBUG] onDelete exists:', !!onDelete)
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
+  const [showPreview, setShowPreview] = useState(!hidePreviewUntilComplete)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // 統一ステータスバー管理
+  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
   
   // valueが空になったら（削除された場合）、uploadingFileもクリア
   useEffect(() => {
@@ -77,6 +85,35 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
     }
 
     setUploadingFile(file)
+    
+    // ステータスバー開始
+    if (showStatusBar) {
+      const uploadId = startUpload(file, 'audio')
+      
+      if (hidePreviewUntilComplete) {
+        setShowPreview(false)
+      }
+      
+      // 仮想プログレス（実際のアップロードは外部で処理）
+      let currentProgress = 0
+      const interval = setInterval(() => {
+        currentProgress += Math.random() * 15 + 5
+        if (currentProgress >= 100) {
+          currentProgress = 100
+          updateProgress(uploadId, currentProgress)
+          setTimeout(() => {
+            completeUpload(uploadId)
+            if (hidePreviewUntilComplete) {
+              setShowPreview(true)
+            }
+          }, 500)
+          clearInterval(interval)
+        } else {
+          updateProgress(uploadId, currentProgress)
+        }
+      }, 200)
+    }
+    
     onChange(file)
   }
 
@@ -122,7 +159,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
           className="hidden"
         />
         
-        {value ? (
+        {value && showPreview ? (
           <div className="space-y-3">
             <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -215,6 +252,18 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
           </div>
         )}
       </div>
+      
+      {/* 統一ステータスバー */}
+      {showStatusBar && (status.isUploading || status.error) && (
+        <UploadStatusBar
+          isUploading={status.isUploading}
+          progress={status.progress}
+          fileName={status.fileName}
+          fileSize={status.fileSize}
+          fileType={status.fileType}
+          error={status.error}
+        />
+      )}
     </div>
   )
 }
