@@ -91,6 +91,26 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     'semifinals_info_props_usage': '準決勝小道具使用',
     'semifinals_info_props_details': '準決勝小道具詳細',
     
+    // 照明シーン情報
+    'semifinals_info_lighting_scene1_color': '照明シーン1 色',
+    'semifinals_info_lighting_scene1_color_other': '照明シーン1 色・系統その他',
+    'semifinals_info_lighting_scene1_image': '照明シーン1 イメージ',
+    'semifinals_info_lighting_scene2_color': '照明シーン2 色',
+    'semifinals_info_lighting_scene2_color_other': '照明シーン2 色・系統その他',
+    'semifinals_info_lighting_scene2_image': '照明シーン2 イメージ',
+    'semifinals_info_lighting_scene3_color': '照明シーン3 色',
+    'semifinals_info_lighting_scene3_color_other': '照明シーン3 色・系統その他',
+    'semifinals_info_lighting_scene3_image': '照明シーン3 イメージ',
+    'semifinals_info_lighting_scene4_color': '照明シーン4 色',
+    'semifinals_info_lighting_scene4_color_other': '照明シーン4 色・系統その他',
+    'semifinals_info_lighting_scene4_image': '照明シーン4 イメージ',
+    'semifinals_info_lighting_scene5_color': '照明シーン5 色',
+    'semifinals_info_lighting_scene5_color_other': '照明シーン5 色・系統その他',
+    'semifinals_info_lighting_scene5_image': '照明シーン5 イメージ',
+    'semifinals_info_lighting_chaser_color': '照明シーン チェイサー 色',
+    'semifinals_info_lighting_chaser_color_other': '照明シーン チェイサー 色・系統その他',
+    'semifinals_info_lighting_chaser_image': '照明シーン チェイサー イメージ',
+    
     // 決勝情報
     'finals_info_music_change': '決勝楽曲変更',
     'finals_info_work_title': '決勝作品タイトル',
