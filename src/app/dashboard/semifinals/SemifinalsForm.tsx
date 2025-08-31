@@ -8,6 +8,7 @@ import { updateFormStatus, checkSemifinalsInfoCompletion } from '@/lib/status-ut
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
+import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { DebugLogger } from '@/lib/debug-logger'
 import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection } from '@/components/semifinals'
 import { 
@@ -49,6 +50,12 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
   const [hasPaymentSlip, setHasPaymentSlip] = useState(false)
+
+  // ファイルアップロードフック（プログレスバー用）
+  const { uploadAudio, uploading, progress } = useFileUploadV2({
+    category: 'audio',
+    onError: (error: string) => showToast(error, 'error')
+  })
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)
@@ -330,16 +337,20 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         await handleFileDelete(field)
       }
 
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${userId}/${entry.id}/semifinals/${field}_${Date.now()}.${fileExt}`
-      const { error: uploadError } = await supabase.storage
-        .from('files')
-        .upload(fileName, file)
-
-      if (uploadError) {
-        console.error('Storage upload error:', uploadError)
-        throw uploadError
+      // useFileUploadV2を使用してプログレスバー付きでアップロード
+      console.log('[UPLOAD DEBUG] useFileUploadV2でアップロード開始')
+      
+      const result = await uploadAudio(file, { 
+        entryId: entry.id, 
+        userId, 
+        folder: `semifinals/${field}` 
+      })
+      
+      if (!result.success || !result.path) {
+        throw new Error(result.error || 'アップロードに失敗しました')
       }
+      
+      const fileName = result.path
 
       // ファイル情報をデータベースに保存（purposeフィールドを確実に設定）
       // ファイルタイプを適切に判定
@@ -814,6 +825,8 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 
