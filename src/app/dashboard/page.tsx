@@ -483,7 +483,7 @@ export default async function DashboardPage() {
                   <h3 className="text-sm font-medium text-blue-800">注意事項</h3>
                   <div className="mt-2 text-sm text-blue-700">
                     <p>
-                      必須項目を全て入力していてもステータスが「入力中」の場合は、編集ボタンから画面を開いて「保存」ボタンをクリックしてください。
+                      必須項目を全て入力していてもステータスが「入力中」の場合は、編集ボタンから画面を開いて<span className="text-red-600 font-bold">「保存」ボタンをクリック</span>してください。
                     </p>
                   </div>
                 </div>
