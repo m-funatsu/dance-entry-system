@@ -310,53 +310,32 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     try {
       const supabase = createClient()
       
-      // エントリーと基本的な関連データを取得
+      // JOINクエリで全関連データを一度に取得（画面表示と同じ方式）
       const { data: entries, error: entriesError } = await supabase
         .from('entries')
         .select(`
           *,
-          users(name, email)
+          users(name, email),
+          basic_info(*),
+          preliminary_info(*),
+          semifinals_info(*),
+          finals_info(*),
+          applications_info(*),
+          program_info(*),
+          sns_info(*),
+          seat_request(*)
         `)
         .order('created_at', { ascending: false })
       
       if (entriesError) throw entriesError
       
-      // 各テーブルのデータを個別に取得
-      const [
-        basicInfoResult,
-        preliminaryInfoResult,
-        semifinalsInfoResult,
-        finalsInfoResult,
-        applicationsInfoResult,
-        programInfoResult,
-        snsInfoResult,
-        seatRequestResult
-      ] = await Promise.all([
-        supabase.from('basic_info').select('*'),
-        supabase.from('preliminary_info').select('*'),
-        supabase.from('semifinals_info').select('*'),
-        supabase.from('finals_info').select('*'),
-        supabase.from('applications_info').select('*'),
-        supabase.from('program_info').select('*'),
-        supabase.from('sns_info').select('*'),
-        supabase.from('seat_request').select('*')
-      ])
-      
-      // エントリーデータに関連データをマージ
+      // JOINされたデータをフラット化
       const mergedData = (entries || []).map(entry => {
-        const basicInfo = basicInfoResult.data?.find(b => b.entry_id === entry.id)
-        const preliminaryInfo = preliminaryInfoResult.data?.find(p => p.entry_id === entry.id)
-        const semifinalsInfo = semifinalsInfoResult.data?.find(s => s.entry_id === entry.id)
-        const finalsInfo = finalsInfoResult.data?.find(f => f.entry_id === entry.id)
-        const applicationsInfo = applicationsInfoResult.data?.find(a => a.entry_id === entry.id)
-        const programInfo = programInfoResult.data?.find(p => p.entry_id === entry.id)
-        const snsInfo = snsInfoResult.data?.find(s => s.entry_id === entry.id)
-        const seatRequest = seatRequestResult.data?.find(s => s.entry_id === entry.id)
-        
         // ユーザー情報を展開
         const userData = entry.users as { name?: string; email?: string } | undefined
         
-        // 準決勝情報のログ出力
+        // 準決勝情報のログ出力（JOINデータから）
+        const semifinalsInfo = Array.isArray(entry.semifinals_info) ? entry.semifinals_info[0] : entry.semifinals_info
         if (semifinalsInfo) {
           console.log('Semifinals Info for entry', entry.id, ':', Object.keys(semifinalsInfo).filter(k => k.includes('color_other')))
           Object.keys(semifinalsInfo).forEach(key => {
@@ -371,15 +350,15 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
           // ユーザー情報を分かりやすく追加
           user_name: userData?.name || '不明',
           user_email: userData?.email || '',
-          // 関連データをマージ
-          basic_info: basicInfo || {},
-          preliminary_info: preliminaryInfo || {},
-          semifinals_info: semifinalsInfo || {},
-          finals_info: finalsInfo || {},
-          applications_info: applicationsInfo || {},
-          program_info: programInfo || {},
-          sns_info: snsInfo || {},
-          seat_request: seatRequest || {}
+          // JOINされた関連データを適切に展開
+          basic_info: Array.isArray(entry.basic_info) ? entry.basic_info[0] || {} : entry.basic_info || {},
+          preliminary_info: Array.isArray(entry.preliminary_info) ? entry.preliminary_info[0] || {} : entry.preliminary_info || {},
+          semifinals_info: Array.isArray(entry.semifinals_info) ? entry.semifinals_info[0] || {} : entry.semifinals_info || {},
+          finals_info: Array.isArray(entry.finals_info) ? entry.finals_info[0] || {} : entry.finals_info || {},
+          applications_info: Array.isArray(entry.applications_info) ? entry.applications_info[0] || {} : entry.applications_info || {},
+          program_info: Array.isArray(entry.program_info) ? entry.program_info[0] || {} : entry.program_info || {},
+          sns_info: Array.isArray(entry.sns_info) ? entry.sns_info[0] || {} : entry.sns_info || {},
+          seat_request: Array.isArray(entry.seat_request) ? entry.seat_request[0] || {} : entry.seat_request || {}
         }
       })
       
