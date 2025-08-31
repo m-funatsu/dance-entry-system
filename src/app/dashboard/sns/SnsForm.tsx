@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, UnifiedFileUpload, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
@@ -471,7 +471,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 </div>
               )}
               
-              <UnifiedFileUpload
+              <FileUploadField
                 label="練習風景動画"
                 value={practiceVideoUrl}
                 onChange={(file) => handleFileUpload('practice_video', file)}
@@ -602,7 +602,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 </div>
               )}
               
-              <UnifiedFileUpload
+              <FileUploadField
                 label="選手紹介・見所動画"
                 value={introVideoUrl}
                 onChange={(file) => handleFileUpload('introduction_highlight', file)}

@@ -75,31 +75,35 @@ export const UnifiedFileUpload = ({
     }
   })
 
-  // アップロード状態の同期
+  // 実際のファイルアップロードフックからのプログレス更新（uploadPathがある場合）
   useEffect(() => {
-    if (uploading && selectedFile && !status.isUploading) {
-      const uploadId = startUpload(selectedFile, category)
-      // 初期プログレスの設定
-      updateProgress(uploadId, progress || 0)
-    }
-    
-    if (!uploading && status.isUploading) {
-      if (uploadError) {
-        failUpload(status.uploadId!, uploadError)
-      } else if (status.uploadId) {
-        completeUpload(status.uploadId)
-      }
-    }
-  }, [uploading, uploadError, selectedFile, status.isUploading, status.uploadId, startUpload, updateProgress, completeUpload, failUpload, category, progress])
-
-  // プログレスの同期
-  useEffect(() => {
-    if (status.isUploading && status.uploadId) {
+    if (uploading && uploadPath && status.isUploading && status.uploadId) {
       updateProgress(status.uploadId, progress || 0)
     }
-  }, [progress, status.isUploading, status.uploadId, updateProgress])
+  }, [uploading, uploadPath, progress, status.isUploading, status.uploadId, updateProgress])
 
   const error = localError || uploadError
+
+  // 仮想的なアップロード進行を表示する関数
+  const simulateUpload = useCallback((uploadId: string) => {
+    let currentProgress = 0
+    const interval = setInterval(() => {
+      currentProgress += Math.random() * 20 + 5 // 5-25%ずつ進める
+      if (currentProgress >= 100) {
+        currentProgress = 100
+        updateProgress(uploadId, currentProgress)
+        setTimeout(() => {
+          completeUpload(uploadId)
+          if (hidePreviewUntilComplete) {
+            setShowPreview(true)
+          }
+        }, 500)
+        clearInterval(interval)
+      } else {
+        updateProgress(uploadId, currentProgress)
+      }
+    }, 200) // 200msごとに更新
+  }, [updateProgress, completeUpload, hidePreviewUntilComplete])
 
   const handleFile = useCallback(async (file: File) => {
     setLocalError(null)
@@ -123,11 +127,24 @@ export const UnifiedFileUpload = ({
       setShowPreview(false)
     }
     
-    // 自動アップロード（uploadPathが提供されている場合）
+    // ステータスバー表示のために常にアップロードを開始
+    const uploadId = startUpload(file, category)
+    
+    // 実際のアップロード処理（uploadPathが提供されている場合のみ）
     if (uploadPath && onUploadComplete) {
-      await upload(file)
+      try {
+        await upload(file)
+        // アップロード成功
+        completeUpload(uploadId)
+      } catch (error) {
+        // アップロード失敗
+        failUpload(uploadId, error instanceof Error ? error.message : 'アップロードに失敗しました')
+      }
+    } else {
+      // uploadPath が提供されていない場合は、仮想的なアップロード進行を表示
+      simulateUpload(uploadId)
     }
-  }, [category, maxSizeMB, onChange, uploadPath, onUploadComplete, upload, hidePreviewUntilComplete])
+  }, [category, maxSizeMB, onChange, uploadPath, onUploadComplete, upload, hidePreviewUntilComplete, startUpload, completeUpload, failUpload, simulateUpload])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
