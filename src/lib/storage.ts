@@ -27,11 +27,11 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
     return { success: false, error: 'ファイルが選択されていません。ファイルを選択してからアップロードしてください。' }
   }
 
-  // 課金後の実際の制限: 動画250MB、PDF100MB、その他200MB
-  const maxSizeInBytes = fileType === 'video' ? 250 * 1024 * 1024 : 
+  // 課金後の実際の制限: 動画1.5GB、PDF100MB、その他200MB
+  const maxSizeInBytes = fileType === 'video' ? 1500 * 1024 * 1024 : 
                         fileType === 'pdf' ? 100 * 1024 * 1024 : 
                         200 * 1024 * 1024
-  const maxSizeText = fileType === 'video' ? '250MB' : 
+  const maxSizeText = fileType === 'video' ? '1.5GB' : 
                      fileType === 'pdf' ? '100MB' : 
                      '200MB'
 
@@ -84,7 +84,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       finalFileName: fileName,
       fileType: file.type,
       fileSize: file.size,
-      maxSize: fileType === 'video' ? '250MB' : '200MB'
+      maxSize: fileType === 'video' ? '1.5GB' : '200MB'
     }
   })
 
@@ -144,7 +144,7 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       const errorObj = error as unknown as { statusCode?: string; error?: string; message?: string }
       
       if (error?.message?.includes('too large') || error?.message?.includes('413') || errorObj?.statusCode === '413') {
-        const actualLimit = fileType === 'video' ? '250MB' : '200MB'
+        const actualLimit = fileType === 'video' ? '1.5GB' : '200MB'
         errorMessage = `ファイルサイズが大きすぎます。現在の制限は${actualLimit}以下です。ファイルを圧縮するか、小さなファイルをアップロードしてください。`
       } else if (errorObj?.statusCode === '400' && errorObj?.error === 'InvalidKey') {
         errorMessage = 'ファイル名に使用できない文字が含まれています。ファイル名を英数字に変更してください。'
