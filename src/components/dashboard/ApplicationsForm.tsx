@@ -7,6 +7,7 @@ import { updateFormStatus, checkApplicationsInfoCompletion } from '@/lib/status-
 import { DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { FileUploadField } from '@/components/ui/FileUploadField'
+import { useFileUploadV2 } from '@/hooks'
 import Image from 'next/image'
 import type { Entry, ApplicationsInfo, EntryFile, BasicInfo } from '@/lib/types'
 
@@ -50,6 +51,15 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
   const [makeupStyle1UrlFinal, setMakeupStyle1UrlFinal] = useState<string>('')  // 希望スタイル①画像URL（決勝）
   const [makeupStyle2FileFinal, setMakeupStyle2FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル②画像（決勝）
   const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
+
+  // ファイルアップロードフック（ドキュメント用）
+  const { uploading: uploadingDocument, progress: progressDocument } = useFileUploadV2({
+    category: 'document',
+    onSuccess: () => {
+      // 成功時は個別のhandleFileUpload関数で処理
+    },
+    onError: (error: string) => setError(error)
+  })
 
   // 関数定義（useEffectより前に配置）
   const calculateTicketTotal = useCallback(() => {
@@ -1442,6 +1452,27 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
           </div>
 
           <div className="space-y-4">
+            {/* アップロード中のプログレスバー */}
+            {uploadingDocument && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <div className="flex items-center mb-2">
+                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-sm font-medium text-blue-800">
+                    ドキュメントをアップロード中... {Math.round(progressDocument)}%
+                  </span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${progressDocument}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
             <FileUploadField
               label="払込用紙のアップロード（複数枚可）"
               category="document"
