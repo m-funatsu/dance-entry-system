@@ -31,6 +31,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
   const [paymentSlipFile, setPaymentSlipFile] = useState<File | null>(null)
   const [hasPaymentSlip, setHasPaymentSlip] = useState<boolean>(false)
+  const [paymentSlipInitialized, setPaymentSlipInitialized] = useState<boolean>(false)
 
   // ファイルアップロードフック（プログレスバー用）
   const { uploading, progress } = useFileUploadV2({
@@ -41,6 +42,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const handlePaymentSlipStatusChange = useCallback((hasFile: boolean) => {
     console.log('[SEMIFINALS FORM] 振込確認用紙状態変更:', { hasFile })
     setHasPaymentSlip(hasFile)
+    setPaymentSlipInitialized(true)
   }, [])
 
   // 決勝情報への同期処理
@@ -215,7 +217,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                semifinalsInfo.choreographer_name_kana.trim() !== ''
       case 'bank':
         // 賞金振込先情報の必須項目（全フィールドが必須）+ 振込確認用紙
-        return !!(
+        const bankFieldsValid = !!(
           semifinalsInfo.bank_name && 
           semifinalsInfo.bank_name.trim() !== '' &&
           semifinalsInfo.branch_name && 
@@ -225,9 +227,14 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           semifinalsInfo.account_number && 
           semifinalsInfo.account_number.trim() !== '' &&
           semifinalsInfo.account_holder &&
-          semifinalsInfo.account_holder.trim() !== '' &&
-          hasPaymentSlip // 振込確認用紙が必須
+          semifinalsInfo.account_holder.trim() !== ''
         )
+        // 振込確認用紙の初期化が完了していない場合は未完了とする
+        if (!paymentSlipInitialized) {
+          console.log('[SEMIFINALS FORM] 振込確認用紙初期化待機中...')
+          return false
+        }
+        return bankFieldsValid && hasPaymentSlip
       default:
         return true
     }
