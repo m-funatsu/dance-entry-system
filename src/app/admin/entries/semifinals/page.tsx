@@ -716,7 +716,7 @@ export default async function SemifinalsInfoListPage() {
                     <td className="px-3 py-3">
                       <div className="space-y-1">
                         {Array.isArray(semifinalsInfo.entry_files) && semifinalsInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose === 'semifinals_payment_slip' || file.purpose === 'payment_slip_path'
+                          file.purpose === 'semifinals_payment_slip'
                         ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
@@ -730,7 +730,7 @@ export default async function SemifinalsInfoListPage() {
                           </div>
                         ))}
                         {(!Array.isArray(semifinalsInfo.entry_files) || !semifinalsInfo.entry_files.some((file: { file_type: string; purpose?: string }) => 
-                          file.purpose === 'semifinals_payment_slip' || file.purpose === 'payment_slip_path'
+                          file.purpose === 'semifinals_payment_slip'
                         )) && (
                           <span className="text-xs text-gray-400">振込確認書なし</span>
                         )}
