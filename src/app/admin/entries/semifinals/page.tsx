@@ -209,15 +209,15 @@ export default async function SemifinalsInfoListPage() {
               // 踊り出し
               item.dance_start_timing || '未入力',
               // 照明シーン1
-              `時間:${item.scene1_time || '未入力'} きっかけ:${item.scene1_trigger || '未入力'} 色:${item.scene1_color_type || '未入力'} イメージ:${item.scene1_image || '未入力'} 備考:${item.scene1_notes || '未入力'}`,
+              `時間:${item.scene1_time || '未入力'} きっかけ:${item.scene1_trigger || '未入力'} 色:${item.scene1_color_type || '未入力'} 色・系統その他:${item.scene1_color_other || '未入力'} イメージ:${item.scene1_image || '未入力'} 備考:${item.scene1_notes || '未入力'}`,
               // 照明シーン2
-              `時間:${item.scene2_time || '未入力'} きっかけ:${item.scene2_trigger || '未入力'} 色:${item.scene2_color_type || '未入力'} イメージ:${item.scene2_image || '未入力'} 備考:${item.scene2_notes || '未入力'}`,
+              `時間:${item.scene2_time || '未入力'} きっかけ:${item.scene2_trigger || '未入力'} 色:${item.scene2_color_type || '未入力'} 色・系統その他:${item.scene2_color_other || '未入力'} イメージ:${item.scene2_image || '未入力'} 備考:${item.scene2_notes || '未入力'}`,
               // 照明シーン3
-              `時間:${item.scene3_time || '未入力'} きっかけ:${item.scene3_trigger || '未入力'} 色:${item.scene3_color_type || '未入力'} イメージ:${item.scene3_image || '未入力'} 備考:${item.scene3_notes || '未入力'}`,
+              `時間:${item.scene3_time || '未入力'} きっかけ:${item.scene3_trigger || '未入力'} 色:${item.scene3_color_type || '未入力'} 色・系統その他:${item.scene3_color_other || '未入力'} イメージ:${item.scene3_image || '未入力'} 備考:${item.scene3_notes || '未入力'}`,
               // 照明シーン4
-              `時間:${item.scene4_time || '未入力'} きっかけ:${item.scene4_trigger || '未入力'} 色:${item.scene4_color_type || '未入力'} イメージ:${item.scene4_image || '未入力'} 備考:${item.scene4_notes || '未入力'}`,
+              `時間:${item.scene4_time || '未入力'} きっかけ:${item.scene4_trigger || '未入力'} 色:${item.scene4_color_type || '未入力'} 色・系統その他:${item.scene4_color_other || '未入力'} イメージ:${item.scene4_image || '未入力'} 備考:${item.scene4_notes || '未入力'}`,
               // 照明シーン5
-              `時間:${item.scene5_time || '未入力'} きっかけ:${item.scene5_trigger || '未入力'} 色:${item.scene5_color_type || '未入力'} イメージ:${item.scene5_image || '未入力'} 備考:${item.scene5_notes || '未入力'}`,
+              `時間:${item.scene5_time || '未入力'} きっかけ:${item.scene5_trigger || '未入力'} 色:${item.scene5_color_type || '未入力'} 色・系統その他:${item.scene5_color_other || '未入力'} イメージ:${item.scene5_image || '未入力'} 備考:${item.scene5_notes || '未入力'}`,
               // 照明シーン チェイサー
               `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
               // 振付師情報
