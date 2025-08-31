@@ -312,6 +312,8 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
 
 
   const handleExportData = async () => {
+    console.log('=== CSV Export Started ===')
+    alert('CSVエクスポート処理を開始します')
     setIsExporting(true)
     setExportStatus('データベースデータをエクスポート中...')
 
@@ -378,9 +380,11 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
       setExportStatus('データエクスポートが完了しました')
     } catch (error) {
       console.error('Export error:', error)
+      alert('エクスポートエラー: ' + (error instanceof Error ? error.message : '不明なエラー'))
       setExportStatus('エクスポートに失敗しました: ' + (error instanceof Error ? error.message : '不明なエラー'))
     } finally {
       setIsExporting(false)
+      console.log('=== CSV Export Finished ===')
     }
   }
 
@@ -451,7 +455,11 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
               参加者情報、エントリー詳細、選考結果などの全データをエクスポートします。
             </p>
             <button
-              onClick={handleExportData}
+              onClick={() => {
+                console.log('Export button clicked!')
+                alert('エクスポートボタンがクリックされました')
+                handleExportData()
+              }}
               disabled={isExporting}
               className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
