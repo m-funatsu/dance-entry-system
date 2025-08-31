@@ -154,7 +154,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
         
         const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || 
                          Object.values(checkboxes).some(value => value === true)
-        const isComplete = checkBasicInfoCompletion(formData, checkboxes)
+        const isComplete = await checkBasicInfoCompletion(formData, checkboxes, entryId)
         console.log('[BASIC INFO SUCCESS] データ存在判定:', hasAnyData)
         console.log('[BASIC INFO SUCCESS] 完了判定結果:', isComplete)
         
@@ -489,7 +489,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
       
       // 必須フィールドの事前チェック（デバッグ用）
       console.log('[BASIC INFO SAVE] === 事前必須フィールドチェック ===')
-      const preCheckResult = checkBasicInfoCompletion(updatedFormData, checkboxes)
+      const preCheckResult = await checkBasicInfoCompletion(updatedFormData, checkboxes, currentEntryId || undefined)
       console.log('[BASIC INFO SAVE] 事前チェック結果:', preCheckResult)
       console.log('[BASIC INFO SAVE] ================================')
 
@@ -573,7 +573,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
         try {
           const hasAnyData = Object.values(updatedFormData).some(value => value && value.toString().trim() !== '') || 
                            Object.values(checkboxes).some(value => value === true)
-          const isComplete = checkBasicInfoCompletion(updatedFormData, checkboxes)
+          const isComplete = await checkBasicInfoCompletion(updatedFormData, checkboxes, currentEntryId as string)
           console.log('[BASIC INFO SAVE] ステータス判定 - hasData:', hasAnyData, 'isComplete:', isComplete)
           
           await updateFormStatus('basic_info', currentEntryId as string, isComplete, hasAnyData)
@@ -653,7 +653,7 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
           
           const hasAnyData = Object.values(updatedFormData).some(val => val && val.toString().trim() !== '') || 
                           Object.values(checkboxes).some(val => val === true)
-          const isComplete = checkBasicInfoCompletion(updatedFormData, checkboxes)
+          const isComplete = await checkBasicInfoCompletion(updatedFormData, checkboxes, entryId)
           
           console.log(`[FIELD CHANGE] リアルタイムチェック結果 - hasData: ${hasAnyData}, isComplete: ${isComplete}`)
           

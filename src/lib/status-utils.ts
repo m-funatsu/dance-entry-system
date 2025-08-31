@@ -147,13 +147,15 @@ export async function updateFormStatus(
 /**
  * 基本情報フォームの完了状況をチェック
  */
-export function checkBasicInfoCompletion(
+export async function checkBasicInfoCompletion(
   formData: Record<string, unknown>,
-  checkboxes: Record<string, boolean>
-): boolean {
+  checkboxes: Record<string, boolean>,
+  entryId?: string
+): Promise<boolean> {
   console.log(`[BASIC INFO CHECK] === 基本情報完了チェック開始 ===`)
   console.log(`[BASIC INFO CHECK] 受信したformData:`, formData)
   console.log(`[BASIC INFO CHECK] 受信したcheckboxes:`, checkboxes)
+  console.log(`[BASIC INFO CHECK] entryId:`, entryId)
   
   // 基本情報フォームのバリデーションルールと完全一致させる
   const requiredFields = [
@@ -222,12 +224,45 @@ export function checkBasicInfoCompletion(
   
   const hasAllAgreements = Object.values(agreementResults).every(result => result === true)
   
-  const result = hasAllRequiredFields && hasAllAgreements
+  // 振込確認用紙のチェック（必須）
+  let hasBankSlip = false
+  if (entryId) {
+    try {
+      const supabase = createClient()
+      const { data: bankSlipFile, error: fileError } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entryId)
+        .eq('purpose', 'bank_slip')
+        .limit(1)
+        .maybeSingle()
+
+      if (fileError) {
+        console.error('[BASIC INFO CHECK] 振込確認用紙チェックエラー:', fileError)
+      } else {
+        hasBankSlip = !!bankSlipFile
+        console.log(`[BASIC INFO CHECK] 振込確認用紙存在: ${hasBankSlip}`)
+        if (bankSlipFile) {
+          console.log(`[BASIC INFO CHECK] 振込確認用紙詳細:`, {
+            file_name: bankSlipFile.file_name,
+            file_path: bankSlipFile.file_path,
+            uploaded_at: bankSlipFile.uploaded_at
+          })
+        }
+      }
+    } catch (error) {
+      console.error('[BASIC INFO CHECK] 振込確認用紙チェック例外:', error)
+      hasBankSlip = false
+    }
+  }
+  
+  const result = hasAllRequiredFields && hasAllAgreements && hasBankSlip
   console.log(`[BASIC INFO CHECK] === チェック結果まとめ ===`)
   console.log(`[BASIC INFO CHECK] 必須フィールド完了: ${hasAllRequiredFields}`)
   console.log(`[BASIC INFO CHECK] フィールド詳細:`, fieldResults)
   console.log(`[BASIC INFO CHECK] 同意事項完了: ${hasAllAgreements}`)
   console.log(`[BASIC INFO CHECK] 同意事項詳細:`, agreementResults)
+  console.log(`[BASIC INFO CHECK] 振込確認用紙存在: ${hasBankSlip}`)
   console.log(`[BASIC INFO CHECK] 最終結果: ${result}`)
   console.log(`[BASIC INFO CHECK] === 基本情報完了チェック終了 ===`)
   
