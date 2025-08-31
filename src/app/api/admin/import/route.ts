@@ -173,8 +173,11 @@ export async function POST(request: NextRequest) {
         }
 
         // エントリーの作成
+        const participantNames = [mappedData.representative_name, mappedData.partner_name].filter(Boolean).join(' / ')
+        
         const entryData = {
           user_id: authData.user.id,
+          participant_names: participantNames,
           dance_style: mappedData.dance_style,
           representative_name: mappedData.representative_name,
           representative_furigana: mappedData.representative_furigana || '',
@@ -185,6 +188,14 @@ export async function POST(request: NextRequest) {
           choreographer_furigana: mappedData.choreographer_furigana || '',
           status: 'pending' as const,
           agreement_checked: mappedData.agreement_status === '理解した',
+          // ステータスフィールドのデフォルト値を設定
+          basic_info_status: '未登録',
+          preliminary_info_status: '未登録',
+          program_info_status: '未登録',
+          semifinals_info_status: '未登録',
+          finals_info_status: '未登録',
+          sns_info_status: '未登録',
+          applications_info_status: '申請なし', // チェック制約に合わせた値
           google_form_data: {
             timestamp: mappedData.timestamp,
             imported_at: new Date().toISOString(),
