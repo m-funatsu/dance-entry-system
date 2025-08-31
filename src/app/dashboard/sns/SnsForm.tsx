@@ -199,6 +199,8 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
 
     try {
       console.log('[SNS VIDEO UPLOAD] 元のファイル名:', file.name)
+      
+      // この時点でuseFileUploadV2フックのuploading=true, progress更新が開始されている
       const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
       
       if (result.success && result.path) {
@@ -217,6 +219,8 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
             setIntroVideoUrl(data.signedUrl)
           }
         }
+        
+        console.log('[SNS VIDEO UPLOAD] アップロード完了')
       }
     } catch (error) {
       console.error('Upload error:', error)
