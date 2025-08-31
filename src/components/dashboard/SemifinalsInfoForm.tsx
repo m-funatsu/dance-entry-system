@@ -41,9 +41,11 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   // 振込確認用紙の状態変更ハンドラー
   const handlePaymentSlipStatusChange = useCallback((hasFile: boolean) => {
     console.log('[SEMIFINALS FORM] 振込確認用紙状態変更:', { hasFile })
+    console.log('[SEMIFINALS FORM] 変更前 - hasPaymentSlip:', hasPaymentSlip, 'paymentSlipInitialized:', paymentSlipInitialized)
     setHasPaymentSlip(hasFile)
     setPaymentSlipInitialized(true)
-  }, [])
+    console.log('[SEMIFINALS FORM] 状態更新完了')
+  }, [hasPaymentSlip, paymentSlipInitialized])
 
   // 決勝情報への同期処理
   const syncToFinals = async () => {
@@ -195,6 +197,11 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       loadSemifinalsInfo()
     }
   }, [entry.id, hasLoadedInitialData]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 振込確認用紙の状態変更を監視
+  useEffect(() => {
+    console.log('[SEMIFINALS FORM] 状態変更監視 - hasPaymentSlip:', hasPaymentSlip, 'paymentSlipInitialized:', paymentSlipInitialized)
+  }, [hasPaymentSlip, paymentSlipInitialized])
 
   // 各タブの必須項目が入力されているかチェック
   const isTabValid = (tab: string) => {
