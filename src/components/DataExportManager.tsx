@@ -227,7 +227,15 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
                      .filter(h => h) // 空文字を除去
     
     console.log('CSV Export - Color other headers found:', headers.filter(h => h.includes('color_other')))
-    console.log('CSV Export - All semifinals headers:', headers.filter(h => h.includes('semifinals_info')).slice(0, 20))
+    console.log('CSV Export - All semifinals headers:', headers.filter(h => h.includes('semifinals_info')).slice(0, 30))
+    
+    // CSV出力内容をアラートで表示（一時的なデバッグ）
+    const colorOtherHeaders = headers.filter(h => h.includes('color_other'))
+    if (colorOtherHeaders.length === 0) {
+      alert('エラー: color_otherヘッダーが見つかりません。コンソールを確認してください。')
+    } else {
+      alert(`color_otherヘッダー ${colorOtherHeaders.length}個見つかりました: ${colorOtherHeaders.join(', ')}`)
+    }
     
     const csvHeaders = headers.map(header => {
       // IDフィールドは除外、ユーザー関連の特別処理
