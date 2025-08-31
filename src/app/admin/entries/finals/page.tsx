@@ -448,7 +448,7 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '240px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>楽曲変更:</strong> {finalsInfo.music_change ? 'あり' : 'なし'}</div>
+                        <div><strong>準決勝からの変更:</strong> {finalsInfo.music_change ? 'あり' : 'なし'}</div>
                         <div><strong>タイトル:</strong> {finalsInfo.work_title || '未入力'}</div>
                         <div><strong>ふりがな:</strong> {finalsInfo.work_title_kana || '未入力'}</div>
                         <div><strong>ストーリー:</strong> {finalsInfo.work_character_story ? `${finalsInfo.work_character_story.slice(0, 30)}...` : '未入力'}</div>
@@ -504,11 +504,11 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>変更:</strong> {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}</div>
-                        <div><strong>スタート:</strong> {finalsInfo.sound_start_timing || '未入力'}</div>
-                        <div><strong>チェイサー:</strong> {finalsInfo.chaser_song_designation || '未入力'}</div>
-                        <div><strong>FO開始:</strong> {finalsInfo.fade_out_start_time || '未入力'}</div>
-                        <div><strong>FO完了:</strong> {finalsInfo.fade_out_complete_time || '未入力'}</div>
+                        <div><strong>準決勝からの変更:</strong> {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}</div>
+                        <div><strong>音楽スタートのタイミング:</strong> {finalsInfo.sound_start_timing || '未入力'}</div>
+                        <div><strong>チェイサー曲の指定:</strong> {finalsInfo.chaser_song_designation || '未入力'}</div>
+                        <div><strong>フェードアウト開始時間:</strong> {finalsInfo.fade_out_start_time || '未入力'}</div>
+                        <div><strong>フェードアウト完了時間:</strong> {finalsInfo.fade_out_complete_time || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
@@ -550,7 +550,7 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>変更:</strong> {finalsInfo.lighting_change_from_semifinals ? 'あり' : 'なし'}</div>
+                        <div><strong>準決勝からの変更:</strong> {finalsInfo.lighting_change_from_semifinals ? 'あり' : 'なし'}</div>
                         <div><strong>踊り出し:</strong> {finalsInfo.dance_start_timing || '未入力'}</div>
                       </div>
                     </td>
@@ -845,7 +845,7 @@ export default async function FinalsInfoListPage() {
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '200px'}}>
                       <div className="space-y-1 text-xs">
-                        <div><strong>変更:</strong> {finalsInfo.choreographer_change ? 'あり' : 'なし'}</div>
+                        <div><strong>準決勝からの変更:</strong> {finalsInfo.choreographer_change ? 'あり' : 'なし'}</div>
                         <div><strong>①氏名:</strong> {finalsInfo.choreographer_name || '未入力'}</div>
                         <div><strong>①フリガナ:</strong> {finalsInfo.choreographer_furigana || '未入力'}</div>
                         <div><strong>②氏名:</strong> {finalsInfo.choreographer2_name || '未入力'}</div>
