@@ -10,13 +10,15 @@ interface BankSectionProps {
   validationErrors: string[]
   onChange: (updates: Partial<SemifinalsInfo>) => void
   isEditable?: boolean
+  onPaymentSlipStatusChange?: (hasPaymentSlip: boolean, fileName?: string) => void
 }
 
 export const BankSection: React.FC<BankSectionProps> = ({
   semifinalsInfo,
   validationErrors,
   onChange,
-  isEditable = true
+  isEditable = true,
+  onPaymentSlipStatusChange
 }) => {
   const supabase = createClient()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,10 +67,14 @@ export const BankSection: React.FC<BankSectionProps> = ({
           if (urlData?.publicUrl) {
             setPaymentSlipUrl(urlData.publicUrl)
             console.log('[BANK SECTION LOAD] URL設定完了')
+            // 親コンポーネントにファイル状態を通知
+            onPaymentSlipStatusChange?.(true, fileData.file_name)
           }
         } else {
           console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりませんでした')
           setPaymentSlipFileName('')
+          // 親コンポーネントにファイル状態を通知
+          onPaymentSlipStatusChange?.(false)
         }
       } catch (error) {
         console.error('[BANK SECTION LOAD] 振込確認用紙の読み込みエラー:', error)
@@ -78,7 +84,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
     }
 
     loadPaymentSlip()
-  }, [semifinalsInfo.entry_id, supabase])
+  }, [semifinalsInfo.entry_id, supabase, onPaymentSlipStatusChange])
 
   // ファイルアップロード処理
   const handleFileUpload = async (file: File) => {
@@ -198,6 +204,8 @@ export const BankSection: React.FC<BankSectionProps> = ({
       // ファイル名も保存
       setPaymentSlipFileName(file.name)
       setPaymentSlip(file)
+      // 親コンポーネントにファイル状態を通知
+      onPaymentSlipStatusChange?.(true, file.name)
       console.log('[BANK SECTION] === 振込確認用紙アップロード完了 ===')
       
     } catch (error) {
@@ -325,6 +333,8 @@ export const BankSection: React.FC<BankSectionProps> = ({
                   setPaymentSlip(null)
                   setPaymentSlipUrl('')
                   setPaymentSlipFileName('')
+                  // 親コンポーネントにファイル状態を通知
+                  onPaymentSlipStatusChange?.(false)
                   console.log('[BANK SECTION DELETE] UI状態クリア完了')
                   console.log('[BANK SECTION DELETE] === 振込確認用紙削除完了 ===')
                   

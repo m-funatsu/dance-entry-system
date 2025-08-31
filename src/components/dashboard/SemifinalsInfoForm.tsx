@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DeadlineNoticeAsync } from '@/components/ui'
 import { BankSection } from '@/components/semifinals/BankSection'
@@ -30,11 +30,18 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
   const [paymentSlipFile, setPaymentSlipFile] = useState<File | null>(null)
+  const [hasPaymentSlip, setHasPaymentSlip] = useState<boolean>(false)
 
   // ファイルアップロードフック（プログレスバー用）
   const { uploading, progress } = useFileUploadV2({
     category: 'audio' // デフォルト（実際のファイル種別は動的に変更）
   })
+
+  // 振込確認用紙の状態変更ハンドラー
+  const handlePaymentSlipStatusChange = useCallback((hasFile: boolean) => {
+    console.log('[SEMIFINALS FORM] 振込確認用紙状態変更:', { hasFile })
+    setHasPaymentSlip(hasFile)
+  }, [])
 
   // 決勝情報への同期処理
   const syncToFinals = async () => {
@@ -207,7 +214,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                !!semifinalsInfo.choreographer_name_kana &&
                semifinalsInfo.choreographer_name_kana.trim() !== ''
       case 'bank':
-        // 賞金振込先情報の必須項目（全フィールドが必須）
+        // 賞金振込先情報の必須項目（全フィールドが必須）+ 振込確認用紙
         return !!(
           semifinalsInfo.bank_name && 
           semifinalsInfo.bank_name.trim() !== '' &&
@@ -218,7 +225,8 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           semifinalsInfo.account_number && 
           semifinalsInfo.account_number.trim() !== '' &&
           semifinalsInfo.account_holder &&
-          semifinalsInfo.account_holder.trim() !== ''
+          semifinalsInfo.account_holder.trim() !== '' &&
+          hasPaymentSlip // 振込確認用紙が必須
         )
       default:
         return true
@@ -489,7 +497,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
             {!isTabValid('sound') && <li>音響指示情報：音楽スタートのタイミング</li>}
             {!isTabValid('lighting') && <li>照明指示情報：踊り出しタイミング</li>}
             {!isTabValid('choreographer') && <li>振付情報：予選との振付師の変更、振付師①の氏名・フリガナ</li>}
-            {!isTabValid('bank') && <li>賞金振込先情報：全項目（銀行名、支店名、口座種類、口座番号、口座名義）</li>}
+            {!isTabValid('bank') && <li>賞金振込先情報：全項目（銀行名、支店名、口座種類、口座番号、口座名義）および振込確認用紙</li>}
           </ul>
         </div>
       )}
@@ -1321,7 +1329,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         <>
           <BankSection
             semifinalsInfo={semifinalsInfo}
-            validationErrors={!isTabValid('bank') ? ['銀行名、支店名、口座種類、口座番号、口座名義を全て入力してください。'] : []}
+            validationErrors={!isTabValid('bank') ? [
+              '銀行名、支店名、口座種類、口座番号、口座名義を全て入力してください。',
+              ...(hasPaymentSlip ? [] : ['振込確認用紙をアップロードしてください。'])
+            ] : []}
             onChange={(updates) => {
               // payment_slip_fileの特別処理
               if ('payment_slip_file' in updates) {
@@ -1334,6 +1345,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
                 setSemifinalsInfo(prev => ({ ...prev, ...updates }))
               }
             }}
+            onPaymentSlipStatusChange={handlePaymentSlipStatusChange}
           />
 
           {/* 保存ボタン */}
