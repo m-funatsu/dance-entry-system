@@ -86,20 +86,32 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
   // 統一ステータスバー管理
   const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
   
-  // アップロードプログレスをリアルタイムで統一ステータスバーに反映
+  // アップロード状態の監視 - uploading状態の変化を追跡
+  const [currentUploadId, setCurrentUploadId] = useState<string | null>(null)
+  
   useEffect(() => {
-    if (status.isUploading && status.uploadId && uploading) {
-      updateProgress(status.uploadId, progress)
+    // アップロード開始検出
+    if (uploading && !currentUploadId) {
+      console.log('[UPLOAD START] アップロード開始を検出')
+      // アップロード開始時点でファイル情報が必要なため、一時的にダミーファイルでステータス開始
+      // 実際のファイル情報は handleFileUpload で設定される
     }
     
-    // アップロード完了時の処理
-    if (status.isUploading && status.uploadId && !uploading && progress === 0) {
-      // アップロードが完了した場合（uploading=false, progressリセット）
-      setTimeout(() => {
-        completeUpload(status.uploadId!)
-      }, 1000) // データベース保存完了を待つ
+    // アップロード中のプログレス更新
+    if (uploading && currentUploadId && progress > 0) {
+      updateProgress(currentUploadId, progress)
+      console.log(`[UPLOAD PROGRESS] 進行状況: ${progress}%`)
     }
-  }, [status.isUploading, status.uploadId, uploading, progress, updateProgress, completeUpload])
+    
+    // アップロード完了検出
+    if (!uploading && currentUploadId) {
+      console.log('[UPLOAD COMPLETE] アップロード完了を検出')
+      setTimeout(() => {
+        completeUpload(currentUploadId)
+        setCurrentUploadId(null)
+      }, 1000) // データベース処理完了を待つ
+    }
+  }, [uploading, progress, currentUploadId, updateProgress, completeUpload])
 
   // データを読み込む
   useEffect(() => {
@@ -218,11 +230,13 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
 
     // 統一ステータスバー開始
     const uploadId = startUpload(file, 'video')
+    setCurrentUploadId(uploadId)
 
     try {
       console.log('[SNS VIDEO UPLOAD] 元のファイル名:', file.name)
+      console.log('[SNS VIDEO UPLOAD] ステータスバー開始, ID:', uploadId)
       
-      // useFileUploadV2が実際のアップロード処理を行い、progressは自動でuseEffectにより更新される
+      // useFileUploadV2が実際のアップロード処理を行い、progressはuseEffectで監視される
       const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
       
       if (result.success && result.path) {
@@ -255,6 +269,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
       
       // ステータスバーエラー表示
       failUpload(uploadId, error instanceof Error ? error.message : 'アップロードに失敗しました')
+      setCurrentUploadId(null)
     }
   }
 

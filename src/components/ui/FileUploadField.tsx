@@ -61,7 +61,7 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
   // 外部のuseFileUploadV2の状態を監視してステータスバーを更新
   const [uploadId, setUploadId] = useState<string | null>(null)
 
-  const { uploading, progress, error: uploadError, upload } = useFileUploadV2({
+  const { uploading, progress, error: uploadError } = useFileUploadV2({
     category,
     config: maxSizeMB ? { maxSize: maxSizeMB * 1024 * 1024 } : undefined,
     generatePath: uploadPath,
@@ -123,38 +123,13 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
 
     setSelectedFile(file)
     
-    // onChangeを呼び出し、その後のアップロード処理は呼び出し元が行う
+    // onChangeを呼び出し - 実際のアップロード処理は呼び出し元で行われる
     onChange(file)
     
-    // 自動アップロード（uploadPathが提供されている場合のみ）
-    if (uploadPath && onUploadComplete) {
-      // ステータスバー表示開始
-      let uploadId: string | undefined
-      if (showStatusBar) {
-        uploadId = startUpload(file, category)
-        
-        // プレビューを一時的に隠す
-        if (hidePreviewUntilComplete) {
-          setShowPreview(false)
-        }
-      }
-      
-      try {
-        await upload(file)
-        if (showStatusBar && uploadId) {
-          completeUpload(uploadId)
-          if (hidePreviewUntilComplete) {
-            setShowPreview(true)
-          }
-        }
-      } catch (error) {
-        if (showStatusBar && uploadId) {
-          failUpload(uploadId, error instanceof Error ? error.message : 'アップロードに失敗しました')
-        }
-      }
-    }
-    // uploadPathがない場合は、useEffectでの外部アップロード監視に依存
-  }, [category, maxSizeMB, onChange, uploadPath, onUploadComplete, upload, showStatusBar, hidePreviewUntilComplete, startUpload, completeUpload, failUpload])
+    // showStatusBarが有効でuploadPathがない場合は、
+    // 外部のアップロード処理によるステータス管理に完全に依存する
+    // （仮想プログレス表示は行わない）
+  }, [category, maxSizeMB, onChange])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
