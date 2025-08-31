@@ -35,7 +35,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
   const [videoUrls, setVideoUrls] = useState<Record<string, string>>({})
 
   // ファイルアップロードフック（ステータスバー用）
-  const { uploadVideo, uploadAudio, uploading, progress } = useFileUploadV2({
+  const { uploading, progress } = useFileUploadV2({
     category: 'music',
     onError: (error: string) => showToast(error, 'error')
   })
