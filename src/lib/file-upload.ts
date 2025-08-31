@@ -25,8 +25,8 @@ export const FILE_UPLOAD_DEFAULTS = {
   },
   allowedTypes: {
     image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-    video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime', 'video/webm'],
-    audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg'],
+    video: ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime', 'video/webm', 'video/x-msvideo'],
+    audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/mp3', 'audio/ogg', 'audio/mp4', 'audio/x-m4a'],
     document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
   },
   // 現在のSupabase課金後の制限
