@@ -3,7 +3,6 @@
 import { FormField, ImageUpload } from '@/components/ui'
 import type { FinalsInfo } from '@/lib/types'
 import { finalsColorTypes } from '@/utils/finalsValidation'
-import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
 interface FinalsLightingSectionProps {
   finalsInfo: Partial<FinalsInfo>
@@ -14,6 +13,8 @@ interface FinalsLightingSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => void
   isEditable?: boolean
+  uploading?: boolean
+  progress?: number
 }
 
 export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
@@ -24,12 +25,10 @@ export const FinalsLightingSection: React.FC<FinalsLightingSectionProps> = ({
   onLightingChangeOption,
   onFileUpload,
   onFileDelete,
-  isEditable = true
+  isEditable = true,
+  uploading = false,
+  progress = 0
 }) => {
-  // プログレスバー用フック
-  const { uploading, progress } = useFileUploadV2({
-    category: 'image'
-  })
   return (
     <div className="space-y-6">
       <h4 className="font-medium text-gray-900">照明指示情報</h4>

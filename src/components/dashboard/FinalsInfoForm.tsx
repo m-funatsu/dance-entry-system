@@ -6,6 +6,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { Alert, TabNavigation, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
+import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { updateFormStatus, checkFinalsInfoCompletion } from '@/lib/status-utils'
 import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
 import { 
@@ -59,6 +60,12 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
     redirectPath: '', // 空文字列で自動リダイレクトを無効化
     onSuccess: (message) => console.log('[FINALS SAVE SUCCESS]', message),
     onError: (message) => console.error('[FINALS SAVE ERROR]', message)
+  })
+
+  // ファイルアップロードフック（プログレスバー用）
+  const { uploading, progress } = useFileUploadV2({
+    category: 'audio', // デフォルト（実際のファイル種別は動的に変更）
+    onError: (error: string) => showToast(error, 'error')
   })
 
   useEffect(() => {
@@ -1145,6 +1152,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 
@@ -1159,6 +1168,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileDelete={handleFileDelete}
           audioFiles={audioFiles}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 
@@ -1172,6 +1183,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 
@@ -1185,6 +1198,8 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 

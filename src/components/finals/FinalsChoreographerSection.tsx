@@ -2,7 +2,6 @@
 
 import { FormField, ImageUpload } from '@/components/ui'
 import type { FinalsInfo } from '@/lib/types'
-import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
 interface FinalsChoreographerSectionProps {
   finalsInfo: Partial<FinalsInfo>
@@ -13,6 +12,8 @@ interface FinalsChoreographerSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete?: (field: string) => Promise<void>
   isEditable?: boolean
+  uploading?: boolean
+  progress?: number
 }
 
 export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProps> = ({
@@ -23,12 +24,10 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
   onChoreographerChangeOption,
   onFileUpload,
   onFileDelete,
-  isEditable = true
+  isEditable = true,
+  uploading = false,
+  progress = 0
 }) => {
-  // プログレスバー用フック
-  const { uploading, progress } = useFileUploadV2({
-    category: 'image'
-  })
   return (
     <div className="space-y-6">
       <h4 className="font-medium text-gray-900">振付師情報</h4>

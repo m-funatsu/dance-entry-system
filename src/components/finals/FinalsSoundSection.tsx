@@ -2,7 +2,6 @@
 
 import { FormField, AudioUpload } from '@/components/ui'
 import type { FinalsInfo } from '@/lib/types'
-import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
 interface FinalsSoundSectionProps {
   finalsInfo: Partial<FinalsInfo>
@@ -14,6 +13,9 @@ interface FinalsSoundSectionProps {
   onFileDelete?: (field: string) => void
   audioFiles?: Record<string, { file_name: string }>
   isEditable?: boolean
+  // プログレスバー用の状態（親フォームから渡される）
+  uploading?: boolean
+  progress?: number
 }
 
 export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
@@ -25,12 +27,10 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   onFileUpload,
   onFileDelete,
   audioFiles,
-  isEditable = true
+  isEditable = true,
+  uploading = false,
+  progress = 0
 }) => {
-  // プログレスバー用フック
-  const { uploading, progress } = useFileUploadV2({
-    category: 'audio'
-  })
   console.log('[FINALS SOUND SECTION DEBUG] === FinalsSoundSection レンダリング ===')
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles:', audioFiles)
   console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.chaser_song:', audioFiles?.chaser_song)
