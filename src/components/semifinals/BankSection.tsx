@@ -45,7 +45,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
           .from('entry_files')
           .select('*')
           .eq('entry_id', semifinalsInfo.entry_id)
-          .eq('purpose', 'payment_slip')
+          .eq('purpose', 'semifinals_payment_slip')
           .single()
 
         console.log('[BANK SECTION LOAD] 検索結果:', fileData)
@@ -112,7 +112,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         .from('entry_files')
         .select('*')
         .eq('entry_id', semifinalsInfo.entry_id)
-        .eq('purpose', 'payment_slip')
+        .eq('purpose', 'semifinals_payment_slip')
 
       if (existingFiles && existingFiles.length > 0) {
         console.log('[BANK SECTION] 既存ファイルを削除します:', existingFiles.length, '件')
@@ -175,7 +175,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         file_type: fileType,
         file_name: file.name,
         file_path: fileName,
-        purpose: 'payment_slip'
+        purpose: 'semifinals_payment_slip'
       }
       
       console.log('[BANK SECTION] データベース挿入データ:', insertData)
@@ -299,7 +299,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
                     .from('entry_files')
                     .select('*')
                     .eq('entry_id', semifinalsInfo.entry_id)
-                    .eq('purpose', 'payment_slip')
+                    .eq('purpose', 'semifinals_payment_slip')
                     .single()
 
                   console.log('[BANK SECTION DELETE] 削除対象ファイル:', fileData)
