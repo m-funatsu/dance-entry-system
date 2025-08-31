@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, UnifiedFileUpload, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
@@ -471,19 +471,22 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 </div>
               )}
               
-              <FileUploadField
+              <UnifiedFileUpload
                 label="練習風景動画"
-                value={null}
+                value={practiceVideoUrl}
                 onChange={(file) => handleFileUpload('practice_video', file)}
                 category="video"
                 disabled={uploading || !!practiceVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={200}
                 accept="video/*"
+                showStatusBar={true}
+                hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "練習風景動画をドラッグ&ドロップ",
                   formats: "対応形式: MP4, MOV, AVI など"
                 }}
+                helperText="練習風景動画（約30秒）の横長動画をアップロードしてください"
               />
             </>
           )}
@@ -599,19 +602,22 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 </div>
               )}
               
-              <FileUploadField
+              <UnifiedFileUpload
                 label="選手紹介・見所動画"
-                value={null}
+                value={introVideoUrl}
                 onChange={(file) => handleFileUpload('introduction_highlight', file)}
                 category="video"
                 disabled={uploading || !!introVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={200}
                 accept="video/*"
+                showStatusBar={true}
+                hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "選手紹介・見所動画をドラッグ&ドロップ",
                   formats: "対応形式: MP4, MOV, AVI など"
                 }}
+                helperText="選手紹介・見所動画（30秒）をアップロードしてください"
               />
             </>
           )}

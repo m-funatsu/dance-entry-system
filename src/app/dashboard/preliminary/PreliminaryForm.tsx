@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
 import { updateFormStatus, checkPreliminaryInfoCompletion } from '@/lib/status-utils'
-import { FormField, SaveButton, Alert, DeadlineNoticeAsync, VideoUpload } from '@/components/ui'
+import { FormField, SaveButton, Alert, DeadlineNoticeAsync, UnifiedFileUpload } from '@/components/ui'
 import { useFormSave, useFormValidation, useFileUploadV2 } from '@/hooks'
 import type { PreliminaryInfo, EntryFile } from '@/lib/types'
 
@@ -553,19 +553,19 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
               </div>
             </div>
           ) : (
-            <VideoUpload
-              value={(() => {
-                const fileName = videoFile ? (videoFile as EntryFile).file_name : ''
-                console.log('[VIDEO DISPLAY] 表示ファイル名:', fileName)
-                console.log('[VIDEO DISPLAY] videoFileオブジェクト:', videoFile)
-                return fileName
-              })()}
+            <UnifiedFileUpload
+              label="予選提出動画"
+              value={videoUrl}
               onChange={handleFileUpload}
               onDelete={() => handleFileDelete()}
+              category="video"
               disabled={uploading || !!videoFile || !entryId || !isEditable}
               required
               maxSizeMB={1500}
               accept="video/*"
+              showStatusBar={true}
+              hidePreviewUntilComplete={true}
+              helperText="予選提出動画をアップロードしてください（最大1.5GB）"
             />
           )}
         </div>
