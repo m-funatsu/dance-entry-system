@@ -888,8 +888,11 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           semifinalsInfo={semifinalsInfo}
           validationErrors={validationErrors.bank || []}
           onChange={handleFieldChange}
+          onFileUpload={handleFileUpload}
           isEditable={isEditable}
           onPaymentSlipStatusChange={(hasFile) => setHasPaymentSlip(hasFile)}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 

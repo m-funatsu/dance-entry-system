@@ -53,8 +53,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
   const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
 
   // ファイルアップロードフック（ドキュメント用）
-  const { uploading: uploadingDocument, progress: progressDocument } = useFileUploadV2({
-    category: 'document',
+  const { uploadImage, uploading: uploadingDocument, progress: progressDocument } = useFileUploadV2({
     onSuccess: () => {
       // 成功時は個別のhandleFileUpload関数で処理
     },
@@ -412,38 +411,19 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
     try {
       setUploadingFile(true)
       
-      // ファイルタイプの検証
-      const allowedTypes = [
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'image/gif',
-        'image/webp',
-        'application/pdf'
-      ]
+      // useFileUploadV2を使用してプログレスバー付きでアップロード
+      console.log('[APPLICATIONS UPLOAD] useFileUploadV2でアップロード開始')
       
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error(`許可されていないファイル形式です。JPG、PNG、GIF、WEBP、PDFのみアップロード可能です。(現在のファイル: ${file.type || '不明'})`)
+      const result = await uploadImage(file, { 
+        entryId: entry.id, 
+        folder: 'applications/payment_slip' 
+      })
+      
+      if (!result.success || !result.path) {
+        throw new Error(result.error || 'アップロードに失敗しました')
       }
       
-      // ファイルサイズの検証（20MB以下）
-      const maxSize = 20 * 1024 * 1024 // 20MB
-      if (file.size > maxSize) {
-        throw new Error('ファイルサイズが20MBを超えています')
-      }
-      
-      const fileExt = file.name.split('.').pop()?.toLowerCase()
-      const fileName = `${entry.id}/applications/payment_slip_${Date.now()}.${fileExt}`
-      
-      const { error: uploadError } = await supabase.storage
-        .from('files')
-        .upload(fileName, file, {
-          contentType: file.type,
-          cacheControl: '3600',
-          upsert: false
-        })
-
-      if (uploadError) throw uploadError
+      const fileName = result.path
 
       // entry_filesテーブルに保存
       const { data: fileData, error: dbError } = await supabase
@@ -1462,6 +1442,27 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
                   </svg>
                   <span className="text-sm font-medium text-blue-800">
                     ドキュメントをアップロード中... {Math.round(progressDocument)}%
+                  </span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${progressDocument}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {/* アップロード中のプログレスバー */}
+            {uploadingDocument && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <div className="flex items-center mb-2">
+                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-sm font-medium text-blue-800">
+                    払込用紙をアップロード中... {Math.round(progressDocument)}%
                   </span>
                 </div>
                 <div className="w-full bg-blue-200 rounded-full h-2">
