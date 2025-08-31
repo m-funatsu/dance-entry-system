@@ -180,6 +180,15 @@ export default async function FinalsInfoListPage() {
     }
   }
 
+  const getChaserSongLabel = (code: string) => {
+    switch (code) {
+      case 'required': return '必要'
+      case 'not_required': return '不要（無音）'
+      case 'included': return '自作曲に組み込み'
+      default: return code || '未入力'
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -208,7 +217,7 @@ export default async function FinalsInfoListPage() {
               // 音響情報
               item.sound_change_from_semifinals ? 'あり' : 'なし',
               item.sound_start_timing || '',
-              item.chaser_song_designation || '',
+              getChaserSongLabel(item.chaser_song_designation || ''),
               item.fade_out_start_time || '',
               item.fade_out_complete_time || '',
               // 照明情報
@@ -506,7 +515,7 @@ export default async function FinalsInfoListPage() {
                       <div className="space-y-1 text-xs">
                         <div><strong>準決勝からの変更:</strong> {finalsInfo.sound_change_from_semifinals ? 'あり' : 'なし'}</div>
                         <div><strong>音楽スタートのタイミング:</strong> {finalsInfo.sound_start_timing || '未入力'}</div>
-                        <div><strong>チェイサー曲の指定:</strong> {finalsInfo.chaser_song_designation || '未入力'}</div>
+                        <div><strong>チェイサー曲の指定:</strong> {getChaserSongLabel(finalsInfo.chaser_song_designation || '')}</div>
                         <div><strong>フェードアウト開始時間:</strong> {finalsInfo.fade_out_start_time || '未入力'}</div>
                         <div><strong>フェードアウト完了時間:</strong> {finalsInfo.fade_out_complete_time || '未入力'}</div>
                       </div>
