@@ -145,7 +145,7 @@ export default async function ProgramInfoListPage() {
               item.semifinal_story || '',
               item.final_story || '',
               item.player_photo_path ? '選手紹介画像あり' : 'なし',
-              item.program_notes || '',
+              item.notes || '',
               getStatusLabel(item.entries?.status)
             ])}
             headers={['システム利用者名', 'ダンスジャンル', '楽曲数', '所属教室または所属', '準決勝 - 作品あらすじ', '決勝 - 作品あらすじ', '選手紹介画像', '備考欄', '選考ステータス']}
@@ -283,7 +283,7 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        {programInfo.program_notes || '未入力'}
+                        {programInfo.notes || '未入力'}
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
