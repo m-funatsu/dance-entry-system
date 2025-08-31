@@ -171,8 +171,64 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
     // フラットなオブジェクトに変換
     const flattenedData = data.map(item => flattenObject(item))
     
-    // CSVヘッダーを作成（日本語名に変換）
-    const headers = Object.keys(flattenedData[0])
+    // 全てのヘッダーを収集（全データから共通のヘッダーを取得）
+    const allHeaders = new Set<string>()
+    flattenedData.forEach(item => {
+      Object.keys(item).forEach(key => allHeaders.add(key))
+    })
+    
+    // 照明シーンの項目順序を固定化
+    const lightingSceneOrder = [
+      'semifinals_info_scene1_time',
+      'semifinals_info_scene1_trigger',
+      'semifinals_info_scene1_color_type',
+      'semifinals_info_scene1_color_other',
+      'semifinals_info_scene1_image',
+      'semifinals_info_scene1_notes',
+      'semifinals_info_scene2_time',
+      'semifinals_info_scene2_trigger',
+      'semifinals_info_scene2_color_type',
+      'semifinals_info_scene2_color_other',
+      'semifinals_info_scene2_image',
+      'semifinals_info_scene2_notes',
+      'semifinals_info_scene3_time',
+      'semifinals_info_scene3_trigger',
+      'semifinals_info_scene3_color_type',
+      'semifinals_info_scene3_color_other',
+      'semifinals_info_scene3_image',
+      'semifinals_info_scene3_notes',
+      'semifinals_info_scene4_time',
+      'semifinals_info_scene4_trigger',
+      'semifinals_info_scene4_color_type',
+      'semifinals_info_scene4_color_other',
+      'semifinals_info_scene4_image',
+      'semifinals_info_scene4_notes',
+      'semifinals_info_scene5_time',
+      'semifinals_info_scene5_trigger',
+      'semifinals_info_scene5_color_type',
+      'semifinals_info_scene5_color_other',
+      'semifinals_info_scene5_image',
+      'semifinals_info_scene5_notes',
+      'semifinals_info_chaser_exit_time',
+      'semifinals_info_chaser_exit_trigger',
+      'semifinals_info_chaser_exit_color_type',
+      'semifinals_info_chaser_exit_color_other',
+      'semifinals_info_chaser_exit_image',
+      'semifinals_info_chaser_exit_notes'
+    ]
+    
+    // 照明シーンの項目を優先順で並び替え、その他は通常順序
+    const allHeadersList = Array.from(allHeaders)
+    const lightingHeaders = lightingSceneOrder.filter(h => allHeaders.has(h))
+    const otherHeaders = allHeadersList.filter(h => !lightingSceneOrder.includes(h)).sort()
+    const headers = [...otherHeaders.slice(0, otherHeaders.findIndex(h => h.includes('semifinals_info'))), 
+                     ...lightingHeaders, 
+                     ...otherHeaders.slice(otherHeaders.findIndex(h => h.includes('semifinals_info')) + otherHeaders.filter(h => h.includes('semifinals_info')).length)]
+                     .filter(h => h) // 空文字を除去
+    
+    console.log('CSV Export - Color other headers found:', headers.filter(h => h.includes('color_other')))
+    console.log('CSV Export - All semifinals headers:', headers.filter(h => h.includes('semifinals_info')).slice(0, 20))
+    
     const csvHeaders = headers.map(header => {
       // IDフィールドは除外、ユーザー関連の特別処理
       if (header === 'user_id' || header.includes('_id') && !header.includes('entry_id')) {
@@ -299,6 +355,16 @@ export default function DataExportManager({ totalEntries, totalFiles }: DataExpo
         
         // ユーザー情報を展開
         const userData = entry.users as { name?: string; email?: string } | undefined
+        
+        // 準決勝情報のログ出力
+        if (semifinalsInfo) {
+          console.log('Semifinals Info for entry', entry.id, ':', Object.keys(semifinalsInfo).filter(k => k.includes('color_other')))
+          Object.keys(semifinalsInfo).forEach(key => {
+            if (key.includes('color_other')) {
+              console.log(`${key}:`, semifinalsInfo[key])
+            }
+          })
+        }
         
         return {
           ...entry,
