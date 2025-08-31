@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
+import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync, UploadStatusBar } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
+import { useUploadStatus } from '@/hooks/useUploadStatus'
 import { ValidationPresets } from '@/lib/validation'
 import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import type { Entry, SnsFormData, EntryFile } from '@/lib/types'
@@ -81,6 +82,9 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
     category: 'video',
     onError: (error: string) => showToast(error, 'error')
   })
+
+  // 統一ステータスバー管理
+  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
 
   // データを読み込む
   useEffect(() => {
@@ -197,13 +201,25 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
       return
     }
 
+    // 統一ステータスバー開始
+    const uploadId = startUpload(file, 'video')
+
     try {
       console.log('[SNS VIDEO UPLOAD] 元のファイル名:', file.name)
       
-      // この時点でuseFileUploadV2フックのuploading=true, progress更新が開始されている
+      // useFileUploadV2のプログレスを監視してステータスバーに反映
+      const progressInterval = setInterval(() => {
+        updateProgress(uploadId, progress)
+      }, 100)
+      
       const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
       
+      clearInterval(progressInterval)
+      
       if (result.success && result.path) {
+        // 最終プログレス
+        updateProgress(uploadId, 100)
+        
         // ファイル情報をデータベースに保存（元のファイル名を渡す）
         await saveVideoFileInfo(result.path, field, file.name)
         
@@ -221,10 +237,19 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
         }
         
         console.log('[SNS VIDEO UPLOAD] アップロード完了')
+        
+        // ステータスバー完了
+        completeUpload(uploadId)
+        
+      } else {
+        throw new Error('アップロードに失敗しました')
       }
     } catch (error) {
       console.error('Upload error:', error)
       showToast('アップロードに失敗しました', 'error')
+      
+      // ステータスバーエラー表示
+      failUpload(uploadId, error instanceof Error ? error.message : 'アップロードに失敗しました')
     }
   }
 
@@ -484,7 +509,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 required
                 maxSizeMB={200}
                 accept="video/*"
-                showStatusBar={true}
+                showStatusBar={false}
                 hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "練習風景動画をドラッグ&ドロップ",
@@ -615,7 +640,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
                 required
                 maxSizeMB={200}
                 accept="video/*"
-                showStatusBar={true}
+                showStatusBar={false}
                 hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "選手紹介・見所動画をドラッグ&ドロップ",
@@ -663,6 +688,18 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
         </div>
         </div>
       </form>
+      )}
+
+      {/* 統一ステータスバー（実際のアップロード処理と連携） */}
+      {(status.isUploading || status.error) && (
+        <UploadStatusBar
+          isUploading={status.isUploading}
+          progress={status.progress}
+          fileName={status.fileName}
+          fileSize={status.fileSize}
+          fileType={status.fileType}
+          error={status.error}
+        />
       )}
     </>
   )
