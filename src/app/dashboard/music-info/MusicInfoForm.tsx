@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
+import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import type { Entry, EntryFile } from '@/lib/types'
 import FileUpload from '@/components/FileUpload'
 
@@ -32,6 +33,12 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
   const [user, setUser] = useState<{id: string} | null>(null)
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({})
   const [videoUrls, setVideoUrls] = useState<Record<string, string>>({})
+
+  // ファイルアップロードフック（ステータスバー用）
+  const { uploadVideo, uploadAudio, uploading, progress } = useFileUploadV2({
+    category: 'music',
+    onError: (error: string) => showToast(error, 'error')
+  })
 
   const fetchUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -270,6 +277,28 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
           <p className="text-sm text-gray-600 mb-4">
             予選用の動画をアップロードしてください（MP4、MOV、AVI形式）
           </p>
+          
+          {/* アップロード中のプログレスバー */}
+          {uploading && (
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+              <div className="flex items-center mb-2">
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="text-sm font-medium text-blue-800">
+                  動画をアップロード中... {Math.round(progress)}%
+                </span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+
           {user && (
             <FileUpload
               userId={user.id}
@@ -333,6 +362,27 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
             {formData.use_different_songs ? '準決勝用音源' : '準決勝・決勝共通音源'}
           </h4>
           <div className="bg-gray-50 p-4 rounded-lg">
+            {/* アップロード中のプログレスバー */}
+            {uploading && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <div className="flex items-center mb-2">
+                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-sm font-medium text-blue-800">
+                    音源をアップロード中... {Math.round(progress)}%
+                  </span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
             {user && (
               <FileUpload
                 userId={user.id}
@@ -377,6 +427,27 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
           <div>
             <h4 className="text-md font-medium text-gray-700 mb-3">決勝用音源</h4>
             <div className="bg-gray-50 p-4 rounded-lg">
+              {/* アップロード中のプログレスバー */}
+              {uploading && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                  <div className="flex items-center mb-2">
+                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-sm font-medium text-blue-800">
+                      決勝用音源をアップロード中... {Math.round(progress)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              
               {user && (
                 <FileUpload
                   userId={user.id}
