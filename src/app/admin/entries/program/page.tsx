@@ -221,20 +221,16 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-2 py-3" style={{maxWidth: '200px'}}>
                       <div className="text-xs text-gray-900">
-                        <div className="truncate">
-                          {programInfo.semifinal_story ? 
-                            `${programInfo.semifinal_story.slice(0, 50)}${programInfo.semifinal_story.length > 50 ? '...' : ''}` 
-                            : '未入力'}
+                        <div className="break-words">
+                          {programInfo.semifinal_story || '未入力'}
                         </div>
                       </div>
                     </td>
                     <td className="px-2 py-3" style={{maxWidth: '200px'}}>
                       <div className="text-xs text-gray-900">
-                        <div className="truncate">
+                        <div className="break-words">
                           {programInfo.song_count === '2曲' ? (
-                            programInfo.final_story ? 
-                              `${programInfo.final_story.slice(0, 50)}${programInfo.final_story.length > 50 ? '...' : ''}` 
-                              : '未入力'
+                            programInfo.final_story || '未入力'
                           ) : (
                             <span className="text-gray-400">1曲のため不要</span>
                           )}
