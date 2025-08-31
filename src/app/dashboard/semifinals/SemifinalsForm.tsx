@@ -48,6 +48,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
+  const [hasPaymentSlip, setHasPaymentSlip] = useState(false)
 
   const handleAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsStartDateAvailable(isAvailable)
@@ -265,7 +266,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   // タブ切り替え時の検証
   const handleSectionChange = (sectionId: string) => {
     // 現在のセクションの検証
-    const currentErrors = validateSemifinalsSection(activeSection, semifinalsInfo)
+    const currentErrors = validateSemifinalsSection(activeSection, semifinalsInfo, { hasPaymentSlip })
     setValidationErrors(prev => ({
       ...prev,
       [activeSection]: currentErrors
@@ -776,7 +777,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   const tabs = semifinalsSections.map(section => ({
     ...section,
     hasErrors: validationErrors[section.id]?.length > 0,
-    isComplete: validateSemifinalsSection(section.id, semifinalsInfo).length === 0
+    isComplete: validateSemifinalsSection(section.id, semifinalsInfo, { hasPaymentSlip }).length === 0
   }))
 
   return (
@@ -873,6 +874,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           validationErrors={validationErrors.bank || []}
           onChange={handleFieldChange}
           isEditable={isEditable}
+          onPaymentSlipStatusChange={(hasFile) => setHasPaymentSlip(hasFile)}
         />
       )}
 

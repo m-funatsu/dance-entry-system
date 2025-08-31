@@ -1,6 +1,6 @@
 import type { SemifinalsInfo } from '@/lib/types'
 
-export const validateSemifinalsSection = (sectionId: string, data: Partial<SemifinalsInfo>): string[] => {
+export const validateSemifinalsSection = (sectionId: string, data: Partial<SemifinalsInfo>, options?: { hasPaymentSlip?: boolean }): string[] => {
   const errors: string[] = []
 
   switch (sectionId) {
@@ -64,18 +64,20 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       if (!data.account_type) errors.push('口座種類')
       if (!data.account_number) errors.push('口座番号')
       if (!data.account_holder) errors.push('口座名義')
+      // 振込確認用紙のアップロード状態をチェック
+      if (!options?.hasPaymentSlip) errors.push('振込確認用紙')
       break
   }
 
   return errors
 }
 
-export const validateAllSemifinalsSection = (data: Partial<SemifinalsInfo>) => {
+export const validateAllSemifinalsSection = (data: Partial<SemifinalsInfo>, options?: { hasPaymentSlip?: boolean }) => {
   const allErrors: Record<string, string[]> = {}
   const sectionIds = ['music', 'sound', 'lighting', 'choreographer', 'bank']
   
   sectionIds.forEach(sectionId => {
-    const errors = validateSemifinalsSection(sectionId, data)
+    const errors = validateSemifinalsSection(sectionId, data, options)
     if (errors.length > 0) {
       allErrors[sectionId] = errors
     }
@@ -84,8 +86,8 @@ export const validateAllSemifinalsSection = (data: Partial<SemifinalsInfo>) => {
   return allErrors
 }
 
-export const isSemifinalsAllRequiredFieldsValid = (data: Partial<SemifinalsInfo>) => {
-  const allErrors = validateAllSemifinalsSection(data)
+export const isSemifinalsAllRequiredFieldsValid = (data: Partial<SemifinalsInfo>, options?: { hasPaymentSlip?: boolean }) => {
+  const allErrors = validateAllSemifinalsSection(data, options)
   return Object.keys(allErrors).length === 0
 }
 
