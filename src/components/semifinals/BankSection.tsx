@@ -40,14 +40,13 @@ export const BankSection: React.FC<BankSectionProps> = ({
       try {
         console.log('[BANK SECTION LOAD] データベースから振込確認用紙を検索...')
         
-        // entry_filesテーブルから振込確認用紙を取得（両方のpurpose値をチェック）
+        // entry_filesテーブルから振込確認用紙を取得
         const { data: fileData, error: searchError } = await supabase
           .from('entry_files')
           .select('*')
           .eq('entry_id', semifinalsInfo.entry_id)
-          .in('purpose', ['payment_slip', 'semifinals_payment_slip'])
-          .limit(1)
-          .maybeSingle()
+          .eq('purpose', 'payment_slip')
+          .single()
 
         console.log('[BANK SECTION LOAD] 検索結果:', fileData)
         console.log('[BANK SECTION LOAD] 検索エラー:', searchError)
@@ -113,7 +112,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         .from('entry_files')
         .select('*')
         .eq('entry_id', semifinalsInfo.entry_id)
-        .in('purpose', ['payment_slip', 'semifinals_payment_slip'])
+        .eq('purpose', 'payment_slip')
 
       if (existingFiles && existingFiles.length > 0) {
         console.log('[BANK SECTION] 既存ファイルを削除します:', existingFiles.length, '件')
@@ -176,7 +175,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
         file_type: fileType,
         file_name: file.name,
         file_path: fileName,
-        purpose: 'semifinals_payment_slip'
+        purpose: 'payment_slip'
       }
       
       console.log('[BANK SECTION] データベース挿入データ:', insertData)
@@ -300,9 +299,8 @@ export const BankSection: React.FC<BankSectionProps> = ({
                     .from('entry_files')
                     .select('*')
                     .eq('entry_id', semifinalsInfo.entry_id)
-                    .in('purpose', ['payment_slip', 'semifinals_payment_slip'])
-                    .limit(1)
-                    .maybeSingle()
+                    .eq('purpose', 'payment_slip')
+                    .single()
 
                   console.log('[BANK SECTION DELETE] 削除対象ファイル:', fileData)
                   console.log('[BANK SECTION DELETE] 検索エラー:', searchError)
