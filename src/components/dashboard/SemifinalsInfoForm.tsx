@@ -29,7 +29,6 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
   })
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false)
   const [userSelectedFields, setUserSelectedFields] = useState<Set<string>>(new Set())
-  const [paymentSlipFile, setPaymentSlipFile] = useState<File | null>(null)
   const [hasPaymentSlip, setHasPaymentSlip] = useState<boolean>(false)
   const [paymentSlipInitialized, setPaymentSlipInitialized] = useState<boolean>(false)
 
@@ -366,46 +365,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         if (error) throw error
       }
 
-      // 振込確認用紙をアップロード
-      if (paymentSlipFile) {
-        try {
-          // ファイル名を生成
-          const fileExt = paymentSlipFile.name.split('.').pop()?.toLowerCase()
-          const fileName = `${entry.id}_semifinals_payment_slip_${Date.now()}.${fileExt}`
-          const filePath = `${entry.id}/${fileName}`
-
-          // Supabaseストレージにアップロード
-          const { error: uploadError } = await supabase.storage
-            .from('files')
-            .upload(filePath, paymentSlipFile, {
-              cacheControl: '3600',
-              upsert: true
-            })
-
-          if (uploadError) throw uploadError
-
-          // entry_filesテーブルに記録
-          const { error: dbError } = await supabase
-            .from('entry_files')
-            .insert({
-              entry_id: entry.id,
-              file_type: 'photo',  // PDFも画像カテゴリとして保存
-              file_name: fileName,
-              file_path: filePath,
-              purpose: 'semifinals_payment_slip',
-              mime_type: paymentSlipFile.type
-            })
-
-          if (dbError) throw dbError
-          
-          // ファイルをリセット
-          setPaymentSlipFile(null)
-        } catch (error) {
-          console.error('振込確認用紙のアップロードエラー:', error)
-          // エラーがあっても保存は成功扱いにし、エラーメッセージを追加
-          setError('振込確認用紙のアップロードに失敗しました。後で再度お試しください。')
-        }
-      }
+      // 振込確認用紙のアップロードはBankSectionで処理されるため削除
 
       // 決勝情報の同期チェック（一時保存・正式保存両方で実行）
       try {
@@ -1384,16 +1344,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
               ...(hasPaymentSlip ? [] : ['振込確認用紙をアップロードしてください。'])
             ] : []}
             onChange={(updates) => {
-              // payment_slip_fileの特別処理
-              if ('payment_slip_file' in updates) {
-                setPaymentSlipFile(updates.payment_slip_file as File)
-                // payment_slip_fileはsemifinalsInfoに含めない
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { payment_slip_file, ...rest } = updates
-                setSemifinalsInfo(prev => ({ ...prev, ...rest }))
-              } else {
-                setSemifinalsInfo(prev => ({ ...prev, ...updates }))
-              }
+              setSemifinalsInfo(prev => ({ ...prev, ...updates }))
             }}
             onPaymentSlipStatusChange={handlePaymentSlipStatusChange}
           />
