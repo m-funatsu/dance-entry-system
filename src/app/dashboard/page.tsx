@@ -483,7 +483,7 @@ export default async function DashboardPage() {
                   <h3 className="text-sm font-medium text-blue-800">注意事項</h3>
                   <div className="mt-2 text-sm text-blue-700">
                     <p>
-                      <span className="text-red-600">Wifi環境(5GHz帯)等、通信環境の良い場所での利用を推奨いたします。</span>必須項目を全て入力していてもステータスが「入力中」の場合は、編集ボタンから画面を開いて<span className="text-red-600 font-bold">「保存」ボタンをクリック</span>してください。
+                      <span className="text-red-600">Wifi環境(5GHz帯)等、通信環境の良い場所での利用</span>を推奨いたします。必須項目を全て入力していてもステータスが「入力中」の場合は、編集ボタンから画面を開いて<span className="text-red-600 font-bold">「保存」ボタンをクリック</span>してください。
                     </p>
                   </div>
                 </div>
