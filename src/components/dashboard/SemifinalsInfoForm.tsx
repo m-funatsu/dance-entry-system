@@ -462,6 +462,13 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
     { id: 'bank', label: 'エントリー振込確認/賞金振込先情報' }
   ]
 
+  // 強制的にレンダリング時のログを出す
+  console.log('🔥🔥🔥 RENDER DEBUG 🔥🔥🔥')
+  console.log('activeSection:', activeSection)
+  console.log('hasPaymentSlip:', hasPaymentSlip)
+  console.log('paymentSlipInitialized:', paymentSlipInitialized)
+  console.log('sections:', sections.map(s => s.id))
+
   const colorTypes = [
     '赤系',
     '青系',
