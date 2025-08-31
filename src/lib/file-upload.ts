@@ -234,17 +234,34 @@ export async function uploadFile({
       // 開始時
       onProgress(10)
       
-      // ファイルサイズに応じて段階的にプログレスを更新
+      // ファイルサイズに基づいた動的プログレス計算
       const fileSize = file.size
-      const intervals = fileSize > 50 * 1024 * 1024 ? [15, 30, 45, 60, 75, 90] : [25, 50, 75, 95]
-      let currentIndex = 0
+      const sizeMB = fileSize / (1024 * 1024)
+      
+      // ファイルサイズに基づいた予想アップロード時間（秒）
+      const estimatedTimeSeconds = Math.max(2, Math.min(60, sizeMB / 10)) // 2秒〜60秒
+      const updateIntervalMs = Math.max(100, Math.min(1000, estimatedTimeSeconds * 100 / 90)) // 100ms〜1000ms
+      
+      console.log(`[REALISTIC PROGRESS] ファイル: ${sizeMB.toFixed(1)}MB, 予想時間: ${estimatedTimeSeconds.toFixed(1)}秒, 更新間隔: ${updateIntervalMs.toFixed(0)}ms`)
+      
+      let currentProgress = 10
       
       const progressInterval = setInterval(() => {
-        if (currentIndex < intervals.length) {
-          onProgress(intervals[currentIndex])
-          currentIndex++
+        // より現実的な進行速度（大きなファイルほど遅く）
+        const increment = sizeMB > 100 ? Math.random() * 3 + 1 :  // 100MB超: 1-4%
+                          sizeMB > 50  ? Math.random() * 5 + 2 :  // 50MB超: 2-7% 
+                          sizeMB > 10  ? Math.random() * 8 + 3 :  // 10MB超: 3-11%
+                                         Math.random() * 15 + 5   // 10MB以下: 5-20%
+        
+        currentProgress += increment
+        
+        if (currentProgress >= 95) {
+          clearInterval(progressInterval)
+          currentProgress = 95 // 実際のアップロード完了まで95%で待機
         }
-      }, fileSize > 50 * 1024 * 1024 ? 1000 : 500) // 大きなファイルは1秒間隔で更新
+        
+        onProgress(Math.round(currentProgress))
+      }, updateIntervalMs)
       
       // アップロード実行
       const { data, error } = await supabase.storage
@@ -254,10 +271,14 @@ export async function uploadFile({
           upsert: false
         })
       
+      // プログレス更新を停止
       clearInterval(progressInterval)
       
       if (!error) {
         onProgress(100) // 完了
+        console.log(`[REALISTIC PROGRESS] アップロード完了: ${sizeMB.toFixed(1)}MB`)
+      } else {
+        console.error(`[REALISTIC PROGRESS] アップロードエラー:`, error)
       }
       
       // エラーの場合は元の処理を継続
