@@ -126,6 +126,8 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
                 isEditable={isEditable}
                 required={sceneNum === 1}
                 maxSizeMB={20}
+                showStatusBar={true}
+                hidePreviewUntilComplete={true}
               />
               <p className="text-xs text-gray-600 mt-2">
                 シーン{sceneNum} イメージ画像の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
@@ -219,6 +221,8 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
               isEditable={isEditable}
               required
               maxSizeMB={20}
+              showStatusBar={true}
+              hidePreviewUntilComplete={true}
             />
             <p className="text-xs text-gray-600 mt-2">
               チェイサー/退場 イメージ画像の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。

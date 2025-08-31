@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { ImageUploadProps } from '@/lib/types'
+import { useUploadStatus } from '@/hooks/useUploadStatus'
+import { UploadStatusBar } from './UploadStatusBar'
 
 export default function ImageUpload({ 
   value, 
@@ -12,13 +14,20 @@ export default function ImageUpload({
   required = false,
   accept = "image/*",
   maxSizeMB = 10,
-  isEditable = true
+  isEditable = true,
+  showStatusBar = false,
+  hidePreviewUntilComplete = false
 }: ImageUploadProps) {
   console.log('ImageUpload isEditable:', isEditable) // ESLintエラー回避用
   const [isDragging, setIsDragging] = useState(false)
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
   const [imageError, setImageError] = useState(false)
+  const [showPreview, setShowPreview] = useState(!hidePreviewUntilComplete)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // 統一ステータスバー管理
+  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
   
   // valueが変更されたら（削除された場合を含む）、previewを更新
   useEffect(() => {
@@ -72,11 +81,44 @@ export default function ImageUpload({
       return
     }
 
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setPreview(reader.result as string)
+    setSelectedFile(file)
+    
+    // ステータスバー開始
+    if (showStatusBar) {
+      const uploadId = startUpload(file, 'image')
+      
+      if (hidePreviewUntilComplete) {
+        setShowPreview(false)
+      }
+      
+      // 仮想プログレス（実際のアップロードは外部で処理）
+      let currentProgress = 0
+      const interval = setInterval(() => {
+        currentProgress += Math.random() * 15 + 5
+        if (currentProgress >= 100) {
+          currentProgress = 100
+          updateProgress(uploadId, currentProgress)
+          setTimeout(() => {
+            completeUpload(uploadId)
+            if (hidePreviewUntilComplete) {
+              setShowPreview(true)
+            }
+          }, 500)
+          clearInterval(interval)
+        } else {
+          updateProgress(uploadId, currentProgress)
+        }
+      }, 200)
     }
-    reader.readAsDataURL(file)
+
+    // プレビュー更新（showPreviewが有効な場合のみ）
+    if (showPreview || !hidePreviewUntilComplete) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
 
     onChange(file)
   }
@@ -151,7 +193,7 @@ export default function ImageUpload({
           className="hidden"
         />
 
-        {preview && !imageError ? (
+        {preview && showPreview && !imageError ? (
           <div className="relative">
             <div className="relative h-48 w-full">
               <Image
@@ -228,6 +270,18 @@ export default function ImageUpload({
           </div>
         )}
       </div>
+      
+      {/* 統一ステータスバー */}
+      {showStatusBar && (status.isUploading || status.error) && (
+        <UploadStatusBar
+          isUploading={status.isUploading}
+          progress={status.progress}
+          fileName={status.fileName}
+          fileSize={status.fileSize}
+          fileType={status.fileType}
+          error={status.error}
+        />
+      )}
     </div>
   )
 }
