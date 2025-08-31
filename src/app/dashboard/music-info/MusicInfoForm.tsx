@@ -36,7 +36,7 @@ export default function MusicInfoForm({ entry }: MusicInfoFormProps) {
 
   // ファイルアップロードフック（ステータスバー用）
   const { uploading, progress } = useFileUploadV2({
-    category: 'music',
+    category: 'audio',
     onError: (error: string) => showToast(error, 'error')
   })
 
