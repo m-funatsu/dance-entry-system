@@ -52,7 +52,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   const [hasPaymentSlip, setHasPaymentSlip] = useState(false)
 
   // ファイルアップロードフック（プログレスバー用）
-  const { uploadAudio, uploading, progress } = useFileUploadV2({
+  const { uploadAudio, uploadImage, uploading, progress } = useFileUploadV2({
     category: 'audio',
     onError: (error: string) => showToast(error, 'error')
   })
@@ -340,11 +340,13 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       // useFileUploadV2を使用してプログレスバー付きでアップロード
       console.log('[UPLOAD DEBUG] useFileUploadV2でアップロード開始')
       
-      const result = await uploadAudio(file, { 
-        entryId: entry.id, 
-        userId, 
-        folder: `semifinals/${field}` 
-      })
+      // ファイルタイプを判定
+      const isImageField = field.includes('image_path')
+      const fileType = isImageField ? 'photo' : 'audio'
+      
+      const result = fileType === 'audio'
+        ? await uploadAudio(file, { entryId: entry.id, userId, folder: `semifinals/${field}` })
+        : await uploadImage(file, { entryId: entry.id, userId, folder: `semifinals/${field}` })
       
       if (!result.success || !result.path) {
         throw new Error(result.error || 'アップロードに失敗しました')
@@ -353,9 +355,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       const fileName = result.path
 
       // ファイル情報をデータベースに保存（purposeフィールドを確実に設定）
-      // ファイルタイプを適切に判定
-      const isImageField = field.includes('image_path')
-      const fileType = isImageField ? 'photo' : 'audio'
       
       const insertData = {
         entry_id: entry.id,
@@ -871,6 +870,8 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onFileUpload={handleFileUpload}
           onFileDelete={handleFileDelete}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 

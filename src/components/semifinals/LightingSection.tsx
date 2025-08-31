@@ -3,7 +3,6 @@
 import { FormField, ImageUpload } from '@/components/ui'
 import type { SemifinalsInfo } from '@/lib/types'
 import { colorTypes } from '@/utils/semifinalsValidation'
-import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
 interface LightingSectionProps {
   semifinalsInfo: Partial<SemifinalsInfo>
@@ -12,6 +11,8 @@ interface LightingSectionProps {
   onFileUpload: (field: string, file: File) => void
   onFileDelete: (field: string) => void
   isEditable?: boolean
+  uploading?: boolean
+  progress?: number
 }
 
 export const LightingSection: React.FC<LightingSectionProps> = ({
@@ -20,12 +21,10 @@ export const LightingSection: React.FC<LightingSectionProps> = ({
   onChange,
   onFileUpload,
   onFileDelete,
-  isEditable = true
+  isEditable = true,
+  uploading = false,
+  progress = 0
 }) => {
-  // プログレスバー用フック
-  const { uploading, progress } = useFileUploadV2({
-    category: 'image'
-  })
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
