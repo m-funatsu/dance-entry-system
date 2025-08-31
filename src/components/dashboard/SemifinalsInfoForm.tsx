@@ -507,6 +507,10 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
       {/* セクションタブ */}
       <div className="border-b">
+        {/* デバッグ情報表示 */}
+        <div className="text-xs text-gray-500 p-2">
+          DEBUG: hasPaymentSlip={hasPaymentSlip ? 'true' : 'false'}, paymentSlipInitialized={paymentSlipInitialized ? 'true' : 'false'}
+        </div>
         <nav className="-mb-px flex space-x-8">
           {sections.map((section) => {
             const isValid = isTabValid(section.id)
