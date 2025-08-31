@@ -110,7 +110,7 @@ export default async function ProgramInfoListPage() {
       basic_info: relatedBasicInfo || null
     }
   })
-  .filter(item => ['pending', 'submitted', 'selected'].includes(item.entries?.status || ''))
+  .filter(item => ['pending', 'selected'].includes(item.entries?.status || ''))
   // ダンスジャンルでソート
   .sort((a, b) => {
     const genreA = a.basic_info?.dance_style || 'ZZZ' // 未設定は最後に
