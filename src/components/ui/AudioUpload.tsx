@@ -29,7 +29,7 @@ export const AudioUpload: React.FC<AudioUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // 統一ステータスバー管理
-  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
+  const { status, startUpload, updateProgress, completeUpload } = useUploadStatus()
   
   // valueが空になったら（削除された場合）、uploadingFileもクリア
   useEffect(() => {

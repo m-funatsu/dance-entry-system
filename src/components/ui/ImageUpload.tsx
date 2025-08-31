@@ -23,11 +23,10 @@ export default function ImageUpload({
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null)
   const [imageError, setImageError] = useState(false)
   const [showPreview, setShowPreview] = useState(!hidePreviewUntilComplete)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // 統一ステータスバー管理
-  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
+  const { status, startUpload, updateProgress, completeUpload } = useUploadStatus()
   
   // valueが変更されたら（削除された場合を含む）、previewを更新
   useEffect(() => {
@@ -81,7 +80,8 @@ export default function ImageUpload({
       return
     }
 
-    setSelectedFile(file)
+    // ファイル選択記録（デバッグ用）
+    console.log('[IMAGE UPLOAD] ファイル選択:', file.name)
     
     // ステータスバー開始
     if (showStatusBar) {
