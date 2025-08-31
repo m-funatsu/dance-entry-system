@@ -1159,6 +1159,22 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                         setBankSlipFile(null)
                         console.log('[BANK SLIP DELETE] 削除完了')
                         showToast('振込確認用紙を削除しました', 'success')
+                        
+                        // 削除後にステータス更新処理を実行
+                        console.log('[BANK SLIP DELETE] ステータス更新処理開始')
+                        if (entryId) {
+                          try {
+                            const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || 
+                                             Object.values(checkboxes).some(value => value === true)
+                            const isComplete = await checkBasicInfoCompletion(formData, checkboxes, entryId)
+                            console.log('[BANK SLIP DELETE] ステータス判定 - hasData:', hasAnyData, 'isComplete:', isComplete)
+                            
+                            await updateFormStatus('basic_info', entryId, isComplete, hasAnyData)
+                            console.log('[BANK SLIP DELETE] ステータス更新完了')
+                          } catch (statusError) {
+                            console.error('[BANK SLIP DELETE] ステータス更新エラー:', statusError)
+                          }
+                        }
                       } catch (error) {
                         console.error('[BANK SLIP DELETE] 削除エラー:', error)
                         showToast('振込確認用紙の削除に失敗しました', 'error')

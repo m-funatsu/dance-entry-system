@@ -233,7 +233,7 @@ export async function checkBasicInfoCompletion(
         .from('entry_files')
         .select('*')
         .eq('entry_id', entryId)
-        .eq('purpose', 'semifinals_payment_slip')
+        .eq('purpose', 'bank_slip')
         .limit(1)
         .maybeSingle()
 
