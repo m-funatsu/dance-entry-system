@@ -198,24 +198,37 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
 
   // 各タブの必須項目が入力されているかチェック
   const isTabValid = (tab: string) => {
+    console.log(`[TAB VALIDATION] === ${tab}タブの検証開始 ===`)
+    
     switch (tab) {
-      case 'music':
+      case 'music': {
         // 楽曲情報の必須項目（ユーザーが選択したかチェック）
-        return userSelectedFields.has('music_change_from_preliminary')
-      case 'sound':
+        const result = userSelectedFields.has('music_change_from_preliminary')
+        console.log(`[TAB VALIDATION] musicタブ: userSelectedFields=${Array.from(userSelectedFields)}, 結果=${result}`)
+        return result
+      }
+      case 'sound': {
         // 音響指示情報の必須項目
-        return !!semifinalsInfo.sound_start_timing
-      case 'lighting':
+        const result = !!semifinalsInfo.sound_start_timing
+        console.log(`[TAB VALIDATION] soundタブ: sound_start_timing="${semifinalsInfo.sound_start_timing}", 結果=${result}`)
+        return result
+      }
+      case 'lighting': {
         // 照明指示情報の必須項目
-        return !!semifinalsInfo.dance_start_timing
-      case 'choreographer':
+        const result = !!semifinalsInfo.dance_start_timing
+        console.log(`[TAB VALIDATION] lightingタブ: dance_start_timing="${semifinalsInfo.dance_start_timing}", 結果=${result}`)
+        return result
+      }
+      case 'choreographer': {
         // 振付情報の必須項目（振付師①の氏名とフリガナが必須）
-        return userSelectedFields.has('choreographer_change_from_preliminary') &&
-               !!semifinalsInfo.choreographer_name &&
-               semifinalsInfo.choreographer_name.trim() !== '' &&
-               !!semifinalsInfo.choreographer_name_kana &&
-               semifinalsInfo.choreographer_name_kana.trim() !== ''
-      case 'bank':
+        const hasSelection = userSelectedFields.has('choreographer_change_from_preliminary')
+        const hasName = !!semifinalsInfo.choreographer_name && semifinalsInfo.choreographer_name.trim() !== ''
+        const hasKana = !!semifinalsInfo.choreographer_name_kana && semifinalsInfo.choreographer_name_kana.trim() !== ''
+        const result = hasSelection && hasName && hasKana
+        console.log(`[TAB VALIDATION] choreographerタブ: 選択=${hasSelection}, 名前="${semifinalsInfo.choreographer_name}" (${hasName}), フリガナ="${semifinalsInfo.choreographer_name_kana}" (${hasKana}), 結果=${result}`)
+        return result
+      }
+      case 'bank': {
         // 賞金振込先情報の必須項目（全フィールドが必須）+ 振込確認用紙
         const bankFieldsValid = !!(
           semifinalsInfo.bank_name && 
@@ -229,13 +242,29 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
           semifinalsInfo.account_holder &&
           semifinalsInfo.account_holder.trim() !== ''
         )
+        
+        console.log(`[TAB VALIDATION] bankタブ詳細:`)
+        console.log(`  - bank_name: "${semifinalsInfo.bank_name}"`)
+        console.log(`  - branch_name: "${semifinalsInfo.branch_name}"`)
+        console.log(`  - account_type: "${semifinalsInfo.account_type}"`)
+        console.log(`  - account_number: "${semifinalsInfo.account_number}"`)
+        console.log(`  - account_holder: "${semifinalsInfo.account_holder}"`)
+        console.log(`  - bankFieldsValid: ${bankFieldsValid}`)
+        console.log(`  - paymentSlipInitialized: ${paymentSlipInitialized}`)
+        console.log(`  - hasPaymentSlip: ${hasPaymentSlip}`)
+        
         // 振込確認用紙の初期化が完了していない場合は未完了とする
         if (!paymentSlipInitialized) {
-          console.log('[SEMIFINALS FORM] 振込確認用紙初期化待機中...')
+          console.log('[TAB VALIDATION] 振込確認用紙初期化待機中...')
           return false
         }
-        return bankFieldsValid && hasPaymentSlip
+        
+        const result = bankFieldsValid && hasPaymentSlip
+        console.log(`[TAB VALIDATION] bankタブ最終結果: ${result}`)
+        return result
+      }
       default:
+        console.log(`[TAB VALIDATION] ${tab}タブ: デフォルト（true）`)
         return true
     }
   }
@@ -514,6 +543,7 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
         <nav className="-mb-px flex space-x-8">
           {sections.map((section) => {
             const isValid = isTabValid(section.id)
+            console.log(`[TAB DISPLAY] ${section.id}タブ "${section.label}": isValid=${isValid}, 赤い点表示=${!isValid}`)
             return (
               <button
                 key={section.id}

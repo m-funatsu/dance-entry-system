@@ -68,12 +68,14 @@ export const BankSection: React.FC<BankSectionProps> = ({
             setPaymentSlipUrl(urlData.publicUrl)
             console.log('[BANK SECTION LOAD] URL設定完了')
             // 親コンポーネントにファイル状態を通知
+            console.log('[BANK SECTION LOAD] 親コンポーネントに通知: hasFile=true, fileName=', fileData.file_name)
             onPaymentSlipStatusChange?.(true, fileData.file_name)
           }
         } else {
           console.log('[BANK SECTION LOAD] 振込確認用紙が見つかりませんでした')
           setPaymentSlipFileName('')
           // 親コンポーネントにファイル状態を通知
+          console.log('[BANK SECTION LOAD] 親コンポーネントに通知: hasFile=false')
           onPaymentSlipStatusChange?.(false)
         }
       } catch (error) {
@@ -205,6 +207,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
       setPaymentSlipFileName(file.name)
       setPaymentSlip(file)
       // 親コンポーネントにファイル状態を通知
+      console.log('[BANK SECTION] 親コンポーネントに通知: hasFile=true, fileName=', file.name)
       onPaymentSlipStatusChange?.(true, file.name)
       console.log('[BANK SECTION] === 振込確認用紙アップロード完了 ===')
       
@@ -334,6 +337,7 @@ export const BankSection: React.FC<BankSectionProps> = ({
                   setPaymentSlipUrl('')
                   setPaymentSlipFileName('')
                   // 親コンポーネントにファイル状態を通知
+                  console.log('[BANK SECTION DELETE] 親コンポーネントに通知: hasFile=false')
                   onPaymentSlipStatusChange?.(false)
                   console.log('[BANK SECTION DELETE] UI状態クリア完了')
                   console.log('[BANK SECTION DELETE] === 振込確認用紙削除完了 ===')
