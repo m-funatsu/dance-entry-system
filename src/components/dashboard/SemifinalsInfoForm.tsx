@@ -512,19 +512,25 @@ export default function SemifinalsInfoForm({ entry }: SemifinalsInfoFormProps) {
       {/* セクションタブ */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeSection === section.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {section.label}
-            </button>
-          ))}
+          {sections.map((section) => {
+            const isValid = isTabValid(section.id)
+            return (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm relative ${
+                  activeSection === section.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {section.label}
+                {!isValid && (
+                  <span className="absolute -top-1 -right-1 block h-2 w-2 bg-red-500 rounded-full"></span>
+                )}
+              </button>
+            )
+          })}
         </nav>
       </div>
 
