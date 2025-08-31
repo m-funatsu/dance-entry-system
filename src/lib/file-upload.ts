@@ -238,26 +238,32 @@ export async function uploadFile({
       console.log(`[UPLOAD START] 開始: ${sizeMB.toFixed(1)}MB ファイル`)
       onProgress(5) // 開始時
       
-      // 大きなファイルの場合は定期的にプログレス更新を開始
+      // プログレス表示を開始（実際のアップロード完了まで継続）
+      let currentProgress = 5
       let progressUpdateInterval: NodeJS.Timeout | null = null
-      if (sizeMB > 10) { // 10MB以上のファイルの場合
-        let currentProgress = 5
-        const maxProgressBeforeComplete = 90 // 実際の完了まで90%で待機
-        const expectedDurationSeconds = Math.max(5, sizeMB / 20) // より現実的な予想時間
-        const incrementPerSecond = maxProgressBeforeComplete / expectedDurationSeconds
+      
+      if (sizeMB > 5) { // 5MB以上のファイルの場合
+        const maxProgressBeforeComplete = 95 // 実際の完了まで95%で待機
+        // 現実的な進行速度（1GBファイル = 約50秒で95%到達）
+        const slowIncrement = maxProgressBeforeComplete / Math.max(8, sizeMB / 20) // 大きなファイルほどゆっくり
         
         progressUpdateInterval = setInterval(() => {
           if (currentProgress < maxProgressBeforeComplete) {
-            currentProgress += incrementPerSecond
+            currentProgress += slowIncrement
             onProgress(Math.round(Math.min(currentProgress, maxProgressBeforeComplete)))
             console.log(`[UPLOAD PROGRESS] 経過: ${Math.round(currentProgress)}%`)
           }
         }, 1000) // 1秒間隔で更新
         
-        console.log(`[UPLOAD PROGRESS] 大きなファイル(${sizeMB.toFixed(1)}MB) - 予想時間: ${expectedDurationSeconds.toFixed(1)}秒`)
+        console.log(`[UPLOAD PROGRESS] ファイル${sizeMB.toFixed(1)}MB - ゆっくり進行モード`)
       }
       
-      // アップロード実行（実際の処理）
+      // 実際のSupabaseアップロード実行
+      console.log(`[UPLOAD ACTUAL] ===== Supabaseアップロード開始 =====`)
+      console.log(`[UPLOAD ACTUAL] ファイル: ${file.name}`)
+      console.log(`[UPLOAD ACTUAL] サイズ: ${sizeMB.toFixed(1)}MB`)
+      console.log(`[UPLOAD ACTUAL] パス: ${filePath}`)
+      
       const { data, error } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file, {
@@ -265,19 +271,24 @@ export async function uploadFile({
           upsert: false
         })
       
-      // プログレス更新を停止
-      if (progressUpdateInterval) {
-        clearInterval(progressUpdateInterval)
-      }
-      
       const endTime = Date.now()
       const actualDuration = (endTime - startTime) / 1000
       
+      // 実際のアップロード完了時点でプログレス更新停止
+      if (progressUpdateInterval) {
+        clearInterval(progressUpdateInterval)
+        console.log(`[UPLOAD ACTUAL] プログレス更新停止`)
+      }
+      
       if (!error) {
         onProgress(100) // 実際の完了時に100%
-        console.log(`[UPLOAD COMPLETE] 完了: ${sizeMB.toFixed(1)}MB, 実時間: ${actualDuration.toFixed(1)}秒`)
+        console.log(`[UPLOAD COMPLETE] ===== アップロード完了 =====`)
+        console.log(`[UPLOAD COMPLETE] サイズ: ${sizeMB.toFixed(1)}MB`)
+        console.log(`[UPLOAD COMPLETE] 実時間: ${actualDuration.toFixed(1)}秒`)
+        console.log(`[UPLOAD COMPLETE] 実際の速度: ${(sizeMB/actualDuration).toFixed(1)}MB/秒`)
+        console.log(`[UPLOAD COMPLETE] パス: ${data?.path}`)
       } else {
-        console.error(`[UPLOAD ERROR] エラー:`, error)
+        console.error(`[UPLOAD ERROR] ===== アップロードエラー =====`, error)
       }
       
       // エラーの場合は元の処理を継続
