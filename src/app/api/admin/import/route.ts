@@ -188,14 +188,14 @@ export async function POST(request: NextRequest) {
           choreographer_furigana: mappedData.choreographer_furigana || '',
           status: 'pending' as const,
           agreement_checked: mappedData.agreement_status === '理解した',
-          // ステータスフィールドのデフォルト値を設定
+          // ステータスフィールドのデフォルト値を設定（Supabaseマイグレーションのデフォルト値を使用）
           basic_info_status: '未登録',
           preliminary_info_status: '未登録', 
-          program_info_status: '未登録', // プログラム情報は未入力状態でインポート
+          program_info_status: '入力中', // Supabaseマイグレーションのデフォルト値
           semifinals_info_status: '未登録',
           finals_info_status: '未登録',
-          sns_info_status: '未登録', // SNS情報は未入力状態でインポート
-          applications_info_status: '申請なし', // 申請情報はデフォルトで申請なし（BasicInfoFormと同じ）
+          sns_info_status: '入力中', // Supabaseマイグレーションのデフォルト値
+          applications_info_status: '入力中', // Supabaseマイグレーションのデフォルト値
           google_form_data: {
             timestamp: mappedData.timestamp,
             imported_at: new Date().toISOString(),
