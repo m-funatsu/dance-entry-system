@@ -301,7 +301,12 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">プログラム掲載用情報</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-900">プログラム掲載用情報</h3>
+        <p className="text-sm text-gray-500">
+          <span className="text-red-500">*</span> は必須項目です
+        </p>
+      </div>
 
       {isEditable && <DeadlineNoticeAsync deadlineKey="program_info_deadline" />}
 

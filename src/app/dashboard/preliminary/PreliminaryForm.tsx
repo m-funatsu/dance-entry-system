@@ -381,12 +381,17 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
       {isEditable && <DeadlineNoticeAsync deadlineKey="music_info_deadline" />}
 
-      <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          予選情報の登録
-        </h3>
-        <p className="text-sm text-gray-600 mb-6">
-          予選で使用する作品情報と楽曲の著作権情報を入力してください。
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            予選情報の登録
+          </h3>
+          <p className="text-sm text-gray-600">
+            予選で使用する作品情報と楽曲の著作権情報を入力してください。
+          </p>
+        </div>
+        <p className="text-sm text-gray-500">
+          <span className="text-red-500">*</span> は必須項目です
         </p>
       </div>
 

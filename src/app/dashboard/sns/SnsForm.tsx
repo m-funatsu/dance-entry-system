@@ -345,14 +345,19 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
 
           {isEditable && <DeadlineNoticeAsync deadlineKey="sns_deadline" />}
 
-          <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          SNS掲載情報の登録
-        </h3>
-        <p className="text-sm text-gray-600 mb-6">
-          SNS掲載に使用する動画や情報をアップロードしてください。
-        </p>
-      </div>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                SNS掲載情報の登録
+              </h3>
+              <p className="text-sm text-gray-600">
+                SNS掲載に使用する動画や情報をアップロードしてください。
+              </p>
+            </div>
+            <p className="text-sm text-gray-500">
+              <span className="text-red-500">*</span> は必須項目です
+            </p>
+          </div>
 
       <div className="space-y-6">
 

@@ -1106,7 +1106,12 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">決勝情報</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-900">決勝情報</h3>
+        <p className="text-sm text-gray-500">
+          <span className="text-red-500">*</span> は必須項目です
+        </p>
+      </div>
 
       <StartDateNotice 
         section="finals"

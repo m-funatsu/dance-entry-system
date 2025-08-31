@@ -672,12 +672,17 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
         </div>
       </div>
 
-      <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          基本情報の登録
-        </h3>
-        <p className="text-sm text-gray-600 mb-6">
-          ダンスジャンルとエントリーの基本情報を入力してください。
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            基本情報の登録
+          </h3>
+          <p className="text-sm text-gray-600">
+            ダンスジャンルとエントリーの基本情報を入力してください。
+          </p>
+        </div>
+        <p className="text-sm text-gray-500">
+          <span className="text-red-500">*</span> は必須項目です
         </p>
       </div>
 
