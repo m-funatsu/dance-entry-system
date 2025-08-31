@@ -72,8 +72,10 @@ export default async function ApplicationsInfoListPage() {
   console.log('[APPLICATIONS DEBUG] ファイルエラー:', filesError)
 
 
-  // データをマッピング（選考通過のみ表示）
-  const mappedApplicationsInfoList = entriesList?.filter(entry => entry.status === 'selected').map(entry => {
+  // データをマッピング（選考通過かつ申請ありのみ表示）
+  const mappedApplicationsInfoList = entriesList?.filter(entry => 
+    entry.status === 'selected' && entry.applications_info_status === '申請あり'
+  ).map(entry => {
     const relatedUser = usersList?.find(user => user.id === entry.user_id)
     const relatedApplicationsInfo = applicationsInfoList?.find(app => app.entry_id === entry.id)
     const relatedFiles = filesList?.filter(file => file.entry_id === entry.id)
