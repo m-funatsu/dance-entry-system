@@ -138,19 +138,17 @@ export default async function ProgramInfoListPage() {
         <div className="flex space-x-4">
           <DownloadButton
             data={mappedProgramInfoList.map(item => [
-              item.id,
-              item.entry_id,
               item.entries?.users?.name || '不明なユーザー',
               item.basic_info?.dance_style || '未入力',
               item.song_count || '',
+              item.affiliation || '',
               item.semifinal_story || '',
-              item.semifinal_highlight || '',
               item.final_story || '',
-              item.final_highlight || '',
-              `準決勝: ${item.affiliation || '未入力'} / 決勝: ${item.final_affiliation || '未入力'}`,
+              item.player_photo_path ? '選手紹介画像あり' : 'なし',
+              item.program_notes || '',
               getStatusLabel(item.entries?.status)
             ])}
-            headers={['ID', 'エントリーID', 'システム利用者名', 'ダンスジャンル', '楽曲数', '準決勝ストーリー', '準決勝見所', '決勝ストーリー', '決勝見所', '所属教室または所属', '選考ステータス']}
+            headers={['システム利用者名', 'ダンスジャンル', '楽曲数', '所属教室または所属', '準決勝の作品あらすじ', '決勝情報', '選手紹介画像', '備考欄', '選考ステータス']}
             filename="program_info"
           />
         </div>
@@ -178,22 +176,19 @@ export default async function ProgramInfoListPage() {
                     楽曲数
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    準決勝情報
+                    所属教室または所属
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    準決勝の作品あらすじ
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     決勝情報
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
+                    選手紹介画像
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    所属教室または所属
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    準決勝用添付ファイル
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    決勝用添付ファイル
+                    備考欄
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     選考ステータス
@@ -221,52 +216,21 @@ export default async function ProgramInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">ストーリー:</div>
-                        <div>
-                          {programInfo.semifinal_story ? 
-                            `${programInfo.semifinal_story.slice(0, 30)}${programInfo.semifinal_story.length > 30 ? '...' : ''}` 
-                            : '未入力'}
-                        </div>
-                        <div className="text-gray-500 mt-1">見所:</div>
-                        <div>
-                          {programInfo.semifinal_highlight ? 
-                            `${programInfo.semifinal_highlight.slice(0, 30)}${programInfo.semifinal_highlight.length > 30 ? '...' : ''}` 
-                            : '未入力'}
-                        </div>
+                        {programInfo.affiliation || '未入力'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="text-xs text-gray-900">
+                        {programInfo.semifinal_story || '未入力'}
                       </div>
                     </td>
                     <td className="px-2 py-3">
                       <div className="text-xs text-gray-900">
                         {programInfo.song_count === '2曲' ? (
-                          <>
-                            <div className="text-gray-500">ストーリー:</div>
-                            <div>
-                              {programInfo.final_story ? 
-                                `${programInfo.final_story.slice(0, 30)}${programInfo.final_story.length > 30 ? '...' : ''}` 
-                                : '未入力'}
-                            </div>
-                            <div className="text-gray-500 mt-1">見所:</div>
-                            <div>
-                              {programInfo.final_highlight ? 
-                                `${programInfo.final_highlight.slice(0, 30)}${programInfo.final_highlight.length > 30 ? '...' : ''}` 
-                                : '未入力'}
-                            </div>
-                          </>
+                          programInfo.final_story || '未入力'
                         ) : (
                           <span className="text-gray-400">1曲のため不要</span>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500 mt-1">作成日: {programInfo.created_at ? new Date(programInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新日: {programInfo.updated_at ? new Date(programInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="font-medium">準決勝: {programInfo.affiliation || '未入力'}</div>
-                        <div className="text-gray-500 mt-1">決勝: {programInfo.final_affiliation || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3">
@@ -314,53 +278,8 @@ export default async function ProgramInfoListPage() {
                       </div>
                     </td>
                     <td className="px-2 py-3">
-                      <div className="space-y-1">
-                        {programInfo.song_count === '2曲' ? (
-                          <>
-                            {/* 決勝用選手紹介画像 */}
-                            {programInfo.final_player_photo_path && (
-                              <div>
-                                <a
-                                  href={getFileUrl(programInfo.final_player_photo_path)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                                >
-                                  📸 選手紹介画像
-                                </a>
-                              </div>
-                            )}
-                            
-                            {/* 決勝用作品イメージ①～④ */}
-                            {[1, 2, 3, 4].map((num) => {
-                              const imagePath = programInfo[`final_image${num}_path` as keyof typeof programInfo] as string
-                              
-                              return imagePath ? (
-                                <div key={`final_image${num}`}>
-                                  <a
-                                    href={getFileUrl(imagePath)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
-                                  >
-                                    📸 作品イメージ{num === 1 ? '①' : num === 2 ? '②' : num === 3 ? '③' : '④'}
-                                  </a>
-                                </div>
-                              ) : null
-                            })}
-                            
-                            {/* ファイルなしの場合 */}
-                            {(!programInfo.final_player_photo_path && 
-                              !programInfo.final_image1_path && 
-                              !programInfo.final_image2_path && 
-                              !programInfo.final_image3_path && 
-                              !programInfo.final_image4_path) && (
-                              <span className="text-xs text-gray-400">ファイルなし</span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-xs text-gray-400">1曲のため不要</span>
-                        )}
+                      <div className="text-xs text-gray-900">
+                        {programInfo.program_notes || '未入力'}
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
