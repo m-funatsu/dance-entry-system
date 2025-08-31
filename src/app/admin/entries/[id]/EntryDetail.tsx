@@ -1779,11 +1779,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                           <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone || '-'}</dd>
                         </div>
                         <div>
-                          <dt className="text-sm font-medium text-gray-500">メイクスタイル1</dt>
+                          <dt className="text-sm font-medium text-gray-500">希望スタイル①</dt>
                           <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style1 || '-'}</dd>
                         </div>
                         <div>
-                          <dt className="text-sm font-medium text-gray-500">メイクスタイル2</dt>
+                          <dt className="text-sm font-medium text-gray-500">希望スタイル②</dt>
                           <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style2 || '-'}</dd>
                         </div>
                         {applicationsInfo.makeup_notes && (
@@ -1817,11 +1817,11 @@ export default function EntryDetail({ entry, mediaUrls = {} }: EntryDetailProps)
                             <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_phone_final || '-'}</dd>
                           </div>
                           <div>
-                            <dt className="text-sm font-medium text-gray-500">メイクスタイル1</dt>
+                            <dt className="text-sm font-medium text-gray-500">希望スタイル①</dt>
                             <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style1_final || '-'}</dd>
                           </div>
                           <div>
-                            <dt className="text-sm font-medium text-gray-500">メイクスタイル2</dt>
+                            <dt className="text-sm font-medium text-gray-500">希望スタイル②</dt>
                             <dd className="mt-1 text-sm text-gray-900">{applicationsInfo.makeup_style2_final || '-'}</dd>
                           </div>
                           {applicationsInfo.makeup_notes_final && (
