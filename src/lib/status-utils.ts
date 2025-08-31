@@ -233,7 +233,7 @@ export async function checkBasicInfoCompletion(
         .from('entry_files')
         .select('*')
         .eq('entry_id', entryId)
-        .eq('purpose', 'bank_slip')
+        .eq('purpose', 'semifinals_payment_slip')
         .limit(1)
         .maybeSingle()
 
@@ -407,11 +407,7 @@ export async function checkSemifinalsInfoCompletion(
       if (allFiles) {
         // 1. 振込確認用紙（必須）
         const hasPaymentSlip = allFiles.some(file => 
-          file.purpose === 'payment_slip_path' || 
-          file.purpose === 'semifinals_payment_slip' ||
-          file.purpose === 'bank_slip' ||
-          file.file_path?.includes('payment_slip') ||
-          file.file_path?.includes('bank_slip')
+          file.purpose === 'semifinals_payment_slip'
         )
         console.log(`[SEMIFINALS INFO COMPLETION] 振込確認用紙: ${hasPaymentSlip}`)
         

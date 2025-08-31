@@ -301,10 +301,10 @@ export default async function DashboardPage() {
       .from('entry_files')
       .select('*')
       .eq('entry_id', entry.id)
-      .eq('purpose', 'bank_slip')
+      .eq('purpose', 'semifinals_payment_slip')
     
     hasBankSlip = !!(bankSlipFiles && bankSlipFiles.length > 0)
-    console.log('[DASHBOARD BASIC INFO] 振込確認用紙チェック:', hasBankSlip)
+    console.log('[DASHBOARD] 振込確認用紙チェック:', hasBankSlip, '件数:', bankSlipFiles?.length || 0)
   }
 
   // const checkPreliminaryInfoComplete = (preliminaryInfo: { [key: string]: unknown } | null, hasVideo: boolean) => {
