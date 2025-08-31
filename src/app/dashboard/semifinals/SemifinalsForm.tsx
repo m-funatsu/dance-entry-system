@@ -858,6 +858,8 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           }}
           audioFiles={audioFiles}
           isEditable={isEditable}
+          uploading={uploading}
+          progress={progress}
         />
       )}
 

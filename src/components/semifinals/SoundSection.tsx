@@ -2,7 +2,6 @@
 
 import { FormField, AudioUpload } from '@/components/ui'
 import type { SemifinalsInfo } from '@/lib/types'
-import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 
 interface SoundSectionProps {
   semifinalsInfo: Partial<SemifinalsInfo>
@@ -13,6 +12,8 @@ interface SoundSectionProps {
   onSave?: (isTemporary?: boolean, customData?: Partial<SemifinalsInfo>) => Promise<void>
   audioFiles?: Record<string, { file_name: string }>
   isEditable?: boolean
+  uploading?: boolean
+  progress?: number
 }
 
 export const SoundSection: React.FC<SoundSectionProps> = ({
@@ -23,12 +24,10 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
   onFileDelete,
   onSave,
   audioFiles,
-  isEditable = true
+  isEditable = true,
+  uploading = false,
+  progress = 0
 }) => {
-  // プログレスバー用フック
-  const { uploading, progress } = useFileUploadV2({
-    category: 'audio'
-  })
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

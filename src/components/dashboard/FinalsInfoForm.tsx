@@ -63,7 +63,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   })
 
   // ファイルアップロードフック（プログレスバー用）
-  const { uploading, progress } = useFileUploadV2({
+  const { uploadAudio, uploadImage, uploading, progress } = useFileUploadV2({
     category: 'audio', // デフォルト（実際のファイル種別は動的に変更）
     onError: (error: string) => showToast(error, 'error')
   })
@@ -825,23 +825,24 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
         await handleFileDelete(field)
       }
       
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${entry.id}/finals/${field}_${Date.now()}.${fileExt}`
+      // useFileUploadV2を使用してプログレスバー付きでアップロード
+      console.log('[UPLOAD] useFileUploadV2でアップロード開始')
       
-      console.log('[UPLOAD] Uploading to:', fileName)
-      
-      const { error: uploadError } = await supabase.storage
-        .from('files')
-        .upload(fileName, file)
-
-      if (uploadError) {
-        console.error('[UPLOAD] Storage upload error:', uploadError)
-        throw uploadError
-      }
-
-      // ファイル情報をデータベースに保存
       const fileType = field === 'choreographer_photo_path' ? 'photo' : 
                       field.includes('image') ? 'photo' : 'audio'
+      
+      const result = fileType === 'audio' 
+        ? await uploadAudio(file, { entryId: entry.id, folder: `finals/${field}` })
+        : await uploadImage(file, { entryId: entry.id, folder: `finals/${field}` })
+      
+      if (!result.success || !result.path) {
+        throw new Error(result.error || 'アップロードに失敗しました')
+      }
+      
+      const fileName = result.path
+      console.log('[UPLOAD] アップロード成功:', fileName)
+
+      // ファイル情報をデータベースに保存
       
       const insertData = {
         entry_id: entry.id,
