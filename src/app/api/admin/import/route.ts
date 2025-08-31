@@ -190,12 +190,12 @@ export async function POST(request: NextRequest) {
           agreement_checked: mappedData.agreement_status === '理解した',
           // ステータスフィールドのデフォルト値を設定
           basic_info_status: '未登録',
-          preliminary_info_status: '未登録',
-          program_info_status: '未登録',
+          preliminary_info_status: '未登録', 
+          program_info_status: '未登録', // プログラム情報は未入力状態でインポート
           semifinals_info_status: '未登録',
           finals_info_status: '未登録',
-          sns_info_status: '未登録',
-          applications_info_status: '申請なし', // チェック制約に合わせた値
+          sns_info_status: '未登録', // SNS情報は未入力状態でインポート
+          applications_info_status: '申請なし', // 申請情報はデフォルトで申請なし（BasicInfoFormと同じ）
           google_form_data: {
             timestamp: mappedData.timestamp,
             imported_at: new Date().toISOString(),
