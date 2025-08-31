@@ -28,8 +28,9 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
   const [bankSlipFile, setBankSlipFile] = useState<{file_name: string; file_path: string; url?: string} | null>(null)
 
   // ファイルアップロードフック（SNS形式のプログレスバー用）
-  const { uploading, progress } = useFileUploadV2({
-    category: 'document'
+  const { uploadImage, uploading, progress } = useFileUploadV2({
+    category: 'document',
+    onError: (error: string) => showToast(error, 'error')
   })
 
   // 振込確認用紙ファイルを読み込む
@@ -1035,55 +1036,53 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
                 }
                 
                 try {
-                  // ファイルアップロード処理
-                  const fileExt = file.name.split('.').pop()
-                  const fileName = `${useEntryId}/bank_slip_${Date.now()}.${fileExt}`
+                  // useFileUploadV2を使用してプログレスバー付きでアップロード
+                  console.log('[BANK SLIP UPLOAD] useFileUploadV2でアップロード開始')
                   
-                  console.log('[BANK SLIP UPLOAD] アップロード先:', fileName)
-                  
-                  const { error: uploadError } = await supabase.storage
-                    .from('files')
-                    .upload(fileName, file)
-                  
-                  if (uploadError) {
-                    console.error('[BANK SLIP UPLOAD] ストレージアップロードエラー:', uploadError)
-                    throw uploadError
-                  }
-                  
-                  // ファイル情報をデータベースに保存
-                  const insertData = {
-                    entry_id: useEntryId,
-                    file_type: 'photo',
-                    file_name: file.name,
-                    file_path: fileName,
-                    purpose: 'bank_slip',
-                    uploaded_at: new Date().toISOString()
-                  }
-                  
-                  console.log('[BANK SLIP UPLOAD] データベース保存:', insertData)
-                  
-                  const { error: dbError } = await supabase
-                    .from('entry_files')
-                    .insert(insertData)
-                  
-                  if (dbError) {
-                    console.error('[BANK SLIP UPLOAD] データベース保存エラー:', dbError)
-                    throw dbError
-                  }
-                  
-                  // 署名付きURLを取得してプレビュー用に設定
-                  const { data: urlData } = await supabase.storage
-                    .from('files')
-                    .createSignedUrl(fileName, 3600)
-
-                  setBankSlipFile({
-                    file_name: file.name,
-                    file_path: fileName,
-                    url: urlData?.signedUrl
+                  const result = await uploadImage(file, { 
+                    entryId: useEntryId || undefined, 
+                    userId, 
+                    folder: 'bank_slip' 
                   })
                   
-                  console.log('[BANK SLIP UPLOAD] アップロード成功、状態更新完了')
-                  showToast('振込確認用紙をアップロードしました', 'success')
+                  if (result.success && result.path) {
+                    // ファイル情報をデータベースに保存
+                    const insertData = {
+                      entry_id: useEntryId,
+                      file_type: 'photo',
+                      file_name: file.name,
+                      file_path: result.path,
+                      purpose: 'bank_slip',
+                      uploaded_at: new Date().toISOString()
+                    }
+                    
+                    console.log('[BANK SLIP UPLOAD] データベース保存:', insertData)
+                    
+                    const { error: dbError } = await supabase
+                      .from('entry_files')
+                      .insert(insertData)
+                    
+                    if (dbError) {
+                      console.error('[BANK SLIP UPLOAD] データベース保存エラー:', dbError)
+                      throw dbError
+                    }
+                    
+                    // 署名付きURLを取得してプレビュー用に設定
+                    const { data: urlData } = await supabase.storage
+                      .from('files')
+                      .createSignedUrl(result.path, 3600)
+
+                    setBankSlipFile({
+                      file_name: file.name,
+                      file_path: result.path,
+                      url: urlData?.signedUrl
+                    })
+                    
+                    console.log('[BANK SLIP UPLOAD] アップロード成功、状態更新完了')
+                    showToast('振込確認用紙をアップロードしました', 'success')
+                  } else {
+                    throw new Error(result.error || 'アップロードに失敗しました')
+                  }
                   
                 } catch (error) {
                   console.error('[BANK SLIP UPLOAD] アップロードエラー:', error)
