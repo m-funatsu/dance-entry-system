@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useRef, memo, useCallback, useMemo, useEffect } from 'react'
+import { useState, useRef, memo, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import { FileCategory, formatFileSize, validateFile } from '@/lib/file-upload'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
-import { useUploadStatus } from '@/hooks/useUploadStatus'
-import { UploadStatusBar } from './UploadStatusBar'
 import { trackBehaviorDifference } from '@/lib/device-detector'
 
 export interface FileUploadFieldProps {
@@ -27,9 +25,6 @@ export interface FileUploadFieldProps {
     subtitle?: string
     formats?: string
   }
-  // 統一ステータスバー用props
-  showStatusBar?: boolean
-  hidePreviewUntilComplete?: boolean
 }
 
 export const FileUploadField = memo<FileUploadFieldProps>(({
@@ -45,23 +40,14 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
   accept,
   uploadPath,
   helperText,
-  placeholder,
-  showStatusBar = false,
-  hidePreviewUntilComplete = false
+  placeholder
 }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [localError, setLocalError] = useState<string | null>(null)
-  const [showPreview, setShowPreview] = useState(!hidePreviewUntilComplete)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 統一ステータスバー管理（showStatusBarが有効な場合）
-  const { status, startUpload, updateProgress, completeUpload, failUpload } = useUploadStatus()
-  
-  // 外部のuseFileUploadV2の状態を監視してステータスバーを更新
-  const [uploadId, setUploadId] = useState<string | null>(null)
-
-  const { uploading, progress, error: uploadError } = useFileUploadV2({
+  const { uploading, progress, error: uploadError, upload } = useFileUploadV2({
     category,
     config: maxSizeMB ? { maxSize: maxSizeMB * 1024 * 1024 } : undefined,
     generatePath: uploadPath,
@@ -74,38 +60,6 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
 
   const error = localError || uploadError
   
-  // 外部アップロード状態監視（showStatusBarが有効で、uploadPathがない場合）
-  useEffect(() => {
-    if (!showStatusBar || uploadPath) return
-    
-    // アップロード開始時
-    if (uploading && !status.isUploading && selectedFile && !uploadId) {
-      const newUploadId = startUpload(selectedFile, category)
-      setUploadId(newUploadId)
-      
-      if (hidePreviewUntilComplete) {
-        setShowPreview(false)
-      }
-    }
-    
-    // プログレス更新
-    if (uploading && uploadId && progress > 0) {
-      updateProgress(uploadId, progress)
-    }
-    
-    // アップロード完了時
-    if (!uploading && uploadId && status.isUploading) {
-      if (uploadError) {
-        failUpload(uploadId, uploadError)
-      } else {
-        completeUpload(uploadId)
-        if (hidePreviewUntilComplete) {
-          setTimeout(() => setShowPreview(true), 500)
-        }
-      }
-      setUploadId(null)
-    }
-  }, [uploading, progress, uploadError, selectedFile, showStatusBar, uploadPath, status.isUploading, uploadId, startUpload, updateProgress, completeUpload, failUpload, category, hidePreviewUntilComplete])
 
   const handleFile = useCallback(async (file: File) => {
     setLocalError(null)
@@ -122,14 +76,13 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
     }
 
     setSelectedFile(file)
-    
-    // onChangeを呼び出し - 実際のアップロード処理は呼び出し元で行われる
     onChange(file)
     
-    // showStatusBarが有効でuploadPathがない場合は、
-    // 外部のアップロード処理によるステータス管理に完全に依存する
-    // （仮想プログレス表示は行わない）
-  }, [category, maxSizeMB, onChange])
+    // 自動アップロード（uploadPathが提供されている場合）
+    if (uploadPath && onUploadComplete) {
+      await upload(file)
+    }
+  }, [category, maxSizeMB, onChange, uploadPath, onUploadComplete, upload])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -317,7 +270,7 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
               </p>
             )}
           </div>
-        ) : value && showPreview ? (
+        ) : value ? (
           <div className="space-y-2">
             {category === 'image' && typeof value === 'string' ? (
               <div className="relative inline-block mx-auto">
@@ -390,18 +343,6 @@ export const FileUploadField = memo<FileUploadFieldProps>(({
           </div>
         )}
       </div>
-      
-      {/* 統一ステータスバー（showStatusBarが有効な場合） */}
-      {showStatusBar && (status.isUploading || status.error) && (
-        <UploadStatusBar
-          isUploading={status.isUploading}
-          progress={status.progress}
-          fileName={status.fileName}
-          fileSize={status.fileSize}
-          fileType={status.fileType}
-          error={status.error}
-        />
-      )}
     </div>
   )
 })

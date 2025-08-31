@@ -2,8 +2,6 @@
 
 import { useState, useRef } from 'react'
 import { VideoUploadProps } from '@/lib/types'
-import { useUploadStatus } from '@/hooks/useUploadStatus'
-import { UploadStatusBar } from './UploadStatusBar'
 
 export const VideoUpload: React.FC<VideoUploadProps> = ({
   label,
@@ -13,16 +11,10 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
   required = false,
   maxSizeMB = 500,
   accept = 'video/*',
-  showStatusBar = false,
-  hidePreviewUntilComplete = false
 }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
-  const [showPreview, setShowPreview] = useState(!hidePreviewUntilComplete)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
-  // 統一ステータスバー管理
-  const { status, startUpload, updateProgress, completeUpload } = useUploadStatus()
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -62,34 +54,6 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
     }
 
     setUploadingFile(file)
-    
-    // ステータスバー開始
-    if (showStatusBar) {
-      const uploadId = startUpload(file, 'video')
-      
-      if (hidePreviewUntilComplete) {
-        setShowPreview(false)
-      }
-      
-      // 仮想プログレス（実際のアップロードは外部で処理）
-      let currentProgress = 0
-      const interval = setInterval(() => {
-        currentProgress += Math.random() * 12 + 3 // ビデオは少し遅めに進行
-        if (currentProgress >= 100) {
-          currentProgress = 100
-          updateProgress(uploadId, currentProgress)
-          setTimeout(() => {
-            completeUpload(uploadId)
-            if (hidePreviewUntilComplete) {
-              setShowPreview(true)
-            }
-          }, 500)
-          clearInterval(interval)
-        } else {
-          updateProgress(uploadId, currentProgress)
-        }
-      }, 300)
-    }
     
     onChange(file)
   }
@@ -136,7 +100,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
           className="hidden"
         />
         
-        {value && showPreview ? (
+        {value ? (
           <div className="space-y-2">
             <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -177,18 +141,6 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
           </div>
         )}
       </div>
-      
-      {/* 統一ステータスバー */}
-      {showStatusBar && (status.isUploading || status.error) && (
-        <UploadStatusBar
-          isUploading={status.isUploading}
-          progress={status.progress}
-          fileName={status.fileName}
-          fileSize={status.fileSize}
-          fileType={status.fileType}
-          error={status.error}
-        />
-      )}
     </div>
   )
 }

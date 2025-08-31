@@ -278,8 +278,6 @@ export const FinalsMusicSection: React.FC<FinalsMusicSectionProps> = ({
           label=""
           value={finalsInfo.music_data_path || ''}
           displayName={audioFiles?.music_data_path?.file_name}
-          showStatusBar={true}
-          hidePreviewUntilComplete={true}
           onChange={(file) => {
             console.log('[FINALS MUSIC DATA UPLOAD] === 決勝楽曲データファイル選択 ===')
             console.log('[FINALS MUSIC DATA UPLOAD] 選択されたファイル:', file.name)

@@ -57,22 +57,16 @@ export interface FileUploadProps {
 
 export interface ImageUploadProps extends FileUploadProps {
   accept?: string
-  showStatusBar?: boolean // 統一ステータスバー表示
-  hidePreviewUntilComplete?: boolean // アップロード完了までプレビュー非表示
 }
 
 export interface AudioUploadProps extends FileUploadProps {
   displayName?: string
   accept?: string
   deletable?: boolean // 削除ボタンの表示制御
-  showStatusBar?: boolean // 統一ステータスバー表示
-  hidePreviewUntilComplete?: boolean // アップロード完了までプレビュー非表示
 }
 
 export interface VideoUploadProps extends FileUploadProps {
   accept?: string
-  showStatusBar?: boolean // 統一ステータスバー表示
-  hidePreviewUntilComplete?: boolean // アップロード完了までプレビュー非表示
 }
 
 // Tab navigation props

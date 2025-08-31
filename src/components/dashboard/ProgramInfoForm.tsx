@@ -325,8 +325,6 @@ export default function ProgramInfoForm({ entry, isEditable = true }: ProgramInf
             disabled={uploading || !isEditable}
             maxSizeMB={100}
             accept="image/*"
-            showStatusBar={true}
-            hidePreviewUntilComplete={true}
           />
           {errors.player_photo_path && (
             <p className="mt-1 text-sm text-red-600">{errors.player_photo_path}</p>

@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/contexts/ToastContext'
-import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync, UploadStatusBar } from '@/components/ui'
+import { FormField, FileUploadField, Alert, SaveButton, DeadlineNoticeAsync } from '@/components/ui'
 import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useBaseForm } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
-import { useUploadStatus } from '@/hooks/useUploadStatus'
 import { ValidationPresets } from '@/lib/validation'
 import { updateFormStatus, checkSnsInfoCompletion } from '@/lib/status-utils'
 import type { Entry, SnsFormData, EntryFile } from '@/lib/types'
@@ -83,36 +82,6 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
     onError: (error: string) => showToast(error, 'error')
   })
 
-  // 統一ステータスバー管理
-  const { status, startUpload, completeUpload, failUpload } = useUploadStatus()
-  
-  // アップロード状態の監視と実時間追跡
-  const [currentUploadId, setCurrentUploadId] = useState<string | null>(null)
-  const [uploadStartTime, setUploadStartTime] = useState<number | null>(null)
-  
-  useEffect(() => {
-    // アップロード開始検出
-    if (uploading && !currentUploadId) {
-      const startTime = Date.now()
-      setUploadStartTime(startTime)
-      console.log('[UPLOAD START] 実際のアップロード開始を検出', new Date(startTime).toLocaleTimeString())
-    }
-    
-    // アップロード完了検出 - 実際にuploading=falseになった時点
-    if (!uploading && currentUploadId && uploadStartTime) {
-      const endTime = Date.now()
-      const actualDuration = (endTime - uploadStartTime) / 1000 // 秒
-      console.log(`[UPLOAD COMPLETE] 実際のアップロード完了検出 - 実時間: ${actualDuration.toFixed(1)}秒`)
-      
-      // 実際のアップロード完了後、データベース処理を待ってステータスバー完了
-      setTimeout(() => {
-        console.log('[UPLOAD COMPLETE] ステータスバー完了処理実行')
-        completeUpload(currentUploadId)
-        setCurrentUploadId(null)
-        setUploadStartTime(null)
-      }, 1500) // データベース保存・URL生成完了を確実に待つ
-    }
-  }, [uploading, currentUploadId, uploadStartTime, completeUpload])
 
   // データを読み込む
   useEffect(() => {
@@ -229,19 +198,12 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
       return
     }
 
-    // 統一ステータスバー開始
-    const uploadId = startUpload(file, 'video')
-    setCurrentUploadId(uploadId)
-
     try {
       console.log('[SNS VIDEO UPLOAD] 元のファイル名:', file.name)
-      console.log('[SNS VIDEO UPLOAD] ステータスバー開始, ID:', uploadId)
       
-      // useFileUploadV2が実際のアップロード処理を行い、progressはuseEffectで監視される
       const result = await uploadVideo(file, { entryId: entry.id, userId, folder: `sns/${field}` })
       
       if (result.success && result.path) {
-        
         // ファイル情報をデータベースに保存（元のファイル名を渡す）
         await saveVideoFileInfo(result.path, field, file.name)
         
@@ -259,18 +221,10 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
         }
         
         console.log('[SNS VIDEO UPLOAD] アップロード完了')
-        // ステータスバー完了はuseEffectで自動処理される
-        
-      } else {
-        throw new Error('アップロードに失敗しました')
       }
     } catch (error) {
       console.error('Upload error:', error)
       showToast('アップロードに失敗しました', 'error')
-      
-      // ステータスバーエラー表示
-      failUpload(uploadId, error instanceof Error ? error.message : 'アップロードに失敗しました')
-      setCurrentUploadId(null)
     }
   }
 
@@ -523,15 +477,13 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
               
               <FileUploadField
                 label="練習風景動画"
-                value={practiceVideoUrl}
+                value={null}
                 onChange={(file) => handleFileUpload('practice_video', file)}
                 category="video"
                 disabled={uploading || !!practiceVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={200}
                 accept="video/*"
-                showStatusBar={false}
-                hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "練習風景動画をドラッグ&ドロップ",
                   formats: "対応形式: MP4, MOV, AVI など"
@@ -654,15 +606,13 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
               
               <FileUploadField
                 label="選手紹介・見所動画"
-                value={introVideoUrl}
+                value={null}
                 onChange={(file) => handleFileUpload('introduction_highlight', file)}
                 category="video"
                 disabled={uploading || !!introVideoFile || !entry || !isEditable}
                 required
                 maxSizeMB={200}
                 accept="video/*"
-                showStatusBar={false}
-                hidePreviewUntilComplete={true}
                 placeholder={{
                   title: "選手紹介・見所動画をドラッグ&ドロップ",
                   formats: "対応形式: MP4, MOV, AVI など"
@@ -709,18 +659,6 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
         </div>
         </div>
       </form>
-      )}
-
-      {/* 統一ステータスバー（実際のアップロード処理と連携） */}
-      {(status.isUploading || status.error) && (
-        <UploadStatusBar
-          isUploading={status.isUploading}
-          progress={status.progress}
-          fileName={status.fileName}
-          fileSize={status.fileSize}
-          fileType={status.fileType}
-          error={status.error}
-        />
       )}
     </>
   )
