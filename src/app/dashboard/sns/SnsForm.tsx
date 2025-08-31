@@ -379,7 +379,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <div className="text-sm text-blue-800 space-y-1">
               <p>動画のアップロード中は画面を操作せず、そのままお待ちください。</p>
-              <p>アップロード処理はネットワーク環境により数分かかることがあります。Wifi環境(5GHz帯)等、通信環境の良い場所での利用を推奨いたします。</p>
+              <p>アップロード処理はネットワーク環境により数分かかることがあります。<span className="text-red-600">Wifi環境(5GHz帯)等、通信環境の良い場所での利用を推奨いたします。</span></p>
             </div>
           </div>
           
@@ -508,7 +508,7 @@ export default function SNSForm({ entry, userId, isEditable = true }: SNSFormPro
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <div className="text-sm text-blue-800 space-y-1">
               <p>動画のアップロード中は画面を操作せず、そのままお待ちください。</p>
-              <p>アップロード処理はネットワーク環境により数分かかることがあります。Wifi環境(5GHz帯)等、通信環境の良い場所での利用を推奨いたします。</p>
+              <p>アップロード処理はネットワーク環境により数分かかることがあります。<span className="text-red-600">Wifi環境(5GHz帯)等、通信環境の良い場所での利用を推奨いたします。</span></p>
             </div>
           </div>
           
