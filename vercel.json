@@ -1,0 +1,9 @@
+{
+  "alias": ["dance-entry-dev.vercel.app"],
+  "git": {
+    "deploymentEnabled": {
+      "develop": true,
+      "main": true
+    }
+  }
+}
