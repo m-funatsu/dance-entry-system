@@ -1,4 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dance Entry Management System
+
+Next.js 15で構築されたダンス大会エントリー管理システム
+
+## 環境
+- **Production**: mainブランチ → 本番環境
+- **Development**: developブランチ → 開発環境（プレビュー）
 
 <!-- Deploy trigger: 2025-08-29 18:03 -->
 
