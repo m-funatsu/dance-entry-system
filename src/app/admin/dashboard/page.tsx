@@ -27,13 +27,27 @@ export default async function AdminDashboardPage() {
   const adminSupabase = createAdminClient()
   const [entriesResult, usersResult, basicInfoResult] = await Promise.all([
     adminSupabase.from('entries').select('*').order('created_at', { ascending: false }),
-    adminSupabase.from('users').select('id, name, email'),
+    adminSupabase.from('users').select('id, name, email, role'),
     adminSupabase.from('basic_info').select('entry_id, dance_style')
   ])
-  
+
   const { data: entries } = entriesResult
   const { data: allUsers } = usersResult
   const { data: basicInfoList } = basicInfoResult
+
+  // 基本情報未入力のユーザーをカウント（エントリーはあるが基本情報がない）
+  const entriesWithoutBasicInfo = entries?.filter(entry =>
+    !basicInfoList?.some(info => info.entry_id === entry.id) &&
+    entry.basic_info_status !== '登録済み'
+  ).length || 0
+
+  // ユーザーはいるがエントリーを作成していない人をカウント
+  const usersWithoutEntry = allUsers?.filter(user =>
+    user.role === 'participant' && !entries?.some(entry => entry.user_id === user.id)
+  ).length || 0
+
+  // 基本情報未入力の合計（エントリーはあるが基本情報なし + エントリーすら作成していない）
+  const totalWithoutBasicInfo = entriesWithoutBasicInfo + usersWithoutEntry
 
   // 手動でユーザーデータと基本情報をマッピング（安全な処理）
   const entriesWithUsers = entries?.map(entry => {
@@ -81,22 +95,30 @@ export default async function AdminDashboardPage() {
   // ダンスジャンル別統計を計算（エントリー数と予選通過数）
   const danceGenreStats = entriesWithUsers.reduce((acc, entry) => {
     let genre = '未分類'
-    
+
     if (entry.dance_style) {
       genre = entry.dance_style as string
     }
-    
+
     if (!acc[genre]) {
       acc[genre] = { total: 0, selected: 0 }
     }
-    
+
     acc[genre].total += 1
     if (entry.status === 'selected') {
       acc[genre].selected += 1
     }
-    
+
     return acc
   }, {} as Record<string, { total: number; selected: number }>)
+
+  // 未分類に基本情報未入力の人数を追加
+  if (totalWithoutBasicInfo > 0) {
+    if (!danceGenreStats['未分類']) {
+      danceGenreStats['未分類'] = { total: 0, selected: 0 }
+    }
+    danceGenreStats['未分類'].total += totalWithoutBasicInfo
+  }
 
   // ダンスジャンル統計を配列に変換してソート
   const danceGenreArray = Object.entries(danceGenreStats)
@@ -261,6 +283,11 @@ export default async function AdminDashboardPage() {
                       <div key={genre} className="p-4 bg-gray-50 rounded-lg">
                         <div className="text-sm font-medium text-gray-900 mb-3 truncate" title={genre}>
                           {genre}
+                          {genre === '未分類' && totalWithoutBasicInfo > 0 && (
+                            <span className="text-xs text-gray-500 ml-1">
+                              (基本情報未入力: {totalWithoutBasicInfo}名含む)
+                            </span>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
