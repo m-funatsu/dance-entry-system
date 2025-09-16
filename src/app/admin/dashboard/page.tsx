@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
   }).length
 
   const stats = {
-    total: entriesWithUsers.length,
+    total: entriesWithUsers.length + usersWithoutEntry,  // 基本情報未入力ユーザーも含めた総数
     preliminarySubmitted: preliminarySubmitted,
     selected: entriesWithUsers.filter(e => e.status === 'selected').length,
     rejected: entriesWithUsers.filter(e => e.status === 'rejected').length,
