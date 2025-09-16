@@ -120,14 +120,20 @@ export default async function AdminDashboardPage() {
     danceGenreStats['未分類'].total += totalWithoutBasicInfo
   }
 
-  // ダンスジャンル統計を配列に変換してソート
+  // ダンスジャンル統計を配列に変換してソート（未分類を最後に固定）
   const danceGenreArray = Object.entries(danceGenreStats)
-    .map(([genre, stats]) => ({ 
-      genre, 
-      totalCount: (stats as { total: number; selected: number }).total, 
-      selectedCount: (stats as { total: number; selected: number }).selected 
+    .map(([genre, stats]) => ({
+      genre,
+      totalCount: (stats as { total: number; selected: number }).total,
+      selectedCount: (stats as { total: number; selected: number }).selected
     }))
-    .sort((a, b) => b.totalCount - a.totalCount)
+    .sort((a, b) => {
+      // 未分類は常に最後に配置
+      if (a.genre === '未分類') return 1
+      if (b.genre === '未分類') return -1
+      // その他は件数の多い順でソート
+      return b.totalCount - a.totalCount
+    })
 
   return (
     <>
