@@ -1488,14 +1488,19 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
         </div>
 
         {/* 保存ボタン */}
-        <div className="flex justify-end pt-6">
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={saving || !isEditable}
-          >
-            {saving ? '保存中...' : '保存'}
-          </Button>
+        <div className="pt-6">
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={saving || !isEditable}
+            >
+              {saving ? '保存中...' : '保存'}
+            </Button>
+          </div>
+          <p className="text-right mt-2 text-sm font-bold text-red-600">
+            保存ボタンは1回だけクリックしてください。通信環境によって保存に時間がかかることがありますがそのままお待ちください。
+          </p>
         </div>
       </div>
     </form>
