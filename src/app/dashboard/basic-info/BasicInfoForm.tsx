@@ -1490,7 +1490,8 @@ export default function BasicInfoForm({ userId, entryId, initialData, isEditable
         {/* 保存ボタン */}
         <div className="pt-6">
           <p className="text-right mb-3 text-sm font-bold text-red-600">
-            保存ボタンは1回だけクリックしてください。通信環境によって保存に時間がかかることがありますがそのままお待ちください。
+            保存ボタンは1回だけクリックしてください。<br />
+            通信環境によって保存に時間がかかることがありますがそのままお待ちください。
           </p>
           <div className="flex justify-end">
             <Button
