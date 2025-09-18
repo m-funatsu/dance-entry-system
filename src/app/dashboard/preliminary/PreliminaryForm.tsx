@@ -41,8 +41,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     choreographer2_furigana: initialData?.choreographer2_furigana || ''
   })
   
-  const [videoFile, setVideoFile] = useState<EntryFile | null>(preliminaryVideo)
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [videoFiles, setVideoFiles] = useState<(EntryFile | null)[]>(
+    preliminaryVideo ? [preliminaryVideo] : [null, null, null]
+  )
+  const [videoUrls, setVideoUrls] = useState<(string | null)[]>([null, null, null])
 
   // バリデーションルール
   const validationRules = {
@@ -76,23 +78,19 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // ファイルアップロードフック
   const { uploading, progress, deleteFile, uploadVideo } = useFileUploadV2({
     category: 'video',
-    onSuccess: async (result: { url?: string; path?: string; originalFileName?: string }) => {
+    onSuccess: async (result: { url?: string; path?: string; originalFileName?: string; field?: string }) => {
       console.log('[UPLOAD SUCCESS] onSuccess呼び出し:', result)
       try {
         if (result.path) {
+          // fieldからindexを取得
+          const uploadIndex = result.field ? parseInt(result.field) : 0
+          console.log('[UPLOAD SUCCESS] uploadIndex:', uploadIndex)
+
           // ファイル情報をデータベースに保存
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo開始')
-          const savedFile = await saveVideoFileInfo(result.path, result.originalFileName)
+          const savedFile = await saveVideoFileInfo(result.path, uploadIndex, result.originalFileName)
           console.log('[UPLOAD SUCCESS] saveVideoFileInfo完了:', savedFile)
-          
-          // setVideoFileの更新（useEffectとの重複を避けるため条件付き）
-          if (savedFile.id !== videoFile?.id) {
-            console.log('[UPLOAD SUCCESS] setVideoFile更新実行')
-            setVideoFile(savedFile)
-          } else {
-            console.log('[UPLOAD SUCCESS] setVideoFile更新スキップ（同じファイル）')
-          }
-          
+
           // 署名付きURLを取得してプレビューを更新
           console.log('[UPLOAD SUCCESS] 署名付きURL取得開始')
           const { data } = await supabase.storage
@@ -100,7 +98,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             .createSignedUrl(result.path, 3600)
           if (data?.signedUrl) {
             console.log('[UPLOAD SUCCESS] 署名付きURL取得完了')
-            setVideoUrl(data.signedUrl)
+            const newVideoUrls = [...videoUrls]
+            newVideoUrls[uploadIndex] = data.signedUrl
+            setVideoUrls(newVideoUrls)
           }
         }
       } catch (error) {
@@ -139,26 +139,39 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // 動画ファイルの状態管理
   useEffect(() => {
     console.log('[VIDEO EFFECT] === useEffect実行 ===')
-    console.log('[VIDEO EFFECT] preliminaryVideo:', preliminaryVideo ? `id=${preliminaryVideo.id}` : 'null')
-    
-    if (preliminaryVideo) {
-      console.log('[VIDEO EFFECT] 動画ファイル情報を設定')
-      setVideoFile(preliminaryVideo)
-      
-      if (preliminaryVideo.file_path) {
-        fetchSignedUrl(preliminaryVideo.file_path).then(url => {
-          if (url) {
-            console.log('[VIDEO EFFECT] URLを状態に設定')
-            setVideoUrl(url)
+
+    const fetchVideoUrls = async () => {
+      if (!entryId) return
+
+      // データベースから予選動画を取得（最大3つ）
+      const { data: files } = await supabase
+        .from('entry_files')
+        .select('*')
+        .eq('entry_id', entryId)
+        .eq('file_type', 'video')
+        .eq('purpose', 'preliminary')
+        .order('uploaded_at', { ascending: true })
+        .limit(3)
+
+      const newVideoFiles: (EntryFile | null)[] = [null, null, null]
+      const newVideoUrls: (string | null)[] = [null, null, null]
+
+      if (files && files.length > 0) {
+        for (let i = 0; i < Math.min(files.length, 3); i++) {
+          newVideoFiles[i] = files[i]
+          if (files[i].file_path) {
+            const url = await fetchSignedUrl(files[i].file_path)
+            newVideoUrls[i] = url
           }
-        })
+        }
       }
-    } else {
-      console.log('[VIDEO EFFECT] preliminaryVideoなし、状態をクリア')
-      setVideoFile(null)
-      setVideoUrl(null)
+
+      setVideoFiles(newVideoFiles)
+      setVideoUrls(newVideoUrls)
     }
-  }, [preliminaryVideo, fetchSignedUrl])
+
+    fetchVideoUrls()
+  }, [entryId, fetchSignedUrl, supabase])
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -166,12 +179,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     validateSingleField(field, value)
   }
 
-  const saveVideoFileInfo = async (filePath: string, originalFileName?: string) => {
+  const saveVideoFileInfo = async (filePath: string, index: number, originalFileName?: string) => {
     try {
       // 元のファイル名を使用（提供されない場合はパスから抽出）
       const fileName = originalFileName || filePath.split('/').pop() || ''
-      console.log('[SAVE VIDEO] 保存ファイル名:', { originalFileName, extractedName: filePath.split('/').pop(), finalFileName: fileName })
-      
+      console.log('[SAVE VIDEO] 保存ファイル名:', { originalFileName, extractedName: filePath.split('/').pop(), finalFileName: fileName, index })
+
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
         .insert({
@@ -186,8 +199,10 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
       if (dbError) throw dbError
 
-      setVideoFile(fileData)
-      showToast('予選動画をアップロードしました', 'success')
+      const newVideoFiles = [...videoFiles]
+      newVideoFiles[index] = fileData
+      setVideoFiles(newVideoFiles)
+      showToast(`予選動画${index + 1}をアップロードしました`, 'success')
       return fileData
     } catch (error) {
       console.error('Error saving file info:', error)
@@ -196,7 +211,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
   
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, index: number) => {
     console.log('[VIDEO UPLOAD] === 動画アップロード開始 ===')
     console.log('[VIDEO UPLOAD] uploading state before:', uploading)
     
@@ -206,8 +221,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       return
     }
 
-    if (videoFile) {
-      showToast('既に動画がアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。', 'error')
+    if (videoFiles[index]) {
+      showToast(`動画${index + 1}は既にアップロードされています。新しい動画をアップロードするには、先に既存の動画を削除してください。`, 'error')
       return
     }
 
@@ -221,7 +236,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
     try {
       console.log('[VIDEO UPLOAD] uploadVideo関数呼び出し開始')
-      await uploadVideo(file, { entryId, userId, folder: 'preliminary' })
+      await uploadVideo(file, { entryId, userId, folder: 'preliminary', field: index.toString() })
       console.log('[VIDEO UPLOAD] uploadVideo関数呼び出し完了')
     } catch (error) {
       console.error('[VIDEO UPLOAD] uploadVideo関数でエラー:', error)
@@ -232,61 +247,70 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     }
   }
 
-  const handleFileDelete = async () => {
+  const handleFileDelete = async (index: number) => {
     console.log('[VIDEO DELETE] === 動画削除開始 ===')
-    console.log('[VIDEO DELETE] videoFile:', videoFile)
-    console.log('[VIDEO DELETE] videoUrl:', videoUrl)
-    
-    if (!videoFile) {
+    console.log('[VIDEO DELETE] index:', index)
+    console.log('[VIDEO DELETE] videoFile:', videoFiles[index])
+    console.log('[VIDEO DELETE] videoUrl:', videoUrls[index])
+
+    if (!videoFiles[index]) {
       console.log('[VIDEO DELETE] videoFileが存在しないため処理を終了')
       return
     }
 
-    if (!window.confirm('予選動画を削除してもよろしいですか？')) {
+    if (!window.confirm(`予選動画${index + 1}を削除してもよろしいですか？`)) {
       console.log('[VIDEO DELETE] ユーザーがキャンセルしたため処理を終了')
       return
     }
 
     // 削除前の状態を保存
-    const previousVideoFile = videoFile
-    const previousVideoUrl = videoUrl
+    const previousVideoFile = videoFiles[index]
+    const previousVideoUrl = videoUrls[index]
     console.log('[VIDEO DELETE] 削除前の状態を保存完了')
     console.log('[VIDEO DELETE] previousVideoFile:', previousVideoFile)
     console.log('[VIDEO DELETE] previousVideoUrl:', previousVideoUrl)
 
     try {
       console.log('[VIDEO DELETE] Step 1: UIの即座更新開始（楽観的更新）')
-      setVideoFile(null)
-      setVideoUrl(null)
+      const newVideoFiles = [...videoFiles]
+      const newVideoUrls = [...videoUrls]
+      newVideoFiles[index] = null
+      newVideoUrls[index] = null
+      setVideoFiles(newVideoFiles)
+      setVideoUrls(newVideoUrls)
       console.log('[VIDEO DELETE] Step 1: UIの即座更新完了')
-      
+
       console.log('[VIDEO DELETE] Step 2: ストレージからの削除開始')
-      console.log('[VIDEO DELETE] 削除対象ファイルパス:', previousVideoFile.file_path)
-      const deleteSuccess = await deleteFile(previousVideoFile.file_path)
+      console.log('[VIDEO DELETE] 削除対象ファイルパス:', previousVideoFile!.file_path)
+      const deleteSuccess = await deleteFile(previousVideoFile!.file_path)
       console.log('[VIDEO DELETE] Step 2: ストレージ削除結果:', deleteSuccess)
-      
+
       if (deleteSuccess) {
         console.log('[VIDEO DELETE] Step 3: データベースからの削除開始')
-        console.log('[VIDEO DELETE] 削除対象ファイルID:', previousVideoFile.id)
-        
+        console.log('[VIDEO DELETE] 削除対象ファイルID:', previousVideoFile!.id)
+
         const { error: dbError } = await supabase
           .from('entry_files')
           .delete()
-          .eq('id', previousVideoFile.id)
+          .eq('id', previousVideoFile!.id)
 
         if (dbError) {
           console.error('[VIDEO DELETE] Step 3: データベース削除でエラー発生:', dbError)
           console.log('[VIDEO DELETE] エラー時の状態復元開始')
-          setVideoFile(previousVideoFile)
-          setVideoUrl(previousVideoUrl)
+          const revertFiles = [...videoFiles]
+          const revertUrls = [...videoUrls]
+          revertFiles[index] = previousVideoFile
+          revertUrls[index] = previousVideoUrl
+          setVideoFiles(revertFiles)
+          setVideoUrls(revertUrls)
           console.log('[VIDEO DELETE] エラー時の状態復元完了')
           throw dbError
         }
 
         console.log('[VIDEO DELETE] Step 3: データベース削除完了')
         console.log('[VIDEO DELETE] Step 4: 成功メッセージ表示')
-        showToast('予選動画を削除しました', 'success')
-        
+        showToast(`予選動画${index + 1}を削除しました`, 'success')
+
         console.log('[VIDEO DELETE] Step 5: 削除後のリロード処理開始（1秒後）')
         setTimeout(() => {
           console.log('[VIDEO DELETE] Step 5: ページリロード実行')
@@ -294,8 +318,12 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         }, 1000)
       } else {
         console.error('[VIDEO DELETE] ストレージ削除が失敗したため状態を復元')
-        setVideoFile(previousVideoFile)
-        setVideoUrl(previousVideoUrl)
+        const revertFiles = [...videoFiles]
+        const revertUrls = [...videoUrls]
+        revertFiles[index] = previousVideoFile
+        revertUrls[index] = previousVideoUrl
+        setVideoFiles(revertFiles)
+        setVideoUrls(revertUrls)
         console.log('[VIDEO DELETE] 状態復元完了')
         throw new Error('ストレージからのファイル削除に失敗しました')
       }
@@ -307,18 +335,22 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         previousVideoFile,
         previousVideoUrl
       })
-      
+
       // エラー時は状態を確実に復元
       console.log('[VIDEO DELETE] エラー時の最終状態復元開始')
-      setVideoFile(previousVideoFile)
-      setVideoUrl(previousVideoUrl)
+      const revertFiles = [...videoFiles]
+      const revertUrls = [...videoUrls]
+      revertFiles[index] = previousVideoFile
+      revertUrls[index] = previousVideoUrl
+      setVideoFiles(revertFiles)
+      setVideoUrls(revertUrls)
       console.log('[VIDEO DELETE] エラー時の最終状態復元完了')
-      
+
       showToast('動画の削除に失敗しました', 'error')
     } finally {
       console.log('[VIDEO DELETE] === 動画削除処理完了 ===')
-      console.log('[VIDEO DELETE] 最終状態 - videoFile:', videoFile)
-      console.log('[VIDEO DELETE] 最終状態 - videoUrl:', videoUrl)
+      console.log('[VIDEO DELETE] 最終状態 - videoFiles:', videoFiles)
+      console.log('[VIDEO DELETE] 最終状態 - videoUrls:', videoUrls)
     }
   }
 
@@ -339,7 +371,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const dataToSave = {
       entry_id: entryId,
       ...formData,
-      video_submitted: !!videoFile
+      video_submitted: videoFiles.some(file => file !== null)
     }
 
     // デバッグ: 保存するデータをログ出力
@@ -355,8 +387,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     await save(dataToSave) // 保存
     
     // ステータス更新（データ存在判定も含めて）
-    const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || !!videoFile
-    const isComplete = checkPreliminaryInfoCompletion(formData, !!videoFile)
+    const hasVideoFiles = videoFiles.some(file => file !== null)
+    const hasAnyData = Object.values(formData).some(value => value && value.toString().trim() !== '') || hasVideoFiles
+    const isComplete = checkPreliminaryInfoCompletion(formData, hasVideoFiles)
     await updateFormStatus('preliminary_info', entryId, isComplete, hasAnyData)
     
     // 保存成功後に同じページをリロード
@@ -371,7 +404,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
   // console.log('[COMPONENT RENDER] === PreliminaryForm レンダリング ===')
   // console.log('[COMPONENT RENDER] saving:', saving)
   // console.log('[COMPONENT RENDER] uploading:', uploading)
-  // console.log('[COMPONENT RENDER] videoFile:', !!videoFile)
+  // console.log('[COMPONENT RENDER] videoFiles:', videoFiles)
   // console.log('[COMPONENT RENDER] entryId:', entryId)
 
   return (
@@ -440,11 +473,11 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         {/* 予選提出動画セクション */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h4 className="text-base font-medium text-gray-900 mb-4">
-            予選提出動画 <span className="text-red-500">*</span>
+            予選提出動画（最大3つまで） <span className="text-red-500">*</span>
           </h4>
-          
-          {!videoFile && (
-            <p className="text-sm text-red-600 mb-4">予選動画のアップロードは必須です</p>
+
+          {!videoFiles.some(file => file !== null) && (
+            <p className="text-sm text-red-600 mb-4">予選動画を少なくとも1つアップロードしてください</p>
           )}
           
           {/* アップロード中のプログレスバー */}
@@ -473,121 +506,133 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             <div className="text-sm text-blue-800 space-y-1">
               <p>動画のアップロード中は画面を操作せず、そのままお待ちください。</p>
               <p>アップロード処理はネットワーク環境により数分かかることがあります。<span className="text-red-600 font-bold">Wifi環境(5GHz帯)等、通信環境の良い場所での利用</span>を推奨いたします。</p>
+              <p className="text-indigo-700 font-semibold">最大3つまで動画をアップロード可能です。</p>
             </div>
           </div>
-          
-          {videoFile ? (
-            <div className="space-y-4">
-              {/* 動画プレビュー */}
-              {videoUrl ? (
-                <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
-                  <div className="aspect-video">
-                    <video
-                      controls
-                      className="w-full h-full object-contain bg-black"
-                      src={videoUrl}
-                      key={`${videoFile.id}_${videoUrl}`}
-                    >
-                      お使いのブラウザは動画タグをサポートしていません。
-                    </video>
-                  </div>
-                </div>
-              ) : (
-                <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <svg className="animate-spin h-8 w-8 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p className="text-gray-500">動画を読み込んでいます...</p>
-                  </div>
-                </div>
-              )}
-              
-              {/* ファイル情報 */}
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                        </svg>
+
+          {/* 動画アップロードエリア */}
+          <div className="space-y-4">
+            {[0, 1, 2].map((index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">
+                  予選動画 {index + 1}
+                  {index === 0 && <span className="text-red-500 ml-1">*</span>}
+                </h5>
+
+                {videoFiles[index] ? (
+                  <div className="space-y-4">
+                    {/* 動画プレビュー */}
+                    {videoUrls[index] ? (
+                      <div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg overflow-hidden border border-indigo-200">
+                        <div className="aspect-video">
+                          <video
+                            controls
+                            className="w-full h-full object-contain bg-black"
+                            src={videoUrls[index]!}
+                            key={`${videoFiles[index]?.id}_${videoUrls[index]}`}
+                          >
+                            お使いのブラウザは動画タグをサポートしていません。
+                          </video>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 p-8 text-center">
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <svg className="animate-spin h-8 w-8 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <p className="text-gray-500">動画を読み込んでいます...</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ファイル情報 */}
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                              <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {videoFiles[index]!.file_name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              ビデオファイル • {videoFiles[index]!.file_size && `${(videoFiles[index]!.file_size! / 1024 / 1024).toFixed(2)} MB`}
+                            </p>
+                            <p className="text-xs text-green-600 mt-1 flex items-center">
+                              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              アップロード完了
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileDelete(index)}
+                          disabled={uploading || !isEditable}
+                          className={`ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full transition-colors duration-200 ${
+                            !isEditable || uploading
+                              ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-50'
+                              : 'text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer'
+                          }`}
+                        >
+                          <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
+                          削除
+                        </button>
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {videoFile.file_name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        ビデオファイル • {videoFile.file_size && `${(videoFile.file_size / 1024 / 1024).toFixed(2)} MB`}
-                      </p>
-                      <p className="text-xs text-green-600 mt-1 flex items-center">
-                        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        アップロード完了
-                      </p>
+
+                    {/* アップロード完了メッセージ */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-green-800">
+                            予選動画{index + 1}のアップロードが完了しました
+                          </p>
+                          <p className="mt-1 text-sm text-green-700">
+                            変更する場合は現在の動画を削除してから新しい動画をアップロードしてください。
+                          </p>
+                          {index === 0 && (
+                            <p className="mt-1 text-sm font-medium text-green-800">
+                              メインの予選動画です。
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-600 mt-2">
+                            動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600 font-semibold">保存ボタンをクリック</span>してください。
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleFileDelete}
-                    disabled={uploading || !isEditable}
-                    className={`ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full transition-colors duration-200 ${
-                      !isEditable || uploading
-                        ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-50'
-                        : 'text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer'
-                    }`}
-                  >
-                    <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                    削除
-                  </button>
-                </div>
+                ) : (
+                  <VideoUpload
+                    label=""
+                    value=""
+                    onChange={(file: File) => handleFileUpload(file, index)}
+                    onDelete={() => handleFileDelete(index)}
+                    disabled={uploading || !!videoFiles[index] || !entryId || !isEditable}
+                    required={index === 0}
+                    maxSizeMB={1500}
+                    accept="video/*"
+                  />
+                )}
               </div>
-              
-              {/* アップロード完了メッセージ */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-green-800">
-                      予選動画のアップロードが完了しました
-                    </p>
-                    <p className="mt-1 text-sm text-green-700">
-                      動画は1つのみアップロード可能です。変更する場合は現在の動画を削除してから新しい動画をアップロードしてください。
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-green-800">
-                      この動画は予選提出に必須です。
-                    </p>
-                    <p className="text-xs text-gray-600 mt-2">
-                      動画の追加/削除を行った場合は必ず画面下部の<span className="text-red-600 font-semibold">保存ボタンをクリック</span>してください。
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <VideoUpload
-              label="予選提出動画"
-              value={(() => {
-                const fileName = videoFile ? (videoFile as EntryFile).file_name : ''
-                return fileName
-              })()}
-              onChange={handleFileUpload}
-              onDelete={() => handleFileDelete()}
-              disabled={uploading || !!videoFile || !entryId || !isEditable}
-              required
-              maxSizeMB={1500}
-              accept="video/*"
-            />
-          )}
+            ))}
+          </div>
         </div>
 
         {/* 楽曲著作権情報セクション */}

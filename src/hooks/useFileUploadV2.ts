@@ -48,6 +48,7 @@ interface UploadOptions {
   field?: string
   folder?: string
   path?: string
+  index?: number
 }
 
 export function useFileUploadV2({
