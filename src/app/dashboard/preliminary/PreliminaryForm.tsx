@@ -572,24 +572,24 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
 
                     {/* ファイル情報 */}
                     <div className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex items-center space-x-3 min-w-0">
                           <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                              <svg className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                            <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                              <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
                               </svg>
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">
+                            <p className="text-sm font-semibold text-gray-900 break-all">
                               {videoFiles[index]!.file_name}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-xs text-gray-600">
                               ビデオファイル • {videoFiles[index]!.file_size && `${(videoFiles[index]!.file_size! / 1024 / 1024).toFixed(2)} MB`}
                             </p>
                             <p className="text-xs text-green-600 mt-1 flex items-center">
-                              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                              <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               アップロード完了
@@ -600,7 +600,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                           type="button"
                           onClick={() => handleFileDelete(index)}
                           disabled={uploading || !isEditable}
-                          className={`ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full transition-colors duration-200 ${
+                          className={`flex-shrink-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full transition-colors duration-200 ${
                             !isEditable || uploading
                               ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-50'
                               : 'text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer'
