@@ -143,28 +143,31 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const fetchVideoUrls = async () => {
       if (!entryId) return
 
-      // データベースから予選動画を取得
+      // データベースから予選動画を取得（preliminary_1, preliminary_2, preliminary_3を取得）
       const { data: files } = await supabase
         .from('entry_files')
         .select('*')
         .eq('entry_id', entryId)
         .eq('file_type', 'video')
-        .eq('purpose', 'preliminary')
+        .in('purpose', ['preliminary', 'preliminary_1', 'preliminary_2', 'preliminary_3'])
         .order('uploaded_at', { ascending: true })
 
       const newVideoFiles: (EntryFile | null)[] = [null, null, null]
       const newVideoUrls: (string | null)[] = [null, null, null]
 
       if (files && files.length > 0) {
-        // ファイルごとにvideo_indexメタデータをチェック
         for (const file of files) {
-          // video_indexがmetadataに保存されていればそれを使用
-          // なければ既存の順番で配置
           let index = 0
-          if (file.metadata && typeof file.metadata === 'object' && 'video_index' in file.metadata) {
-            index = (file.metadata as { video_index: number }).video_index
-          } else {
-            // 既存のファイルは最初の空いている位置に配置
+
+          // purposeから位置を判定
+          if (file.purpose === 'preliminary_1') {
+            index = 0
+          } else if (file.purpose === 'preliminary_2') {
+            index = 1
+          } else if (file.purpose === 'preliminary_3') {
+            index = 2
+          } else if (file.purpose === 'preliminary') {
+            // 旧形式の場合は最初の空いている位置に配置
             for (let i = 0; i < 3; i++) {
               if (!newVideoFiles[i]) {
                 index = i
@@ -173,7 +176,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
             }
           }
 
-          if (index >= 0 && index < 3) {
+          if (index >= 0 && index < 3 && !newVideoFiles[index]) {
             newVideoFiles[index] = file
             if (file.file_path) {
               const url = await fetchSignedUrl(file.file_path)
@@ -202,6 +205,9 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
       const fileName = originalFileName || filePath.split('/').pop() || ''
       console.log('[SAVE VIDEO] 保存ファイル名:', { originalFileName, extractedName: filePath.split('/').pop(), finalFileName: fileName, index })
 
+      // インデックスを示すpurpose値を作成
+      const purposeValue = `preliminary_${index + 1}`
+
       const { data: fileData, error: dbError } = await supabase
         .from('entry_files')
         .insert({
@@ -209,8 +215,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           file_type: 'video',
           file_name: fileName, // 元の日本語ファイル名を保持
           file_path: filePath,
-          purpose: 'preliminary',
-          metadata: { video_index: index } // インデックスをメタデータに保存
+          purpose: purposeValue // インデックスをpurposeに含める
         })
         .select()
         .single()
@@ -643,7 +648,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
                     onChange={(file: File) => handleFileUpload(file, index)}
                     onDelete={() => handleFileDelete(index)}
                     disabled={uploading || !!videoFiles[index] || !entryId || !isEditable}
-                    required={index === 0}
+                    required={false}
                     maxSizeMB={1500}
                     accept="video/*"
                   />
