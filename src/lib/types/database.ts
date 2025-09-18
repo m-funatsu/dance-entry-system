@@ -73,6 +73,7 @@ export interface EntryFile {
   file_size?: number
   mime_type?: string
   purpose?: string
+  metadata?: Record<string, unknown>
   uploaded_at: string
 }
 

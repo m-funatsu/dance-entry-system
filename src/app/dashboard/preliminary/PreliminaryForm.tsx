@@ -143,7 +143,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
     const fetchVideoUrls = async () => {
       if (!entryId) return
 
-      // データベースから予選動画を取得（最大3つ）
+      // データベースから予選動画を取得
       const { data: files } = await supabase
         .from('entry_files')
         .select('*')
@@ -151,17 +151,34 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
         .eq('file_type', 'video')
         .eq('purpose', 'preliminary')
         .order('uploaded_at', { ascending: true })
-        .limit(3)
 
       const newVideoFiles: (EntryFile | null)[] = [null, null, null]
       const newVideoUrls: (string | null)[] = [null, null, null]
 
       if (files && files.length > 0) {
-        for (let i = 0; i < Math.min(files.length, 3); i++) {
-          newVideoFiles[i] = files[i]
-          if (files[i].file_path) {
-            const url = await fetchSignedUrl(files[i].file_path)
-            newVideoUrls[i] = url
+        // ファイルごとにvideo_indexメタデータをチェック
+        for (const file of files) {
+          // video_indexがmetadataに保存されていればそれを使用
+          // なければ既存の順番で配置
+          let index = 0
+          if (file.metadata && typeof file.metadata === 'object' && 'video_index' in file.metadata) {
+            index = (file.metadata as { video_index: number }).video_index
+          } else {
+            // 既存のファイルは最初の空いている位置に配置
+            for (let i = 0; i < 3; i++) {
+              if (!newVideoFiles[i]) {
+                index = i
+                break
+              }
+            }
+          }
+
+          if (index >= 0 && index < 3) {
+            newVideoFiles[index] = file
+            if (file.file_path) {
+              const url = await fetchSignedUrl(file.file_path)
+              newVideoUrls[index] = url
+            }
           }
         }
       }
@@ -192,7 +209,8 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           file_type: 'video',
           file_name: fileName, // 元の日本語ファイル名を保持
           file_path: filePath,
-          purpose: 'preliminary'
+          purpose: 'preliminary',
+          metadata: { video_index: index } // インデックスをメタデータに保存
         })
         .select()
         .single()
@@ -511,7 +529,7 @@ export default function PreliminaryForm({ entryId, initialData, preliminaryVideo
           </div>
 
           {/* 動画アップロードエリア */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {[0, 1, 2].map((index) => (
               <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white">
                 <h5 className="text-sm font-medium text-gray-700 mb-3">
