@@ -305,7 +305,7 @@ export default async function PreliminaryInfoListPage() {
                       <div className="space-y-1">
                         {Array.isArray(preliminaryInfo.entry_files) && preliminaryInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) =>
                           file.purpose === 'preliminary' || file.purpose === 'preliminary_1' || file.purpose === 'preliminary_2' || file.purpose === 'preliminary_3'
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }, index: number) => (
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
