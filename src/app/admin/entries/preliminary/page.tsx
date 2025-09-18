@@ -303,9 +303,9 @@ export default async function PreliminaryInfoListPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="space-y-1">
-                        {Array.isArray(preliminaryInfo.entry_files) && preliminaryInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => 
-                          file.purpose === 'preliminary'
-                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) => (
+                        {Array.isArray(preliminaryInfo.entry_files) && preliminaryInfo.entry_files.filter((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }) =>
+                          file.purpose === 'preliminary' || file.purpose === 'preliminary_1' || file.purpose === 'preliminary_2' || file.purpose === 'preliminary_3'
+                        ).map((file: { id: string; file_name: string; file_path: string; file_type: string; purpose?: string }, index: number) => (
                           <div key={file.id}>
                             <a
                               href={getFileUrl(file.file_path)}
@@ -313,11 +313,16 @@ export default async function PreliminaryInfoListPage() {
                               rel="noopener noreferrer"
                               className="text-xs text-indigo-600 hover:text-indigo-500 underline block"
                             >
-                              {getFileIcon(file.file_type, file.file_name)} {file.file_name}
+                              {getFileIcon(file.file_type, file.file_name)}
+                              {file.purpose === 'preliminary_1' || file.purpose === 'preliminary_2' || file.purpose === 'preliminary_3' ?
+                                `動画${file.purpose.split('_')[1]}: ` : ''}
+                              {file.file_name}
                             </a>
                           </div>
                         ))}
-                        {(!Array.isArray(preliminaryInfo.entry_files) || !preliminaryInfo.entry_files.some((file: { purpose?: string }) => file.purpose === 'preliminary')) && (
+                        {(!Array.isArray(preliminaryInfo.entry_files) || !preliminaryInfo.entry_files.some((file: { purpose?: string }) =>
+                          file.purpose === 'preliminary' || file.purpose === 'preliminary_1' || file.purpose === 'preliminary_2' || file.purpose === 'preliminary_3'
+                        )) && (
                           <span className="text-xs text-gray-400">ファイルなし</span>
                         )}
                       </div>
