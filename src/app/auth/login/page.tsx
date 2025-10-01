@@ -269,25 +269,17 @@ export default function LoginPage() {
               </button>
             </div>
             <div>
-              <p>
-                <span 
-                  className="block sm:inline"
-                  style={{color: '#FFD700', fontSize: '16.5px'}}
-                >
-                  アカウントをお持ちでない場合は、
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    console.log('🔸 [LOGIN] 新規登録リンククリック')
-                    window.location.href = '/auth/register'
-                  }}
-                  className="cursor-pointer underline bg-transparent border-none"
-                  style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
-                >
-                  新規登録
-                </button>
-              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('🔸 [LOGIN] 新規登録リンククリック')
+                  window.location.href = '/auth/register'
+                }}
+                className="cursor-pointer underline bg-transparent border-none"
+                style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
+              >
+                新規登録
+              </button>
             </div>
           </div>
         </form>
