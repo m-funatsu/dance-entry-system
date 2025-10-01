@@ -254,33 +254,18 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="text-center space-y-3 sm:space-y-2">
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  console.log('🔸 [LOGIN] パスワード忘れリンククリック')
-                  window.location.href = '/auth/reset-password'
-                }}
-                className="bg-transparent border-none cursor-pointer underline"
-                style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
-              >
-                パスワードを忘れた方はこちら
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  console.log('🔸 [LOGIN] 新規登録リンククリック')
-                  window.location.href = '/auth/register'
-                }}
-                className="cursor-pointer underline bg-transparent border-none"
-                style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
-              >
-                新規登録
-              </button>
-            </div>
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => {
+                console.log('🔸 [LOGIN] パスワード忘れリンククリック')
+                window.location.href = '/auth/reset-password'
+              }}
+              className="bg-transparent border-none cursor-pointer underline"
+              style={{color: 'rgb(217,217,217)', fontSize: '16.5px'}}
+            >
+              パスワードを忘れた方はこちら
+            </button>
           </div>
         </form>
       </div>
