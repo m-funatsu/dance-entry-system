@@ -261,8 +261,8 @@ export default async function SemifinalsInfoListPage() {
               '21. 振付師情報',
               '22. 小道具情報',
               '23. 賞金振込先情報',
-              '24. レギュレーションチェック',
-              '25. リハーサル参加',
+              '24. リハーサル参加',
+              '25. レギュレーションチェック',
               '26. 選考ステータス'
             ]}
             filename="semifinals_info_16columns"
@@ -353,11 +353,11 @@ export default async function SemifinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     24. 賞金振込先情報
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    25. レギュレーションチェック
-                  </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    26. リハーサル参加
+                    25. リハーサル参加
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    26. レギュレーションチェック
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
                     27. 選考ステータス
@@ -760,7 +760,16 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
 
-                    {/* 25. レギュレーションチェック */}
+                    {/* 25. リハーサル参加 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <span className={semifinalsInfo.rehearsal_participation === '希望する' ? 'text-green-600' : 'text-gray-600'}>
+                          {semifinalsInfo.rehearsal_participation || '未選択'}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* 26. レギュレーションチェック */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900 space-y-1">
                         <div className="flex items-center">
@@ -787,15 +796,6 @@ export default async function SemifinalsInfoListPage() {
                           </span>
                           <span className="ml-1">反社会的内容禁止</span>
                         </div>
-                      </div>
-                    </td>
-
-                    {/* 26. リハーサル参加 */}
-                    <td className="px-3 py-3">
-                      <div className="text-xs text-gray-900">
-                        <span className={semifinalsInfo.rehearsal_participation === '希望する' ? 'text-green-600' : 'text-gray-600'}>
-                          {semifinalsInfo.rehearsal_participation || '未選択'}
-                        </span>
                       </div>
                     </td>
 
