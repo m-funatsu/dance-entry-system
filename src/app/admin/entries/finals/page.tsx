@@ -279,7 +279,12 @@ export default async function FinalsInfoListPage() {
               item.choreography_after_change || '',
               // 作品振付師出席情報
               item.choreographer_attendance || '',
-              item.choreographer_photo_permission || ''
+              item.choreographer_photo_permission || '',
+              // レギュレーション
+              item.lift_regulation ? '確認済み' : '未確認',
+              item.no_props ? '確認済み' : '未確認',
+              item.performance_time ? '確認済み' : '未確認',
+              item.no_antisocial ? '確認済み' : '未確認'
             ])}
             headers={[
               '1. システム利用者名',
@@ -349,7 +354,11 @@ export default async function FinalsInfoListPage() {
               '65. 振付師・振付変更情報 - 変更前（準決勝振付）',
               '66. 振付師・振付変更情報 - 変更後（決勝振付）',
               '67. 振付師・振付変更情報 - 作品振付師出席予定',
-              '68. 振付師・振付変更情報 - 作品振付師写真掲載'
+              '68. 振付師・振付変更情報 - 作品振付師写真掲載',
+              '69. レギュレーション - リフト規定確認',
+              '70. レギュレーション - 小道具禁止確認',
+              '71. レギュレーション - 演技時間確認',
+              '72. レギュレーション - 反社会的内容禁止確認'
             ]}
             filename="finals_info"
           />
@@ -442,6 +451,9 @@ export default async function FinalsInfoListPage() {
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
                     25. 振付師写真
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    26. レギュレーションチェック
                   </th>
                 </tr>
               </thead>
@@ -908,6 +920,34 @@ export default async function FinalsInfoListPage() {
                         )) && !finalsInfo.file_urls?.choreographer_photo_path && (
                           <span className="text-xs text-gray-400">写真なし</span>
                         )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900 space-y-1">
+                        <div className="flex items-center">
+                          <span className={finalsInfo.lift_regulation ? 'text-green-600' : 'text-red-600'}>
+                            {finalsInfo.lift_regulation ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">リフト規定</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={finalsInfo.no_props ? 'text-green-600' : 'text-red-600'}>
+                            {finalsInfo.no_props ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">小道具禁止</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={finalsInfo.performance_time ? 'text-green-600' : 'text-red-600'}>
+                            {finalsInfo.performance_time ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">演技時間</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={finalsInfo.no_antisocial ? 'text-green-600' : 'text-red-600'}>
+                            {finalsInfo.no_antisocial ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">反社会的禁止</span>
+                        </div>
                       </div>
                     </td>
                   </tr>

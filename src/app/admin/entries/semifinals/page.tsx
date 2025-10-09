@@ -226,6 +226,10 @@ export default async function SemifinalsInfoListPage() {
               `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
               // 賞金振込先情報
               `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
+              // レギュレーションチェック
+              `リフト規定:${item.lift_regulation ? '✓' : '✗'} 小道具禁止:${item.no_props ? '✓' : '✗'} 演技時間:${item.performance_time ? '✓' : '✗'} 反社会的内容禁止:${item.no_antisocial ? '✓' : '✗'}`,
+              // リハーサル参加
+              item.rehearsal_participation || '未選択',
               // 選考ステータス
               getStatusLabel(item.entries?.status)
             ])}
@@ -256,8 +260,10 @@ export default async function SemifinalsInfoListPage() {
               '19. 照明シーン チェイサー',
               '21. 振付師情報',
               '22. 小道具情報',
-              '24. 賞金振込先情報',
-              '25. 選考ステータス'
+              '23. 賞金振込先情報',
+              '24. レギュレーションチェック',
+              '25. リハーサル参加',
+              '26. 選考ステータス'
             ]}
             filename="semifinals_info_16columns"
           />
@@ -347,8 +353,14 @@ export default async function SemifinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     24. 賞金振込先情報
                   </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    25. レギュレーションチェック
+                  </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    25. 選考ステータス
+                    26. リハーサル参加
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
+                    27. 選考ステータス
                   </th>
                 </tr>
               </thead>
@@ -747,8 +759,47 @@ export default async function SemifinalsInfoListPage() {
                         <div><strong>口座名義:</strong> {semifinalsInfo.account_holder || '未入力'}</div>
                       </div>
                     </td>
-                    
-                    {/* 24. 選考ステータス */}
+
+                    {/* 25. レギュレーションチェック */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900 space-y-1">
+                        <div className="flex items-center">
+                          <span className={semifinalsInfo.lift_regulation ? 'text-green-600' : 'text-red-600'}>
+                            {semifinalsInfo.lift_regulation ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">リフト規定</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={semifinalsInfo.no_props ? 'text-green-600' : 'text-red-600'}>
+                            {semifinalsInfo.no_props ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">小道具禁止</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={semifinalsInfo.performance_time ? 'text-green-600' : 'text-red-600'}>
+                            {semifinalsInfo.performance_time ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">演技時間</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className={semifinalsInfo.no_antisocial ? 'text-green-600' : 'text-red-600'}>
+                            {semifinalsInfo.no_antisocial ? '✓' : '✗'}
+                          </span>
+                          <span className="ml-1">反社会的内容禁止</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* 26. リハーサル参加 */}
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-900">
+                        <span className={semifinalsInfo.rehearsal_participation === '希望する' ? 'text-green-600' : 'text-gray-600'}>
+                          {semifinalsInfo.rehearsal_participation || '未選択'}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* 27. 選考ステータス */}
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(semifinalsInfo.entries?.status)}`}>
                         {getStatusLabel(semifinalsInfo.entries?.status)}
