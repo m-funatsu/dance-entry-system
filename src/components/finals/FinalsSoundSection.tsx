@@ -1,6 +1,6 @@
 'use client'
 
-import { FormField, AudioUpload } from '@/components/ui'
+import { FormField } from '@/components/ui'
 import type { FinalsInfo } from '@/lib/types'
 
 interface FinalsSoundSectionProps {
@@ -24,22 +24,12 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
   validationErrors,
   onChange,
   onSoundChangeOption,
-  onFileUpload,
-  onFileDelete,
-  audioFiles,
   isEditable = true,
-  uploading = false,
-  progress = 0
 }) => {
-  console.log('[FINALS SOUND SECTION DEBUG] === FinalsSoundSection レンダリング ===')
-  console.log('[FINALS SOUND SECTION DEBUG] audioFiles:', audioFiles)
-  console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.chaser_song:', audioFiles?.chaser_song)
-  console.log('[FINALS SOUND SECTION DEBUG] audioFiles?.music_data_path:', audioFiles?.music_data_path)
-  console.log('[FINALS SOUND SECTION DEBUG] finalsInfo.chaser_song:', finalsInfo.chaser_song)
   return (
     <div className="space-y-4">
       <h4 className="font-medium text-gray-900">音響指示情報</h4>
-      
+
       {validationErrors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <p className="text-sm text-red-800 font-medium">以下の項目を入力してください：</p>
@@ -50,7 +40,7 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
           </ul>
         </div>
       )}
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
           準決勝との音響指示 <span className="text-red-500">*</span>
@@ -88,127 +78,6 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         name="sound_start_timing"
         value={finalsInfo.sound_start_timing || ''}
         onChange={(e) => onChange({ sound_start_timing: e.target.value })}
-        disabled={soundChangeOption === 'same' || !isEditable}
-        required={soundChangeOption === 'different'}
-      />
-
-      <FormField
-        label="チェイサー（退場）曲の指定 *"
-        name="chaser_song_designation"
-        type="select"
-        value={finalsInfo.chaser_song_designation || ''}
-        onChange={(e) => {
-          const newValue = e.target.value
-          onChange({ chaser_song_designation: newValue })
-          
-          // 「自作曲に組み込み」または「不要（無音）」選択時は音源ファイルを削除
-          if ((newValue === '自作曲に組み込み' || newValue === '不要（無音）')) {
-            if ((finalsInfo.chaser_song && finalsInfo.chaser_song.trim()) || audioFiles?.chaser_song) {
-              console.log('[FINALS CHASER CHANGE] チェイサー曲指定変更 - 音源を削除:', newValue)
-              if (onFileDelete) {
-                onFileDelete('chaser_song')
-              }
-            }
-          }
-        }}
-        disabled={soundChangeOption === 'same' || !isEditable}
-        required={soundChangeOption === 'different'}
-      >
-        <option value="">選択してください</option>
-        <option value="自作曲に組み込み">自作曲に組み込み</option>
-        <option value="必要">必要</option>
-        <option value="不要（無音）">不要（無音）</option>
-      </FormField>
-
-      {finalsInfo.chaser_song_designation === '必要' && (
-        <div>
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-            <div className="text-sm text-yellow-800 space-y-2">
-              <p className="font-medium">チェイサー（退場曲）について</p>
-              <p>
-                作品に一般曲（自作曲ではない楽曲）をご指定の場合、作品と同じ楽曲を使用することは不可とさせていただきます。
-              </p>
-              <p>
-                チェイサー楽曲が必要な場合は、下記サイトより楽曲をお選びいただき、下記に楽曲データをアップロードお願いいたします。
-              </p>
-              <div className="space-y-1 mt-2">
-                <p>
-                  <a href="https://dova-s.jp/" target="_blank" rel="noopener noreferrer" 
-                     className="text-blue-600 hover:text-blue-800 underline">
-                    DOVA-SYNDROME
-                  </a>
-                </p>
-                <p>
-                  <a href="https://bgmer.net/" target="_blank" rel="noopener noreferrer"
-                     className="text-blue-600 hover:text-blue-800 underline">
-                    BGMer
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* アップロード中のプログレスバー */}
-          {uploading && (
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
-              <div className="flex items-center mb-2">
-                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span className="text-sm font-medium text-blue-800">
-                  チェイサー曲音源をアップロード中... {Math.round(progress)}%
-                </span>
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-          
-          <AudioUpload
-            label="チェイサー（退場）曲 音源 *"
-            value={finalsInfo.chaser_song || ''}
-            displayName={audioFiles?.chaser_song?.file_name}
-            onChange={(file) => {
-              console.log('[FINALS CHASER UPLOAD] === 決勝チェイサー曲ファイル選択 ===')
-              console.log('[FINALS CHASER UPLOAD] 選択されたファイル:', file.name)
-              onFileUpload('chaser_song', file)
-            }}
-            onDelete={onFileDelete ? () => {
-              console.log('[FINALS CHASER DELETE] === 決勝チェイサー曲削除 ===')
-              onFileDelete('chaser_song')
-            } : undefined}
-            disabled={soundChangeOption === 'same' || !isEditable}
-            required={soundChangeOption === 'different' && finalsInfo.chaser_song_designation === '必要'}
-            deletable={soundChangeOption === 'different'} // 異なる音響指示時のみ削除可能
-            accept=".wav,.mp3,.m4a"
-          />
-          <p className="text-xs text-gray-600 mt-2">
-            チェイサー（退場）曲音源の追加/削除を行った場合は必ず画面下部の<span className="text-red-600">保存ボタンをクリック</span>してください。
-          </p>
-        </div>
-      )}
-
-      <FormField
-        label="フェードアウト開始時間 *"
-        name="fade_out_start_time"
-        value={finalsInfo.fade_out_start_time || ''}
-        onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
-        placeholder="例：3:45"
-        disabled={soundChangeOption === 'same' || !isEditable}
-        required={soundChangeOption === 'different'}
-      />
-
-      <FormField
-        label="フェードアウト完了時間 *"
-        name="fade_out_complete_time"
-        value={finalsInfo.fade_out_complete_time || ''}
-        onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
-        placeholder="例：4:00"
         disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       />

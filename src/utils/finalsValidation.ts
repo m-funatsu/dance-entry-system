@@ -28,14 +28,8 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (!data.sound_change_from_semifinals && data.sound_change_from_semifinals !== false) {
         errors.push('準決勝との音響指示を選択してください')
       }
-      // すべての音響指示項目が常時必須
+      // 音楽スタートのタイミングのみ必須
       if (!data.sound_start_timing) errors.push('音楽スタートのタイミング')
-      if (!data.chaser_song_designation) errors.push('チェイサー（退場）曲の指定')
-      if (data.chaser_song_designation === '必要' && !data.chaser_song) {
-        errors.push('チェイサー（退場）曲音源')
-      }
-      if (!data.fade_out_start_time) errors.push('フェードアウト開始時間')
-      if (!data.fade_out_complete_time) errors.push('フェードアウト完了時間')
       break
 
     case 'lighting':
