@@ -10,7 +10,7 @@ import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { DebugLogger } from '@/lib/debug-logger'
-import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection, RegulationSection } from '@/components/semifinals'
+import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection, RegulationSection, RehearsalSection } from '@/components/semifinals'
 import { 
   validateSemifinalsSection, 
   semifinalsSections 
@@ -898,6 +898,14 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
 
       {activeSection === 'regulation' && (
         <RegulationSection
+          semifinalsInfo={semifinalsInfo}
+          onChange={handleFieldChange}
+          isEditable={isEditable}
+        />
+      )}
+
+      {activeSection === 'rehearsal' && (
+        <RehearsalSection
           semifinalsInfo={semifinalsInfo}
           onChange={handleFieldChange}
           isEditable={isEditable}

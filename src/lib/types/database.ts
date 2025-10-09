@@ -280,6 +280,8 @@ export interface SemifinalsInfo {
   no_props?: boolean
   performance_time?: boolean
   no_antisocial?: boolean
+  // リハーサル参加
+  rehearsal_participation?: string
   created_at: string
   created_by?: string
   updated_at: string

@@ -75,6 +75,11 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       if (!data.performance_time) errors.push('演技時間の確認')
       if (!data.no_antisocial) errors.push('反社会的内容禁止の確認')
       break
+
+    case 'rehearsal':
+      // リハーサル参加確認（必須）
+      if (!data.rehearsal_participation) errors.push('リハーサルへの参加を選択してください')
+      break
   }
 
   return errors
@@ -82,15 +87,15 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
 
 export const validateAllSemifinalsSection = (data: Partial<SemifinalsInfo>, options?: { hasPaymentSlip?: boolean }) => {
   const allErrors: Record<string, string[]> = {}
-  const sectionIds = ['music', 'sound', 'lighting', 'choreographer', 'bank', 'regulation']
-  
+  const sectionIds = ['music', 'sound', 'lighting', 'choreographer', 'bank', 'regulation', 'rehearsal']
+
   sectionIds.forEach(sectionId => {
     const errors = validateSemifinalsSection(sectionId, data, options)
     if (errors.length > 0) {
       allErrors[sectionId] = errors
     }
   })
-  
+
   return allErrors
 }
 
@@ -105,7 +110,8 @@ export const semifinalsSections = [
   { id: 'lighting', label: '照明指示情報' },
   { id: 'choreographer', label: '振付情報' },
   { id: 'bank', label: '本大会エントリー料振込確認 / 賞金振込先情報' },
-  { id: 'regulation', label: 'レギュレーション' }
+  { id: 'regulation', label: 'レギュレーション' },
+  { id: 'rehearsal', label: 'リハーサル' }
 ]
 
 export const colorTypes = ['暖色系', '寒色系', 'その他色指定']
