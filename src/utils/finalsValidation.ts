@@ -117,11 +117,11 @@ export const isFinalsAllRequiredFieldsValid = (data: Partial<FinalsInfo>) => {
 }
 
 export const finalsSections = [
-  { id: 'regulation', label: 'レギュレーション' },
   { id: 'music', label: '楽曲情報' },
   { id: 'sound', label: '音響指示情報' },
   { id: 'lighting', label: '照明指示情報' },
-  { id: 'choreographer', label: '振付変更情報・作品振付師出席情報' }
+  { id: 'choreographer', label: '振付変更情報・作品振付師出席情報' },
+  { id: 'regulation', label: 'レギュレーション' }
 ]
 
 export const finalsColorTypes = [

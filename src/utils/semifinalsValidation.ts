@@ -96,12 +96,12 @@ export const isSemifinalsAllRequiredFieldsValid = (data: Partial<SemifinalsInfo>
 }
 
 export const semifinalsSections = [
-  { id: 'regulation', label: 'レギュレーション' },
   { id: 'music', label: '楽曲情報' },
   { id: 'sound', label: '音響指示情報' },
   { id: 'lighting', label: '照明指示情報' },
   { id: 'choreographer', label: '振付情報' },
-  { id: 'bank', label: '本大会エントリー料振込確認 / 賞金振込先情報' }
+  { id: 'bank', label: '本大会エントリー料振込確認 / 賞金振込先情報' },
+  { id: 'regulation', label: 'レギュレーション' }
 ]
 
 export const colorTypes = ['暖色系', '寒色系', 'その他色指定']

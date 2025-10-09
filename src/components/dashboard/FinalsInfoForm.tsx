@@ -26,7 +26,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   const [loading, setLoading] = useState(false)
   
   console.log('FinalsInfoForm isEditable:', isEditable)
-  const [activeSection, setActiveSection] = useState('regulation')
+  const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
@@ -1141,14 +1141,6 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           />
 
           {/* 各セクションのコンテンツ */}
-      {activeSection === 'regulation' && (
-        <FinalsRegulationSection
-          finalsInfo={finalsInfo}
-          onChange={handleFieldChange}
-          isEditable={isEditable}
-        />
-      )}
-
       {activeSection === 'music' && (
         <FinalsMusicSection
           finalsInfo={finalsInfo}
@@ -1208,6 +1200,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           isEditable={isEditable}
           uploading={uploading}
           progress={progress}
+        />
+      )}
+
+      {activeSection === 'regulation' && (
+        <FinalsRegulationSection
+          finalsInfo={finalsInfo}
+          onChange={handleFieldChange}
+          isEditable={isEditable}
         />
       )}
 

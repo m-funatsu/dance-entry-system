@@ -45,7 +45,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeSection, setActiveSection] = useState('regulation')
+  const [activeSection, setActiveSection] = useState('music')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
@@ -813,14 +813,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       />
 
       {/* 各セクションのコンテンツ */}
-      {activeSection === 'regulation' && (
-        <RegulationSection
-          semifinalsInfo={semifinalsInfo}
-          onChange={handleFieldChange}
-          isEditable={isEditable}
-        />
-      )}
-
       {activeSection === 'music' && (
         <MusicSection
           semifinalsInfo={semifinalsInfo}
@@ -901,6 +893,14 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           onPaymentSlipStatusChange={(hasFile) => setHasPaymentSlip(hasFile)}
           uploading={uploading}
           progress={progress}
+        />
+      )}
+
+      {activeSection === 'regulation' && (
+        <RegulationSection
+          semifinalsInfo={semifinalsInfo}
+          onChange={handleFieldChange}
+          isEditable={isEditable}
         />
       )}
 
