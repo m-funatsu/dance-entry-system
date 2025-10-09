@@ -29,7 +29,7 @@ export function FinalsRegulationSection({
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex justify-between items-start mb-2">
         <h3 className="text-lg font-semibold text-gray-900">レギュレーション確認</h3>
-        <span className="text-sm text-red-500">* 必須項目</span>
+        <span className="text-sm text-red-500">* は必須項目です</span>
       </div>
       <p className="text-sm text-gray-600 mb-4">
         決勝作品が、以下のレギュレーションを満たしていることを確認し、チェックボックスにチェックください。
