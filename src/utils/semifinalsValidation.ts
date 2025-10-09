@@ -67,6 +67,10 @@ export const validateSemifinalsSection = (sectionId: string, data: Partial<Semif
       // 振込確認用紙のアップロード状態をチェック
       if (!options?.hasPaymentSlip) errors.push('振込確認用紙')
       break
+
+    case 'regulation':
+      // レギュレーションチェックは必須ではない（確認用）
+      break
   }
 
   return errors
@@ -92,6 +96,7 @@ export const isSemifinalsAllRequiredFieldsValid = (data: Partial<SemifinalsInfo>
 }
 
 export const semifinalsSections = [
+  { id: 'regulation', label: 'レギュレーション' },
   { id: 'music', label: '楽曲情報' },
   { id: 'sound', label: '音響指示情報' },
   { id: 'lighting', label: '照明指示情報' },

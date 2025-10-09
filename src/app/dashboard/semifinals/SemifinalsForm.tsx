@@ -10,7 +10,7 @@ import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { DebugLogger } from '@/lib/debug-logger'
-import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection } from '@/components/semifinals'
+import { MusicSection, SoundSection, LightingSection, ChoreographerSection, BankSection, RegulationSection } from '@/components/semifinals'
 import { 
   validateSemifinalsSection, 
   semifinalsSections 
@@ -45,7 +45,7 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
   
   const [preliminaryInfo, setPreliminaryInfo] = useState<PreliminaryInfo | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeSection, setActiveSection] = useState('music')
+  const [activeSection, setActiveSection] = useState('regulation')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [audioFiles, setAudioFiles] = useState<Record<string, EntryFile>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
@@ -813,6 +813,14 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       />
 
       {/* 各セクションのコンテンツ */}
+      {activeSection === 'regulation' && (
+        <RegulationSection
+          semifinalsInfo={semifinalsInfo}
+          onChange={handleFieldChange}
+          isEditable={isEditable}
+        />
+      )}
+
       {activeSection === 'music' && (
         <MusicSection
           semifinalsInfo={semifinalsInfo}

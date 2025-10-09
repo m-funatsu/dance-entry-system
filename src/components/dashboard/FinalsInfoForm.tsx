@@ -8,7 +8,7 @@ import { StartDateNotice } from '@/components/ui/StartDateNotice'
 import { useFormSave } from '@/hooks'
 import { useFileUploadV2 } from '@/hooks/useFileUploadV2'
 import { updateFormStatus, checkFinalsInfoCompletion } from '@/lib/status-utils'
-import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection } from '@/components/finals'
+import { FinalsMusicSection, FinalsSoundSection, FinalsLightingSection, FinalsChoreographerSection, FinalsRegulationSection } from '@/components/finals'
 import { 
   validateFinalsSection, 
   finalsSections 
@@ -26,7 +26,7 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
   const [loading, setLoading] = useState(false)
   
   console.log('FinalsInfoForm isEditable:', isEditable)
-  const [activeSection, setActiveSection] = useState('music')
+  const [activeSection, setActiveSection] = useState('regulation')
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [isStartDateAvailable, setIsStartDateAvailable] = useState(false)
 
@@ -1141,6 +1141,14 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
           />
 
           {/* 各セクションのコンテンツ */}
+      {activeSection === 'regulation' && (
+        <FinalsRegulationSection
+          finalsInfo={finalsInfo}
+          onChange={handleFieldChange}
+          isEditable={isEditable}
+        />
+      )}
+
       {activeSection === 'music' && (
         <FinalsMusicSection
           finalsInfo={finalsInfo}

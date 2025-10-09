@@ -275,6 +275,11 @@ export interface SemifinalsInfo {
   account_type?: string
   account_number?: string
   account_holder?: string
+  // レギュレーションチェック項目
+  lift_regulation?: boolean
+  no_props?: boolean
+  performance_time?: boolean
+  no_antisocial?: boolean
   created_at: string
   created_by?: string
   updated_at: string
@@ -361,6 +366,11 @@ export interface FinalsInfo {
   choreographer_attendance?: string
   choreographer_photo_permission?: string
   choreographer_photo_path?: string
+  // レギュレーションチェック項目
+  lift_regulation?: boolean
+  no_props?: boolean
+  performance_time?: boolean
+  no_antisocial?: boolean
   created_at: string
   created_by?: string
   updated_at: string

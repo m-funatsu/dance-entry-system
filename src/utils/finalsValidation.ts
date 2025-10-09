@@ -88,6 +88,10 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       if (!data.choreographer_photo_permission) errors.push('作品振付師写真掲載')
       if (!data.choreographer_photo_path) errors.push('作品振付師写真')
       break
+
+    case 'regulation':
+      // レギュレーションチェックは必須ではない（確認用）
+      break
   }
 
   return errors
@@ -113,6 +117,7 @@ export const isFinalsAllRequiredFieldsValid = (data: Partial<FinalsInfo>) => {
 }
 
 export const finalsSections = [
+  { id: 'regulation', label: 'レギュレーション' },
   { id: 'music', label: '楽曲情報' },
   { id: 'sound', label: '音響指示情報' },
   { id: 'lighting', label: '照明指示情報' },
