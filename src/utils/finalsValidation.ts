@@ -90,7 +90,11 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
       break
 
     case 'regulation':
-      // レギュレーションチェックは必須ではない（確認用）
+      // レギュレーションチェック項目（すべて必須）
+      if (!data.lift_regulation) errors.push('リフト規定の確認')
+      if (!data.no_props) errors.push('小道具使用禁止の確認')
+      if (!data.performance_time) errors.push('演技時間の確認')
+      if (!data.no_antisocial) errors.push('反社会的内容禁止の確認')
       break
   }
 
@@ -99,7 +103,7 @@ export const validateFinalsSection = (sectionId: string, data: Partial<FinalsInf
 
 export const validateAllFinalsSection = (data: Partial<FinalsInfo>) => {
   const allErrors: Record<string, string[]> = {}
-  const sectionIds = ['music', 'sound', 'lighting', 'choreographer']
+  const sectionIds = ['music', 'sound', 'lighting', 'choreographer', 'regulation']
   
   sectionIds.forEach(sectionId => {
     const errors = validateFinalsSection(sectionId, data)

@@ -27,7 +27,10 @@ export function RegulationSection({
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">レギュレーション確認</h3>
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-lg font-semibold text-gray-900">レギュレーション確認</h3>
+        <span className="text-sm text-red-500">* 必須項目</span>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         準決勝作品が、以下のレギュレーションを満たしていることを確認し、チェックボックスにチェックください。
       </p>
@@ -46,6 +49,7 @@ export function RegulationSection({
               disabled={!isEditable}
             />
             <span className="text-sm text-gray-700">
+              <span className="text-red-500">* </span>
               リフトは規定内であること（1回のリフトは15秒以下かつ３回以下）
             </span>
           </label>
@@ -59,6 +63,7 @@ export function RegulationSection({
               disabled={!isEditable}
             />
             <span className="text-sm text-gray-700">
+              <span className="text-red-500">* </span>
               小道具を使わないこと（選手の衣装の一部ではないアイテム、衣装と切り離すことができるアイテムは小道具とみなされる）
             </span>
           </label>
@@ -72,6 +77,7 @@ export function RegulationSection({
               disabled={!isEditable}
             />
             <span className="text-sm text-gray-700">
+              <span className="text-red-500">* </span>
               演技は時間内であること（フロアーに入場又は曲のスタートのいずれか早い方から退場までが４分以内）
             </span>
           </label>
@@ -85,7 +91,7 @@ export function RegulationSection({
               disabled={!isEditable}
             />
             <div className="text-sm text-gray-700">
-              <div>反社会的な印象を受ける作品、衣装等ではないこと</div>
+              <div><span className="text-red-500">* </span>反社会的な印象を受ける作品、衣装等ではないこと</div>
               <ul className="mt-1 ml-4 text-xs text-gray-600 list-disc space-y-1">
                 <li>反社会的な印象を与えるもの、まを想起・肯定・助長するもの</li>
                 <li>人種・民族・国籍・宗教・性別・性的指向・障がい等に対する差別やヘイト表現、宗教的または政治的な主張を目的とするもの（教義や信条の賛否を訴える表現、布教・批判を含む）</li>
