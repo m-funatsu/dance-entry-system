@@ -38,19 +38,28 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
   const [paymentSlipFiles, setPaymentSlipFiles] = useState<EntryFile[]>([])  // 複数の払込用紙を管理
   const [paymentSlipUrls, setPaymentSlipUrls] = useState<{ [key: string]: string }>({})  // ファイルIDとURLのマッピング
   const [uploadingFile, setUploadingFile] = useState(false)
+  // メイク・ヘアメイク関連の状態変数（現在非表示のため一時的にコメントアウト）
   const [makeupStyle1File, setMakeupStyle1File] = useState<EntryFile | null>(null)  // 希望スタイル①画像（準決勝）
-  const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL（準決勝）
+  // const [makeupStyle1Url, setMakeupStyle1Url] = useState<string>('')  // 希望スタイル①画像URL（準決勝）
+  const [, setMakeupStyle1Url] = useState<string>('')
   const [makeupStyle2File, setMakeupStyle2File] = useState<EntryFile | null>(null)  // 希望スタイル②画像（準決勝）
-  const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL（準決勝）
-  const [uploadingMakeupFile, setUploadingMakeupFile] = useState(false)
-  const [basicInfo, setBasicInfo] = useState<Partial<BasicInfo> | null>(null)  // 基本情報
-  const [makeupApplicant, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（準決勝）
+  // const [makeupStyle2Url, setMakeupStyle2Url] = useState<string>('')  // 希望スタイル②画像URL（準決勝）
+  const [, setMakeupStyle2Url] = useState<string>('')
+  // const [uploadingMakeupFile, setUploadingMakeupFile] = useState(false)
+  const [, setUploadingMakeupFile] = useState(false)
+  // const [basicInfo, setBasicInfo] = useState<Partial<BasicInfo> | null>(null)  // 基本情報
+  const [, setBasicInfo] = useState<Partial<BasicInfo> | null>(null)
+  // const [makeupApplicant, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（準決勝）
+  const [, setMakeupApplicant] = useState<'representative' | 'partner' | ''>('')
   // 決勝用の状態
-  const [makeupApplicantFinal, setMakeupApplicantFinal] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（決勝）
+  // const [makeupApplicantFinal, setMakeupApplicantFinal] = useState<'representative' | 'partner' | ''>('')  // メイク申請者（決勝）
+  const [, setMakeupApplicantFinal] = useState<'representative' | 'partner' | ''>('')
   const [makeupStyle1FileFinal, setMakeupStyle1FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル①画像（決勝）
-  const [makeupStyle1UrlFinal, setMakeupStyle1UrlFinal] = useState<string>('')  // 希望スタイル①画像URL（決勝）
+  // const [makeupStyle1UrlFinal, setMakeupStyle1UrlFinal] = useState<string>('')  // 希望スタイル①画像URL（決勝）
+  const [, setMakeupStyle1UrlFinal] = useState<string>('')
   const [makeupStyle2FileFinal, setMakeupStyle2FileFinal] = useState<EntryFile | null>(null)  // 希望スタイル②画像（決勝）
-  const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
+  // const [makeupStyle2UrlFinal, setMakeupStyle2UrlFinal] = useState<string>('')  // 希望スタイル②画像URL（決勝）
+  const [, setMakeupStyle2UrlFinal] = useState<string>('')
 
   // ファイルアップロードフック（ドキュメント用）
   const { uploadImage, uploading: uploadingDocument, progress: progressDocument } = useFileUploadV2({
@@ -537,8 +546,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
     }
   }
 
-  // メイクスタイル画像のアップロード処理
-  const handleMakeupStyleUpload = async (file: File, styleNumber: 1 | 2, isFinal: boolean = false) => {
+  // メイクスタイル画像のアップロード処理（現在非表示のため一時的にコメントアウト）
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _handleMakeupStyleUpload = async (file: File, styleNumber: 1 | 2, isFinal: boolean = false) => {
     try {
       setUploadingMakeupFile(true)
       const fileExt = file.name.split('.').pop()
@@ -615,8 +625,9 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
     }
   }
 
-  // メイクスタイル画像の削除処理
-  const handleMakeupStyleDelete = async (styleNumber: 1 | 2, isFinal: boolean = false) => {
+  // メイクスタイル画像の削除処理（現在非表示のため一時的にコメントアウト）
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _handleMakeupStyleDelete = async (styleNumber: 1 | 2, isFinal: boolean = false) => {
     const stage = isFinal ? '（決勝）' : '（準決勝）'
     if (!window.confirm(`希望スタイル${styleNumber === 1 ? '①' : '②'}${stage}の画像を削除してもよろしいですか？`)) return
 
@@ -734,16 +745,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
           >
             払込用紙
           </button>
-          <button
-            onClick={() => setActiveTab('makeup')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm cursor-pointer ${
-              activeTab === 'makeup'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            メイク・ヘアメイク予約申請
-          </button>
+          {/* メイク・ヘアメイク予約申請タブを非表示にしています */}
         </nav>
       </div>
 
@@ -930,8 +932,8 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
         </div>
       )}
 
-      {/* メイク・ヘアメイク予約申請 */}
-      {activeTab === 'makeup' && (
+      {/* メイク・ヘアメイク予約申請 - 現在非表示 */}
+      {/* {activeTab === 'makeup' && (
         <div className="space-y-8">
           <h4 className="font-medium text-gray-900">メイク・ヘアメイク予約申請</h4>
           
@@ -949,7 +951,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
             </div>
           </div>
 
-          {/* 準決勝用 */}
+          {/* 準決勝用 */}{/*
           <div className="border rounded-lg p-6 space-y-4">
             <h5 className="font-medium text-lg border-b pb-2 text-gray-900">準決勝用</h5>
             
@@ -1181,7 +1183,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
             </div>
           </div>
 
-          {/* 決勝用 */}
+          {/* 決勝用 */}{/*
           <div className="border rounded-lg p-6 space-y-4">
             <h5 className="font-medium text-lg border-b pb-2 text-gray-900">決勝用</h5>
             <p className="text-sm text-gray-600">※決勝でメイク・ヘアメイクを変更される場合はご記入ください。</p>
@@ -1402,7 +1404,7 @@ export default function ApplicationsForm({ entry, isEditable = true }: Applicati
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* 払込用紙 */}
       {activeTab === 'payment' && (
