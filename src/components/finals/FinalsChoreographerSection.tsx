@@ -122,7 +122,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         <h4 className="font-medium mb-4 text-gray-900">振付変更</h4>
         <div className="bg-gray-50 p-4 rounded-lg space-y-4">
           <FormField
-            label="振付変更部分（曲が始まってから何分何秒の部分か） *"
+            label={<>振付変更部分（曲が始まってから何分何秒の部分か） <span className="text-red-500">*</span></>}
             name="choreography_change_timing"
             value={finalsInfo.choreography_change_timing || ''}
             onChange={(e) => onChange({ choreography_change_timing: e.target.value })}
@@ -131,7 +131,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           />
 
           <FormField
-            label="変更前（準決勝振付） *"
+            label={<>変更前（準決勝振付） <span className="text-red-500">*</span></>}
             name="choreography_before_change"
             type="textarea"
             value={finalsInfo.choreography_before_change || ''}
@@ -142,7 +142,7 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
           />
 
           <FormField
-            label="変更後（決勝振付） *"
+            label={<>変更後（決勝振付） <span className="text-red-500">*</span></>}
             name="choreography_after_change"
             type="textarea"
             value={finalsInfo.choreography_after_change || ''}
