@@ -41,11 +41,29 @@ export function checkFormCompletion(
   
   requiredFields.forEach(field => {
     const value = formData[field]
-    // boolean値の場合は true/false どちらも有効とする
-    const isValid = typeof value === 'boolean' ? true : !!(value && value.toString().trim() !== '')
+    // レギュレーション関連のboolean値フィールドは true の場合のみ有効
+    const isRegulationField = ['lift_regulation', 'no_props', 'performance_time', 'no_antisocial'].includes(field)
+    // rehearsal_participationは文字列型（「希望する」/「希望しない」）
+    const isRehearsalField = field === 'rehearsal_participation'
+
+    let isValid: boolean
+    if (isRehearsalField) {
+      // リハーサル参加は「希望する」の場合のみ有効
+      isValid = value === '希望する'
+    } else if (isRegulationField && typeof value === 'boolean') {
+      // レギュレーション項目は true の場合のみ有効
+      isValid = value === true
+    } else if (typeof value === 'boolean') {
+      // その他のboolean値は true/false どちらも有効
+      isValid = true
+    } else {
+      // 文字列等の通常フィールド
+      isValid = !!(value && value.toString().trim() !== '')
+    }
+
     fieldResults[field] = isValid
-    console.log(`[${formName.toUpperCase()} CHECK] ${field}: "${value}" (${typeof value}) -> ${isValid}`)
-    
+    console.log(`[${formName.toUpperCase()} CHECK] ${field}: "${value}" (${typeof value}) -> ${isValid}${isRegulationField ? ' [REGULATION]' : ''}${isRehearsalField ? ' [REHEARSAL]' : ''}`)
+
     if (!isValid) {
       missingFields.push(field)
     }
