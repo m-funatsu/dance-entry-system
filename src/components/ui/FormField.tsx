@@ -80,7 +80,11 @@ export const FormField = memo<FormFieldProps>(({
   return (
     <div>
       <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
+        {typeof label === 'string' ? (
+          <>{label} {required && <span className="text-red-500">*</span>}</>
+        ) : (
+          label
+        )}
       </label>
       {renderField()}
       {type === 'textarea' && maxLength && (

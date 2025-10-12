@@ -16,7 +16,7 @@ export interface ButtonProps {
 
 // Form field component props
 export interface FormFieldProps {
-  label: string
+  label: string | ReactNode
   name: string
   type?: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select' | 'date' | 'datetime-local'
   value: string | number
