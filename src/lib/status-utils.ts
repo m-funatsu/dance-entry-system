@@ -48,8 +48,8 @@ export function checkFormCompletion(
 
     let isValid: boolean
     if (isRehearsalField) {
-      // リハーサル参加は「希望する」の場合のみ有効
-      isValid = value === '希望する'
+      // リハーサル参加は「希望する」または「希望しない」の場合有効（未選択の場合のみ無効）
+      isValid = value === '希望する' || value === '希望しない'
     } else if (isRegulationField && typeof value === 'boolean') {
       // レギュレーション項目は true の場合のみ有効
       isValid = value === true
