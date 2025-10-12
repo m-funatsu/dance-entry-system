@@ -1085,10 +1085,29 @@ export default function FinalsInfoForm({ entry, isEditable = true }: FinalsInfoF
 
     await save(dataToSave)
     console.log('[FINALS SAVE] データベース保存完了')
-    
-    // 必須項目が完了している場合はステータスを「登録済み」に更新
-    const isComplete = checkFinalsInfoCompletion(finalsInfo)
-    await updateFormStatus('finals_info', entry.id, isComplete)
+
+    // 保存後の最新データを取得してステータス更新
+    const { data: savedData } = await supabase
+      .from('finals_info')
+      .select('*')
+      .eq('entry_id', entry.id)
+      .single()
+
+    if (savedData) {
+      // 保存されたデータでステータスチェック
+      const isComplete = checkFinalsInfoCompletion(savedData)
+      await updateFormStatus('finals_info', entry.id, isComplete, true)
+
+      console.log('[FINALS SAVE] ステータス更新完了', {
+        isComplete,
+        hasAllRegulations: !!(
+          savedData.lift_regulation &&
+          savedData.no_props &&
+          savedData.performance_time &&
+          savedData.no_antisocial
+        )
+      })
+    }
     
     // 保存成功後の処理
     setValidationErrors({})

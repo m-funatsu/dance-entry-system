@@ -727,12 +727,12 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
 
     try {
       await save(dataToSave) // 保存
-      
+
       debugLogger.log('SEMIFINALS SAVE', '準決勝情報保存完了', {
         message: '保存処理完了',
         work_title_kana_saved: dataToSave.work_title_kana
       })
-      
+
       // 準決勝保存後に決勝情報を同期
       console.log('[SEMIFINALS SAVE] 決勝情報との同期を開始')
       try {
@@ -743,6 +743,30 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         console.error('[SEMIFINALS SAVE] 決勝情報同期エラー:', syncError)
         // 同期エラーは保存成功を阻害しない
       }
+
+      // 保存後の最新データを取得してステータス更新
+      const { data: savedData } = await supabase
+        .from('semifinals_info')
+        .select('*')
+        .eq('entry_id', entry.id)
+        .single()
+
+      if (savedData) {
+        // 保存されたデータでステータスチェック
+        const isComplete = await checkSemifinalsInfoCompletion(savedData, entry.id)
+        await updateFormStatus('semifinals_info', entry.id, isComplete, true)
+
+        console.log('[SEMIFINALS SAVE] ステータス更新完了', {
+          isComplete,
+          hasAllRegulations: !!(
+            savedData.lift_regulation &&
+            savedData.no_props &&
+            savedData.performance_time &&
+            savedData.no_antisocial &&
+            savedData.rehearsal_participation
+          )
+        })
+      }
     } catch (saveError) {
       trackBehaviorDifference('SEMIFINALS', 'SAVE_ERROR', 'error', {
         errorMessage: saveError instanceof Error ? saveError.message : String(saveError),
@@ -752,10 +776,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       console.error('保存エラー詳細:', saveError)
       throw saveError
     }
-    
-    // 必須項目が完了している場合はステータスを「登録済み」に更新
-    const isComplete = await checkSemifinalsInfoCompletion(semifinalsInfo, entry.id)
-    await updateFormStatus('semifinals_info', entry.id, isComplete)
     
     // 保存成功後にページをリロード
     trackBehaviorDifference('SEMIFINALS', 'SAVE_SUCCESS', 'success', {
