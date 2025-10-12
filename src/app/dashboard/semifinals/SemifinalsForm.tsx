@@ -751,9 +751,10 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
         .eq('entry_id', entry.id)
         .single()
 
+      let isComplete = false
       if (savedData) {
         // 保存されたデータでステータスチェック
-        const isComplete = await checkSemifinalsInfoCompletion(savedData, entry.id)
+        isComplete = await checkSemifinalsInfoCompletion(savedData, entry.id)
         await updateFormStatus('semifinals_info', entry.id, isComplete, true)
 
         console.log('[SEMIFINALS SAVE] ステータス更新完了', {
@@ -767,6 +768,12 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
           )
         })
       }
+
+      // 保存成功後にページをリロード
+      trackBehaviorDifference('SEMIFINALS', 'SAVE_SUCCESS', 'success', {
+        isComplete: isComplete,
+        reloadMethod: 'window.location.reload'
+      })
     } catch (saveError) {
       trackBehaviorDifference('SEMIFINALS', 'SAVE_ERROR', 'error', {
         errorMessage: saveError instanceof Error ? saveError.message : String(saveError),
@@ -776,12 +783,6 @@ export default function SemifinalsForm({ entry, userId, isEditable = true }: Sem
       console.error('保存エラー詳細:', saveError)
       throw saveError
     }
-    
-    // 保存成功後にページをリロード
-    trackBehaviorDifference('SEMIFINALS', 'SAVE_SUCCESS', 'success', {
-      isComplete: isComplete,
-      reloadMethod: 'window.location.reload'
-    })
     
     showToast('準決勝情報を保存しました', 'success')
     
