@@ -79,12 +79,32 @@ export default async function EntryDetailPage({ params }: PageProps) {
   // 署名付きURLを生成する関数
   const generateSignedUrl = async (path: string | null | undefined) => {
     if (!path) return null
-    
-    // すでにURLの場合はそのまま返す
+
+    // すでにURLの場合、ファイルパスを抽出
     if (path.startsWith('http://') || path.startsWith('https://')) {
+      // Supabase URLから実際のファイルパスを抽出
+      if (path.includes('supabase.co/storage/v1/object/sign/files/')) {
+        const match = path.match(/files\/(.*?)(\?|$)/)
+        if (match && match[1]) {
+          const filePath = decodeURIComponent(match[1])
+          console.log('[URL FIX] Extracted file path from URL:', filePath)
+
+          // 抽出したファイルパスから新しい署名付きURLを生成
+          try {
+            const { data } = await adminSupabase.storage
+              .from('files')
+              .createSignedUrl(filePath, 3600) // 1時間有効
+            return data?.signedUrl || path // 生成失敗時は元のURLを返す
+          } catch (error) {
+            console.error('Error generating new signed URL:', error)
+            return path // エラー時は元のURLを返す
+          }
+        }
+      }
+      // Supabase URL以外はそのまま返す
       return path
     }
-    
+
     try {
       const { data } = await adminSupabase.storage
         .from('files')
