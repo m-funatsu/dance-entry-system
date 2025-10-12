@@ -348,17 +348,15 @@ export default async function FinalsInfoListPage() {
               '59. 振付師・振付変更情報 - 振付師 氏名フリガナ①',
               '60. 振付師・振付変更情報 - 振付師 氏名②',
               '61. 振付師・振付変更情報 - 振付師 氏名フリガナ②',
-              '62. 振付師・振付変更情報 - 小道具の有無',
-              '63. 振付師・振付変更情報 - 利用する小道具',
-              '64. 振付師・振付変更情報 - 振付変更部分（曲が始まってから何分何秒の部分か）',
-              '65. 振付師・振付変更情報 - 変更前（準決勝振付）',
-              '66. 振付師・振付変更情報 - 変更後（決勝振付）',
-              '67. 振付師・振付変更情報 - 作品振付師出席予定',
-              '68. 振付師・振付変更情報 - 作品振付師写真掲載',
-              '69. レギュレーション - リフト規定確認',
-              '70. レギュレーション - 小道具禁止確認',
-              '71. レギュレーション - 演技時間確認',
-              '72. レギュレーション - 反社会的内容禁止確認'
+              '62. 振付師・振付変更情報 - 振付変更部分（曲が始まってから何分何秒の部分か）',
+              '63. 振付師・振付変更情報 - 変更前（準決勝振付）',
+              '64. 振付師・振付変更情報 - 変更後（決勝振付）',
+              '65. 振付師・振付変更情報 - 作品振付師出席予定',
+              '66. 振付師・振付変更情報 - 作品振付師写真掲載',
+              '67. レギュレーション - リフト規定確認',
+              '68. レギュレーション - 小道具禁止確認',
+              '69. レギュレーション - 演技時間確認',
+              '70. レギュレーション - 反社会的内容禁止確認'
             ]}
             filename="finals_info"
           />
@@ -444,16 +442,13 @@ export default async function FinalsInfoListPage() {
                     22. 振付師情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    23. 小道具情報
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    24. 作品振付師出席情報
+                    23. 作品振付師出席情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    25. 振付師写真
+                    24. 振付師写真
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    26. レギュレーションチェック
+                    25. レギュレーションチェック
                   </th>
                 </tr>
               </thead>
