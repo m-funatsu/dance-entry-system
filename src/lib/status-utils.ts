@@ -351,7 +351,16 @@ export async function checkSemifinalsInfoCompletion(
     'branch_name',                      // 支店名
     'account_type',                     // 口座種類
     'account_number',                   // 口座番号
-    'account_holder'                    // 口座名義
+    'account_holder',                   // 口座名義
+
+    // レギュレーション（準決勝）
+    'lift_regulation',                  // リフト規定確認
+    'no_props',                         // 小道具使用禁止確認
+    'performance_time',                 // 演技時間確認
+    'no_antisocial',                    // 反社会的内容禁止確認
+
+    // リハーサル参加確認
+    'rehearsal_participation'           // リハーサルへの参加
   ]
   
   // 条件付き必須項目を追加
@@ -551,7 +560,13 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     'props_usage',                  // 小道具の有無
     'choreographer_attendance',     // 作品振付師出席予定
     'choreographer_photo_permission', // 作品振付師写真掲載
-    'choreographer_photo_path'      // 作品振付師写真
+    'choreographer_photo_path',     // 作品振付師写真
+
+    // レギュレーション（決勝）
+    'lift_regulation',              // リフト規定確認
+    'no_props',                     // 小道具使用禁止確認
+    'performance_time',             // 演技時間確認
+    'no_antisocial'                 // 反社会的内容禁止確認
   ]
   
   // 条件付き必須項目を追加
