@@ -291,8 +291,6 @@ export default async function FinalsInfoListPage() {
               item.choreographer_furigana || '',
               item.choreographer2_name || '',
               item.choreographer2_furigana || '',
-              item.props_usage || '',
-              item.props_details || '',
               // 振付変更情報
               item.choreography_change_timing || '',
               item.choreography_before_change || '',
@@ -886,12 +884,6 @@ export default async function FinalsInfoListPage() {
                         <div><strong>①フリガナ:</strong> {finalsInfo.choreographer_furigana || '未入力'}</div>
                         <div><strong>②氏名:</strong> {finalsInfo.choreographer2_name || '未入力'}</div>
                         <div><strong>②フリガナ:</strong> {finalsInfo.choreographer2_furigana || '未入力'}</div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '150px'}}>
-                      <div className="space-y-1 text-xs">
-                        <div><strong>有無:</strong> {finalsInfo.props_usage || '未入力'}</div>
-                        <div><strong>詳細:</strong> {finalsInfo.props_details || '未入力'}</div>
                       </div>
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-900" style={{maxWidth: '150px'}}>
