@@ -362,7 +362,6 @@ export async function checkSemifinalsInfoCompletion(
     // 振付師情報
     'choreographer_name',               // 振付師 氏名①
     'choreographer_name_kana',          // 振付師 氏名フリガナ①
-    'props_usage',                      // 小道具の有無
     
     // 賞金振込先情報
     'bank_name',                        // 銀行名
@@ -389,10 +388,6 @@ export async function checkSemifinalsInfoCompletion(
     conditionallyRequired.push('chaser_song')
   }
   
-  // 小道具詳細（小道具ありの場合のみ必須）
-  if (formData.props_usage === 'あり') {
-    conditionallyRequired.push('props_details')
-  }
   
   const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
   
@@ -575,7 +570,6 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     'choreography_change_timing',   // 振付変更部分（曲が始まってから何分何秒の部分か）
     'choreography_before_change',   // 変更前（準決勝振付）
     'choreography_after_change',    // 変更後（決勝振付）
-    'props_usage',                  // 小道具の有無
     'choreographer_attendance',     // 作品振付師出席予定
     'choreographer_photo_permission', // 作品振付師写真掲載
     'choreographer_photo_path',     // 作品振付師写真
@@ -595,10 +589,6 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     conditionallyRequired.push('chaser_song')
   }
   
-  // 小道具詳細（小道具ありの場合のみ必須）
-  if (formData.props_usage === 'あり') {
-    conditionallyRequired.push('props_details')
-  }
   
   const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
   
