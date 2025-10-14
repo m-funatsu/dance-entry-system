@@ -222,8 +222,6 @@ export default async function SemifinalsInfoListPage() {
               `時間:${item.chaser_exit_time || '未入力'} きっかけ:${item.chaser_exit_trigger || '未入力'} 色:${item.chaser_exit_color_type || '未入力'} その他:${item.chaser_exit_color_other || '未入力'} イメージ:${item.chaser_exit_image || '未入力'} 備考:${item.chaser_exit_notes || '未入力'}`,
               // 振付師情報
               `①${item.choreographer_name || '未入力'} (${item.choreographer_name_kana || '未入力'}) ②${item.choreographer2_name || '未入力'} (${item.choreographer2_furigana || '未入力'})`,
-              // 小道具情報
-              `有無:${item.props_usage || '未入力'} 詳細:${item.props_details || '未入力'}`,
               // 賞金振込先情報
               `${item.bank_name || '未入力'} ${item.branch_name || '未入力'} ${item.account_type || '未入力'} ${item.account_number || '未入力'} ${item.account_holder || '未入力'}`,
               // レギュレーションチェック
@@ -259,11 +257,10 @@ export default async function SemifinalsInfoListPage() {
               '17. 照明シーン5',
               '19. 照明シーン チェイサー',
               '21. 振付師情報',
-              '22. 小道具情報',
-              '23. 賞金振込先情報',
-              '24. リハーサル参加',
-              '25. レギュレーションチェック',
-              '26. 選考ステータス'
+              '22. 賞金振込先情報',
+              '23. リハーサル参加',
+              '24. レギュレーションチェック',
+              '25. 選考ステータス'
             ]}
             filename="semifinals_info_16columns"
           />
@@ -344,23 +341,20 @@ export default async function SemifinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
                     21. 振付師情報
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-36">
-                    22. 小道具情報
-                  </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    23. 振込確認
+                    22. 振込確認
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48">
-                    24. 賞金振込先情報
+                    23. 賞金振込先情報
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    25. リハーサル参加
+                    24. リハーサル参加
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
-                    26. レギュレーションチェック
+                    25. レギュレーションチェック
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
-                    27. 選考ステータス
+                    26. 選考ステータス
                   </th>
                 </tr>
               </thead>
@@ -715,15 +709,7 @@ export default async function SemifinalsInfoListPage() {
                         <div><strong>振付師氏名フリガナ②:</strong> {semifinalsInfo.choreographer2_furigana || '未入力'}</div>
                       </div>
                     </td>
-                    
-                    {/* 21. 小道具情報 */}
-                    <td className="px-3 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="mb-1"><strong>小道具の有無:</strong> {semifinalsInfo.props_usage || '未入力'}</div>
-                        <div><strong>利用する小道具:</strong><br/>{semifinalsInfo.props_details || '未入力'}</div>
-                      </div>
-                    </td>
-                    
+
                     {/* 22. 振込確認 */}
                     <td className="px-3 py-3">
                       <div className="space-y-1">
@@ -748,7 +734,7 @@ export default async function SemifinalsInfoListPage() {
                         )}
                       </div>
                     </td>
-                    
+
                     {/* 23. 賞金振込先情報 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
@@ -760,7 +746,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
 
-                    {/* 25. リハーサル参加 */}
+                    {/* 24. リハーサル参加 */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900">
                         <span className={semifinalsInfo.rehearsal_participation === '希望する' ? 'text-green-600' : 'text-gray-600'}>
@@ -769,7 +755,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
 
-                    {/* 26. レギュレーションチェック */}
+                    {/* 25. レギュレーションチェック */}
                     <td className="px-3 py-3">
                       <div className="text-xs text-gray-900 space-y-1">
                         <div className="flex items-center">
@@ -799,7 +785,7 @@ export default async function SemifinalsInfoListPage() {
                       </div>
                     </td>
 
-                    {/* 27. 選考ステータス */}
+                    {/* 26. 選考ステータス */}
                     <td className="px-3 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(semifinalsInfo.entries?.status)}`}>
                         {getStatusLabel(semifinalsInfo.entries?.status)}
