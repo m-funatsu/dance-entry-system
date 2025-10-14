@@ -154,52 +154,6 @@ export const FinalsChoreographerSection: React.FC<FinalsChoreographerSectionProp
         </div>
       </div>
 
-      {/* 小道具セクション */}
-      <div className="border-t pt-6">
-        <h4 className="font-medium mb-4 text-gray-900">小道具</h4>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
-            小道具の有無 <span className="text-red-500">*</span>
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center text-gray-900">
-              <input
-                type="radio"
-                name="props_usage"
-                value="あり"
-                checked={finalsInfo.props_usage === 'あり'}
-                onChange={() => onChange({ props_usage: 'あり' })}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-              />
-              あり
-            </label>
-            <label className="flex items-center text-gray-900">
-              <input
-                type="radio"
-                name="props_usage"
-                value="なし"
-                checked={finalsInfo.props_usage === 'なし'}
-                onChange={() => onChange({ props_usage: 'なし', props_details: '' })}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-              />
-              なし
-            </label>
-          </div>
-        </div>
-
-        {finalsInfo.props_usage === 'あり' && (
-          <FormField
-            label="利用する小道具"
-            name="props_details"
-            value={finalsInfo.props_details || ''}
-            onChange={(e) => onChange({ props_details: e.target.value })}
-            required
-            placeholder="例：扇子、スカーフ、傘など"
-          />
-        )}
-      </div>
-
       <div className="border-t pt-4">
         <h4 className="font-medium mb-3 text-gray-900">作品振付師出席情報</h4>
         
