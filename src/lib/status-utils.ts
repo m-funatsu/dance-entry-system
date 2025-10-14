@@ -340,9 +340,6 @@ export async function checkSemifinalsInfoCompletion(
     'music_type',                       // 楽曲種類
     'music_data_path',                  // 楽曲データ
     'sound_start_timing',               // 音楽スタートのタイミング（きっかけ、ポーズなど）
-    'chaser_song_designation',          // チェイサー（退場）曲の指定
-    'fade_out_start_time',              // フェードアウト開始時間
-    'fade_out_complete_time',           // フェードアウト完了時間
     
     // 照明指示情報セクション
     'dance_start_timing',               // 準決勝 - 踊り出しタイミング ★追加
@@ -380,15 +377,9 @@ export async function checkSemifinalsInfoCompletion(
     'rehearsal_participation'           // リハーサルへの参加
   ]
   
-  // 条件付き必須項目を追加
+  // 条件付き必須項目を追加（現在は特になし）
   const conditionallyRequired: string[] = []
-  
-  // チェイサー曲（必要な場合のみ必須）
-  if (formData.chaser_song_designation === 'required') {
-    conditionallyRequired.push('chaser_song')
-  }
-  
-  
+
   const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
   
   console.log(`[SEMIFINALS INFO COMPLETION] 基本必須フィールド数: ${baseRequiredFields.length}`)
@@ -543,9 +534,6 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     // 音響指示セクション（常時必須）
     'sound_change_from_semifinals', // 準決勝との音響指示（選択必須）
     'sound_start_timing',           // 音楽スタートのタイミング
-    'chaser_song_designation',      // チェイサー（退場）曲の指定
-    'fade_out_start_time',          // フェードアウト開始時間
-    'fade_out_complete_time',       // フェードアウト完了時間
     
     // 照明指示セクション（常時必須）
     'lighting_change_from_semifinals', // 準決勝との照明指示変更の有無（選択必須）
@@ -581,15 +569,9 @@ export function checkFinalsInfoCompletion(formData: Record<string, unknown>): bo
     'no_antisocial'                 // 反社会的内容禁止確認
   ]
   
-  // 条件付き必須項目を追加
+  // 条件付き必須項目を追加（現在は特になし）
   const conditionallyRequired: string[] = []
-  
-  // チェイサー曲（必要な場合のみ必須）
-  if (formData.chaser_song_designation === '必要') {
-    conditionallyRequired.push('chaser_song')
-  }
-  
-  
+
   const allRequiredFields = [...baseRequiredFields, ...conditionallyRequired]
   
   console.log(`[FINALS INFO COMPLETION] 基本必須フィールド数: ${baseRequiredFields.length}`)
