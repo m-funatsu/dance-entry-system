@@ -258,8 +258,8 @@ export default async function SemifinalsInfoListPage() {
               '19. 照明シーン チェイサー',
               '21. 振付師情報',
               '22. 賞金振込先情報',
-              '23. リハーサル参加',
-              '24. レギュレーションチェック',
+              '23. レギュレーションチェック',
+              '24. リハーサル参加',
               '25. 選考ステータス'
             ]}
             filename="semifinals_info_16columns"
