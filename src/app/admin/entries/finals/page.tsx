@@ -468,6 +468,9 @@ export default async function FinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
                     25. レギュレーションチェック
                   </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    26. 更新日時
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -955,6 +958,19 @@ export default async function FinalsInfoListPage() {
                           </span>
                           <span className="ml-1">反社会的禁止</span>
                         </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-500">
+                        {finalsInfo.updated_at ?
+                          new Date(finalsInfo.updated_at).toLocaleString('ja-JP', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                          : '不明'}
                       </div>
                     </td>
                   </tr>

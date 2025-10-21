@@ -206,6 +206,9 @@ export default async function BasicInfoListPage() {
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ステータス
                   </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    更新日時
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -320,6 +323,19 @@ export default async function BasicInfoListPage() {
                         {basicInfo.entries?.status === 'selected' && '選考通過'}
                         {basicInfo.entries?.status === 'rejected' && '不選考'}
                       </span>
+                    </td>
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-500">
+                        {basicInfo.updated_at ?
+                          new Date(basicInfo.updated_at).toLocaleString('ja-JP', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                          : '不明'}
+                      </div>
                     </td>
                   </tr>
                 ))}
