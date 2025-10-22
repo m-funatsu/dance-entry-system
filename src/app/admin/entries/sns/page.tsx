@@ -138,9 +138,6 @@ export default async function SnsInfoListPage() {
                     選手紹介動画
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    その他詳細
-                  </th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     選考ステータス
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -210,12 +207,6 @@ export default async function SnsInfoListPage() {
                         )) && (
                           <span className="text-xs text-gray-400">選手紹介動画なし</span>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="text-xs text-gray-900">
-                        <div className="text-gray-500">作成: {snsInfo.created_at ? new Date(snsInfo.created_at).toLocaleDateString('ja-JP') : '不明'}</div>
-                        <div className="text-gray-500">更新: {snsInfo.updated_at ? new Date(snsInfo.updated_at).toLocaleDateString('ja-JP') : '不明'}</div>
                       </div>
                     </td>
                     <td className="px-2 py-3 whitespace-nowrap">
