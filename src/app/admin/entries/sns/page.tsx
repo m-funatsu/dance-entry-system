@@ -226,6 +226,7 @@ export default async function SnsInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {snsInfo.updated_at ?
                           new Date(snsInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
