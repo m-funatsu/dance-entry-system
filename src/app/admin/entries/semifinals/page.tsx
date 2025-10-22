@@ -356,6 +356,9 @@ export default async function SemifinalsInfoListPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-24">
                     26. 選考ステータス
                   </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">
+                    27. 更新日時
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -790,6 +793,21 @@ export default async function SemifinalsInfoListPage() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(semifinalsInfo.entries?.status)}`}>
                         {getStatusLabel(semifinalsInfo.entries?.status)}
                       </span>
+                    </td>
+
+                    {/* 27. 更新日時 */}
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-500">
+                        {semifinalsInfo.updated_at ?
+                          new Date(semifinalsInfo.updated_at).toLocaleString('ja-JP', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                          : '不明'}
+                      </div>
                     </td>
                   </tr>
                 ))}

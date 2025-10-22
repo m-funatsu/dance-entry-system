@@ -133,6 +133,8 @@ export default async function ApplicationsInfoListPage() {
       makeup_notes_final: relatedApplicationsInfo?.makeup_notes_final || '',
       // 備考情報
       applications_notes: relatedApplicationsInfo?.applications_notes || '',
+      // 更新日時
+      updated_at: relatedApplicationsInfo?.updated_at || entry.updated_at,
       // エントリー情報
       entries: {
         ...entry,
@@ -283,6 +285,9 @@ export default async function ApplicationsInfoListPage() {
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     メイク(決勝)希望スタイル添付
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    更新日時
                   </th>
                 </tr>
               </thead>
@@ -491,6 +496,21 @@ export default async function ApplicationsInfoListPage() {
                         )) && (
                           <span className="text-xs text-gray-400">画像なし</span>
                         )}
+                      </div>
+                    </td>
+
+                    {/* 更新日時 */}
+                    <td className="px-2 py-3 whitespace-nowrap">
+                      <div className="text-xs text-gray-500">
+                        {applicationsInfo.updated_at ?
+                          new Date(applicationsInfo.updated_at).toLocaleString('ja-JP', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                          : '不明'}
                       </div>
                     </td>
                   </tr>
