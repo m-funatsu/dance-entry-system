@@ -334,6 +334,7 @@ export default async function PreliminaryInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {preliminaryInfo.updated_at ?
                           new Date(preliminaryInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',

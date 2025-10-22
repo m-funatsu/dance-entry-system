@@ -328,6 +328,7 @@ export default async function BasicInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {basicInfo.updated_at ?
                           new Date(basicInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',

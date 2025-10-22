@@ -964,6 +964,7 @@ export default async function FinalsInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {finalsInfo.updated_at ?
                           new Date(finalsInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',

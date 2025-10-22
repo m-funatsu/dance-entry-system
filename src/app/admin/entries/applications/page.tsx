@@ -504,6 +504,7 @@ export default async function ApplicationsInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {applicationsInfo.updated_at ?
                           new Date(applicationsInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',

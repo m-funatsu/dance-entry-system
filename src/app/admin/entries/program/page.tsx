@@ -298,6 +298,7 @@ export default async function ProgramInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {programInfo.updated_at ?
                           new Date(programInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',

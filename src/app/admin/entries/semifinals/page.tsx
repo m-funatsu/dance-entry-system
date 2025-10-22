@@ -800,6 +800,7 @@ export default async function SemifinalsInfoListPage() {
                       <div className="text-xs text-gray-500">
                         {semifinalsInfo.updated_at ?
                           new Date(semifinalsInfo.updated_at).toLocaleString('ja-JP', {
+                            timeZone: 'Asia/Tokyo',
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
