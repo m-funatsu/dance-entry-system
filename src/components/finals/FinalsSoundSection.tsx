@@ -81,6 +81,24 @@ export const FinalsSoundSection: React.FC<FinalsSoundSectionProps> = ({
         disabled={soundChangeOption === 'same' || !isEditable}
         required={soundChangeOption === 'different'}
       />
+
+      <FormField
+        label="フェードアウト開始時間"
+        name="fade_out_start_time"
+        value={finalsInfo.fade_out_start_time || ''}
+        onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
+        disabled={soundChangeOption === 'same' || !isEditable}
+        placeholder="例: 2:45"
+      />
+
+      <FormField
+        label="フェードアウト完了時間"
+        name="fade_out_complete_time"
+        value={finalsInfo.fade_out_complete_time || ''}
+        onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
+        disabled={soundChangeOption === 'same' || !isEditable}
+        placeholder="例: 2:55"
+      />
     </div>
   )
 }

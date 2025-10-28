@@ -50,6 +50,24 @@ export const SoundSection: React.FC<SoundSectionProps> = ({
         disabled={!isEditable}
         required
       />
+
+      <FormField
+        label="フェードアウト開始時間"
+        name="fade_out_start_time"
+        value={semifinalsInfo.fade_out_start_time || ''}
+        onChange={(e) => onChange({ fade_out_start_time: e.target.value })}
+        disabled={!isEditable}
+        placeholder="例: 2:45"
+      />
+
+      <FormField
+        label="フェードアウト完了時間"
+        name="fade_out_complete_time"
+        value={semifinalsInfo.fade_out_complete_time || ''}
+        onChange={(e) => onChange({ fade_out_complete_time: e.target.value })}
+        disabled={!isEditable}
+        placeholder="例: 2:55"
+      />
     </div>
   )
 }
